@@ -1132,7 +1132,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 process.out.outputCommands = cms.untracked.vstring(
       "drop *",
-      "keep *_*bTagNtuple_*_*")
+      "keep *_*BTagNtuple_*_*")
 
 process.e = cms.EndPath(process.out)
 

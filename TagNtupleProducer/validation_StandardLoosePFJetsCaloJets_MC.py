@@ -999,7 +999,7 @@ process.bTagNtuples = cms.Sequence(
     )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(10000)
 )
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -1131,10 +1131,10 @@ process.plots = cms.Path(
   process.svTaggers *
   process.slTagInfos *
   process.slTaggers *
-  process.flavourSeq *
+  process.flavourSeq 
 #  process.bTagValidation * 
 #  process.MEtoEDMConverter
-  process.bTagNtuples
+#  process.bTagNtuples
 )
 
 process.out = cms.OutputModule("PoolOutputModule",
@@ -1143,7 +1143,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 process.out.outputCommands = cms.untracked.vstring(
       "drop *",
-      "keep *_*bTagNtuple_*_*")
+      "keep *_*BTagNtuple_*_*")
 
 process.e = cms.EndPath(process.out)
 
