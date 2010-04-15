@@ -551,7 +551,6 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  addTracksVertex+=math::XYZVector(thisTrack.px(), thisTrack.py(), thisTrack.pz());
 		  vertexP4+=math::XYZTLorentzVector(thisTrack.px(), thisTrack.py(), thisTrack.pz(), thisTrack.p()); // massless hypothesis
 		  vertexP4piHyp+=math::XYZTLorentzVector(thisTrack.px(), thisTrack.py(), thisTrack.pz(), sqrt(0.01948816 + thisTrack.p() * thisTrack.p()) ); // pion mass hypothesis
-		  cout << "The mass is " << vertexP4.M() << endl;
 		}
 	      SVMass.push_back(vertexP4.M());
 	      SVMasspiHyp.push_back(vertexP4piHyp.M());
