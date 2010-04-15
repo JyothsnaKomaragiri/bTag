@@ -91,7 +91,8 @@ class TagNtupleProducer : public edm::EDProducer {
       edm::InputTag electron_tag_infos_;
       edm::InputTag muon_tag_infos_;
       std::vector< edm::ParameterSet > bTag_Config_;
-
+      std::string label_;
+  
 };
 
 //
@@ -135,123 +136,124 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   IP_n_saved_tracks_ = iConfig.getParameter<unsigned int>( "IPnSavedTracks" );
   electron_tag_infos_ = iConfig.getParameter<edm::InputTag>( "ElectronTagInfos" );
   muon_tag_infos_ = iConfig.getParameter<edm::InputTag>( "MuonTagInfos" );
+  label_ = iConfig.getParameter<string>( "Label" );
   
   //Basic Jet Information
-  produces<vector<math::XYZTLorentzVector> >( alias = "jetP4"                  ).setBranchAlias( alias );
-  produces<vector<float> >( alias = "jetPt"                                    ).setBranchAlias( alias );
-  produces<vector<float> >( alias = "jetEta"                                   ).setBranchAlias( alias );
-  produces<vector<float> >( alias = "jetPhi"                                   ).setBranchAlias( alias );
-  produces<vector<float> >( alias = "jetEMFraction"                            ).setBranchAlias( alias );
-  produces<vector<float> >( alias = "jetChargedEmEnergyFraction"               ).setBranchAlias( alias );
-  produces<vector<float> >( alias = "jetNeutralEmEnergyFraction"               ).setBranchAlias( alias );
-  produces<vector<float> >( alias = "jetChargedHadronEnergyFraction"           ).setBranchAlias( alias );
-  produces<vector<float> >( alias = "jetNeutralHadronEnergyFraction"           ).setBranchAlias( alias );
-  produces<vector<float> >( alias = "jetChargedMultiplicity"                   ).setBranchAlias( alias );
-  produces<vector<float> >( alias = "jetMass"                                  ).setBranchAlias( alias );
-  produces<vector<int> >( alias = "jetnConstituents"                           ).setBranchAlias( alias ); 
-  produces<vector<int> >( alias = "jetnTracks"                                 ).setBranchAlias( alias );  
-  produces<vector<math::XYZVector> >(alias = "jetVertex"                       ).setBranchAlias( alias );
-  produces<vector<float> >(alias = "jetVertexChi2"                             ).setBranchAlias( alias );
-  produces<vector<float> >(alias = "jetVertexChi2Ndof"                         ).setBranchAlias( alias );
-  produces<vector<float> >(alias = "jetVertexNormalizedChi2"                   ).setBranchAlias( alias );
+  produces<vector<math::XYZTLorentzVector> >( alias = label_ + "jetP4"                  ).setBranchAlias( alias );
+  produces<vector<float> >( alias = label_ + "jetPt"                                    ).setBranchAlias( alias );
+  produces<vector<float> >( alias = label_ + "jetEta"                                   ).setBranchAlias( alias );
+  produces<vector<float> >( alias = label_ + "jetPhi"                                   ).setBranchAlias( alias );
+  produces<vector<float> >( alias = label_ + "jetEMFraction"                            ).setBranchAlias( alias );
+  produces<vector<float> >( alias = label_ + "jetChargedEmEnergyFraction"               ).setBranchAlias( alias );
+  produces<vector<float> >( alias = label_ + "jetNeutralEmEnergyFraction"               ).setBranchAlias( alias );
+  produces<vector<float> >( alias = label_ + "jetChargedHadronEnergyFraction"           ).setBranchAlias( alias );
+  produces<vector<float> >( alias = label_ + "jetNeutralHadronEnergyFraction"           ).setBranchAlias( alias );
+  produces<vector<float> >( alias = label_ + "jetChargedMultiplicity"                   ).setBranchAlias( alias );
+  produces<vector<float> >( alias = label_ + "jetMass"                                  ).setBranchAlias( alias );
+  produces<vector<int> >( alias = label_ + "jetnConstituents"                           ).setBranchAlias( alias ); 
+  produces<vector<int> >( alias = label_ + "jetnTracks"                                 ).setBranchAlias( alias );  
+  produces<vector<math::XYZVector> >(alias = label_ + "jetVertex"                       ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "jetVertexChi2"                             ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "jetVertexChi2Ndof"                         ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "jetVertexNormalizedChi2"                   ).setBranchAlias( alias );
 
   //MC Truth Information
-  produces<vector<float> >( alias = "MCTrueFlavor"                             ).setBranchAlias( alias ); 
+  produces<vector<float> >( alias = label_ + "MCTrueFlavor"                             ).setBranchAlias( alias ); 
   if(get_SV_tag_infos_)
     {
       //secondaryVertexTagInfos:					               
-      produces<vector<math::XYZVector> >( alias = "SecondaryVertex"                ).setBranchAlias( alias );  
-      produces<vector<float> >( alias = "SV3dDistance"                             ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = "SV3dDistanceError"                        ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = "SV2dDistance"                             ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = "SV2dDistanceError"                        ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = "SVChi2"                                   ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = "SVDegreesOfFreedom"                       ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = "SVNormChi2"                               ).setBranchAlias( alias );   
-      produces<vector<int> >( alias = "SVnSelectedTracks"                                  ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = "SVMass"                                   ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = "SVMasspiHyp"                                   ).setBranchAlias( alias );   
-      produces<vector<int> >( alias = "SVnVertices"                                ).setBranchAlias( alias );   
-      produces<vector<int> >( alias = "SVnVertexTracks"                            ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = "SVjetDeltaR"                            ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = "SVjetAngle"                            ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = "SVjetCosAngle"                            ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = "SVdeltaCosAngle"                            ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = "SVdeltaAngle"                            ).setBranchAlias( alias );   
+      produces<vector<math::XYZVector> >( alias = label_ + "SecondaryVertex"                ).setBranchAlias( alias );  
+      produces<vector<float> >( alias = label_ + "SV3dDistance"                             ).setBranchAlias( alias ); 
+      produces<vector<float> >( alias = label_ + "SV3dDistanceError"                        ).setBranchAlias( alias );   
+      produces<vector<float> >( alias = label_ + "SV2dDistance"                             ).setBranchAlias( alias );   
+      produces<vector<float> >( alias = label_ + "SV2dDistanceError"                        ).setBranchAlias( alias );   
+      produces<vector<float> >( alias = label_ + "SVChi2"                                   ).setBranchAlias( alias );   
+      produces<vector<float> >( alias = label_ + "SVDegreesOfFreedom"                       ).setBranchAlias( alias );   
+      produces<vector<float> >( alias = label_ + "SVNormChi2"                               ).setBranchAlias( alias );   
+      produces<vector<int> >( alias = label_ + "SVnSelectedTracks"                                  ).setBranchAlias( alias );   
+      produces<vector<float> >( alias = label_ + "SVMass"                                   ).setBranchAlias( alias );   
+      produces<vector<float> >( alias = label_ + "SVMasspiHyp"                                   ).setBranchAlias( alias );   
+      produces<vector<int> >( alias = label_ + "SVnVertices"                                ).setBranchAlias( alias );   
+      produces<vector<int> >( alias = label_ + "SVnVertexTracks"                            ).setBranchAlias( alias ); 
+      produces<vector<float> >( alias = label_ + "SVjetDeltaR"                            ).setBranchAlias( alias ); 
+      produces<vector<float> >( alias = label_ + "SVjetAngle"                            ).setBranchAlias( alias ); 
+      produces<vector<float> >( alias = label_ + "SVjetCosAngle"                            ).setBranchAlias( alias ); 
+      produces<vector<float> >( alias = label_ + "SVdeltaCosAngle"                            ).setBranchAlias( alias );   
+      produces<vector<float> >( alias = label_ + "SVdeltaAngle"                            ).setBranchAlias( alias );   
     } 
   if(get_IP_tag_infos_)
     {
       //impactParameterTagInfos
-      produces<vector<int> >( alias = "IPnSelectedTracks"                          ).setBranchAlias( alias );  
-      produces<vector<math::XYZVector> >( alias = "IPghostTrackP3"         ).setBranchAlias( alias );
-      produces<vector<float> >( alias = "IPghostTrackPt"                           ).setBranchAlias( alias );
-      produces<vector<float> >( alias = "IPghostTrackPtRel"                        ).setBranchAlias( alias );
-      produces<vector<float> >( alias = "IPghostTrackEta"                          ).setBranchAlias( alias );
-      produces<vector<float> >( alias = "IPghostTrackPhi"                          ).setBranchAlias( alias );
-      produces<vector<float> >( alias = "IPghostTrackDeltaR"                       ).setBranchAlias( alias );
+      produces<vector<int> >( alias = label_ + "IPnSelectedTracks"                          ).setBranchAlias( alias );  
+      produces<vector<math::XYZVector> >( alias = label_ + "IPghostTrackP3"         ).setBranchAlias( alias );
+      produces<vector<float> >( alias = label_ + "IPghostTrackPt"                           ).setBranchAlias( alias );
+      produces<vector<float> >( alias = label_ + "IPghostTrackPtRel"                        ).setBranchAlias( alias );
+      produces<vector<float> >( alias = label_ + "IPghostTrackEta"                          ).setBranchAlias( alias );
+      produces<vector<float> >( alias = label_ + "IPghostTrackPhi"                          ).setBranchAlias( alias );
+      produces<vector<float> >( alias = label_ + "IPghostTrackDeltaR"                       ).setBranchAlias( alias );
       for(unsigned int iTrack = 0; iTrack < IP_n_saved_tracks_; iTrack++)
 	{
 	  stringstream trackNum;
 	  trackNum << (iTrack+1);
-	  alias = "IP3d"+trackNum.str();
+	  alias = label_ + "IP3d"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = "IP3dError"+trackNum.str();
+	  alias = label_ + "IP3dError"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = "IP3dProbability"+trackNum.str();
+	  alias = label_ + "IP3dProbability"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = "IP3dTrackPtRel"+trackNum.str();
+	  alias = label_ + "IP3dTrackPtRel"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = "IP2d"+trackNum.str();
+	  alias = label_ + "IP2d"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = "IP2dError"+trackNum.str();
+	  alias = label_ + "IP2dError"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = "IP2dProbability"+trackNum.str();
+	  alias = label_ + "IP2dProbability"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = "IP2dTrackPtRel"+trackNum.str();
+	  alias = label_ + "IP2dTrackPtRel"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
 	}
     }
   if(get_SE_tag_infos_)
     {
       //softElectronTagInfos
-      produces<vector<int> >(alias = "nElectrons"                                ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronPt"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronEta"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronPhi"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronNHits"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronNChi2"			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronPtRel"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronSip2d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronSip3d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronP0Par"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronDeltaR"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronEtaRel"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronRatio"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "electronRatioRel"                          ).setBranchAlias( alias );
+      produces<vector<int> >(alias = label_ + "nElectrons"                                ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronPt"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronEta"  			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronPhi"  			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronNHits"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronNChi2"			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronPtRel"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronSip2d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronSip3d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronP0Par"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronDeltaR"  			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronEtaRel"  			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronRatio"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronRatioRel"                          ).setBranchAlias( alias );
     }
   if(get_SM_tag_infos_)
     {
       //softMuonTagInfos	
-      produces<vector<int> >(alias = "nMuons"                                    ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonPt"   			               ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonEta"  			               ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonPhi"  			               ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonNHits"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonNChi2"	         		       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonPtRel"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonSip2d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonSip3d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonP0Par"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonDeltaR"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonEtaRel"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonRatio"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = "muonRatioRel"                              ).setBranchAlias( alias );
+      produces<vector<int> >(alias = label_ + "nMuons"                                    ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonPt"   			               ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonEta"  			               ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonPhi"  			               ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonNHits"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonNChi2"	         		       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonPtRel"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonSip2d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonSip3d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonP0Par"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonDeltaR"  			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonEtaRel"  			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonRatio"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonRatioRel"                              ).setBranchAlias( alias );
     }
   //b tagger outputs configured in python file
   bTag_Config_ = iConfig.getParameter< vector<edm::ParameterSet> >("bTagConfig");
   for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
     {
-      alias = ibTag->getParameter<string>("alias");
+      alias = label_ + ibTag->getParameter<string>("alias");
       produces<vector<float> >( alias ).setBranchAlias( alias ); 
     }
 
@@ -703,79 +705,79 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //Putting Information into the Event
 
   //Basic Jet Information
-  iEvent.put(auto_ptr< vector< math::XYZTLorentzVector> >(new vector< math::XYZTLorentzVector>(jetP4)),"jetP4");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetPt)),"jetPt");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetEta)),"jetEta");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetPhi)),"jetPhi");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetEMFraction)),"jetEMFraction");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetChargedEmEnergyFraction)),"jetChargedEmEnergyFraction");    
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetNeutralEmEnergyFraction)),"jetNeutralEmEnergyFraction");    
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetChargedHadronEnergyFraction)),"jetChargedHadronEnergyFraction");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetNeutralHadronEnergyFraction)),"jetNeutralHadronEnergyFraction");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetChargedMultiplicity)),"jetChargedMultiplicity");        
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetMass)),"jetMass");
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(jetnConstituents)),"jetnConstituents");
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(jetnTracks)),"jetnTracks");
-  iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(jetVertex)),"jetVertex");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexChi2)),"jetVertexChi2");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexChi2Ndof)),"jetVertexChi2Ndof");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexNormalizedChi2)),"jetVertexNormalizedChi2");
+  iEvent.put(auto_ptr< vector< math::XYZTLorentzVector> >(new vector< math::XYZTLorentzVector>(jetP4)),label_+"jetP4");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetPt)),label_+"jetPt");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetEta)),label_+"jetEta");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetPhi)),label_+"jetPhi");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetEMFraction)),label_+"jetEMFraction");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetChargedEmEnergyFraction)),label_+"jetChargedEmEnergyFraction");    
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetNeutralEmEnergyFraction)),label_+"jetNeutralEmEnergyFraction");    
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetChargedHadronEnergyFraction)),label_+"jetChargedHadronEnergyFraction");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetNeutralHadronEnergyFraction)),label_+"jetNeutralHadronEnergyFraction");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetChargedMultiplicity)),label_+"jetChargedMultiplicity");        
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetMass)),label_+"jetMass");
+  iEvent.put(auto_ptr< vector<int> >(new vector<int>(jetnConstituents)),label_+"jetnConstituents");
+  iEvent.put(auto_ptr< vector<int> >(new vector<int>(jetnTracks)),label_+"jetnTracks");
+  iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(jetVertex)),label_+"jetVertex");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexChi2)),label_+"jetVertexChi2");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexChi2Ndof)),label_+"jetVertexChi2Ndof");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexNormalizedChi2)),label_+"jetVertexNormalizedChi2");
 
   //MC Truth Information
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(MCTrueFlavor)),"MCTrueFlavor");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(MCTrueFlavor)),label_+"MCTrueFlavor");
 					               
   //secondaryVertexTagInfos:					               
   if(get_SV_tag_infos_)
     {
-      iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(SecondaryVertex)),"SecondaryVertex");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV3dDistance)),"SV3dDistance");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV3dDistanceError)),"SV3dDistanceError");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV2dDistance)),"SV2dDistance");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV2dDistanceError)),"SV2dDistanceError");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVChi2)),"SVChi2");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVDegreesOfFreedom)),"SVDegreesOfFreedom");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVNormChi2)),"SVNormChi2");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnSelectedTracks)),"SVnSelectedTracks");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVMass)),"SVMass");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVMasspiHyp)),"SVMasspiHyp");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertices)),"SVnVertices");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertexTracks)),"SVnVertexTracks");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetDeltaR)),"SVjetDeltaR");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetAngle)),"SVjetAngle");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetCosAngle)),"SVjetCosAngle");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVdeltaCosAngle)),"SVdeltaCosAngle");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVdeltaAngle)),"SVdeltaAngle");
+      iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(SecondaryVertex)),label_+"SecondaryVertex");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV3dDistance)),label_+"SV3dDistance");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV3dDistanceError)),label_+"SV3dDistanceError");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV2dDistance)),label_+"SV2dDistance");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV2dDistanceError)),label_+"SV2dDistanceError");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVChi2)),label_+"SVChi2");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVDegreesOfFreedom)),label_+"SVDegreesOfFreedom");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVNormChi2)),label_+"SVNormChi2");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnSelectedTracks)),label_+"SVnSelectedTracks");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVMass)),label_+"SVMass");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVMasspiHyp)),label_+"SVMasspiHyp");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertices)),label_+"SVnVertices");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertexTracks)),label_+"SVnVertexTracks");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetDeltaR)),label_+"SVjetDeltaR");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetAngle)),label_+"SVjetAngle");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetCosAngle)),label_+"SVjetCosAngle");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVdeltaCosAngle)),label_+"SVdeltaCosAngle");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVdeltaAngle)),label_+"SVdeltaAngle");
     }          
   //impactParameterTagInfos
   if(get_IP_tag_infos_)
     {
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPnSelectedTracks)),"IPnSelectedTracks");
-      iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(IPghostTrackP3)),"IPghostTrackP3");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackPt)),"IPghostTrackPt");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackPtRel)),"IPghostTrackPtRel");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackEta)),"IPghostTrackEta");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackPhi)),"IPghostTrackPhi");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackDeltaR)),"IPghostTrackDeltaR");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPnSelectedTracks)),label_+"IPnSelectedTracks");
+      iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(IPghostTrackP3)),label_+"IPghostTrackP3");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackPt)),label_+"IPghostTrackPt");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackPtRel)),label_+"IPghostTrackPtRel");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackEta)),label_+"IPghostTrackEta");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackPhi)),label_+"IPghostTrackPhi");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackDeltaR)),label_+"IPghostTrackDeltaR");
       for(unsigned int iTrack = 0; iTrack < IP_n_saved_tracks_; iTrack++)
 	{
 	  string alias;
 	  stringstream trackNum;
 	  trackNum << (iTrack+1);
-	  alias = "IP3d"+trackNum.str();
+	  alias = label_ + "IP3d"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3d[iTrack])),alias);
-	  alias = "IP3dError"+trackNum.str();
+	  alias = label_ + "IP3dError"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dError[iTrack])),alias);
-	  alias = "IP3dProbability"+trackNum.str();
+	  alias = label_ + "IP3dProbability"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dProbability[iTrack])),alias);
-	  alias = "IP3dTrackPtRel"+trackNum.str();
+	  alias = label_ + "IP3dTrackPtRel"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dTrackPtRel[iTrack])),alias);
-	  alias = "IP2d"+trackNum.str();
+	  alias = label_ + "IP2d"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP2d[iTrack])),alias);
-	  alias = "IP2dError"+trackNum.str();
+	  alias = label_ + "IP2dError"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP2dError[iTrack])),alias);
-	  alias = "IP2dProbability"+trackNum.str();
+	  alias = label_ + "IP2dProbability"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP2dProbability[iTrack])),alias);
-	  alias = "IP2dTrackPtRel"+trackNum.str();
+	  alias = label_ + "IP2dTrackPtRel"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP2dTrackPtRel[iTrack])),alias);
 	}
     }
@@ -783,45 +785,45 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //softElectronTagInfos
   if(get_SE_tag_infos_)
     {
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(nElectrons)),"nElectrons");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPt)),"electronPt");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronEta)),"electronEta");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPhi)),"electronPhi");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronNHits)),"electronNHits");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronNChi2)),"electronNChi2");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPtRel)),"electronPtRel");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronSip2d)),"electronSip2d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronSip3d)),"electronSip3d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronP0Par)),"electronP0Par");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronDeltaR)),"electronDeltaR");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronEtaRel)),"electronEtaRel");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronRatio)),"electronRatio");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronRatioRel)),"electronRatioRel");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(nElectrons)),label_+"nElectrons");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPt)),label_+"electronPt");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronEta)),label_+"electronEta");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPhi)),label_+"electronPhi");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronNHits)),label_+"electronNHits");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronNChi2)),label_+"electronNChi2");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPtRel)),label_+"electronPtRel");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronSip2d)),label_+"electronSip2d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronSip3d)),label_+"electronSip3d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronP0Par)),label_+"electronP0Par");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronDeltaR)),label_+"electronDeltaR");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronEtaRel)),label_+"electronEtaRel");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronRatio)),label_+"electronRatio");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronRatioRel)),label_+"electronRatioRel");
     }
 							               
   //softMuonTagInfos	
   if(get_SM_tag_infos_)
     {
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(nMuons)),"nMuons");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPt)),"muonPt");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonEta)),"muonEta");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPhi)),"muonPhi");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonNHits)),"muonNHits");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonNChi2)),"muonNChi2");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPtRel)),"muonPtRel");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonSip2d)),"muonSip2d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonSip3d)),"muonSip3d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonP0Par)),"muonP0Par");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonDeltaR)),"muonDeltaR");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonEtaRel)),"muonEtaRel");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonRatio)),"muonRatio");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonRatioRel)),"muonRatioRel");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(nMuons)),label_+"nMuons");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPt)),label_+"muonPt");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonEta)),label_+"muonEta");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPhi)),label_+"muonPhi");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonNHits)),label_+"muonNHits");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonNChi2)),label_+"muonNChi2");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPtRel)),label_+"muonPtRel");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonSip2d)),label_+"muonSip2d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonSip3d)),label_+"muonSip3d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonP0Par)),label_+"muonP0Par");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonDeltaR)),label_+"muonDeltaR");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonEtaRel)),label_+"muonEtaRel");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonRatio)),label_+"muonRatio");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonRatioRel)),label_+"muonRatioRel");
     }
 
   //b tagger outputs configured in python file
   for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
     {
-      string alias = ibTag->getParameter<string>("alias");
+      string alias = label_ + ibTag->getParameter<string>("alias");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(bTagVectors[ibTag->getParameter<string>("alias")])),alias);
     }  
 }

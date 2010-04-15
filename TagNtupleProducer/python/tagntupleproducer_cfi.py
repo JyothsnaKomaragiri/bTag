@@ -14,6 +14,7 @@ bTagNtuple = cms.EDProducer('TagNtupleProducer',
                             IPnSavedTracks = cms.uint32(3),
                             ElectronTagInfos = cms.InputTag( "softElectronTagInfos" ),
                             MuonTagInfos = cms.InputTag( "softMuonTagInfos" ),
+                            Label = cms.string(""),
                             bTagConfig = cms.VPSet(
                                 cms.PSet(
                                     alias = cms.string("trackCountingHighEffBJetTags"),
