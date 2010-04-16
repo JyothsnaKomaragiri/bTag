@@ -60,11 +60,7 @@ process.PFJetsFilter = cms.EDFilter("PFJetSelector",
 )
 
 #Filter for CaloJets
-process.CaloJetsFilter = cms.EDFilter("CaloJetSelector",
-  src = cms.InputTag("ak5CaloJets"),
-  cut = cms.string("pt > 10.0 && abs(eta) < 2.4 && emEnergyFraction > 0.01"),
-  filter = cms.bool(True)
-)
+process.load("bTag.CommissioningCommonSetup.caloJetIDFilter_cff")
 
 #Filter for removing scraping events
 process.noscraping = cms.EDFilter("FilterOutScraping",
@@ -78,7 +74,7 @@ process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 
 process.ak5CaloJetTracksAssociatorAtVertex = cms.EDProducer("JetTracksAssociatorAtVertex",
    process.j2tParametersVX,
-   jets = cms.InputTag("CaloJetsFilter")
+   jets = cms.InputTag("caloJetIDFilter")
 )
 
 process.ak5PFJetTracksAssociatorAtVertex = process.ak5CaloJetTracksAssociatorAtVertex.clone(
@@ -305,10 +301,10 @@ process.looseSoftPFElectrons = process.softPFElectrons.clone(
   ForwardMVACuts = cms.vdouble(-0.4, 1.0)
 )
 process.standardSoftMuonCaloTagInfos = process.softMuonTagInfos.clone(
-  jets = "CaloJetsFilter"
+  jets = "caloJetIDFilter"
 )
 process.looseSoftMuonCaloTagInfos = process.softMuonTagInfos.clone(
-  jets = "CaloJetsFilter",
+  jets = "caloJetIDFilter",
   leptonChi2Cut = 10.0,
   muonSelection = RecoBTag.SoftLepton.muonSelection.AllTrackerMuons
 )
@@ -319,10 +315,10 @@ process.looseSoftMuonPFTagInfos = process.looseSoftMuonCaloTagInfos.clone(
   jets = "PFJetsFilter"
 )
 process.standardSoftElectronCaloTagInfos = process.softElectronTagInfos.clone(
-  jets = "CaloJetsFilter"
+  jets = "caloJetIDFilter"
 )
 process.looseSoftElectronCaloTagInfos = process.softElectronTagInfos.clone(
-  jets = "CaloJetsFilter",
+  jets = "caloJetIDFilter",
   leptons = "looseSoftPFElectrons"
 )
 process.standardSoftElectronPFTagInfos = process.standardSoftElectronCaloTagInfos.clone(
@@ -413,7 +409,7 @@ process.looseSoftElectronByIP3dPFBJetTags = process.softElectronByIP3dBJetTags.c
 )
 
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
-process.AK5byRef.jets = "CaloJetsFilter"
+process.AK5byRef.jets = "caloJetIDFilter"
 process.AK5PFbyRef = process.AK5byRef.clone(
   jets = "PFJetsFilter"
 )
@@ -866,8 +862,9 @@ process.plots = cms.Path(
   process.bit40 +
   process.noscraping +
   process.oneGoodVertexFilter +
-  cms.ignore(process.PFJetsFilter) +
-  cms.ignore(process.CaloJetsFilter) +
+  cms.ignore(process.PFJetsFilter) *
+  process.ak5JetID *
+  cms.ignore(process.caloJetIDFilter) *
   process.trackAssociation *
   process.ipTagInfos *
   process.svTagInfos *
