@@ -126,6 +126,23 @@ process.looseSecondaryVertexCaloTagInfos.trackSelection.maxDistToAxis = 0.1
 process.looseSecondaryVertexCaloTagInfos.trackSelection.jetDeltaRMax = 0.5
 process.looseSecondaryVertexCaloTagInfos.trackSelection.qualityClass = "tight"
 
+process.standardCombinedSecondaryVertex = process.combinedSecondaryVertex.clone()
+
+process.looseCombinedSecondaryVertex = process.combinedSecondaryVertex.clone()
+process.looseCombinedSecondaryVertex.correctVertexMass = False
+process.looseCombinedSecondaryVertex.trackPairV0Filter = cms.PSet(k0sMassWindow = cms.double(0.015))
+process.looseCombinedSecondaryVertex.pseudoVertexV0Filter = cms.PSet(k0sMassWindow = cms.double(0.015))
+process.looseCombinedSecondaryVertex.trackMultiplicityMin = 2
+process.looseCombinedSecondaryVertex.trackSelection.maxDistToAxis = 999
+process.looseCombinedSecondaryVertex.trackSelection.qualityClass = 'tight'
+process.looseCombinedSecondaryVertex.trackSelection.maxDecayLen = 999
+process.looseCombinedSecondaryVertex.trackSelection.jetDeltaRMax = 999
+process.looseCombinedSecondaryVertex.trackPseudoSelection.maxDistToAxis = 999
+process.looseCombinedSecondaryVertex.trackPseudoSelection.qualityClass = 'tight'
+process.looseCombinedSecondaryVertex.trackPseudoSelection.maxDecayLen = 999
+process.looseCombinedSecondaryVertex.trackPseudoSelection.jetDeltaRMax = 999
+
+
 process.standardSecondaryVertexPFTagInfos = process.standardSecondaryVertexCaloTagInfos.clone(
   trackIPTagInfos = "standardImpactParameterPFTagInfos"
 )
@@ -231,21 +248,25 @@ process.looseSimpleSecondaryVertexHighPurPFBJetTags = process.simpleSecondaryVer
 )
 
 process.standardCombinedSecondaryVertexCaloBJetTags = process.combinedSecondaryVertexBJetTags.clone(
+  jetTagComputer = cms.string('standardCombinedSecondaryVertex'),
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterCaloTagInfos"),
                            cms.InputTag("standardSecondaryVertexCaloTagInfos"))
 )
 
 process.looseCombinedSecondaryVertexCaloBJetTags = process.combinedSecondaryVertexBJetTags.clone(
+  jetTagComputer = cms.string('looseCombinedSecondaryVertex'),
   tagInfos = cms.VInputTag(cms.InputTag("looseImpactParameterCaloTagInfos"),
                            cms.InputTag("looseSecondaryVertexCaloTagInfos"))
 )
 
 process.standardCombinedSecondaryVertexPFBJetTags = process.combinedSecondaryVertexBJetTags.clone(
+  jetTagComputer = cms.string('standardCombinedSecondaryVertex'),
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterPFTagInfos"),
                            cms.InputTag("standardSecondaryVertexPFTagInfos"))
 )
 
 process.looseCombinedSecondaryVertexPFBJetTags = process.combinedSecondaryVertexBJetTags.clone(
+  jetTagComputer = cms.string('looseCombinedSecondaryVertex'),
   tagInfos = cms.VInputTag(cms.InputTag("looseImpactParameterPFTagInfos"),
                            cms.InputTag("looseSecondaryVertexPFTagInfos"))
 )
