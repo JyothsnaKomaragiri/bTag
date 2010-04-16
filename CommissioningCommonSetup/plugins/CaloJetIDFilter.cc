@@ -13,7 +13,7 @@
 //
 // Original Author:  Jason Keller
 //         Created:  Thu Apr 25 23:23:27 CDT 2020
-// $Id$
+// $Id: CaloJetIDFilter.cc,v 1.1 2010/04/16 18:04:43 kellerjd Exp $
 //
 //
 
@@ -169,7 +169,7 @@ CaloJetIDFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   bool jetsEmpty = goodJets->empty();
   iEvent.put(goodJets);
-  return jetsEmpty;
+  return !jetsEmpty;
 }
 
 // ------------ method called once each job just before starting event loop  ------------
