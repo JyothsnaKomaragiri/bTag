@@ -58,7 +58,7 @@ process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
 #Filter for PFJets
 process.PFJetsFilter = cms.EDFilter("PFJetSelector",
   src = cms.InputTag("ak5PFJets"),
-  cut = cms.string("pt > 10.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 1.0 && neutralEmEnergyFraction < 1.0 && nConstituents > 0 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 1.0"),
+  cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 1.0 && neutralEmEnergyFraction < 1.0 && nConstituents > 0 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 1.0"),
   filter = cms.bool(True)
 )
 
@@ -416,8 +416,8 @@ process.caloBTagAnalysis = process.bTagAnalysis.clone()
 process.caloBTagAnalysis.finalizePlots = False 
 process.caloBTagAnalysis.finalizeOnly = False 
 process.caloBTagAnalysis.ptRecJetMin = 10.0
-process.caloBTagAnalysis.ptRanges = cms.vdouble(9999.0)
-process.caloBTagAnalysis.etaRanges = cms.vdouble(2.4)
+process.caloBTagAnalysis.ptRanges = cms.vdouble(10.0, 20.0, 40.0, 99999.0)
+process.caloBTagAnalysis.etaRanges = cms.vdouble(0.0, 1.5, 2.5)
 process.caloBTagAnalysis.tagConfig = cms.VPSet(
         cms.PSet(
             bTagTrackIPAnalysisBlock,
@@ -732,7 +732,15 @@ process.source = cms.Source("PoolSource",
 
 process.EDM = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('drop *',
-                       "keep *_MEtoEDMConverter_*_validation"
+                       "keep *_*_*_validation",
+                       "keep recoTracks_generalTracks_*_*",
+                       "keep recoTracks_globalMuons_*_*",
+                       "keep *_offlineBeamSpot_*_*",
+                       "keep *_gsfElectrons_*_*",
+                       "keep recoMuons_muons_*_*",
+                       "keep *_softPFElectrons_*_*",
+                       "keep recoGsfTracks_electronGsfTracks_*_*",
+                       "keep *_TriggerResults_*_*"
     ),
     fileName = cms.untracked.string('MEtoEDMConverter.root'),
     SelectEvents = cms.untracked.PSet(
