@@ -25,18 +25,18 @@ process.DQMStore.collateHistograms = True
 process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 #For harvesting of data
-#process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
+process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
 #For harvesting of MC
-process.load("Validation.RecoB.bTagAnalysis_harvesting_cfi")
+#process.load("Validation.RecoB.bTagAnalysis_harvesting_cfi")
 #For harvesting of data
-#process.bTagAnalysisHarvest = process.bTagAnalysis.clone()
+process.bTagAnalysisHarvest = process.bTagAnalysis.clone()
 #For harvesting of MC
-process.bTagAnalysisHarvest = process.bTagValidationHarvest.clone()
+#process.bTagAnalysisHarvest = process.bTagValidationHarvest.clone()
 process.bTagAnalysisHarvest.finalizePlots = True
 process.bTagAnalysisHarvest.finalizeOnly = True
 process.bTagAnalysisHarvest.ptRecJetMin = 10.0
-process.bTagAnalysisHarvest.ptRanges = cms.vdouble(9999.0)
-process.bTagAnalysisHarvest.etaRanges = cms.vdouble(2.4)
+process.bTagAnalysisHarvest.ptRanges = cms.vdouble(10.0, 20.0, 40.0, 99999.0)
+process.bTagAnalysisHarvest.etaRanges = cms.vdouble(0.0, 1.5, 2.5)
 process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
         cms.PSet(
             bTagTrackIPAnalysisBlock,
@@ -48,7 +48,7 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             ipTagInfos = cms.InputTag("standardImpactParameterCaloTagInfos"),
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("standardSecondaryVertexCaloTagInfos"),
-            label = cms.InputTag("combinedSecondaryVertex")
+            label = cms.InputTag("standardCombinedSecondaryVertexCalo")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -122,7 +122,7 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             ipTagInfos = cms.InputTag("looseImpactParameterCaloTagInfos"),
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("looseSecondaryVertexCaloTagInfos"),
-            label = cms.InputTag("combinedSecondaryVertex")
+            label = cms.InputTag("looseCombinedSecondaryVertexCalo")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -196,7 +196,7 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             ipTagInfos = cms.InputTag("standardImpactParameterPFTagInfos"),
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("standardSecondaryVertexPFTagInfos"),
-            label = cms.InputTag("combinedSecondaryVertex")
+            label = cms.InputTag("standardCombinedSecondaryVertexPF")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -270,7 +270,7 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             ipTagInfos = cms.InputTag("looseImpactParameterPFTagInfos"),
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("looseSecondaryVertexPFTagInfos"),
-            label = cms.InputTag("combinedSecondaryVertex")
+            label = cms.InputTag("looseCombinedSecondaryVertexPF")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -342,7 +342,7 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(),
     inputCommands = cms.untracked.vstring("drop *",
-      "keep *_*_*_validation"
+      "keep *_MEtoEDMConverter_*_validation"
     )
 )
 
@@ -359,13 +359,16 @@ process.dqmSaver.saveByRun = cms.untracked.int32(-1)
 process.dqmSaver.saveAtJobEnd =cms.untracked.bool(True) 
 process.dqmSaver.forceRunNumber = cms.untracked.int32(1)
 
-#for i in range(1,58):
-#  process.PoolSource.fileNames.append("file:7TeV_MC_Validation/res/MEtoEDMConverter_"+str(i)+"_1.root")
+for i in range(1,202):
+  process.PoolSource.fileNames.append("dcap:///pnfs/fnal.gov/usr/cms/WAX/resilient/jkeller7/BTagCommissioning2010/BTagCommissioning2010_April20_7TeV_Data_Apr1ReReco_"+str(i)+"_1.root")
 
-#for i in range(1,56):
-#  process.PoolSource.fileNames.append("file:7TeV_Data_Validation_Standard_SSBHighPur_part2/res/MEtoEDMConverter_"+str(i)+".root")
+for i in range(1,216):
+    process.PoolSource.fileNames.append("dcap:///pnfs/fnal.gov/usr/cms/WAX/resilient/jkeller7/BTagCommissioning2010/BTagCommissioning2010_April20_7TeV_Data_PromptReco_v8_"+str(i)+"_1.root")
 
-process.PoolSource.fileNames = [
-  "file:MEtoEDMConverter.root"
-]
+#for i in range(1,205):
+#  process.PoolSource.fileNames.append("dcap:///pnfs/fnal.gov/usr/cms/WAX/resilient/jkeller7/BTagCommissioning2010/BTagCommissioning2010_April20_7TeV_MC_"+str(i)+"_1.root")
+
+#process.PoolSource.fileNames = [
+#  "file:BTagCommissioning2010_April20_7TeV_MC.root"
+#]
 

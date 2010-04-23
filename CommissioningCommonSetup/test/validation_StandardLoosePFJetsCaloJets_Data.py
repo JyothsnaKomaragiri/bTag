@@ -33,9 +33,9 @@ process.load('Configuration.StandardSequences.GeometryExtended_cff')
 process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 #For use with propt reco
-#process.GlobalTag.globaltag = 'GR10_P_V4::All'
+process.GlobalTag.globaltag = 'GR10_P_V4::All'
 #For use with April 1st rereco
-process.GlobalTag.globaltag = 'GR_R_35X_V6::All'
+#process.GlobalTag.globaltag = 'GR_R_35X_V6::All'
 
 process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
@@ -122,22 +122,24 @@ process.looseSecondaryVertexCaloTagInfos.trackSelection.maxDistToAxis = 0.1
 process.looseSecondaryVertexCaloTagInfos.trackSelection.jetDeltaRMax = 0.5
 process.looseSecondaryVertexCaloTagInfos.trackSelection.qualityClass = "tight"
 
-process.standardCombinedSecondaryVertex = process.combinedSecondaryVertex.clone()
+process.standardCombinedSecondaryVertexCalo = process.combinedSecondaryVertex.clone()
 
-process.looseCombinedSecondaryVertex = process.combinedSecondaryVertex.clone()
-process.looseCombinedSecondaryVertex.correctVertexMass = False
-process.looseCombinedSecondaryVertex.trackPairV0Filter = cms.PSet(k0sMassWindow = cms.double(0.015))
-process.looseCombinedSecondaryVertex.pseudoVertexV0Filter = cms.PSet(k0sMassWindow = cms.double(0.015))
-process.looseCombinedSecondaryVertex.trackMultiplicityMin = 2
-process.looseCombinedSecondaryVertex.trackSelection.maxDistToAxis = 999
-process.looseCombinedSecondaryVertex.trackSelection.qualityClass = 'tight'
-process.looseCombinedSecondaryVertex.trackSelection.maxDecayLen = 999
-process.looseCombinedSecondaryVertex.trackSelection.jetDeltaRMax = 999
-process.looseCombinedSecondaryVertex.trackPseudoSelection.maxDistToAxis = 999
-process.looseCombinedSecondaryVertex.trackPseudoSelection.qualityClass = 'tight'
-process.looseCombinedSecondaryVertex.trackPseudoSelection.maxDecayLen = 999
-process.looseCombinedSecondaryVertex.trackPseudoSelection.jetDeltaRMax = 999
+process.looseCombinedSecondaryVertexCalo = process.combinedSecondaryVertex.clone()
+process.looseCombinedSecondaryVertexCalo.correctVertexMass = False
+process.looseCombinedSecondaryVertexCalo.trackPairV0Filter = cms.PSet(k0sMassWindow = cms.double(0.015))
+process.looseCombinedSecondaryVertexCalo.pseudoVertexV0Filter = cms.PSet(k0sMassWindow = cms.double(0.015))
+process.looseCombinedSecondaryVertexCalo.trackMultiplicityMin = 2
+process.looseCombinedSecondaryVertexCalo.trackSelection.maxDistToAxis = 999
+process.looseCombinedSecondaryVertexCalo.trackSelection.qualityClass = 'tight'
+process.looseCombinedSecondaryVertexCalo.trackSelection.maxDecayLen = 999
+process.looseCombinedSecondaryVertexCalo.trackSelection.jetDeltaRMax = 999
+process.looseCombinedSecondaryVertexCalo.trackPseudoSelection.maxDistToAxis = 999
+process.looseCombinedSecondaryVertexCalo.trackPseudoSelection.qualityClass = 'tight'
+process.looseCombinedSecondaryVertexCalo.trackPseudoSelection.maxDecayLen = 999
+process.looseCombinedSecondaryVertexCalo.trackPseudoSelection.jetDeltaRMax = 999
 
+process.standardCombinedSecondaryVertexPF = process.standardCombinedSecondaryVertexCalo.clone()
+process.looseCombinedSecondaryVertexPF = process.looseCombinedSecondaryVertexCalo.clone()
 
 process.standardSecondaryVertexPFTagInfos = process.standardSecondaryVertexCaloTagInfos.clone(
   trackIPTagInfos = "standardImpactParameterPFTagInfos"
@@ -244,25 +246,25 @@ process.looseSimpleSecondaryVertexHighPurPFBJetTags = process.simpleSecondaryVer
 )
 
 process.standardCombinedSecondaryVertexCaloBJetTags = process.combinedSecondaryVertexBJetTags.clone(
-  jetTagComputer = cms.string('standardCombinedSecondaryVertex'),
+  jetTagComputer = cms.string('standardCombinedSecondaryVertexCalo'),
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterCaloTagInfos"),
                            cms.InputTag("standardSecondaryVertexCaloTagInfos"))
 )
 
 process.looseCombinedSecondaryVertexCaloBJetTags = process.combinedSecondaryVertexBJetTags.clone(
-  jetTagComputer = cms.string('looseCombinedSecondaryVertex'),
+  jetTagComputer = cms.string('looseCombinedSecondaryVertexCalo'),
   tagInfos = cms.VInputTag(cms.InputTag("looseImpactParameterCaloTagInfos"),
                            cms.InputTag("looseSecondaryVertexCaloTagInfos"))
 )
 
 process.standardCombinedSecondaryVertexPFBJetTags = process.combinedSecondaryVertexBJetTags.clone(
-  jetTagComputer = cms.string('standardCombinedSecondaryVertex'),
+  jetTagComputer = cms.string('standardCombinedSecondaryVertexPF'),
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterPFTagInfos"),
                            cms.InputTag("standardSecondaryVertexPFTagInfos"))
 )
 
 process.looseCombinedSecondaryVertexPFBJetTags = process.combinedSecondaryVertexBJetTags.clone(
-  jetTagComputer = cms.string('looseCombinedSecondaryVertex'),
+  jetTagComputer = cms.string('looseCombinedSecondaryVertexPF'),
   tagInfos = cms.VInputTag(cms.InputTag("looseImpactParameterPFTagInfos"),
                            cms.InputTag("looseSecondaryVertexPFTagInfos"))
 )
@@ -429,7 +431,7 @@ process.caloBTagAnalysis.tagConfig = cms.VPSet(
             ipTagInfos = cms.InputTag("standardImpactParameterCaloTagInfos"),
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("standardSecondaryVertexCaloTagInfos"),
-            label = cms.InputTag("combinedSecondaryVertex")
+            label = cms.InputTag("standardCombinedSecondaryVertexCalo")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -503,7 +505,7 @@ process.caloBTagAnalysis.tagConfig = cms.VPSet(
             ipTagInfos = cms.InputTag("looseImpactParameterCaloTagInfos"),
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("looseSecondaryVertexCaloTagInfos"),
-            label = cms.InputTag("combinedSecondaryVertex")
+            label = cms.InputTag("looseCombinedSecondaryVertexCalo")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -581,7 +583,7 @@ process.pfBTagAnalysis.tagConfig = cms.VPSet(
             ipTagInfos = cms.InputTag("standardImpactParameterPFTagInfos"),
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("standardSecondaryVertexPFTagInfos"),
-            label = cms.InputTag("combinedSecondaryVertex")
+            label = cms.InputTag("standardCombinedSecondaryVertexPF")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -655,7 +657,7 @@ process.pfBTagAnalysis.tagConfig = cms.VPSet(
             ipTagInfos = cms.InputTag("looseImpactParameterPFTagInfos"),
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("looseSecondaryVertexPFTagInfos"),
-            label = cms.InputTag("combinedSecondaryVertex")
+            label = cms.InputTag("looseCombinedSecondaryVertexPF")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -729,6 +731,74 @@ process.source = cms.Source("PoolSource",
     '/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0139/F26CDE14-933E-DF11-B693-001A92971B04.root'
     )
 )
+process.evtLumiFilter = cms.EDFilter("EventLumiFilter",
+  lumisToProcess = cms.VLuminosityBlockRange(
+	'132440:85-132440:138',
+	'132440:141-132440:401',
+	'132473:1-132473:29',
+	'132476:23-132476:28',
+	'132476:54-132476:57',
+	'132477:1-132477:5',
+	'132477:34-132477:35',
+	'132477:63-132477:64',
+	'132477:90-132477:93',
+	'132477:118-132477:121',
+	'132477:148-132477:149',
+	'132477:176-132477:179',
+	'132477:225-132477:236',
+	'132477:368-132477:384',
+	'132477:517-132477:520',
+	'132596:382-132596:383',
+	'132596:447-132596:453',
+	'132598:80-132598:82',
+	'132598:174-132598:188',
+	'132599:1-132599:379',
+	'132599:381-132599:538',
+	'132601:1-132601:207',
+	'132601:209-132601:259',
+	'132601:261-132601:1131',
+	'132602:1-132602:83',
+	'132605:1-132605:444',
+	'132605:446-132605:622',
+	'132605:624-132605:829',
+	'132605:831-132605:968',
+	'132606:1-132606:37',
+	'132656:1-132656:140',
+	'132658:1-132658:177',
+	'132659:1-132659:84',
+	'132661:1-132661:130',
+	'132662:1-132662:130',
+	'132662:132-132662:217',
+	'132716:220-132716:591',
+	'132716:593-132716:640',
+	'132959:1-132959:276',
+	'132959:278-132959:417',
+	'132960:1-132960:190',
+	'132961:1-132961:427',
+	'132965:1-132965:107',
+	'132968:1-132968:173',
+	'133029:101-133029:115',
+	'133029:129-133029:350',
+	'133031:1-133031:18',
+	'133034:131-133034:325',
+	'133046:1-133046:43',
+	'133046:45-133046:323',
+	'133082:1-133082:336',
+	'133082:523-133082:592',
+	'133082:595-133082:608',
+	'133158:65-133158:786',
+	'133321:1-133321:383',
+	'133450:1-133450:329',
+	'133450:332-133450:658',
+	'133472:92-133472:106',
+	'133474:1-133474:95',
+	'133474:157-133474:189',
+	'133483:94-133483:159',
+	'133483:161-133483:591',
+	'133483:652-133483:658',
+	'133509:60-133509:75'
+)
+)
 
 process.EDM = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('drop *',
@@ -740,9 +810,10 @@ process.EDM = cms.OutputModule("PoolOutputModule",
                        "keep recoMuons_muons_*_*",
                        "keep *_softPFElectrons_*_*",
                        "keep recoGsfTracks_electronGsfTracks_*_*",
-                       "keep *_TriggerResults_*_*"
+                       "keep *_TriggerResults_*_*",
+                       "keep *_offlinePrimaryVertices_*_*"
     ),
-    fileName = cms.untracked.string('MEtoEDMConverter.root'),
+    fileName = cms.untracked.string('BTagCommissioning2010_April20_7TeV_Data_PromptReco_v8.root'),
     SelectEvents = cms.untracked.PSet(
        SelectEvents = cms.vstring("plots")
     )
@@ -850,6 +921,7 @@ process.bTagValidation = cms.Sequence(
 )
 
 process.plots = cms.Path(
+  process.evtLumiFilter +
   process.bit40 +
   process.bptxAnd +
   process.physDecl +
