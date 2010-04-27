@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.4 2010/04/15 19:18:48 winstrom Exp $
+// $Id: TagNtupleProducer.cc,v 1.5 2010/04/15 23:16:07 winstrom Exp $
 //
 //
 
@@ -85,6 +85,7 @@ class TagNtupleProducer : public edm::EDProducer {
       edm::InputTag jet_src_;
       edm::InputTag jet_MC_src_;
       edm::InputTag jet_tracks_;
+      edm::InputTag primaryVertexProducer_;
       edm::InputTag SV_tag_infos_;
       edm::InputTag IP_tag_infos_;
       unsigned int IP_n_saved_tracks_;
@@ -130,7 +131,8 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   get_SM_tag_infos_= iConfig.getParameter<bool>( "getSMTagInfo" );
   jet_src_        = iConfig.getParameter<edm::InputTag>( "jetSrc" );
   jet_MC_src_     = iConfig.getParameter<edm::InputTag>( "jetMCSrc" );
-  jet_tracks_     = iConfig.getParameter<edm::InputTag>( "jetTracks" );  
+  jet_tracks_     = iConfig.getParameter<edm::InputTag>( "jetTracks" ); 
+  primaryVertexProducer_   = iConfig.getParameter<InputTag>("primaryVertex"); 
   SV_tag_infos_   = iConfig.getParameter<edm::InputTag>( "SVTagInfos" );
   IP_tag_infos_   = iConfig.getParameter<edm::InputTag>( "IPTagInfos" );
   IP_n_saved_tracks_ = iConfig.getParameter<unsigned int>( "IPnSavedTracks" );
@@ -157,8 +159,25 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   produces<vector<float> >(alias = label_ + "jetVertexChi2Ndof"                         ).setBranchAlias( alias );
   produces<vector<float> >(alias = label_ + "jetVertexNormalizedChi2"                   ).setBranchAlias( alias );
 
-  //MC Truth Information
-  produces<vector<float> >( alias = label_ + "MCTrueFlavor"                             ).setBranchAlias( alias ); 
+  //Track Information
+  produces<vector<int> >  (alias = label_ + "trackJetIndex"                   ).setBranchAlias( alias );
+  produces<vector<math::XYZVector> >( alias = label_ + "track3Momentum"                ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "trackTransverseMomentum"                 ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "trackMomentum"                   ).setBranchAlias( alias );
+  produces<vector<int> >(alias = label_ + "trackNHits"                   ).setBranchAlias( alias );
+  produces<vector<int> >(alias = label_ + "trackNPixelHits"                   ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "trackChi2"                   ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "trackNormChi2"                   ).setBranchAlias( alias );
+  produces<vector<int> >(alias = label_ + "trackQuality"                   ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "trackLongitudinalImpactParameter"          ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "trackDecayLength"          ).setBranchAlias( alias );
+
+  if(getMCTruth_)
+    {
+      //MC Truth Information
+      produces<vector<float> >( alias = label_ + "MCTrueFlavor"                             ).setBranchAlias( alias ); 
+    }
+
   if(get_SV_tag_infos_)
     {
       //secondaryVertexTagInfos:					               
@@ -286,6 +305,9 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   Handle<JetTracksAssociation::Container > jetTracks;
   iEvent.getByLabel(jet_tracks_,jetTracks);
 
+  Handle<reco::VertexCollection> primaryVertex;
+  iEvent.getByLabel(primaryVertexProducer_, primaryVertex);
+
   //Get the TagInfo stuff and make is accesible with a map to a RefToBase<Jet>, since that's apparently what the JetTags use
   typedef RefToBase<Jet> JetRef;
   typedef map<JetRef, const SoftLeptonTagInfo*, JetRefCompare> slTagInfoMap;
@@ -389,7 +411,22 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<math::XYZVector> jetVertex;                   
   vector<float> jetVertexChi2;               
   vector<float> jetVertexChi2Ndof;           
-  vector<float> jetVertexNormalizedChi2;           
+  vector<float> jetVertexNormalizedChi2;    
+
+  //Track Information
+
+  vector<int> trackJetIndex;
+  vector<math::XYZVector> track3Momentum;
+  vector<float> trackTransverseMomentum;
+  vector<float> trackMomentum;
+  vector<int> trackNHits;
+  vector<int> trackNPixelHits;
+  vector<float> trackChi2;
+  vector<float> trackNormChi2;
+  vector<int> trackQuality;
+  vector<float> trackLongitudinalImpactParameter;
+  vector<float> trackDecayLength;
+       
 
   //MC Truth Information
   vector<float> MCTrueFlavor;                          
@@ -509,14 +546,48 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       jetMass.push_back(thisJetRef->p4().M());
       jetnConstituents.push_back(thisJetRef->nConstituents());
       jetnTracks.push_back((*jetTracks)[thisJetRef].size());
-      //      for(track_iterator iTrack = jetTracks[thisJetRef]->begin(); iTrack != jetTracks[thisJetRef]->end(); iTrack++)
-      //	{
-      //	  //Do something with all the tracks
-      //	}
+
       jetVertex.push_back(math::XYZVector(thisJetRef->vx(),thisJetRef->vy(),thisJetRef->vz()));
       jetVertexChi2.push_back(thisJetRef->vertexChi2());
       jetVertexChi2Ndof.push_back(thisJetRef->vertexNdof());
       jetVertexNormalizedChi2.push_back(thisJetRef->vertexNormalizedChi2());
+
+      //Track Information
+
+
+      //Stolen from CMSSW/RecoBTag/ImpactParameter/plugins/TrackIPProducer.cc
+      Vertex dummy;
+      const Vertex *pv = &dummy;
+      edm::Ref<VertexCollection> pvRef;
+      if (primaryVertex->size() != 0) {
+	pv = &*primaryVertex->begin();
+	// we always use the first vertex (at the moment)
+	pvRef = edm::Ref<VertexCollection>(primaryVertex, 0);
+      } else { // create a dummy PV
+	Vertex::Error e;
+	e(0, 0) = 0.0015 * 0.0015;
+	e(1, 1) = 0.0015 * 0.0015;
+	e(2, 2) = 15. * 15.;
+	Vertex::Point p(0, 0, 0);
+	dummy = Vertex(p, e, 0, 0, 0);
+      }
+
+      //End Stealing
+
+      for(track_iterator iTrack = (*jetTracks)[thisJetRef].begin(); iTrack != (*jetTracks)[thisJetRef].end(); iTrack++)
+	{ 
+	  trackJetIndex.push_back(iJet);
+	  track3Momentum.push_back(math::XYZVector((*iTrack)->px(),(*iTrack)->py(),(*iTrack)->pz()));
+	  trackTransverseMomentum.push_back((*iTrack)->pt());
+	  trackMomentum.push_back((*iTrack)->p());
+	  trackNHits.push_back((*iTrack)->hitPattern().numberOfValidHits());
+	  trackNPixelHits.push_back((*iTrack)->hitPattern().numberOfValidPixelHits());
+	  trackChi2.push_back((*iTrack)->chi2());
+	  trackNormChi2.push_back((*iTrack)->normalizedChi2());
+	  trackQuality.push_back((*iTrack)->qualityMask());
+	  trackLongitudinalImpactParameter.push_back((*iTrack)->dz(pv->position()));
+	  //trackDecayLength.pushback();
+      	}       
 
       //MC Truth Information
       MCTrueFlavor.push_back(flavor[thisJetRef]);                          
@@ -722,9 +793,26 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexChi2Ndof)),label_+"jetVertexChi2Ndof");
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexNormalizedChi2)),label_+"jetVertexNormalizedChi2");
 
+  //Track Information
+
+  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackJetIndex)), label_ + "trackJetIndex" );
+  iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(track3Momentum)),label_ + "track3Momentum");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackTransverseMomentum)),label_ + "trackTransverseMomentum" );
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackMomentum)),label_ + "trackMomentum");
+  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackNHits)),label_ + "trackNHits");
+  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackNPixelHits)),label_ + "trackNPixelHits");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackChi2)),label_ + "trackChi2");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackNormChi2)),label_ + "trackNormChi2");
+  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackQuality)),label_ + "trackQuality" );
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackLongitudinalImpactParameter)),label_ + "trackLongitudinalImpactParameter");
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDecayLength)),label_ + "trackDecayLength" );
+
   //MC Truth Information
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(MCTrueFlavor)),label_+"MCTrueFlavor");
-					               
+  if(getMCTruth_)
+    {
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(MCTrueFlavor)),label_+"MCTrueFlavor");
+    }
+			               
   //secondaryVertexTagInfos:					               
   if(get_SV_tag_infos_)
     {
