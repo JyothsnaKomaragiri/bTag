@@ -624,14 +624,14 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  trackNormChi2.push_back((*iTrack)->normalizedChi2());
 	  trackQuality.push_back((*iTrack)->qualityMask());
 	  trackLongitudinalImpactParameter.push_back((*iTrack)->dz(pv->position()));
-//	  TransientTrack transientTrack = builder->build(*iTrack);
-//	  GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
-//	  Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
-//	  Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
-//	  trackIP3d.push_back(ip3d.value());
-//	  trackIP2d.push_back(ip2d.value());
-//	  trackIP3dError.push_back(ip3d.error());
-//	  trackIP2dError.push_back(ip2d.error());
+  	  TransientTrack transientTrack = builder->build(*iTrack);
+  	  GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
+  	  Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
+  	  Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
+  	  trackIP3d.push_back(ip3d.value());
+  	  trackIP2d.push_back(ip2d.value());
+  	  trackIP3dError.push_back(ip3d.error());
+  	  trackIP2dError.push_back(ip2d.error());
 	  //trackDecayLength.push_back();
       	}       
 
