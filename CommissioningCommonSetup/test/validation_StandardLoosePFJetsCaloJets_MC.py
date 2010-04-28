@@ -745,7 +745,7 @@ process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 
 process.standardCaloBTagNtuple = process.bTagNtuple.clone()
 process.standardCaloBTagNtuple.jetSrc = cms.InputTag( "caloJetIDFilter" )
-process.looseCaloBTagNtuple.jetMCSrc = cms.InputTag( "AK5byValAlgo" )
+process.standardCaloBTagNtuple.jetMCSrc = cms.InputTag( "AK5byValAlgo" )
 process.standardCaloBTagNtuple.jetTracks = cms.InputTag( "ak5CaloJetTracksAssociatorAtVertex" )
 process.standardCaloBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexCaloTagInfos" )
 process.standardCaloBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParameterCaloTagInfos" )
