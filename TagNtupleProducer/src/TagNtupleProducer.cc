@@ -622,7 +622,14 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  trackNPixelHits.push_back((*iTrack)->hitPattern().numberOfValidPixelHits());
 	  trackChi2.push_back((*iTrack)->chi2());
 	  trackNormChi2.push_back((*iTrack)->normalizedChi2());
-	  trackQuality.push_back((*iTrack)->qualityMask());
+	  //trackQuality.push_back((*iTrack)->qualityMask());
+	  //cout << (*iTrack)->qualityMask() << endl;
+	  for(int i = 2; i>-2; i--){
+	    if((*iTrack)->quality(reco::TrackBase::TrackQuality(i))){
+	      trackQuality.push_back(i);
+	      continue;
+	    }
+	  }
 	  trackLongitudinalImpactParameter.push_back((*iTrack)->dz(pv->position()));
   	  TransientTrack transientTrack = builder->build(*iTrack);
   	  GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
@@ -719,7 +726,12 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
 		{
 		  size_t location3D = ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig)[iTrack];
-		  IP3dTrackQuality[iTrack].push_back(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->qualityMask());
+		  for(int i = 2; i>-2; i--){
+		    if(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->quality(reco::TrackBase::TrackQuality(i))){
+		      IP3dTrackQuality[iTrack].push_back(i);
+		      continue;
+		    }
+		  }
 		  IP3d[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.value());
 		  IP3dError[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.error());
 		  IP3dProbability[iTrack].push_back(ipTagInfo[thisJetRef]->probabilities(0)[location3D]);
@@ -739,7 +751,12 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
 		{
 		  size_t location2D = ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP2DSig)[iTrack];
-		  IP2dTrackQuality[iTrack].push_back(ipTagInfo[thisJetRef]->selectedTracks()[location2D]->qualityMask());
+		  for(int i = 2; i>-2; i--){
+		    if(ipTagInfo[thisJetRef]->selectedTracks()[location2D]->quality(reco::TrackBase::TrackQuality(i))){
+		      IP2dTrackQuality[iTrack].push_back(i);
+		      continue;
+		    }
+		  }
 		  IP2d[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location2D].ip2d.value());
 		  IP2dError[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location2D].ip2d.error());
 		  IP2dProbability[iTrack].push_back(ipTagInfo[thisJetRef]->probabilities(1)[location2D]);
