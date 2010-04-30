@@ -1,0 +1,11 @@
+run the plotting macro with the command
+
+root -l -b -q MakeAllPlots.C+'("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg")'
+
+where MCfileList.cfg and DATAfileList.cfg are the list of files to read including their weight, separated by a comma.
+
+Example list of files:
+/nfs/data6/alschmid/btagCommissioning/files/MC_QCDPt20_30/BTagCommissioning2010_April20_7TeV_MC_13_1.root,1
+/nfs/data6/alschmid/btagCommissioning/files/MC_QCDPt20_30/BTagCommissioning2010_April20_7TeV_MC_14_1.root,1
+
+(the weight is 1 in this case)
