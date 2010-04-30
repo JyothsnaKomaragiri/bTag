@@ -307,6 +307,11 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   hists.mc_hist_loose->Scale(scale);
   hists.mc_hist_tight->Scale(scale);
   hists.mc_hist_high_purity->Scale(scale);
+  hists.mc_hist_undef->SetFillColor(kCyan);
+  hists.mc_hist_loose->SetFillColor(kMagenta);
+  hists.mc_hist_tight->SetFillColor(kBlue);
+  hists.mc_hist_high_purity->SetFillColor(kRed);
+
   //Make Canvas
   TCanvas canvasOne("onePlot","Comparison of Monte Carlo Flavors",300,300);
   canvasOne.cd();
@@ -468,9 +473,9 @@ void MakeATrackQualityHist(string type, TTree* thisTree, information1d info, qua
   if(info.cut!="")
     {
       undefCut = "("+info.cut+")&&"+undefCut;
-      looseCut = "("+info.cut+")&&"+undefCut;
-      tightCut = "("+info.cut+")&&"+undefCut;
-      highPurityCut = "("+info.cut+")&&"+undefCut;
+      looseCut = "("+info.cut+")&&"+looseCut;
+      tightCut = "("+info.cut+")&&"+tightCut;
+      highPurityCut = "("+info.cut+")&&"+highPurityCut;
     }
   //Fill Histograms
   if(type == "data")
@@ -479,10 +484,10 @@ void MakeATrackQualityHist(string type, TTree* thisTree, information1d info, qua
       TH1F* temp_data_hist_loose = (TH1F*)hists.data_hist_loose->Clone((info.plotName+"_temp_data_hist_loose").c_str());
       TH1F* temp_data_hist_tight = (TH1F*)hists.data_hist_tight->Clone((info.plotName+"_temp_data_hist_tight").c_str());
       TH1F* temp_data_hist_high_purity = (TH1F*)hists.data_hist_high_purity->Clone((info.plotName+"_temp_data_hist_high_purity").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_undef").c_str(),(scale+"*("+info.cut+")").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_loose").c_str(),(scale+"*("+info.cut+")").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_tight").c_str(),(scale+"*("+info.cut+")").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_high_purity").c_str(),(scale+"*("+info.cut+")").c_str());
+      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_undef").c_str(),(scale+"*("+undefCut+")").c_str());
+      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_loose").c_str(),(scale+"*("+looseCut+")").c_str());
+      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_tight").c_str(),(scale+"*("+tightCut+")").c_str());
+      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_high_purity").c_str(),(scale+"*("+highPurityCut+")").c_str());
       hists.data_hist_undef->Add(temp_data_hist_undef);
       hists.data_hist_loose->Add(temp_data_hist_loose);
       hists.data_hist_tight->Add(temp_data_hist_tight);
@@ -494,10 +499,10 @@ void MakeATrackQualityHist(string type, TTree* thisTree, information1d info, qua
       TH1F* temp_mc_hist_loose = (TH1F*)hists.mc_hist_loose->Clone((info.plotName+"_temp_mc_hist_loose").c_str());
       TH1F* temp_mc_hist_tight = (TH1F*)hists.mc_hist_tight->Clone((info.plotName+"_temp_mc_hist_tight").c_str());
       TH1F* temp_mc_hist_high_purity = (TH1F*)hists.mc_hist_high_purity->Clone((info.plotName+"_temp_mc_hist_high_purity").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_undef").c_str(),(scale+"*("+info.cut+")").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_loose").c_str(),(scale+"*("+info.cut+")").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_tight").c_str(),(scale+"*("+info.cut+")").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_high_purity").c_str(),(scale+"*("+info.cut+")").c_str());
+      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_undef").c_str(),(scale+"*("+undefCut+")").c_str());
+      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_loose").c_str(),(scale+"*("+looseCut+")").c_str());
+      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_tight").c_str(),(scale+"*("+tightCut+")").c_str());
+      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_high_purity").c_str(),(scale+"*("+highPurityCut+")").c_str());
       hists.mc_hist_undef->Add(temp_mc_hist_undef);
       hists.mc_hist_loose->Add(temp_mc_hist_loose);
       hists.mc_hist_tight->Add(temp_mc_hist_tight);
@@ -712,7 +717,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     if(line.find("plot_type")==string::npos) continue;
     size_t typePosition = line.find("=");
     string plotType = line.substr(typePosition+1);
-    if(plotType=="jetPlots1D"){
+    if(plotType.find("jetPlots1D")!=string::npos){
       information1d thisPlot = param1d(&plotFiles);
       if(doPlot == "" || thisPlot.plotName.find(doPlot)!=string::npos){
 	flavorHists1D theseHists;
@@ -731,7 +736,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	jetPlots1D.push_back(pair<information1d,flavorHists1D>(thisPlot,theseHists));
       }
     }
-    if(plotType=="jetPlots2D"){
+    if(plotType.find("jetPlots2D")!=string::npos){
       information2d thisPlot = param2d(&plotFiles);
       if(doPlot == "" || thisPlot.plotName.find(doPlot)!=string::npos){
 	flavorHists2D theseHists;
@@ -750,7 +755,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	jetPlots2D.push_back(pair<information2d,flavorHists2D>(thisPlot,theseHists));
       }
     }
-    if(plotType=="profilePlots"){
+    if(plotType.find("profilePlots")!=string::npos){
       information2d thisPlot = param2d(&plotFiles);
       if(doPlot == "" || thisPlot.plotName.find(doPlot)!=string::npos){
 	profileHists theseHists;
@@ -769,7 +774,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	profilePlots.push_back(pair<information2d,profileHists>(thisPlot,theseHists));
       }
     }
-    if(plotType=="trackPlots_flavorStack"){
+    if(plotType.find("trackPlots_flavorStack")!=string::npos){
       information1d thisPlot = param1d(&plotFiles);
       if(doPlot == "" || thisPlot.plotName.find(doPlot)!=string::npos){
 	flavorHists1D theseHists;
@@ -788,7 +793,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	trackPlots_flavorStack.push_back(pair<information1d,flavorHists1D>(thisPlot,theseHists));
       }
     }
-    if(plotType=="trackPlots_qualityStack"){
+    if(plotType.find("trackPlots_qualityStack")!=string::npos){
       information1d thisPlot = param1d(&plotFiles);
       if(doPlot == "" || thisPlot.plotName.find(doPlot)!=string::npos){
 	qualityHists1D theseHists;
