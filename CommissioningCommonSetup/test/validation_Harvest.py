@@ -25,13 +25,13 @@ process.DQMStore.collateHistograms = True
 process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 #For harvesting of data
-process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
+#process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
 #For harvesting of MC
-#process.load("Validation.RecoB.bTagAnalysis_harvesting_cfi")
+process.load("Validation.RecoB.bTagAnalysis_harvesting_cfi")
 #For harvesting of data
-process.bTagAnalysisHarvest = process.bTagAnalysis.clone()
+#process.bTagAnalysisHarvest = process.bTagAnalysis.clone()
 #For harvesting of MC
-#process.bTagAnalysisHarvest = process.bTagValidationHarvest.clone()
+process.bTagAnalysisHarvest = process.bTagValidationHarvest.clone()
 process.bTagAnalysisHarvest.finalizePlots = True
 process.bTagAnalysisHarvest.finalizeOnly = True
 process.bTagAnalysisHarvest.ptRecJetMin = 10.0
@@ -49,6 +49,13 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("standardSecondaryVertexCaloTagInfos"),
             label = cms.InputTag("standardCombinedSecondaryVertexCalo")
+        ), 
+        cms.PSet(
+            bTagCombinedSVAnalysisBlock,
+            ipTagInfos = cms.InputTag("standardImpactParameterCaloTagInfos"),
+            type = cms.string('GenericMVA'),
+            svTagInfos = cms.InputTag("standardSecondaryVertexV0CaloTagInfos"),
+            label = cms.InputTag("standardCombinedSecondaryVertexV0Calo")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -125,6 +132,13 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             label = cms.InputTag("looseCombinedSecondaryVertexCalo")
         ), 
         cms.PSet(
+            bTagCombinedSVAnalysisBlock,
+            ipTagInfos = cms.InputTag("looseImpactParameterCaloTagInfos"),
+            type = cms.string('GenericMVA'),
+            svTagInfos = cms.InputTag("looseSecondaryVertexV0CaloTagInfos"),
+            label = cms.InputTag("looseCombinedSecondaryVertexV0Calo")
+        ), 
+        cms.PSet(
             bTagTrackCountingAnalysisBlock,
             label = cms.InputTag("looseTrackCountingHighEffCaloBJetTags")
         ), 
@@ -185,7 +199,7 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             bTagSoftLeptonAnalysisBlock,
             type = cms.string("SoftLepton"),
             label = cms.InputTag("looseSoftElectronCaloTagInfos")
-        ), 
+        ),
         cms.PSet(
             bTagTrackIPAnalysisBlock,
             type = cms.string('TrackIP'),
@@ -197,6 +211,13 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("standardSecondaryVertexPFTagInfos"),
             label = cms.InputTag("standardCombinedSecondaryVertexPF")
+        ), 
+        cms.PSet(
+            bTagCombinedSVAnalysisBlock,
+            ipTagInfos = cms.InputTag("standardImpactParameterPFTagInfos"),
+            type = cms.string('GenericMVA'),
+            svTagInfos = cms.InputTag("standardSecondaryVertexV0PFTagInfos"),
+            label = cms.InputTag("standardCombinedSecondaryVertexV0PF")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -271,6 +292,13 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("looseSecondaryVertexPFTagInfos"),
             label = cms.InputTag("looseCombinedSecondaryVertexPF")
+        ), 
+        cms.PSet(
+            bTagCombinedSVAnalysisBlock,
+            ipTagInfos = cms.InputTag("looseImpactParameterPFTagInfos"),
+            type = cms.string('GenericMVA'),
+            svTagInfos = cms.InputTag("looseSecondaryVertexV0PFTagInfos"),
+            label = cms.InputTag("looseCombinedSecondaryVertexV0PF")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -359,16 +387,12 @@ process.dqmSaver.saveByRun = cms.untracked.int32(-1)
 process.dqmSaver.saveAtJobEnd =cms.untracked.bool(True) 
 process.dqmSaver.forceRunNumber = cms.untracked.int32(1)
 
-for i in range(1,202):
-  process.PoolSource.fileNames.append("dcap:///pnfs/fnal.gov/usr/cms/WAX/resilient/jkeller7/BTagCommissioning2010/BTagCommissioning2010_April20_7TeV_Data_Apr1ReReco_"+str(i)+"_1.root")
+## Dijet pT 0 to 15
+for i in range(1,52):
+  process.PoolSource.fileNames.append("rfio:///castor/cern.ch/user/a/alschmid/btagApr30/BTagCommissioning2010_April20_7TeV_MC_"+str(i)+"_1.root")
 
-for i in range(1,216):
-    process.PoolSource.fileNames.append("dcap:///pnfs/fnal.gov/usr/cms/WAX/resilient/jkeller7/BTagCommissioning2010/BTagCommissioning2010_April20_7TeV_Data_PromptReco_v8_"+str(i)+"_1.root")
+## Dijet pT 15 to 20
+#for i in range(1,52):
+#  process.PoolSource.fileNames.append("rfio:///castor/cern.ch/user/a/alschmid/btagApr30_mid/BTagCommissioning2010_April20_7TeV_MC_"+str(i)+"_1.root")
 
-#for i in range(1,205):
-#  process.PoolSource.fileNames.append("dcap:///pnfs/fnal.gov/usr/cms/WAX/resilient/jkeller7/BTagCommissioning2010/BTagCommissioning2010_April20_7TeV_MC_"+str(i)+"_1.root")
-
-#process.PoolSource.fileNames = [
-#  "file:BTagCommissioning2010_April20_7TeV_MC.root"
-#]
 
