@@ -267,7 +267,7 @@ def main(args, left, blind):
 	mc0 = ROOT.TFile.Open("MC_QCD_Pt_0_15.root")
 	mc1 = ROOT.TFile.Open("MC_QCD_Pt_15_20.root")
 	mc2 = ROOT.TFile.Open("MC_QCD_Pt_20_30.root")
-	#mc3 = ROOT.TFile.Open("MC_QCD_Pt_30.root")
+	mc3 = ROOT.TFile.Open("MC_QCD_Pt_30.root")
 
 	data = ROOT.TFile.Open("data.root")
 
@@ -389,13 +389,13 @@ def main(args, left, blind):
 		mc2.Get("%s/%sALL" % (pfx, histo))
 		]
 	#pT 30
-#	mc3 = [
-#		mc3.Get("%s/%sNI" % (pfx, histo)),
-#		mc3.Get("%s/%sDUSG" % (pfx, histo)),
-#		mc3.Get("%s/%sC" % (pfx, histo)),
-#		mc3.Get("%s/%sB" % (pfx, histo)),
-#		mc3.Get("%s/%sALL" % (pfx, histo))
-#		]
+	mc3 = [
+		mc3.Get("%s/%sNI" % (pfx, histo)),
+		mc3.Get("%s/%sDUSG" % (pfx, histo)),
+		mc3.Get("%s/%sC" % (pfx, histo)),
+		mc3.Get("%s/%sB" % (pfx, histo)),
+		mc3.Get("%s/%sALL" % (pfx, histo))
+		]
 
 #### Scale MC to data lumi ...Data/MC ratio
 ## Data lumi = 0.244 + 0.609 = 0.853 nb-1 
@@ -408,9 +408,11 @@ def main(args, left, blind):
 
 ##################
 
+## Adding the histos:
+## scale[0]*mc0 + scale[1]*mc1 + scale[2]*mc2 + scale[3]*mc3 
 	for i in range(5):
-#		mc2[i].Add( mc2[i], mc3[i], float(scale[2]), float(scale[3]))
-		mc1[i].Add( mc1[i], mc2[i], float(scale[1]), float(scale[2]))
+		mc2[i].Add( mc2[i], mc3[i], float(scale[2]), float(scale[3]))
+		mc1[i].Add( mc1[i], mc2[i], float(scale[1]), 1.0)
 		mc0[i].Add( mc0[i], mc1[i], float(scale[0]), 1.0) 
 
 	mc = mc0

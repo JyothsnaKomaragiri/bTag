@@ -90,10 +90,42 @@ do
 ###############################################################
 ################# Impact Parameter TagInfo
 ###############################################################
-./NormoverlayMCData.py -r ipdecLen ${category}  ${bin} 'Decay length' 'Normalized to lumi' -0.5 5
-./NormoverlayMCData.py -r -l ipjetDist ${category}  ${bin} 'Jet distance' 'Normalized to lumi' -0.15 0.01
+### 2dimensional plots
+./NormoverlayMCData.py -r iptrackMultVsJetPt ${category}  ${bin} 'Track Multiplicity vs Jet Pt for all Tracks' 'Normalized to lumi'
+./NormoverlayMCData.py -r ipselectedTrackMultVsJetPt ${category}  ${bin} 'Track Multiplicity vs Jet Pt for Selected Tracks' 'Normalized to lumi'
+
+### Track quality plots
+./NormoverlayMCData.py -r iptrackQual         ${category}  ${bin} 'Track Quality for all Tracks' 'Normalized to lumi'
+./NormoverlayMCData.py -r ipselectedTrackQual ${category}  ${bin} 'Track Quality for Selected Tracks' 'Normalized to lumi'
+
+### 2D plots
+./NormoverlayMCData.py -r ipdecLen_2D ${category}  ${bin} '2D Decay length' 'Normalized to lumi' -0.5 5
+./NormoverlayMCData.py -r ipdecLen1_2D ${category}  ${bin} '1^{st} track 2D Decay length' 'Normalized to lumi' -0.5 5
+./NormoverlayMCData.py -r ipdecLen2_2D ${category}  ${bin} '2^{nd} track 2D Decay length' 'Normalized to lumi' -0.5 5
+./NormoverlayMCData.py -r ipdecLen3_2D ${category}  ${bin} '3^{rd} track 2D Decay length' 'Normalized to lumi' -0.5 5
+./NormoverlayMCData.py -r ipdecLen4_2D ${category}  ${bin} '4^{th} track 2D Decay length' 'Normalized to lumi' -0.5 5
+
+./NormoverlayMCData.py -r -l ipjetDist_2D ${category}  ${bin} '2D Jet distance' 'Normalized to lumi' -0.15 0.01
+./NormoverlayMCData.py -r -l ipjetDist1_2D ${category}  ${bin} ' 1^{st} track 2D Jet distance' 'Normalized to lumi' -0.15 0.01
+./NormoverlayMCData.py -r -l ipjetDist2_2D ${category}  ${bin} ' 2^{nd} track 2D Jet distance' 'Normalized to lumi' -0.15 0.01
+./NormoverlayMCData.py -r -l ipjetDist3_2D ${category}  ${bin} ' 3^{rd} track 2D Jet distance' 'Normalized to lumi' -0.15 0.01
+./NormoverlayMCData.py -r -l ipjetDist4_2D ${category}  ${bin} ' 4^{th} track 2D Jet distance' 'Normalized to lumi' -0.15 0.01
 
 ./NormoverlayMCData.py -r ipselTrksNbr_2D ${category}  ${bin} 'no. of selected tracks for 2D in jet' 'Normalized to lumi' -0.5 19.5
+
+### 3D plots
+./NormoverlayMCData.py -r ipdecLen_3D ${category}  ${bin} '3D Decay length' 'Normalized to lumi' -0.5 5
+./NormoverlayMCData.py -r ipdecLen1_3D ${category}  ${bin} '1^{st} track 3D Decay length' 'Normalized to lumi' -0.5 5
+./NormoverlayMCData.py -r ipdecLen2_3D ${category}  ${bin} '2^{nd} track 3D Decay length' 'Normalized to lumi' -0.5 5
+./NormoverlayMCData.py -r ipdecLen3_3D ${category}  ${bin} '3^{rd} track 3D Decay length' 'Normalized to lumi' -0.5 5
+./NormoverlayMCData.py -r ipdecLen4_3D ${category}  ${bin} '4^{th} track 3D Decay length' 'Normalized to lumi' -0.5 5
+
+./NormoverlayMCData.py -r -l ipjetDist_3D  ${category}  ${bin} '3D Jet distance' 'Normalized to lumi' -0.15 0.01
+./NormoverlayMCData.py -r -l ipjetDist1_3D ${category}  ${bin} ' 1^{st} track 3D Jet distance' 'Normalized to lumi' -0.15 0.01
+./NormoverlayMCData.py -r -l ipjetDist2_3D ${category}  ${bin} ' 2^{nd} track 3D Jet distance' 'Normalized to lumi' -0.15 0.01
+./NormoverlayMCData.py -r -l ipjetDist3_3D ${category}  ${bin} ' 3^{rd} track 3D Jet distance' 'Normalized to lumi' -0.15 0.01
+./NormoverlayMCData.py -r -l ipjetDist4_3D ${category}  ${bin} ' 4^{th} track 3D Jet distance' 'Normalized to lumi' -0.15 0.01
+
 ./NormoverlayMCData.py -r ipselTrksNbr_3D ${category}  ${bin} 'no. of selected tracks for 3D in jet' 'Normalized to lumi' -0.5 19.5
 
 ### 2D plots
@@ -103,17 +135,19 @@ do
 ./NormoverlayMCData.py -r ipprob_2D ${category}  ${bin} '2D IP probability' 'Normalized to lumi' -1.1 1.1
 
 ./NormoverlayMCData.py -r ipip1_2D ${category}  ${bin} '1^{st} track 2D IP value' 'Normalized to lumi' -0.2 0.2
-
 ./NormoverlayMCData.py -r ipipe1_2D ${category}  ${bin} '1^{st} track 2D IP error' 'Normalized to lumi' 0 0.05
 ./NormoverlayMCData.py -r ipips1_2D ${category}  ${bin} '1^{st} track 2D IP significance' 'Normalized to lumi' -40 40
+./NormoverlayMCData.py -r ipprob1_2D ${category}  ${bin} '1^{st} track 2D IP probability' 'Normalized to lumi' -1.1 1.1
 
 ./NormoverlayMCData.py -r ipip2_2D ${category}  ${bin} '2^{nd} track 2D IP value' 'Normalized to lumi' -0.2 0.2
 ./NormoverlayMCData.py -r ipipe2_2D ${category}  ${bin} '2^{nd} track 2D IP error' 'Normalized to lumi' 0 0.05
 ./NormoverlayMCData.py -r ipips2_2D ${category}  ${bin} '2^{nd} track 2D IP significance' 'Normalized to lumi' -40 40
+./NormoverlayMCData.py -r ipprob2_2D ${category}  ${bin} '2^{nd} track 2D IP probability' 'Normalized to lumi' -1.1 1.1
 
 ./NormoverlayMCData.py -r ipip3_2D ${category}  ${bin} '3^{rd} track 2D IP value' 'Normalized to lumi' -0.2 0.2
 ./NormoverlayMCData.py -r ipipe3_2D ${category}  ${bin} '3^{rd} track 2D IP error' 'Normalized to lumi' 0 0.05
 ./NormoverlayMCData.py -r ipips3_2D ${category}  ${bin} '3^{rd} track 2D IP significance' 'Normalized to lumi' -40 40
+./NormoverlayMCData.py -r ipprob3_2D ${category}  ${bin} '3^{rd} track 2D IP probability' 'Normalized to lumi' -1.1 1.1
 
 ### 3D plots
 ./NormoverlayMCData.py -r ipip_3D ${category}  ${bin} '3D IP value' 'Normalized to lumi' -0.2 0.2
@@ -124,14 +158,56 @@ do
 ./NormoverlayMCData.py -r ipip1_3D ${category}  ${bin} '1^{st} track 3D IP value' 'Normalized to lumi' -0.2 0.2
 ./NormoverlayMCData.py -r ipipe1_3D ${category}  ${bin} '1^{st} track 3D IP error' 'Normalized to lumi' 0 0.05
 ./NormoverlayMCData.py -r ipips1_3D ${category}  ${bin} '1^{st} track 3D IP significance' 'Normalized to lumi' -40 40
+./NormoverlayMCData.py -r ipprob1_3D ${category}  ${bin} '1^{st} track 3D IP probability' 'Normalized to lumi' -1.1 1.1
 
 ./NormoverlayMCData.py -r ipip2_3D ${category}  ${bin} '2^{nd} track 3D IP value' 'Normalized to lumi' -0.2 0.2
 ./NormoverlayMCData.py -r ipipe2_3D ${category}  ${bin} '2^{nd} track 3D IP error' 'Normalized to lumi' 0 0.05
 ./NormoverlayMCData.py -r ipips2_3D ${category}  ${bin} '2^{nd} track 3D IP significance' 'Normalized to lumi' -40 40
+./NormoverlayMCData.py -r ipprob2_3D ${category}  ${bin} '2^{nd} track 3D IP probability' 'Normalized to lumi' -1.1 1.1
 
 ./NormoverlayMCData.py -r ipip3_3D ${category}  ${bin} '3^{rd} track 3D IP value' 'Normalized to lumi' -0.2 0.2
 ./NormoverlayMCData.py -r ipipe3_3D ${category}  ${bin} '3^{rd} track 3D IP error' 'Normalized to lumi' 0 0.05
 ./NormoverlayMCData.py -r ipips3_3D ${category}  ${bin} '3^{rd} track 3D IP significance' 'Normalized to lumi' -40 40
+./NormoverlayMCData.py -r ipprob3_3D ${category}  ${bin} '3^{rd} track 3D IP probability' 'Normalized to lumi' -1.1 1.1
+
+### Track pT
+./NormoverlayMCData.py -r iptkPt_2D ${category}  ${bin}  'Track p_{T} 2D [GeV/c]' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkPt1_2D ${category}  ${bin} '1^{st} Track p_{T} 2D [GeV/c]' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkPt2_2D ${category}  ${bin} '2^{nd} Track p_{T} 2D [GeV/c]' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkPt3_2D ${category}  ${bin} '3^{rd} Track p_{T} 2D [GeV/c]' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkPt4_2D ${category}  ${bin} '4^{th} Track p_{T} 2D [GeV/c]' 'Normalized to lumi'
+
+./NormoverlayMCData.py -r iptkPt_3D ${category}  ${bin}  'Track p_{T} 3D [GeV/c]' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkPt1_3D ${category}  ${bin} '1^{st} Track p_{T} 3D [GeV/c]' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkPt2_3D ${category}  ${bin} '2^{nd} Track p_{T} 3D [GeV/c]' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkPt3_3D ${category}  ${bin} '3^{rd} Track p_{T} 3D [GeV/c]' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkPt4_3D ${category}  ${bin} '4^{th} Track p_{T} 3D [GeV/c]' 'Normalized to lumi'
+
+### Track N hits
+./NormoverlayMCData.py -r iptkNHits_2D ${category}  ${bin}   'Track NHits 2D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNHits1_2D ${category}  ${bin}  '1^{st} Track NHits 2D ' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNHits2_2D ${category}  ${bin}  '2^{nd} Track NHits 2D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNHits3_2D ${category}  ${bin}  '3^{rd} Track NHits 2D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNHits4_2D ${category}  ${bin}  '4^{th} Track NHits 2D' 'Normalized to lumi'
+
+./NormoverlayMCData.py -r iptkNHits_3D ${category}  ${bin}   'Track NHits 3D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNHits1_3D ${category}  ${bin}  '1^{st} Track NHits 3D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNHits2_3D ${category}  ${bin}  '2^{nd} Track NHits 3D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNHits3_3D ${category}  ${bin}  '3^{rd} Track NHits 3D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNHits4_3D ${category}  ${bin}  '4^{th} Track NHits 3D' 'Normalized to lumi'
+
+### Track Nomalized chi^2
+./NormoverlayMCData.py -r iptkNChiSqr_2D ${category}  ${bin}   'Track Normalized #chi^2 2D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNChiSqr1_2D ${category}  ${bin}  '1^{st} Track Normalized #chi^2 2D ' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNChiSqr2_2D ${category}  ${bin}  '2^{nd} Track Normalized #chi^2 2D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNChiSqr3_2D ${category}  ${bin}  '3^{rd} Track Normalized #chi^2 2D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNChiSqr4_2D ${category}  ${bin}  '4^{th} Track Normalized #chi^2 2D' 'Normalized to lumi'
+
+./NormoverlayMCData.py -r iptkNChiSqr_3D ${category}  ${bin}   'Track Normalized #chi^2 3D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNChiSqr1_3D ${category}  ${bin}  '1^{st} Track Normalized #chi^2 3D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNChiSqr2_3D ${category}  ${bin}  '2^{nd} Track Normalized #chi^2 3D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNChiSqr3_3D ${category}  ${bin}  '3^{rd} Track Normalized #chi^2 3D' 'Normalized to lumi'
+./NormoverlayMCData.py -r iptkNChiSqr4_3D ${category}  ${bin}  '4^{th} Track Normalized #chi^2 3D' 'Normalized to lumi'
 
 ###############################################################
 ################# Electron TagInfo
