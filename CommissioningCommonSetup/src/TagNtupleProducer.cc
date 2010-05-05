@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.9 2010/04/29 11:38:51 winstrom Exp $
+// $Id: TagNtupleProducer.cc,v 1.3 2010/04/29 11:52:29 winstrom Exp $
 //
 //
 
@@ -58,6 +58,7 @@
 
 #include "SimDataFormats/JetMatching/interface/JetFlavour.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
 
@@ -146,7 +147,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   muon_tag_infos_ = iConfig.getParameter<edm::InputTag>( "MuonTagInfos" );
   label_ = iConfig.getParameter<string>( "Label" );
   
-  //Basic Jet Information
+   //Basic Jet Information
   produces<vector<math::XYZTLorentzVector> >( alias = label_ + "jetP4"                  ).setBranchAlias( alias );
   produces<vector<float> >( alias = label_ + "jetPt"                                    ).setBranchAlias( alias );
   produces<vector<float> >( alias = label_ + "jetEta"                                   ).setBranchAlias( alias );
@@ -188,6 +189,8 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
     {
       //MC Truth Information
       produces<vector<float> >( alias = label_ + "MCTrueFlavor"                             ).setBranchAlias( alias ); 
+      // the pthat information
+      produces<float>( alias = label_ + "pthat"  ).setBranchAlias( alias );
     }
 
   if(get_SV_tag_infos_)
@@ -380,6 +383,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   FlavorMap flavor;
 
   edm::Handle<JetFlavourMatchingCollection> jetMC;
+  float pthat;
   if(getMCTruth_)
     {
       iEvent.getByLabel(jet_MC_src_, jetMC);      
@@ -388,6 +392,18 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  int fl = std::abs(iFlav->second.getFlavour());
 	  flavor[iFlav->first] = fl;
 	}
+
+      // fill pt hat
+      pthat = -1;
+      Handle< GenEventInfoProduct   > genInfo;
+      iEvent.getByLabel("generator", genInfo  );      
+      if (genInfo.isValid()) {
+	if( genInfo->hasBinningValues() )
+	  if( genInfo->binningValues().size() > 0 ){
+	    pthat = genInfo->binningValues()[0];  
+	    std::cout<<"   pthat = " << pthat << std::endl;
+	  }
+      }
     } 
   else 
     {
@@ -396,6 +412,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	{
 	  flavor[RefToBase<Jet>(jets, iJet)] = fl;
 	}
+      pthat = -1;
     }
 
   //Get the btaggers that are defined in the configuration file
@@ -454,7 +471,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   //MC Truth Information
   vector<float> MCTrueFlavor;                          
-						       
+ 				       
   //secondaryVertexTagInfos:			       
   vector<math::XYZVector> SecondaryVertex;             
   vector<float> SV3dDistance;                          
@@ -883,6 +900,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   if(getMCTruth_)
     {
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(MCTrueFlavor)),label_+"MCTrueFlavor");
+      iEvent.put(auto_ptr< float >        ( new float(pthat) ),             label_+"pthat");
     }
 			               
   //secondaryVertexTagInfos:					               
