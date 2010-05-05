@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.4 2010/05/05 12:36:20 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.5 2010/05/05 13:01:19 alschmid Exp $
 //
 //
 
@@ -55,6 +55,7 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 
 #include "SimDataFormats/JetMatching/interface/JetFlavour.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
@@ -179,6 +180,8 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   produces<vector<int> >(alias = label_ + "trackQuality"                   ).setBranchAlias( alias );
   produces<vector<float> >(alias = label_ + "trackLongitudinalImpactParameter"          ).setBranchAlias( alias );
   produces<vector<float> >(alias = label_ + "trackDecayLength"          ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "trackDistJetAxis"          ).setBranchAlias( alias ) ;
+  produces<vector<float> >(alias = label_ + "trackDeltaR"          ).setBranchAlias( alias ) ;
   produces<vector<float> >(alias = label_ + "trackIP3d" ).setBranchAlias( alias );
   produces<vector<float> >(alias = label_ + "trackIP2d" ).setBranchAlias( alias );
   produces<vector<float> >(alias = label_ + "trackIP3dError" ).setBranchAlias( alias );
@@ -238,6 +241,22 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
 	  alias = label_ + "IP3dProbability"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
 	  alias = label_ + "IP3dTrackPtRel"+trackNum.str();
+	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dDistJetAxis"+trackNum.str();
+	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dDecayLength"+trackNum.str();
+	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dDeltaR"+trackNum.str();
+	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dMomentum"+trackNum.str();
+	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dTransverseMomentum"+trackNum.str();
+	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dNHits"+trackNum.str();
+	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dNPixelHits"+trackNum.str();
+	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dNormChi2"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
 	  alias = label_ + "IP2dTrackQuality"+trackNum.str();
 	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
@@ -401,7 +420,6 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	if( genInfo->hasBinningValues() )
 	  if( genInfo->binningValues().size() > 0 ){
 	    pthat = genInfo->binningValues()[0];  
-	    std::cout<<"   pthat = " << pthat << std::endl;
 	  }
       }
     } 
@@ -464,6 +482,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<float> trackLongitudinalImpactParameter;
   vector<float> trackIP;
   vector<float> trackDecayLength;
+  vector<float> trackDistJetAxis;
+  vector<float> trackDeltaR;
   vector<float> trackIP3d;
   vector<float> trackIP2d;
   vector<float> trackIP3dError;
@@ -505,7 +525,15 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector< vector<float> > IP3dError(IP_n_saved_tracks_);
   vector< vector<float> > IP3dProbability(IP_n_saved_tracks_);
   vector< vector<float> > IP3dTrackPtRel(IP_n_saved_tracks_);
-  vector< vector<int> > IP2dTrackQuality(IP_n_saved_tracks_);    
+  vector< vector<float> > IP3dDistJetAxis(IP_n_saved_tracks_);
+  vector< vector<float> > IP3dDecayLength(IP_n_saved_tracks_);
+  vector< vector<float> > IP3dDeltaR(IP_n_saved_tracks_);
+  vector< vector<float> > IP3dMomentum(IP_n_saved_tracks_);
+  vector< vector<float> > IP3dTransverseMomentum(IP_n_saved_tracks_);
+  vector< vector<int> >   IP3dNHits(IP_n_saved_tracks_);
+  vector< vector<int> >   IP3dNPixelHits(IP_n_saved_tracks_);
+  vector< vector<float> > IP3dNormChi2(IP_n_saved_tracks_);
+  vector< vector<int> >   IP2dTrackQuality(IP_n_saved_tracks_);    
   vector< vector<float> > IP2d(IP_n_saved_tracks_);
   vector< vector<float> > IP2dError(IP_n_saved_tracks_);
   vector< vector<float> > IP2dProbability(IP_n_saved_tracks_);
@@ -656,7 +684,18 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   	  trackIP2d.push_back(ip2d.value());
   	  trackIP3dError.push_back(ip3d.error());
   	  trackIP2dError.push_back(ip2d.error());
-	  //trackDecayLength.push_back();
+	  TrajectoryStateOnSurface closest =
+	    IPTools::closestApproachToJet(transientTrack.impactPointState(),
+					  *pv, direction,
+					  transientTrack.field());
+	  if (closest.isValid()){
+	    trackDecayLength.push_back( (closest.globalPosition()-   RecoVertex::convertPos(pv->position())).mag() );
+	  }
+	  else{
+	    trackDecayLength.push_back(-1);
+	  }
+	  trackDistJetAxis.push_back( IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value() );
+	  trackDeltaR.push_back( ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),(*iTrack)->momentum()) );
       	}       
 
       //MC Truth Information
@@ -756,6 +795,15 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 						  ipTagInfo[thisJetRef]->selectedTracks()[location3D]->py(),
 						  ipTagInfo[thisJetRef]->selectedTracks()[location3D]->pz());
 		  IP3dTrackPtRel[iTrack].push_back( Perp(thisTrack,axis ) );
+		  IP3dDistJetAxis[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location3D].distanceToJetAxis.value());
+	       	  IP3dDecayLength[iTrack].push_back( (ipTagInfo[thisJetRef]->impactParameterData()[location3D].closestToJetAxis 
+						      -  RecoVertex::convertPos(pv->position())).mag() );
+		  IP3dDeltaR[iTrack].push_back(  ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),ipTagInfo[thisJetRef]->selectedTracks()[location3D]->momentum()) );
+		  IP3dMomentum[iTrack].push_back(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->p() );
+		  IP3dTransverseMomentum[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->pt() );
+		  IP3dNHits[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->hitPattern().numberOfValidHits() ); 
+		  IP3dNPixelHits[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->hitPattern().numberOfValidPixelHits() ); 
+		  IP3dNormChi2[iTrack].push_back(  ipTagInfo[thisJetRef]->selectedTracks()[location3D]->normalizedChi2() );
 		}
 	      else
 		{
@@ -764,6 +812,14 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  IP3dError[iTrack].push_back(-1.0);
 		  IP3dProbability[iTrack].push_back(-1.0);
 		  IP3dTrackPtRel[iTrack].push_back(-1.0);
+		  IP3dDistJetAxis[iTrack].push_back(-100);
+		  IP3dDecayLength[iTrack].push_back(-100);
+		  IP3dDeltaR[iTrack].push_back(-100);
+		  IP3dMomentum[iTrack].push_back(-100);
+		  IP3dTransverseMomentum[iTrack].push_back(-100);
+		  IP3dNHits[iTrack].push_back( -100);
+		  IP3dNPixelHits[iTrack].push_back(-100);
+		  IP3dNormChi2[iTrack].push_back( -100 );
 		}
 	      if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
 		{
@@ -891,6 +947,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackQuality)),label_ + "trackQuality" );
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackLongitudinalImpactParameter)),label_ + "trackLongitudinalImpactParameter");
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDecayLength)),label_ + "trackDecayLength" );
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDistJetAxis)),label_ + "trackDistJetAxis" );
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDistJetAxis)),label_ + "trackDeltaR" );
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP3d)),label_ + "trackIP3d" );
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP2d)),label_ + "trackIP2d" );
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP3dError)),label_ + "trackIP3dError" );
@@ -950,6 +1008,22 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dProbability[iTrack])),alias);
 	  alias = label_ + "IP3dTrackPtRel"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dTrackPtRel[iTrack])),alias);
+	  alias = label_ + "IP3dDecayLength"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dDecayLength[iTrack])),alias);
+	  alias = label_ + "IP3dDistJetAxis"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dDistJetAxis[iTrack])),alias);
+	  alias = label_ + "IP3dDeltaR"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dDeltaR[iTrack])),alias);
+	  alias = label_ + "IP3dNHits"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dNHits[iTrack])),alias);
+	  alias = label_ + "IP3dNPixelHits"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dNPixelHits[iTrack])),alias);
+	  alias = label_ + "IP3dNormChi2"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dNormChi2[iTrack])),alias);
+	  alias = label_ + "IP3dMomentum"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dMomentum[iTrack])),alias);
+	  alias = label_ + "IP3dTransverseMomentum"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dTransverseMomentum[iTrack])),alias);
 	  alias = label_ + "IP2dTrackQuality"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP2dTrackQuality[iTrack])),alias);
 	  alias = label_ + "IP2d"+trackNum.str();
