@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.3 2010/04/29 11:52:29 winstrom Exp $
+// $Id: TagNtupleProducer.cc,v 1.4 2010/05/05 12:36:20 alschmid Exp $
 //
 //
 
@@ -412,7 +412,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	{
 	  flavor[RefToBase<Jet>(jets, iJet)] = fl;
 	}
-      pthat = -1;
+      pthat = -2;
     }
 
   //Get the btaggers that are defined in the configuration file
