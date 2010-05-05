@@ -686,6 +686,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   hists.mc_hist_loose->Write();
   hists.mc_hist_tight->Write();
   hists.mc_hist_high_purity->Write();
+
   if(scale<=0)
     {
       //assume normalization to data
@@ -700,42 +701,38 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   hists.mc_hist_tight->SetFillColor(kBlue);
   hists.mc_hist_high_purity->SetFillColor(kRed);
 
+  hists.data_hist_undef->SetMarkerStyle(23);
+  hists.data_hist_loose->SetMarkerStyle(22);
+  hists.data_hist_tight->SetMarkerStyle(21);
+  hists.data_hist_high_purity->SetMarkerStyle(20);
+
   THStack mc_stack_hpUp((info.plotName+"_mc_stack_hpUp").c_str(),info.plotTitle.c_str());
   mc_stack_hpUp.Add(hists.mc_hist_undef);
   mc_stack_hpUp.Add(hists.mc_hist_loose);
   mc_stack_hpUp.Add(hists.mc_hist_tight);
   mc_stack_hpUp.Add(hists.mc_hist_high_purity);
-  mc_stack_hpUp.Write();
 
   THStack mc_stack_hpDown((info.plotName+"_mc_stack_hpDown").c_str(),info.plotTitle.c_str());
   mc_stack_hpDown.Add(hists.mc_hist_high_purity);
   mc_stack_hpDown.Add(hists.mc_hist_tight);
   mc_stack_hpDown.Add(hists.mc_hist_loose);
   mc_stack_hpDown.Add(hists.mc_hist_undef);
-  mc_stack_hpDown.Write();
 
   THStack data_stack_hpUp((info.plotName+"_data_stack_hpUp").c_str(),info.plotTitle.c_str());
   data_stack_hpUp.Add(hists.data_hist_undef);
   data_stack_hpUp.Add(hists.data_hist_loose);
   data_stack_hpUp.Add(hists.data_hist_tight);
   data_stack_hpUp.Add(hists.data_hist_high_purity);
-  data_stack_hpUp.Write();
 
   THStack data_stack_hpDown((info.plotName+"_data_stack_hpDown").c_str(),info.plotTitle.c_str());
   data_stack_hpDown.Add(hists.data_hist_high_purity);
   data_stack_hpDown.Add(hists.data_hist_tight);
   data_stack_hpDown.Add(hists.data_hist_loose);
   data_stack_hpDown.Add(hists.data_hist_undef);
-  data_stack_hpDown.Write();
-
-  hists.data_hist_undef->SetMarkerStyle(23);
-  hists.data_hist_loose->SetMarkerStyle(22);
-  hists.data_hist_tight->SetMarkerStyle(21);
-  hists.data_hist_high_purity->SetMarkerStyle(20);
 
   //Make Canvas
 
-  TLegend MClegend(0.8,0.65,0.95,0.8);
+  TLegend MClegend(0.8,0.65,0.98,0.8);
   MClegend.SetHeader("Monte Carlo Simulation");
   MClegend.AddEntry(hists.mc_hist_high_purity,"High Purity Tracks","F");
   MClegend.AddEntry(hists.mc_hist_tight,"Tight Tracks","F");
@@ -745,7 +742,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   MClegend.SetBorderSize(1);
   MClegend.SetFillColor(kWhite);
 
-  TLegend datalegend(0.8,0.8,0.95,0.95);
+  TLegend datalegend(0.8,0.8,0.98,0.95);
   datalegend.SetHeader("Data");
   datalegend.AddEntry(hists.data_hist_high_purity,"High Purity Tracks","PE");
   datalegend.AddEntry(hists.data_hist_tight,"Tight Tracks","PE");
@@ -755,9 +752,12 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   datalegend.SetBorderSize(1);
   datalegend.SetFillColor(kWhite);
 
+  datalegend.SetTextSize(MClegend.GetTextSize());
+
   TCanvas canvas_hpUp((info.plotName+"canvas_hpUp").c_str(),info.plotTitle.c_str(),300,300);
   canvas_hpUp.cd();
   mc_stack_hpUp.Draw("HIST");
+  mc_stack_hpUp.GetXaxis()->SetTitle(info.xTitle.c_str());
   data_stack_hpUp.Draw("E1X0SAME");
   MClegend.Draw();
   datalegend.Draw();
@@ -767,6 +767,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   mc_stack_hpUp.SetMinimum(0.1);
   data_stack_hpUp.SetMinimum(0.1);
   mc_stack_hpUp.Draw("HIST");
+  mc_stack_hpUp.GetXaxis()->SetTitle(info.xTitle.c_str());
   data_stack_hpUp.Draw("E1X0SAME");
   MClegend.Draw();
   datalegend.Draw();
@@ -775,6 +776,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   TCanvas canvas_hpDown((info.plotName+"canvas_hpDown").c_str(),info.plotTitle.c_str(),300,300);
   canvas_hpDown.cd();
   mc_stack_hpDown.Draw("HIST");
+  mc_stack_hpDown.GetXaxis()->SetTitle(info.xTitle.c_str());
   data_stack_hpDown.Draw("E1X0SAME");
   MClegend.Draw();
   datalegend.Draw();
@@ -799,6 +801,18 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   hists.data_hist_tight->SetFillColor(kBlue);
   hists.data_hist_high_purity->SetFillColor(kRed);
 
+  THStack data_stack2_hpUp((info.plotName+"_data_stack2_hpUp").c_str(),info.plotTitle.c_str());
+  data_stack2_hpUp.Add(hists.data_hist_undef);
+  data_stack2_hpUp.Add(hists.data_hist_loose);
+  data_stack2_hpUp.Add(hists.data_hist_tight);
+  data_stack2_hpUp.Add(hists.data_hist_high_purity);
+
+  THStack data_stack2_hpDown((info.plotName+"_data_stack2_hpDown").c_str(),info.plotTitle.c_str());
+  data_stack2_hpDown.Add(hists.data_hist_high_purity);
+  data_stack2_hpDown.Add(hists.data_hist_tight);
+  data_stack2_hpDown.Add(hists.data_hist_loose);
+  data_stack2_hpDown.Add(hists.data_hist_undef);
+
   TLegend legend2(0.8,0.8,0.95,0.95);
   legend2.AddEntry(hists.mc_hist_high_purity,"High Purity Tracks","F");
   legend2.AddEntry(hists.mc_hist_tight,"Tight Tracks","F");
@@ -809,53 +823,61 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   legend2.SetFillColor(kWhite);
 
   mc_stack_hpDown.SetTitle((info.plotTitle+" : Monte Carlo Simulation").c_str());
-  data_stack_hpDown.SetTitle((info.plotTitle+" : Data").c_str());
+  data_stack2_hpDown.SetTitle((info.plotTitle+" : Data").c_str());
   mc_stack_hpUp.SetTitle((info.plotTitle+" : Monte Carlo Simulation").c_str());
-  data_stack_hpUp.SetTitle((info.plotTitle+" : Data").c_str());
+  data_stack2_hpUp.SetTitle((info.plotTitle+" : Data").c_str());
 
   TCanvas canvasTwo_hpUp((info.plotName+"canvasTwo_hpUp").c_str(),info.plotTitle.c_str(),600,300);
   canvasTwo_hpUp.Divide(2,1);
   canvasTwo_hpUp.cd(1);
-  mc_stack_hpUp.Draw("HIST");
+  data_stack2_hpUp.Draw("HIST");
+  data_stack2_hpUp.GetXaxis()->SetTitle(info.xTitle.c_str());
   legend2.Draw();
   canvasTwo_hpUp.cd(2);
   mc_stack_hpUp.Draw("HIST");
+  mc_stack_hpUp.GetXaxis()->SetTitle(info.xTitle.c_str());
   legend2.Draw();
   canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Linear.pdf").c_str());
   canvasTwo_hpUp.Clear();
   mc_stack_hpUp.SetMinimum(0.1);
-  data_stack_hpUp.SetMinimum(0.1);
+  data_stack2_hpUp.SetMinimum(0.1);
   canvasTwo_hpUp.Divide(2,1);
   canvasTwo_hpUp.GetPad(1)->SetLogy();
   canvasTwo_hpUp.GetPad(2)->SetLogy();
   canvasTwo_hpUp.cd(1);
-  mc_stack_hpUp.Draw("HIST");
+  data_stack2_hpUp.Draw("HIST");
+  data_stack2_hpUp.GetXaxis()->SetTitle(info.xTitle.c_str());
   legend2.Draw();
   canvasTwo_hpUp.cd(2);
   mc_stack_hpUp.Draw("HIST");
+  mc_stack_hpUp.GetXaxis()->SetTitle(info.xTitle.c_str());
   legend2.Draw();
   canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Log.pdf").c_str());
 
   TCanvas canvasTwo_hpDown((info.plotName+"canvasTwo_hpDown").c_str(),info.plotTitle.c_str(),600,300);
   canvasTwo_hpDown.Divide(2,1);
   canvasTwo_hpDown.cd(1);
-  mc_stack_hpDown.Draw("HIST");
+  data_stack2_hpDown.Draw("HIST");
+  data_stack2_hpDown.GetXaxis()->SetTitle(info.xTitle.c_str());
   legend2.Draw();
   canvasTwo_hpDown.cd(2);
   mc_stack_hpDown.Draw("HIST");
+  mc_stack_hpDown.GetXaxis()->SetTitle(info.xTitle.c_str());
   legend2.Draw();
   canvasTwo_hpDown.SaveAs((info.plotName+"_hpDown_Linear.pdf").c_str());
   canvasTwo_hpDown.Clear();
   mc_stack_hpDown.SetMinimum(0.1);
-  data_stack_hpDown.SetMinimum(0.1);
+  data_stack2_hpDown.SetMinimum(0.1);
   canvasTwo_hpDown.Divide(2,1);
   canvasTwo_hpDown.GetPad(1)->SetLogy();
   canvasTwo_hpDown.GetPad(2)->SetLogy();
   canvasTwo_hpDown.cd(1);
-  mc_stack_hpDown.Draw("HIST");
+  data_stack2_hpDown.Draw("HIST");
+  data_stack2_hpDown.GetXaxis()->SetTitle(info.xTitle.c_str());
   legend2.Draw();
   canvasTwo_hpDown.cd(2);
   mc_stack_hpDown.Draw("HIST");
+  mc_stack_hpDown.GetXaxis()->SetTitle(info.xTitle.c_str());
   legend2.Draw();
   canvasTwo_hpDown.SaveAs((info.plotName+"_hpDown_Log.pdf").c_str());
   
@@ -867,6 +889,7 @@ void MakeAJetTrackQualityPlot(informationQuality info, qualityHists1D hists, dou
   information1d helperQuality;
   helperQuality.plotName = info.plotName;
   helperQuality.plotTitle = info.plotTitle;
+  helperQuality.xTitle = info.xTitle;
   MakeATrackQualityPlot(helperQuality,hists,scale);
 }
 
