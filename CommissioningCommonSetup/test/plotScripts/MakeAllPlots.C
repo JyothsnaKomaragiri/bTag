@@ -13,8 +13,10 @@
 
 #include <cmath>
 #include <string>
+#include <string.h>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <list>
 #include <utility>
@@ -39,6 +41,19 @@ struct informationQuality{
   std::string xTitle;
   std::string cut;
   std::string qualityVar;
+  double xlow;
+  double xup;
+  int nbinsx;
+};
+
+struct informationPtHat{
+  std::string plotName;
+  std::string plotTitle;
+  std::string label;
+  std::string aliasx;
+  std::string xTitle;
+  std::string cut;
+  std::vector<double> ptHatBins;
   double xlow;
   double xup;
   int nbinsx;
@@ -86,6 +101,11 @@ struct flavorHists1D{
   TH1D* mc_c_hist;
   TH1D* mc_light_hist;
   TH1D* mc_none_hist;
+};
+
+struct ptHatHists1D{
+  TH1D* data_hist;
+  std::vector<TH1D*> mc_hists;
 };
 
 struct qualityHists1D{
@@ -220,6 +240,83 @@ informationQuality paramQuality(ifstream* plotFile, informationQuality defaultPa
     if(line.find("qualityVar")<position){
       qualityVar = true;
       thisPlot.qualityVar = line.substr(position+1);
+    }
+    if(line.find("xlow")<position){
+      xlow = true;
+      thisPlot.xlow = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("xup")<position){
+      xup = true;
+      thisPlot.xup = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("nbinsx")<position){
+      nbinsx = true;
+      thisPlot.nbinsx = atoi((line.substr(position+1)).c_str());
+    }
+  }
+  return thisPlot;
+}
+
+informationPtHat paramPtHat(ifstream* plotFile, informationPtHat defaultParams)
+{
+  informationPtHat thisPlot = defaultParams;
+  bool plotName = false;
+  bool plotTitle = false;
+  bool label = false;
+  bool aliasx = false;
+  bool xTitle = false;
+  bool cut = false;
+  bool ptHatBins = false;
+  bool xlow = false;
+  bool xup = false;
+  bool nbinsx = false;
+
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && ptHatBins && xlow && xup && nbinsx)) {
+    string line;
+    size_t position;
+    getline(*plotFile,line);
+    if (line.find("#")==0) continue;
+    if (line.find("end_plot")!=string::npos) return thisPlot;
+    if (line.find("end_default")!=string::npos) return thisPlot;
+    position = line.find("=");
+    if(line.find("plotName")<position){
+      plotName = true; 
+      thisPlot.plotName = line.substr(position+1);
+    }
+    if(line.find("plotTitle")<position){
+      plotTitle = true; 
+      thisPlot.plotTitle = line.substr(position+1);
+    }
+    if(line.find("label")<position){
+      label = true; 
+      thisPlot.label = line.substr(position+1);
+    }
+    if(line.find("aliasx")<position){
+      aliasx = true;
+      thisPlot.aliasx = line.substr(position+1);
+    }
+    if(line.find("xTitle")<position){
+      xTitle = true;
+      thisPlot.xTitle = line.substr(position+1);
+    }
+    if(line.find("cut")<position){
+      cut = true;
+      thisPlot.cut = line.substr(position+1);
+    }
+    if(line.find("ptHatBins")<position){
+      ptHatBins = true;
+      string binString = line.substr(position+1);
+      vector<double> bins;
+      char* allBins;
+      allBins = new char [binString.size()+1];
+      strcpy (allBins, binString.c_str());
+      char * tokens = strtok(allBins,", ");
+      while(tokens!=NULL){
+	bins.push_back(atof(tokens));
+	tokens = strtok(NULL,", ");
+      }
+      thisPlot.ptHatBins = bins;
+      delete[] allBins;
     }
     if(line.find("xlow")<position){
       xlow = true;
@@ -427,6 +524,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
       //assume normalization to data
       scale = hists.data_hist->Integral()/hists.mc_all_hist->Integral();
     }      
+  hists.mc_all_hist->Scale(scale);
   hists.mc_b_hist->Scale(scale);
   hists.mc_c_hist->Scale(scale);
   hists.mc_light_hist->Scale(scale);
@@ -558,6 +656,85 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   canvas.SaveAs((info.plotName+".pdf").c_str());
 }
 
+void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale)
+{
+  hists.mc_all_hist->Write();
+  hists.mc_b_hist->Write();
+  hists.mc_c_hist->Write();
+  hists.mc_light_hist->Write();
+  hists.mc_none_hist->Write();
+  hists.data_hist->Write();
+  if(scale<=0)
+    {
+      //assume normalization to data
+      scale = hists.data_hist->Integral()/hists.mc_all_hist->Integral();
+    }   
+  
+  hists.mc_all_hist->Scale(scale);
+  hists.mc_b_hist->Scale(scale);
+  hists.mc_c_hist->Scale(scale);
+  hists.mc_light_hist->Scale(scale);
+  hists.mc_none_hist->Scale(scale);
+
+  flavorHists1D reweightedHists;
+  information1d reweightedInfo;
+
+  reweightedInfo.plotName = info.plotName;
+  reweightedInfo.plotTitle = info.plotTitle;
+
+  reweightedHists.data_hist = hists.data_hist->ProjectionX();
+  reweightedHists.mc_all_hist = hists.mc_all_hist->ProjectionX();
+  reweightedHists.mc_b_hist = hists.mc_b_hist->ProjectionX();
+  reweightedHists.mc_c_hist = hists.mc_c_hist->ProjectionX();
+  reweightedHists.mc_light_hist = hists.mc_light_hist->ProjectionX();
+  reweightedHists.mc_none_hist = hists.mc_none_hist->ProjectionX();
+
+  reweightedHists.data_hist->Scale(0);
+  reweightedHists.mc_all_hist->Scale(0);
+  reweightedHists.mc_b_hist->Scale(0);
+  reweightedHists.mc_c_hist->Scale(0);
+  reweightedHists.mc_light_hist->Scale(0);
+  reweightedHists.mc_none_hist->Scale(0);
+
+  TH1D* data_temp;
+  TH1D* mc_all_temp;
+  TH1D* mc_b_temp;
+  TH1D* mc_c_temp;
+  TH1D* mc_light_temp;
+  TH1D* mc_none_temp;
+
+  for(int iYbin = 0; iYbin<info.nbinsy+2; iYbin++){
+    double tempScale;
+    data_temp = hists.data_hist->ProjectionX("data_temp",iYbin,iYbin);
+    mc_all_temp = hists.mc_all_hist->ProjectionX("mc_all_temp",iYbin,iYbin);
+    mc_b_temp = hists.mc_b_hist->ProjectionX("mc_b_temp",iYbin,iYbin);
+    mc_c_temp = hists.mc_c_hist->ProjectionX("mc_c_temp",iYbin,iYbin);
+    mc_light_temp = hists.mc_light_hist->ProjectionX("mc_light_temp",iYbin,iYbin);
+    mc_none_temp = hists.mc_none_hist->ProjectionX("mc_none_temp",iYbin,iYbin);
+    if(mc_all_temp->Integral() !=0 ) tempScale = data_temp->Integral()/mc_all_temp->Integral();
+    else tempScale = 1;
+    mc_all_temp->Scale(tempScale);
+    mc_b_temp->Scale(tempScale);
+    mc_c_temp->Scale(tempScale);
+    mc_light_temp->Scale(tempScale);
+    mc_none_temp->Scale(tempScale);
+    reweightedHists.data_hist->Add(data_temp);
+    reweightedHists.mc_all_hist->Add(mc_all_temp);
+    reweightedHists.mc_b_hist->Add(mc_b_temp);
+    reweightedHists.mc_c_hist->Add(mc_c_temp);
+    reweightedHists.mc_light_hist->Add(mc_light_temp);
+    reweightedHists.mc_none_hist->Add(mc_none_temp);
+    delete data_temp;
+    delete mc_all_temp;
+    delete mc_b_temp;
+    delete mc_c_temp;
+    delete mc_light_temp;
+    delete mc_none_temp;
+  }
+
+  MakeAFlavorPlot(reweightedInfo,reweightedHists,scale);
+}
+
 void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
 {
   hists.mc_all_hist->Write();
@@ -571,6 +748,8 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
       //assume normalization to data
       scale = hists.data_hist->Integral()/hists.mc_all_hist->Integral();
     }   
+
+  hists.mc_all_hist->Scale(scale);
   hists.mc_b_hist->Scale(scale);
   hists.mc_c_hist->Scale(scale);
   hists.mc_light_hist->Scale(scale);
@@ -1288,6 +1467,45 @@ void MakeA2DHist(string type, TTree* thisTree, information2d info,flavorHists2D 
   return;
 }
 
+void MakeA2DTrackHist(string type, TTree* thisTree, information2d info, flavorHists2D hists, string scale)
+{
+  if(type=="data")
+    {
+      TH2D* temp_data_hist = (TH2D*)hists.data_hist->Clone((info.plotName+"_temp_data_hist").c_str());
+      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_data_hist").c_str(),(scale+"*("+info.cut+")").c_str(),"goff");
+      hists.data_hist->Add(temp_data_hist);
+    }
+  if(type=="mc")
+    {
+      string bcut,ccut,lightcut,nonecut;
+      bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5)";
+      ccut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==4)";
+      lightcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==1 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==2 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==3 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==21)";
+      nonecut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==0)";
+      
+      if(info.cut!="")  
+	{
+	  bcut = "("+info.cut+")&&"+bcut;
+	  ccut = "("+info.cut+")&&"+ccut;
+	  lightcut ="("+info.cut+")&&"+lightcut;
+	  nonecut ="("+info.cut+")&&"+nonecut;
+	}      
+      TH2D* temp_mc_b_hist = (TH2D*)hists.mc_b_hist->Clone((info.plotName+"_temp_mc_b_hist").c_str());
+      TH2D* temp_mc_c_hist = (TH2D*)hists.mc_c_hist->Clone((info.plotName+"_temp_mc_c_hist").c_str());
+      TH2D* temp_mc_light_hist = (TH2D*)hists.mc_light_hist->Clone((info.plotName+"_temp_mc_light_hist").c_str());
+      TH2D* temp_mc_none_hist = (TH2D*)hists.mc_none_hist->Clone((info.plotName+"_temp_mc_none_hist").c_str());
+      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_b_hist").c_str(),(scale+"*("+bcut+")").c_str(),"goff");
+      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_c_hist").c_str(),(scale+"*("+ccut+")").c_str(),"goff");
+      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_light_hist").c_str(),(scale+"*("+lightcut+")").c_str(),"goff");
+      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_none_hist").c_str(),(scale+"*("+nonecut+")").c_str(),"goff");
+      hists.mc_b_hist->Add(temp_mc_b_hist);
+      hists.mc_c_hist->Add(temp_mc_c_hist);
+      hists.mc_light_hist->Add(temp_mc_light_hist);
+      hists.mc_none_hist->Add(temp_mc_none_hist);
+    }
+  return;
+}
+
 void MakeACutHist(string type, TTree* thisTree, informationCut info,flavorHists2D hists, string scale)
 {
   if(type=="data")
@@ -1390,6 +1608,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   information2d defaultInformation2d;
   informationCut defaultInformationCut;
   informationQuality defaultInformationQuality;
+  informationPtHat defaultInformationPtHat;
 
   list< pair< information1d , flavorHists1D > > jetPlots1D;
   list< pair< information1d , flavorHists1D > > trackPlots_flavorStack;
@@ -1397,6 +1616,9 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   list< pair< information2d , flavorHists2D > > jetPlots2D;
   list< pair< informationCut , flavorHists2D > > cutPlots;
   list< pair< informationQuality , qualityHists1D > > jetTrackQualityPlots;
+  list< pair< informationPtHat , ptHatHists1D > > ptHatPlots;
+  list< pair< information2d , flavorHists2D > > reweightedPlots;
+  list< pair< information2d , flavorHists2D > > reweightedTrackPlots;
 
   while (! plotFiles.eof()) {
     string line;
@@ -1406,6 +1628,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     if (line.find("default2d")!=string::npos) defaultInformation2d = param2d(&plotFiles,defaultInformation2d);
     if (line.find("defaultCut")!=string::npos) defaultInformationCut = paramCut(&plotFiles,defaultInformationCut);
     if (line.find("defaultQuality")!=string::npos) defaultInformationQuality = paramQuality(&plotFiles,defaultInformationQuality);
+    if (line.find("defaultPtHat")!=string::npos) defaultInformationPtHat = paramPtHat(&plotFiles,defaultInformationPtHat);
     if(line.find("plot_type")==string::npos) continue;
     size_t typePosition = line.find("=");
     string plotType = line.substr(typePosition+1);
@@ -1432,6 +1655,27 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_light_hist->Sumw2();
 	theseHists.mc_none_hist->Sumw2();
 	jetPlots1D.push_back(pair<information1d,flavorHists1D>(thisPlot,theseHists));
+      }
+    }
+    if(plotType.find("ptHatPlots")!=string::npos){
+      informationPtHat thisPlot = paramPtHat(&plotFiles,defaultInformationPtHat);
+      if(doPlot == "" || thisPlot.plotName.find(doPlot)!=string::npos){
+	ptHatHists1D theseHists;
+	for(vector<double>::iterator iPlot = thisPlot.ptHatBins.begin(); (iPlot+1)!=thisPlot.ptHatBins.end(); iPlot++)
+	  {
+	    stringstream lowBin;
+	    lowBin << *iPlot;
+	    stringstream highBin;
+	    highBin << *(iPlot+1);
+	    TH1D* thisPlotPointer = new TH1D(((thisPlot.plotName+"_mc_hist_"+lowBin.str()+"_"+highBin.str()).c_str()),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	    thisPlotPointer->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	    thisPlotPointer->Sumw2();
+	    theseHists.mc_hists.push_back(thisPlotPointer);
+	  }
+	theseHists.data_hist = new TH1D((thisPlot.plotName+"_data_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.data_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.data_hist->Sumw2();
+        ptHatPlots.push_back(pair<informationPtHat,ptHatHists1D>(thisPlot,theseHists));
       }
     }
    if(plotType.find("jetTrackQualityPlots")!=string::npos){
@@ -1494,6 +1738,68 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_light_hist->Sumw2();
 	theseHists.mc_none_hist->Sumw2();
 	jetPlots2D.push_back(pair<information2d,flavorHists2D>(thisPlot,theseHists));
+      }
+    }
+    if(plotType.find("reweightedPlot")!=string::npos){
+      information2d thisPlot = param2d(&plotFiles,defaultInformation2d);
+      if(doPlot == "" || thisPlot.plotName.find(doPlot)!=string::npos){
+	flavorHists2D theseHists;
+	theseHists.data_hist = new TH2D((thisPlot.plotName+"_data_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.mc_all_hist = new TH2D((thisPlot.plotName+"_mc_all_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.mc_b_hist = new TH2D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.mc_c_hist = new TH2D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.mc_light_hist = new TH2D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.mc_none_hist = new TH2D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.data_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_all_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.data_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.data_hist->Sumw2();
+	theseHists.mc_all_hist->Sumw2();
+	theseHists.mc_b_hist->Sumw2();
+	theseHists.mc_c_hist->Sumw2();
+	theseHists.mc_light_hist->Sumw2();
+	theseHists.mc_none_hist->Sumw2();
+	reweightedPlots.push_back(pair<information2d,flavorHists2D>(thisPlot,theseHists));
+      }
+    }
+    if(plotType.find("reweightedTrackPlot")!=string::npos){
+      information2d thisPlot = param2d(&plotFiles,defaultInformation2d);
+      if(doPlot == "" || thisPlot.plotName.find(doPlot)!=string::npos){
+	flavorHists2D theseHists;
+	theseHists.data_hist = new TH2D((thisPlot.plotName+"_data_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.mc_all_hist = new TH2D((thisPlot.plotName+"_mc_all_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.mc_b_hist = new TH2D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.mc_c_hist = new TH2D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.mc_light_hist = new TH2D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.mc_none_hist = new TH2D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	theseHists.data_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_all_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.data_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.data_hist->Sumw2();
+	theseHists.mc_all_hist->Sumw2();
+	theseHists.mc_b_hist->Sumw2();
+	theseHists.mc_c_hist->Sumw2();
+	theseHists.mc_light_hist->Sumw2();
+	theseHists.mc_none_hist->Sumw2();
+	reweightedTrackPlots.push_back(pair<information2d,flavorHists2D>(thisPlot,theseHists));
       }
     }
     if(plotType.find("cutPlots")!=string::npos){
@@ -1605,6 +1911,14 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	{
 	  MakeA2DHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
 	}
+      for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedPlots.begin(); iPlot != reweightedPlots.end(); iPlot++)
+	{
+	  MakeA2DHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
+	}
+      for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedTrackPlots.begin(); iPlot != reweightedTrackPlots.end(); iPlot++)
+	{
+	  MakeA2DTrackHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
+	}
       for(list< pair< informationCut , flavorHists2D > >::iterator iPlot = cutPlots.begin(); iPlot != cutPlots.end(); iPlot++)
 	{
 	  MakeACutHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
@@ -1635,6 +1949,14 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
       for(list< pair< information2d , flavorHists2D > >::iterator iPlot = jetPlots2D.begin(); iPlot != jetPlots2D.end(); iPlot++)
 	{
 	  MakeA2DHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
+	}
+      for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedPlots.begin(); iPlot != reweightedPlots.end(); iPlot++)
+	{   
+	  MakeA2DHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
+	}
+      for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedTrackPlots.begin(); iPlot != reweightedTrackPlots.end(); iPlot++)
+	{	  
+	  MakeA2DTrackHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
 	}
       for(list< pair< informationCut , flavorHists2D > >::iterator iPlot = cutPlots.begin(); iPlot != cutPlots.end(); iPlot++)
 	{
@@ -1676,6 +1998,22 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
       iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
       iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
       MakeA2DPlot(iPlot->first,iPlot->second,finalNorm);
+    }
+  for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedPlots.begin(); iPlot != reweightedPlots.end(); iPlot++)
+    {
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
+      MakeAReweightedPlot(iPlot->first,iPlot->second,finalNorm);
+    }
+  for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedTrackPlots.begin(); iPlot != reweightedTrackPlots.end(); iPlot++)
+    {
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
+      MakeAReweightedPlot(iPlot->first,iPlot->second,finalNorm);
     }
   for(list< pair< informationCut , flavorHists2D > >::iterator iPlot = cutPlots.begin(); iPlot != cutPlots.end(); iPlot++)
     {
