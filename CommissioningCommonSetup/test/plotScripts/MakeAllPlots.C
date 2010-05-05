@@ -456,11 +456,24 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
+  TLegend legend(0.8,0.8,0.95,0.95);
+  legend.AddEntry(drawHelper,"Data","LPE");
+  //  dataEntry->SetMarkerStyle(20);
+  legend.AddEntry(hists.mc_b_hist,"MC Simulation: True b-jet","F");
+  legend.AddEntry(hists.mc_c_hist,"MC Simulation: True c-jet","F");
+  legend.AddEntry(hists.mc_light_hist,"MC Simulation: True light-jet","F");
+  legend.AddEntry(hists.mc_none_hist,"MC Simulation: No Truth Match","F");
+
+  legend.SetBorderSize(1);
+  legend.SetFillColor(kWhite);
+  //legend.SetFillStyle(1);
+
   TCanvas canvas_bUp((info.plotName+"canvas_bUp").c_str(),info.plotTitle.c_str(),300,300);
   canvas_bUp.cd();
   mc_stack_bUp.Draw("HIST");
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
+  legend.Draw();
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.pdf").c_str());
   canvas_bUp.Clear();
   canvas_bUp.SetLogy();
@@ -471,6 +484,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.data_hist->SetMarkerStyle(1);
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
+  legend.Draw();
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log.pdf").c_str());
   hists.data_hist->SetMinimum(0);
   
@@ -480,6 +494,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.data_hist->SetMarkerStyle(1);
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
+  legend.Draw();
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.pdf").c_str());
   canvas_bDown.Clear();
   canvas_bDown.SetLogy();
@@ -488,6 +503,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bDown.Draw("HIST");
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
+  legend.Draw();
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.pdf").c_str());
 
   return;
@@ -513,16 +529,32 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   mc_stack.Add(hists.mc_b_hist);
   mc_stack.Add(hists.mc_all_hist);
 
+  hists.data_hist->SetLineColor(kBlack);
+  hists.data_hist->SetFillStyle(0);
+
   //Make Canvas
 
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
+  TLegend legend(0.8,0.8,0.95,0.95);
+  legend.AddEntry(drawHelper,"Data","LPE");
+  //  dataEntry->SetMarkerStyle(20);
+  legend.AddEntry(hists.mc_all_hist,"MC Simulation","L");
+  legend.AddEntry(hists.mc_b_hist,"MC Simulation: True b-jet","L");
+  legend.AddEntry(hists.mc_c_hist,"MC Simulation: True c-jet","L");
+  legend.AddEntry(hists.mc_light_hist,"MC Simulation: True light-jet","L");
+  legend.AddEntry(hists.mc_none_hist,"MC Simulation: No Truth Match","L");
+
+  legend.SetBorderSize(1);
+  legend.SetFillColor(kWhite);
+
   TCanvas canvas((info.plotName+"canvas").c_str(),info.plotTitle.c_str(),300,300);
   canvas.cd();
   mc_stack.Draw("HISTNOSTACK");
-  hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
+  hists.data_hist->Draw("E1X0SAME");
+  legend.Draw();
   canvas.SaveAs((info.plotName+".pdf").c_str());
 }
 
@@ -657,7 +689,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   if(scale<=0)
     {
       //assume normalization to data
-      scale = hists.data_hist_undef->Integral()/hists.mc_hist_undef->Integral();
+      scale = (hists.data_hist_undef->Integral()+hists.data_hist_loose->Integral()+hists.data_hist_tight->Integral()+hists.data_hist_high_purity->Integral())/(hists.mc_hist_undef->Integral()+hists.mc_hist_loose->Integral()+hists.mc_hist_tight->Integral()+hists.mc_hist_high_purity->Integral());
     }   
   hists.mc_hist_undef->Scale(scale);
   hists.mc_hist_loose->Scale(scale);
@@ -696,11 +728,39 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   data_stack_hpDown.Add(hists.data_hist_undef);
   data_stack_hpDown.Write();
 
+  hists.data_hist_undef->SetMarkerStyle(23);
+  hists.data_hist_loose->SetMarkerStyle(22);
+  hists.data_hist_tight->SetMarkerStyle(21);
+  hists.data_hist_high_purity->SetMarkerStyle(20);
+
   //Make Canvas
+
+  TLegend MClegend(0.8,0.65,0.95,0.8);
+  MClegend.SetHeader("Monte Carlo Simulation");
+  MClegend.AddEntry(hists.mc_hist_high_purity,"High Purity Tracks","F");
+  MClegend.AddEntry(hists.mc_hist_tight,"Tight Tracks","F");
+  MClegend.AddEntry(hists.mc_hist_loose,"Loose Tracks","F");
+  MClegend.AddEntry(hists.mc_hist_undef,"Undefined Tracks","F");
+
+  MClegend.SetBorderSize(1);
+  MClegend.SetFillColor(kWhite);
+
+  TLegend datalegend(0.8,0.8,0.95,0.95);
+  datalegend.SetHeader("Data");
+  datalegend.AddEntry(hists.data_hist_high_purity,"High Purity Tracks","PE");
+  datalegend.AddEntry(hists.data_hist_tight,"Tight Tracks","PE");
+  datalegend.AddEntry(hists.data_hist_loose,"Loose Tracks","PE");
+  datalegend.AddEntry(hists.data_hist_undef,"Undefined Tracks","PE");
+
+  datalegend.SetBorderSize(1);
+  datalegend.SetFillColor(kWhite);
+
   TCanvas canvas_hpUp((info.plotName+"canvas_hpUp").c_str(),info.plotTitle.c_str(),300,300);
   canvas_hpUp.cd();
   mc_stack_hpUp.Draw("HIST");
   data_stack_hpUp.Draw("E1X0SAME");
+  MClegend.Draw();
+  datalegend.Draw();
   canvas_hpUp.SaveAs((info.plotName+"_hpUp_overlay_Linear.pdf").c_str());
   canvas_hpUp.Clear();
   canvas_hpUp.SetLogy();
@@ -708,12 +768,16 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   data_stack_hpUp.SetMinimum(0.1);
   mc_stack_hpUp.Draw("HIST");
   data_stack_hpUp.Draw("E1X0SAME");
+  MClegend.Draw();
+  datalegend.Draw();
   canvas_hpUp.SaveAs((info.plotName+"_hpUp_overlay_Log.pdf").c_str());
   
   TCanvas canvas_hpDown((info.plotName+"canvas_hpDown").c_str(),info.plotTitle.c_str(),300,300);
   canvas_hpDown.cd();
   mc_stack_hpDown.Draw("HIST");
   data_stack_hpDown.Draw("E1X0SAME");
+  MClegend.Draw();
+  datalegend.Draw();
   canvas_hpDown.SaveAs((info.plotName+"_hpDown_overlay_Linear.pdf").c_str());
   canvas_hpDown.Clear();
   canvas_hpDown.SetLogy();
@@ -721,6 +785,8 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   data_stack_hpDown.SetMinimum(0.1);
   mc_stack_hpUp.Draw("HIST");
   data_stack_hpDown.Draw("E1X0SAME");
+  MClegend.Draw();
+  datalegend.Draw();
   canvas_hpUp.SaveAs((info.plotName+"_hpDown_overlay_Log.pdf").c_str());
 
   mc_stack_hpUp.SetMinimum(0);
@@ -733,6 +799,15 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   hists.data_hist_tight->SetFillColor(kBlue);
   hists.data_hist_high_purity->SetFillColor(kRed);
 
+  TLegend legend2(0.8,0.8,0.95,0.95);
+  legend2.AddEntry(hists.mc_hist_high_purity,"High Purity Tracks","F");
+  legend2.AddEntry(hists.mc_hist_tight,"Tight Tracks","F");
+  legend2.AddEntry(hists.mc_hist_loose,"Loose Tracks","F");
+  legend2.AddEntry(hists.mc_hist_undef,"Undefined Tracks","F");
+
+  legend2.SetBorderSize(1);
+  legend2.SetFillColor(kWhite);
+
   mc_stack_hpDown.SetTitle((info.plotTitle+" : Monte Carlo Simulation").c_str());
   data_stack_hpDown.SetTitle((info.plotTitle+" : Data").c_str());
   mc_stack_hpUp.SetTitle((info.plotTitle+" : Monte Carlo Simulation").c_str());
@@ -742,8 +817,10 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   canvasTwo_hpUp.Divide(2,1);
   canvasTwo_hpUp.cd(1);
   mc_stack_hpUp.Draw("HIST");
+  legend2.Draw();
   canvasTwo_hpUp.cd(2);
   mc_stack_hpUp.Draw("HIST");
+  legend2.Draw();
   canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Linear.pdf").c_str());
   canvasTwo_hpUp.Clear();
   mc_stack_hpUp.SetMinimum(0.1);
@@ -753,16 +830,20 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   canvasTwo_hpUp.GetPad(2)->SetLogy();
   canvasTwo_hpUp.cd(1);
   mc_stack_hpUp.Draw("HIST");
+  legend2.Draw();
   canvasTwo_hpUp.cd(2);
   mc_stack_hpUp.Draw("HIST");
+  legend2.Draw();
   canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Log.pdf").c_str());
 
   TCanvas canvasTwo_hpDown((info.plotName+"canvasTwo_hpDown").c_str(),info.plotTitle.c_str(),600,300);
   canvasTwo_hpDown.Divide(2,1);
   canvasTwo_hpDown.cd(1);
   mc_stack_hpDown.Draw("HIST");
+  legend2.Draw();
   canvasTwo_hpDown.cd(2);
   mc_stack_hpDown.Draw("HIST");
+  legend2.Draw();
   canvasTwo_hpDown.SaveAs((info.plotName+"_hpDown_Linear.pdf").c_str());
   canvasTwo_hpDown.Clear();
   mc_stack_hpDown.SetMinimum(0.1);
@@ -772,8 +853,10 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   canvasTwo_hpDown.GetPad(2)->SetLogy();
   canvasTwo_hpDown.cd(1);
   mc_stack_hpDown.Draw("HIST");
+  legend2.Draw();
   canvasTwo_hpDown.cd(2);
   mc_stack_hpDown.Draw("HIST");
+  legend2.Draw();
   canvasTwo_hpDown.SaveAs((info.plotName+"_hpDown_Log.pdf").c_str());
   
   return;
@@ -824,18 +907,22 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale)
 	  data_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.data_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx+1,iYbin,iYbin));
 	  error2_data[iYbin]+=pow(hists.data_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
 	  data_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_data[iYbin]));
-	  mc_b_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_b_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx,iYbin,iYbin));
-	  error2_mc_b[iYbin]+=pow(hists.mc_b_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
-	  mc_b_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_mc_b[iYbin]));
-	  mc_c_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_c_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx,iYbin,iYbin));
-	  error2_mc_c[iYbin]+=pow(hists.mc_c_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
-	  mc_c_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_mc_c[iYbin]));
-	  mc_light_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_light_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx,iYbin,iYbin));
-	  error2_mc_light[iYbin]+=pow(hists.mc_light_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
-	  mc_light_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_mc_light[iYbin]));
-	  mc_none_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_none_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx,iYbin,iYbin));
-	  error2_mc_none[iYbin]+=pow(hists.mc_none_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
-	  mc_none_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_mc_none[iYbin]));
+
+	  mc_b_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_b_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx+1,iYbin,iYbin));
+	  error2_data[iYbin]+=pow(hists.mc_b_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
+	  mc_b_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_data[iYbin]));
+
+	  mc_c_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_c_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx+1,iYbin,iYbin));
+	  error2_data[iYbin]+=pow(hists.mc_c_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
+	  mc_c_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_data[iYbin]));
+
+	  mc_light_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_light_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx+1,iYbin,iYbin));
+	  error2_data[iYbin]+=pow(hists.mc_light_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
+	  mc_light_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_data[iYbin]));
+
+	  mc_none_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_none_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx+1,iYbin,iYbin));
+	  error2_data[iYbin]+=pow(hists.mc_none_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
+	  mc_none_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_data[iYbin]));
 	}
       }
     }
@@ -846,18 +933,22 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale)
 	  data_int->SetBinContent(iXbin,iYbin,hists.data_hist->Integral(0,iXbin,iYbin,iYbin));
 	  error2_data[iYbin]+=pow(hists.data_hist->GetBinError(iXbin,iYbin),2);
 	  data_int->SetBinError(iXbin,iYbin,sqrt(error2_data[iYbin]));
+
 	  mc_b_int->SetBinContent(iXbin,iYbin,hists.mc_b_hist->Integral(0,iXbin,iYbin,iYbin));
-	  error2_mc_b[iYbin]+=pow(hists.mc_b_hist->GetBinError(iXbin,iYbin),2);
-	  mc_b_int->SetBinError(iXbin,iYbin,sqrt(error2_mc_b[iYbin]));
+	  error2_data[iYbin]+=pow(hists.mc_b_hist->GetBinError(iXbin,iYbin),2);
+	  mc_b_int->SetBinError(iXbin,iYbin,sqrt(error2_data[iYbin]));
+
 	  mc_c_int->SetBinContent(iXbin,iYbin,hists.mc_c_hist->Integral(0,iXbin,iYbin,iYbin));
-	  error2_mc_c[iYbin]+=pow(hists.mc_c_hist->GetBinError(iXbin,iYbin),2);
-	  mc_c_int->SetBinError(iXbin,iYbin,sqrt(error2_mc_c[iYbin]));
+	  error2_data[iYbin]+=pow(hists.mc_c_hist->GetBinError(iXbin,iYbin),2);
+	  mc_c_int->SetBinError(iXbin,iYbin,sqrt(error2_data[iYbin]));
+
 	  mc_light_int->SetBinContent(iXbin,iYbin,hists.mc_light_hist->Integral(0,iXbin,iYbin,iYbin));
-	  error2_mc_light[iYbin]+=pow(hists.mc_light_hist->GetBinError(iXbin,iYbin),2);
-	  mc_light_int->SetBinError(iXbin,iYbin,sqrt(error2_mc_light[iYbin]));
+	  error2_data[iYbin]+=pow(hists.mc_light_hist->GetBinError(iXbin,iYbin),2);
+	  mc_light_int->SetBinError(iXbin,iYbin,sqrt(error2_data[iYbin]));
+
 	  mc_none_int->SetBinContent(iXbin,iYbin,hists.mc_none_hist->Integral(0,iXbin,iYbin,iYbin));
-	  error2_mc_none[iYbin]+=pow(hists.mc_none_hist->GetBinError(iXbin,iYbin),2);
-	  mc_none_int->SetBinError(iXbin,iYbin,sqrt(error2_mc_none[iYbin]));
+	  error2_data[iYbin]+=pow(hists.mc_none_hist->GetBinError(iXbin,iYbin),2);
+	  mc_none_int->SetBinError(iXbin,iYbin,sqrt(error2_data[iYbin]));
 	}
       }
     }
@@ -867,6 +958,11 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale)
   mc_all_int->Add(mc_light_int);
   mc_all_int->Add(mc_none_int);
   
+  hists.mc_all_hist->Add(hists.mc_b_hist);
+  hists.mc_all_hist->Add(hists.mc_c_hist);
+  hists.mc_all_hist->Add(hists.mc_light_hist);
+  hists.mc_all_hist->Add(hists.mc_none_hist);
+
   if(scale<=0)
     {
       //assume normalization to data
@@ -1209,7 +1305,7 @@ void MakeACutHist(string type, TTree* thisTree, informationCut info,flavorHists2
 }
 
 void
-MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double finalNorm=1, string rootFile="plots.root" , string doPlot="")
+MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double finalNorm=0, string rootFile="plots.root" , string doPlot="")
 {
 
   TFile* theFile = TFile::Open(rootFile.c_str(),"RECREATE");
