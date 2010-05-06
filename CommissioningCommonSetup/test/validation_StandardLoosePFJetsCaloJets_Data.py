@@ -446,6 +446,7 @@ process.caloBTagAnalysis = process.bTagAnalysis.clone()
 process.caloBTagAnalysis.finalizePlots = False 
 process.caloBTagAnalysis.finalizeOnly = False 
 process.caloBTagAnalysis.ptRecJetMin = 10.0
+process.caloBTagAnalysis.etaMax = 2.5
 process.caloBTagAnalysis.ptRanges = cms.vdouble(10.0, 20.0, 40.0, 99999.0)
 process.caloBTagAnalysis.etaRanges = cms.vdouble(0.0, 1.5, 2.5)
 process.caloBTagAnalysis.tagConfig = cms.VPSet(
