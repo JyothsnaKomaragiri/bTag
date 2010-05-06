@@ -53,10 +53,14 @@ struct informationPtHat{
   std::string aliasx;
   std::string xTitle;
   std::string cut;
+  std::string pthatCut;
   std::vector<double> ptHatBins;
   double xlow;
   double xup;
   int nbinsx;
+  double pthatlow;
+  double pthatup;
+  int nbinspthat;
 };
 
 struct information2d{
@@ -105,6 +109,7 @@ struct flavorHists1D{
 
 struct ptHatHists1D{
   TH1D* data_hist;
+  TH1D* pthat_hist;
   std::vector<TH1D*> mc_hists;
 };
 
@@ -266,12 +271,16 @@ informationPtHat paramPtHat(ifstream* plotFile, informationPtHat defaultParams)
   bool aliasx = false;
   bool xTitle = false;
   bool cut = false;
+  bool pthatCut = false;
   bool ptHatBins = false;
   bool xlow = false;
   bool xup = false;
   bool nbinsx = false;
+  bool pthatlow = false;
+  bool pthatup = false;
+  bool nbinspthat = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && ptHatBins && xlow && xup && nbinsx)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && pthatCut && ptHatBins && xlow && xup && nbinsx && pthatlow && pthatup && nbinspthat)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -303,6 +312,10 @@ informationPtHat paramPtHat(ifstream* plotFile, informationPtHat defaultParams)
       cut = true;
       thisPlot.cut = line.substr(position+1);
     }
+    if(line.find("pthatCut")<position){
+      pthatCut = true;
+      thisPlot.pthatCut = line.substr(position+1);
+    }
     if(line.find("ptHatBins")<position){
       ptHatBins = true;
       string binString = line.substr(position+1);
@@ -329,6 +342,18 @@ informationPtHat paramPtHat(ifstream* plotFile, informationPtHat defaultParams)
     if(line.find("nbinsx")<position){
       nbinsx = true;
       thisPlot.nbinsx = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("pthatlow")<position){
+      pthatlow = true;
+      thisPlot.pthatlow = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("pthatup")<position){
+      pthatup = true;
+      thisPlot.pthatup = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("nbinspthat")<position){
+      nbinspthat = true;
+      thisPlot.nbinspthat = atoi((line.substr(position+1)).c_str());
     }
   }
   return thisPlot;
@@ -519,10 +544,15 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.mc_light_hist->Write();
   hists.mc_none_hist->Write();
   hists.data_hist->Write();
-  if(scale<=0)
+  if(scale==0)
     {
       //assume normalization to data
       scale = hists.data_hist->Integral()/hists.mc_all_hist->Integral();
+    }    
+  if(scale==-1)
+    {
+      //assume normalization to data
+      scale = hists.data_hist->Integral(0,info.nbinsx+1)/hists.mc_all_hist->Integral(0,info.nbinsx+1);
     }      
   hists.mc_all_hist->Scale(scale);
   hists.mc_b_hist->Scale(scale);
@@ -553,6 +583,11 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
+
+  TH1D* ratio = (TH1D*)hists.data_hist->Clone((info.plotName+"ratio").c_str());
+  ratio->SetTitle((info.plotTitle+": Data to Monte Carlo Simulation Ratio").c_str());  
+  ratio->Divide(hists.mc_all_hist);
+  ratio->SetMarkerStyle(20);
 
   TLegend legend(0.8,0.8,0.95,0.95);
   legend.AddEntry(drawHelper,"Data","LPE");
@@ -604,6 +639,118 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend.Draw();
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.pdf").c_str());
 
+  TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),300,300);
+  canvas_ratio.cd();
+  ratio->Draw("E1X0");
+  canvas_ratio.SaveAs((info.plotName+"_ratio.pdf").c_str());
+  
+  return;
+}
+
+void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
+{
+  if(scale==0)
+    {
+      //assume normalization to data
+      double mc_int = 0;
+      for(vector<TH1D*>::iterator iPlot = hists.mc_hists.begin();iPlot!=hists.mc_hists.end(); iPlot++)
+	  {
+	    mc_int+=(*iPlot)->Integral();
+	  }
+      scale = hists.data_hist->Integral()/mc_int;
+    }   
+  if(scale==-1)
+    {
+      double mc_int = 0;
+      for(vector<TH1D*>::iterator iPlot = hists.mc_hists.begin();iPlot!=hists.mc_hists.end(); iPlot++)
+	  {
+	    mc_int+=(*iPlot)->Integral(0,info.nbinsx+1);
+	  }
+      scale = hists.data_hist->Integral(0,info.nbinsx+1)/mc_int;
+    }      
+
+  THStack mc_stack_highUp((info.plotName+"_mc_stack_highUp").c_str(),info.plotTitle.c_str());
+  THStack mc_stack_highDown((info.plotName+"_mc_stack_highDown").c_str(),info.plotTitle.c_str());
+
+  TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
+  drawHelper->SetMarkerStyle(20);
+
+  TLegend legend(0.8,0.6,0.95,0.95);
+  legend.AddEntry(drawHelper,"Data","LPE");
+
+  int iColor = 2;
+  vector<double>::iterator iPtHat;
+  vector<TH1D*>::iterator iPlot;
+  for(iPtHat = info.ptHatBins.begin() , iPlot = hists.mc_hists.begin(); (iPtHat+1)!=info.ptHatBins.end()||iPlot!=hists.mc_hists.end(); iPtHat++,iPlot++)
+	  {
+	    stringstream lowBin;
+	    lowBin << *iPtHat;
+	    stringstream highBin;
+	    highBin << *(iPtHat+1);
+	    (*iPlot)->Scale(scale);
+	    (*iPlot)->SetFillColor(iColor);
+	    iColor++;
+	    mc_stack_highUp.Add(*iPlot);	    
+	    if(*(iPtHat+1)!=-1) legend.AddEntry(*iPlot,(lowBin.str()+" < pthat < "+highBin.str()).c_str());
+	    else legend.AddEntry(*iPlot,(lowBin.str()+" < pthat").c_str());
+	  }
+
+  for(vector<TH1D*>::reverse_iterator irPlot = hists.mc_hists.rbegin(); irPlot!=hists.mc_hists.rend(); irPlot++)
+	  {
+	    mc_stack_highDown.Add(*irPlot);
+	  }
+
+  legend.SetBorderSize(1);
+  legend.SetFillColor(kWhite);
+  //legend.SetFillStyle(1);
+
+  TCanvas canvas_highUp((info.plotName+"canvas_highUp").c_str(),info.plotTitle.c_str(),300,300);
+  canvas_highUp.cd();
+  mc_stack_highUp.Draw("HIST");
+  hists.data_hist->Draw("E1X0SAME");
+  drawHelper->Draw("PSAME");
+  legend.Draw();
+  canvas_highUp.SaveAs((info.plotName+"_highUp_Linear.pdf").c_str());
+  canvas_highUp.Clear();
+  canvas_highUp.SetLogy();
+  mc_stack_highUp.SetMinimum(0.1);
+  hists.data_hist->SetMinimum(0.1);
+  hists.data_hist->SetMarkerStyle(1);
+  mc_stack_highUp.Draw("HIST");
+  hists.data_hist->SetMarkerStyle(1);
+  hists.data_hist->Draw("E1X0SAME");
+  drawHelper->Draw("PSAME");
+  legend.Draw();
+  canvas_highUp.SaveAs((info.plotName+"_highUp_Log.pdf").c_str());
+  hists.data_hist->SetMinimum(0);
+  
+  TCanvas canvas_highDown((info.plotName+"canvas_highDown").c_str(),info.plotTitle.c_str(),300,300);
+  canvas_highDown.cd();
+  mc_stack_highDown.Draw("HIST");
+  hists.data_hist->SetMarkerStyle(1);
+  hists.data_hist->Draw("E1X0SAME");
+  drawHelper->Draw("PSAME");
+  legend.Draw();
+  canvas_highDown.SaveAs((info.plotName+"_highDown_Linear.pdf").c_str());
+  canvas_highDown.Clear();
+  canvas_highDown.SetLogy();
+  mc_stack_highDown.SetMinimum(0.1);
+  hists.data_hist->SetMinimum(0.1);
+  mc_stack_highDown.Draw("HIST");
+  hists.data_hist->Draw("E1X0SAME");
+  drawHelper->Draw("PSAME");
+  legend.Draw();
+  canvas_highDown.SaveAs((info.plotName+"_highDown_Log.pdf").c_str());
+
+  TCanvas canvas_pthat((info.plotName+"canvas_pthat").c_str(),info.plotTitle.c_str(),300,300);
+  canvas_pthat.cd();
+  hists.pthat_hist->Draw();
+  canvas_pthat.SaveAs((info.plotName+"_pthat_Linear.pdf").c_str());
+  hists.pthat_hist->SetMinimum(0.1);
+  canvas_pthat.Clear();
+  canvas_pthat.SetLogy();
+  hists.pthat_hist->Draw();
+  canvas_pthat.SaveAs((info.plotName+"_pthat_Log.pdf").c_str());
   return;
 }
 
@@ -664,10 +811,16 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale)
   hists.mc_light_hist->Write();
   hists.mc_none_hist->Write();
   hists.data_hist->Write();
-  if(scale<=0)
+  double finalScale = scale;
+  if(scale==0)
     {
       //assume normalization to data
       scale = hists.data_hist->Integral()/hists.mc_all_hist->Integral();
+    }   
+  if(scale==-1)
+    {
+      //assume normalization to data
+      scale = hists.data_hist->Integral(0,info.nbinsx+1,0,info.nbinsy+1)/hists.mc_all_hist->Integral(0,info.nbinsx+1,0,info.nbinsy+1);
     }   
   
   hists.mc_all_hist->Scale(scale);
@@ -689,12 +842,12 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale)
   reweightedHists.mc_light_hist = hists.mc_light_hist->ProjectionX();
   reweightedHists.mc_none_hist = hists.mc_none_hist->ProjectionX();
 
-  reweightedHists.data_hist->Scale(0);
-  reweightedHists.mc_all_hist->Scale(0);
-  reweightedHists.mc_b_hist->Scale(0);
-  reweightedHists.mc_c_hist->Scale(0);
-  reweightedHists.mc_light_hist->Scale(0);
-  reweightedHists.mc_none_hist->Scale(0);
+  reweightedHists.data_hist->Reset();
+  reweightedHists.mc_all_hist->Reset();
+  reweightedHists.mc_b_hist->Reset();
+  reweightedHists.mc_c_hist->Reset();
+  reweightedHists.mc_light_hist->Reset();
+  reweightedHists.mc_none_hist->Reset();
 
   TH1D* data_temp;
   TH1D* mc_all_temp;
@@ -711,7 +864,7 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale)
     mc_c_temp = hists.mc_c_hist->ProjectionX("mc_c_temp",iYbin,iYbin);
     mc_light_temp = hists.mc_light_hist->ProjectionX("mc_light_temp",iYbin,iYbin);
     mc_none_temp = hists.mc_none_hist->ProjectionX("mc_none_temp",iYbin,iYbin);
-    if(mc_all_temp->Integral() !=0 ) tempScale = data_temp->Integral()/mc_all_temp->Integral();
+    if(mc_all_temp->Integral(0,info.nbinsy+1) !=0 ) tempScale = data_temp->Integral(0,info.nbinsy+1)/mc_all_temp->Integral(0,info.nbinsy+1);
     else tempScale = 1;
     mc_all_temp->Scale(tempScale);
     mc_b_temp->Scale(tempScale);
@@ -731,8 +884,7 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale)
     delete mc_light_temp;
     delete mc_none_temp;
   }
-
-  MakeAFlavorPlot(reweightedInfo,reweightedHists,scale);
+  MakeAFlavorPlot(reweightedInfo,reweightedHists,finalScale);
 }
 
 void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
@@ -743,11 +895,16 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
   hists.mc_light_hist->Write();
   hists.mc_none_hist->Write();
   hists.data_hist->Write();
-  if(scale<=0)
+  if(scale==0)
     {
       //assume normalization to data
       scale = hists.data_hist->Integral()/hists.mc_all_hist->Integral();
     }   
+  if(scale==-1)
+    {
+      //assume normalization to data
+      scale = hists.data_hist->Integral(0,info.nbinsx+1,0,info.nbinsy+1)/hists.mc_all_hist->Integral(0,info.nbinsx+1,0,info.nbinsy+1);
+    }    
 
   hists.mc_all_hist->Scale(scale);
   hists.mc_b_hist->Scale(scale);
@@ -866,10 +1023,15 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   hists.mc_hist_tight->Write();
   hists.mc_hist_high_purity->Write();
 
-  if(scale<=0)
+  if(scale==0)
     {
       //assume normalization to data
       scale = (hists.data_hist_undef->Integral()+hists.data_hist_loose->Integral()+hists.data_hist_tight->Integral()+hists.data_hist_high_purity->Integral())/(hists.mc_hist_undef->Integral()+hists.mc_hist_loose->Integral()+hists.mc_hist_tight->Integral()+hists.mc_hist_high_purity->Integral());
+    }   
+  if(scale==-1)
+    {
+      //assume normalization to data
+      scale = (hists.data_hist_undef->Integral(0,info.nbinsx+1)+hists.data_hist_loose->Integral(0,info.nbinsx+1)+hists.data_hist_tight->Integral(0,info.nbinsx+1)+hists.data_hist_high_purity->Integral(0,info.nbinsx+1))/(hists.mc_hist_undef->Integral(0,info.nbinsx+1)+hists.mc_hist_loose->Integral(0,info.nbinsx+1)+hists.mc_hist_tight->Integral(0,info.nbinsx+1)+hists.mc_hist_high_purity->Integral(0,info.nbinsx+1));
     }   
   hists.mc_hist_undef->Scale(scale);
   hists.mc_hist_loose->Scale(scale);
@@ -1165,11 +1327,16 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale)
   hists.mc_all_hist->Add(hists.mc_light_hist);
   hists.mc_all_hist->Add(hists.mc_none_hist);
 
-  if(scale<=0)
+  if(scale==0)
     {
       //assume normalization to data
       scale = hists.data_hist->Integral()/hists.mc_all_hist->Integral();
     }   
+  if(scale==-1)
+    {
+      //assume normalization to data
+      scale = hists.data_hist->Integral(0,info.nbinsx+1,0,info.nbinsy+1)/hists.mc_all_hist->Integral(0,info.nbinsx+1,0,info.nbinsy+1);
+    }    
 
   mc_all_int->Scale(scale);
   mc_b_int->Scale(scale);
@@ -1428,6 +1595,43 @@ void MakeAHist(string type, TTree* thisTree, information1d info, flavorHists1D h
   return;
 }
 
+void MakeAPtHatHist(string type, TTree* thisTree, informationPtHat info, ptHatHists1D hists,string scale)
+{
+  if(type=="data")
+    {
+      TH1D* temp_data_hist = (TH1D*)hists.data_hist->Clone((info.plotName+"_temp_data_hist").c_str());
+      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist").c_str(),(scale+"*("+info.cut+")").c_str(),"goff");
+      hists.data_hist->Add(temp_data_hist);
+    }
+  if(type=="mc")
+    {
+      vector<double>::iterator iPtHat; 
+      vector<TH1D*>::iterator iPlot;
+      for(iPtHat = info.ptHatBins.begin() , iPlot = hists.mc_hists.begin(); (iPtHat+1)!=info.ptHatBins.end()||iPlot!=hists.mc_hists.end(); iPtHat++,iPlot++)
+	  {
+	    stringstream lowBin;
+	    lowBin << *iPtHat;
+	    stringstream highBin;
+	    highBin << *(iPtHat+1);
+	    string cut = "("+info.label+"pthat>"+lowBin.str();
+	    if(*(iPtHat+1) != -1) cut = cut+"&&"+info.label+"pthat<"+highBin.str()+")";
+	    else cut = cut+")";
+	    if(info.cut!="") cut = "("+info.cut+")&&"+cut;
+	    TH1D* tempPlotPointer = (TH1D*) (*iPlot)->Clone((info.plotName+"_mc_hist_"+lowBin.str()+"_"+highBin.str()+"_temp").c_str());
+	    thisTree->Draw((info.aliasx+">>"+info.plotName+"_mc_hist_"+lowBin.str()+"_"+highBin.str()+"_temp").c_str(),(scale+"*("+cut+")").c_str(),"goff");
+	    (*iPlot)->Add(tempPlotPointer);
+	    delete tempPlotPointer;
+	  }
+      string cut ="";
+      if(info.pthatCut!="") cut = scale+"*("+info.pthatCut+")";
+      else cut=scale;
+      TH1D* temp_pthat_hist = (TH1D*)hists.pthat_hist->Clone((info.plotName+"_temp_pthat_hist").c_str());
+      thisTree->Draw((info.label+"pthat >>"+info.plotName+"_temp_pthat_hist").c_str(),cut.c_str(),"goff");
+      hists.pthat_hist->Add(temp_pthat_hist);
+    }
+  return;
+}
+
 void MakeA2DHist(string type, TTree* thisTree, information2d info,flavorHists2D hists, string scale)
 {
   if(type=="data")
@@ -1546,7 +1750,7 @@ void MakeACutHist(string type, TTree* thisTree, informationCut info,flavorHists2
 }
 
 void
-MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double finalNorm=0, string rootFile="plots.root" , string doPlot="")
+MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double finalNorm=-1, string rootFile="plots.root" , string doPlot="")
 {
 
   TFile* theFile = TFile::Open(rootFile.c_str(),"RECREATE");
@@ -1675,6 +1879,9 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.data_hist = new TH1D((thisPlot.plotName+"_data_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	theseHists.data_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.data_hist->Sumw2();
+	theseHists.pthat_hist = new TH1D((thisPlot.plotName+"_pthat_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinspthat,thisPlot.pthatlow,thisPlot.pthatup);
+	theseHists.pthat_hist->GetXaxis()->SetTitle("p_{T} hat");
+	theseHists.pthat_hist->Sumw2();
         ptHatPlots.push_back(pair<informationPtHat,ptHatHists1D>(thisPlot,theseHists));
       }
     }
@@ -1899,6 +2106,10 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	{
 	  MakeAHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
 	}
+      for(list< pair< informationPtHat , ptHatHists1D > >::iterator iPlot = ptHatPlots.begin(); iPlot != ptHatPlots.end(); iPlot++)
+	{
+	  MakeAPtHatHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
+	}
       for(list< pair< information1d , flavorHists1D > >::iterator iPlot = trackPlots_flavorStack.begin(); iPlot != trackPlots_flavorStack.end(); iPlot++)
 	{
 	  MakeATrackHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
@@ -1937,6 +2148,10 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
       for(list< pair< information1d , flavorHists1D > >::iterator iPlot = jetPlots1D.begin(); iPlot != jetPlots1D.end(); iPlot++)
 	{
 	  MakeAHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
+	}
+      for(list< pair< informationPtHat , ptHatHists1D > >::iterator iPlot = ptHatPlots.begin(); iPlot != ptHatPlots.end(); iPlot++)
+	{
+	  MakeAPtHatHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
 	}
       for(list< pair< information1d , flavorHists1D > >::iterator iPlot = trackPlots_flavorStack.begin(); iPlot != trackPlots_flavorStack.end(); iPlot++)
 	{
@@ -1978,6 +2193,10 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
       iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
       iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
       MakeAFlavorPlot(iPlot->first,iPlot->second,finalNorm);
+    }
+  for(list< pair< informationPtHat , ptHatHists1D > >::iterator iPlot = ptHatPlots.begin(); iPlot != ptHatPlots.end(); iPlot++)
+    {
+      MakeAPtHatPlot(iPlot->first,iPlot->second,finalNorm);
     }
   for(list< pair< information1d , flavorHists1D > >::iterator iPlot = trackPlots_flavorStack.begin(); iPlot != trackPlots_flavorStack.end(); iPlot++)
     {
