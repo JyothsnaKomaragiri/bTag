@@ -1,6 +1,10 @@
 run the plotting macro with the command
 
-root -l -b -q MakeAllPlots.C+'("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg")'
+for lumi normalization:
+root -l -b -q MakeAllPlots.C+'("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 1)'
+
+for area normalization:
+root -l -b -q MakeAllPlots.C+'("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 0)'
 
 where MCfileList.cfg and DATAfileList.cfg are the list of files to read including their weight, separated by a comma.
 
