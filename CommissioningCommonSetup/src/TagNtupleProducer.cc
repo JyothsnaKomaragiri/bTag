@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.5 2010/05/05 13:01:19 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.6 2010/05/05 17:33:47 alschmid Exp $
 //
 //
 
@@ -948,7 +948,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackLongitudinalImpactParameter)),label_ + "trackLongitudinalImpactParameter");
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDecayLength)),label_ + "trackDecayLength" );
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDistJetAxis)),label_ + "trackDistJetAxis" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDistJetAxis)),label_ + "trackDeltaR" );
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDeltaR)),label_ + "trackDeltaR" );
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP3d)),label_ + "trackIP3d" );
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP2d)),label_ + "trackIP2d" );
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP3dError)),label_ + "trackIP3dError" );
