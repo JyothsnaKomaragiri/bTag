@@ -1020,11 +1020,11 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
   hists.data_hist->Draw("colz");
   string mc_name = info.plotName+"_flavorComp.pdf";
   mc_comp.SaveAs(mc_name.c_str());
-  string mc_name = info.plotName+"_flavorComp.png";
+  mc_name = info.plotName+"_flavorComp.png";
   mc_comp.SaveAs(mc_name.c_str());
   string data_name = info.plotName+"_dataComp.pdf";
   data_comp.SaveAs(data_name.c_str());
-  string data_name = info.plotName+"_dataComp.png";
+  data_name = info.plotName+"_dataComp.png";
   data_comp.SaveAs(data_name.c_str());
   return;
 }
@@ -1438,11 +1438,11 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale)
   data_int->Draw("colz");
   string mc_name = info.plotName+"_flavorComp.pdf";
   mc_comp.SaveAs(mc_name.c_str());
-  string mc_name = info.plotName+"_flavorComp.png";
+  mc_name = info.plotName+"_flavorComp.png";
   mc_comp.SaveAs(mc_name.c_str());
   string data_name = info.plotName+"_dataComp.pdf";
   data_comp.SaveAs(data_name.c_str());
-  string data_name = info.plotName+"_dataComp.png";
+  data_name = info.plotName+"_dataComp.png";
   data_comp.SaveAs(data_name.c_str());
   return;
 }
