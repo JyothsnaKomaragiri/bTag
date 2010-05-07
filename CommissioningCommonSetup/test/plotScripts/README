@@ -1,10 +1,10 @@
-run the plotting macro with the command
+run the plotting macro with the following command
 
 for lumi normalization:
-root -l -b -q MakeAllPlots.C+'("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 1)'
+root -l -b -q MakeAllPlots.C+'("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 1, "plots.root", "plotname")'
 
 for area normalization:
-root -l -b -q MakeAllPlots.C+'("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 0)'
+root -l -b -q MakeAllPlots.C+'("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 0, "plots.root", "plotname")'
 
 where MCfileList.cfg and DATAfileList.cfg are the list of files to read including their weight, separated by a comma.
 
@@ -13,3 +13,8 @@ Example list of files:
 /nfs/data6/alschmid/btagCommissioning/files/MC_QCDPt20_30/BTagCommissioning2010_April20_7TeV_MC_14_1.root,1
 
 (the weight is 1 in this case)
+
+
+"plots.root" is the output root file containing histograms (optional)
+
+"plotname" is the name of the plot to be produced (optional). Use empty string "" to produce ALL plots defined in the plots.cfg.
