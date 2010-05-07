@@ -601,7 +601,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend.SetFillColor(kWhite);
   //legend.SetFillStyle(1);
 
-  TCanvas canvas_bUp((info.plotName+"canvas_bUp").c_str(),info.plotTitle.c_str(),300,300);
+  TCanvas canvas_bUp((info.plotName+"canvas_bUp").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bUp.cd();
   mc_stack_bUp.Draw("HIST");
   hists.data_hist->Draw("E1X0SAME");
@@ -623,7 +623,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log.png").c_str());
   hists.data_hist->SetMinimum(0);
   
-  TCanvas canvas_bDown((info.plotName+"canvas_bDown").c_str(),info.plotTitle.c_str(),300,300);
+  TCanvas canvas_bDown((info.plotName+"canvas_bDown").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bDown.cd();
   mc_stack_bDown.Draw("HIST");
   hists.data_hist->SetMarkerStyle(1);
@@ -643,7 +643,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.pdf").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.png").c_str());
 
-  TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),300,300);
+  TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_ratio.cd();
   ratio->Draw("E1X0");
   canvas_ratio.SaveAs((info.plotName+"_ratio.pdf").c_str());
@@ -709,7 +709,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   legend.SetFillColor(kWhite);
   //legend.SetFillStyle(1);
 
-  TCanvas canvas_highUp((info.plotName+"canvas_highUp").c_str(),info.plotTitle.c_str(),300,300);
+  TCanvas canvas_highUp((info.plotName+"canvas_highUp").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_highUp.cd();
   mc_stack_highUp.Draw("HIST");
   hists.data_hist->Draw("E1X0SAME");
@@ -731,7 +731,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   canvas_highUp.SaveAs((info.plotName+"_highUp_Log.png").c_str());
   hists.data_hist->SetMinimum(0);
   
-  TCanvas canvas_highDown((info.plotName+"canvas_highDown").c_str(),info.plotTitle.c_str(),300,300);
+  TCanvas canvas_highDown((info.plotName+"canvas_highDown").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_highDown.cd();
   mc_stack_highDown.Draw("HIST");
   hists.data_hist->SetMarkerStyle(1);
@@ -751,7 +751,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   canvas_highDown.SaveAs((info.plotName+"_highDown_Log.pdf").c_str());
   canvas_highDown.SaveAs((info.plotName+"_highDown_Log.png").c_str());
 
-  TCanvas canvas_pthat((info.plotName+"canvas_pthat").c_str(),info.plotTitle.c_str(),300,300);
+  TCanvas canvas_pthat((info.plotName+"canvas_pthat").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_pthat.cd();
   hists.pthat_hist->SetMarkerStyle(21);
   hists.pthat_hist->Draw();
@@ -806,7 +806,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   legend.SetBorderSize(1);
   legend.SetFillColor(kWhite);
 
-  TCanvas canvas((info.plotName+"canvas").c_str(),info.plotTitle.c_str(),300,300);
+  TCanvas canvas((info.plotName+"canvas").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas.cd();
   mc_stack.Draw("HISTNOSTACK");
   drawHelper->Draw("PSAME");
@@ -995,8 +995,8 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
   MakeAProfilePlot(profInfo,profiles);
 
   //Make Canvases
-  TCanvas mc_comp((info.plotName+"mc_comp").c_str(),info.plotTitle.c_str(),800,800);
-  TCanvas data_comp((info.plotName+"data_comp").c_str(),info.plotTitle.c_str(),800,400);
+  TCanvas mc_comp((info.plotName+"mc_comp").c_str(),info.plotTitle.c_str(),2048,2048);
+  TCanvas data_comp((info.plotName+"data_comp").c_str(),info.plotTitle.c_str(),2048,1024);
   mc_comp.Divide(2,2);
   data_comp.Divide(2,1);
   mc_comp.cd(1);
@@ -1112,7 +1112,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
 
   datalegend.SetTextSize(MClegend.GetTextSize());
 
-  TCanvas canvas_hpUp((info.plotName+"canvas_hpUp").c_str(),info.plotTitle.c_str(),300,300);
+  TCanvas canvas_hpUp((info.plotName+"canvas_hpUp").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_hpUp.cd();
   mc_stack_hpUp.Draw("HIST");
   mc_stack_hpUp.GetXaxis()->SetTitle(info.xTitle.c_str());
@@ -1133,7 +1133,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   canvas_hpUp.SaveAs((info.plotName+"_hpUp_overlay_Log.pdf").c_str());
   canvas_hpUp.SaveAs((info.plotName+"_hpUp_overlay_Log.png").c_str());
   
-  TCanvas canvas_hpDown((info.plotName+"canvas_hpDown").c_str(),info.plotTitle.c_str(),300,300);
+  TCanvas canvas_hpDown((info.plotName+"canvas_hpDown").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_hpDown.cd();
   mc_stack_hpDown.Draw("HIST");
   mc_stack_hpDown.GetXaxis()->SetTitle(info.xTitle.c_str());
@@ -1189,7 +1189,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   mc_stack_hpUp.SetTitle((info.plotTitle+" : Monte Carlo Simulation").c_str());
   data_stack2_hpUp.SetTitle((info.plotTitle+" : Data").c_str());
 
-  TCanvas canvasTwo_hpUp((info.plotName+"canvasTwo_hpUp").c_str(),info.plotTitle.c_str(),600,300);
+  TCanvas canvasTwo_hpUp((info.plotName+"canvasTwo_hpUp").c_str(),info.plotTitle.c_str(),2048,1024);
   canvasTwo_hpUp.Divide(2,1);
   canvasTwo_hpUp.cd(1);
   data_stack2_hpUp.Draw("HIST");
@@ -1218,7 +1218,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Log.pdf").c_str());
   canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Log.png").c_str());
 
-  TCanvas canvasTwo_hpDown((info.plotName+"canvasTwo_hpDown").c_str(),info.plotTitle.c_str(),600,300);
+  TCanvas canvasTwo_hpDown((info.plotName+"canvasTwo_hpDown").c_str(),info.plotTitle.c_str(),2048,1024);
   canvasTwo_hpDown.Divide(2,1);
   canvasTwo_hpDown.cd(1);
   data_stack2_hpDown.Draw("HIST");
@@ -1413,8 +1413,8 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale)
 //  TH1D* mc_none_proj = mc_none_int->ProjectX();
 
   //Make Canvases
-  TCanvas mc_comp((info.plotName+"mc_comp").c_str(),info.plotTitle.c_str(),800,800);
-  TCanvas data_comp((info.plotName+"data_comp").c_str(),info.plotTitle.c_str(),800,400);
+  TCanvas mc_comp((info.plotName+"mc_comp").c_str(),info.plotTitle.c_str(),2048,2048);
+  TCanvas data_comp((info.plotName+"data_comp").c_str(),info.plotTitle.c_str(),2048,1024);
   mc_comp.Divide(2,2);
   data_comp.Divide(2,1);
   mc_comp.cd(1);
@@ -1479,7 +1479,7 @@ void MakeATrackQualityHist(string type, TTree* thisTree, information1d info, qua
       hists.data_hist_tight->Add(temp_data_hist_tight);
       hists.data_hist_high_purity->Add(temp_data_hist_high_purity);
     }
-  if(type == "data")
+  if(type == "mc")
     {
       TH1D* temp_mc_hist_undef = (TH1D*)hists.mc_hist_undef->Clone((info.plotName+"_temp_mc_hist_undef").c_str());
       TH1D* temp_mc_hist_loose = (TH1D*)hists.mc_hist_loose->Clone((info.plotName+"_temp_mc_hist_loose").c_str());
@@ -1528,7 +1528,7 @@ void MakeAJetTrackQualityHist(string type, TTree* thisTree, informationQuality i
       hists.data_hist_tight->Add(temp_data_hist_tight);
       hists.data_hist_high_purity->Add(temp_data_hist_high_purity);
     }
-  if(type == "data")
+  if(type == "mc")
     {
       TH1D* temp_mc_hist_undef = (TH1D*)hists.mc_hist_undef->Clone((info.plotName+"_temp_mc_hist_undef").c_str());
       TH1D* temp_mc_hist_loose = (TH1D*)hists.mc_hist_loose->Clone((info.plotName+"_temp_mc_hist_loose").c_str());
