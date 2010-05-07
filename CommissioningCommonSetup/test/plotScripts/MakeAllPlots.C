@@ -753,6 +753,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
 
   TCanvas canvas_pthat((info.plotName+"canvas_pthat").c_str(),info.plotTitle.c_str(),300,300);
   canvas_pthat.cd();
+  hists.pthat_hist->SetMarkerStyle(21);
   hists.pthat_hist->Draw();
   canvas_pthat.SaveAs((info.plotName+"_pthat_Linear.pdf").c_str());
   canvas_pthat.SaveAs((info.plotName+"_pthat_Linear.png").c_str());
@@ -2127,7 +2128,8 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   }
 
   for(list<pair<string,string> >::iterator iFile = mcList.begin(); iFile != mcList.end(); iFile++)
-    {
+    {  
+      std::cout<<"opening file " << iFile->first << std::endl;
       TFile* thisFile = TFile::Open((iFile->first).c_str());
       TTree* thisTree = (TTree*)thisFile->Get("Events");
       for(list< pair< information1d , flavorHists1D > >::iterator iPlot = jetPlots1D.begin(); iPlot != jetPlots1D.end(); iPlot++)
@@ -2171,6 +2173,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 
   for(list<pair<string,string> >::iterator iFile = dataList.begin(); iFile != dataList.end(); iFile++)
     {
+      std::cout<<"opening file " << iFile->first << std::endl;
       TFile* thisFile = TFile::Open((iFile->first).c_str());
       TTree* thisTree = (TTree*)thisFile->Get("Events");
       for(list< pair< information1d , flavorHists1D > >::iterator iPlot = jetPlots1D.begin(); iPlot != jetPlots1D.end(); iPlot++)
