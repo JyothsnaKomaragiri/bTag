@@ -48,7 +48,7 @@ do
 ./NormoverlayMCData.py -r svflightDistance3dSig_CAT1 ${category}  ${bin} '3D flight distance significance' 'Normalized to lumi' 0 80
 
 ./NormoverlayMCData.py -r svvertexNTracks_CAT1 ${category}  ${bin} 'no. of tracks at SV' 'Normalized to lumi' 0.5 11.5
-./NormoverlayMCData.py -r svvertexMass_CAT1 ${category}  ${bin} 'vertex mass [GeV/c^{2}]' 'Normalized to lumi' 0 3.5
+./NormoverlayMCData.py -r svvertexMass_CAT1 ${category}  ${bin} 'vertex mass [GeV/c^{2}]' 'Normalized to lumi' 0 10.0
 ./NormoverlayMCData.py -r -l svvertexEnergyRatio_CAT1 ${category}  ${bin} 'fraction of charged jet energy at SV' 'Normalized to lumi' 0 1
 ./NormoverlayMCData.py -r svvertexJetDeltaR_CAT1 ${category}  ${bin} '#DeltaR(sv, jet axis)' 'Normalized to lumi' -0.1 0.7
 
@@ -83,7 +83,7 @@ do
 ./NormoverlayMCData.py -r sv0flightDistance3dSig_CAT1 ${category}  ${bin} '3D flight distance significance' 'Normalized to lumi' 0 80
 
 ./NormoverlayMCData.py -r sv0vertexNTracks_CAT1 ${category}  ${bin} 'no. of tracks at SV' 'Normalized to lumi' 0.5 11.5
-./NormoverlayMCData.py -r sv0vertexMass_CAT1 ${category}  ${bin} 'vertex mass [GeV/c^{2}]' 'Normalized to lumi' 0 3.5
+./NormoverlayMCData.py -r sv0vertexMass_CAT1 ${category}  ${bin} 'vertex mass [GeV/c^{2}]' 'Normalized to lumi' 0 10.0
 ./NormoverlayMCData.py -r -l sv0vertexEnergyRatio_CAT1 ${category}  ${bin} 'fraction of charged jet energy at SV' 'Normalized to lumi' 0 1
 ./NormoverlayMCData.py -r sv0vertexJetDeltaR_CAT1 ${category}  ${bin} '#DeltaR(sv, jet axis)' 'Normalized to lumi' -0.1 0.7
 

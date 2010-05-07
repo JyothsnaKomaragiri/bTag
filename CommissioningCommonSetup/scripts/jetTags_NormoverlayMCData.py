@@ -20,9 +20,9 @@ class Canvas:
 		self.c.cd()
 
 	def Print(self, p):
-		self.c.Print("PlotsLumi/%s.png" % p)		
+#		self.c.Print("PlotsLumi/%s.png" % p)		
 ### For area normalization
-#		self.c.Print("PlotsArea/%s.png" % p)
+		self.c.Print("PlotsArea/%s.png" % p)
 #		self.c.Print("PlotsArea/%s.eps" % p)
 #		os.system("sed -e 's/0\\.95 0\\.95 0\\.95/1.0 1.0 1.0/g' -i 'PlotsArea/%s.eps'" % p)
 #		os.system("epstopdf 'PlotsArea/%s.eps'" % p)
@@ -95,13 +95,6 @@ def format(h, i, fac = 1.):
 	global colors, markers, styles
 
 	h.UseCurrentStyle()
-#	if not h.GetSumw2N():
-#		h.Sumw2()
-#		for j in range(h.GetNbinsX()):
-#			v = h.GetBinContent(j + 1) / fac
-#			h.SetBinContent(j + 1, v)
-#			h.SetBinError(j + 1, math.sqrt(v))
-
 	h.SetFillColor(0)
 	h.GetXaxis().SetTitleOffset(0.9)
 	h.GetYaxis().SetTitleOffset(1.22)
@@ -127,17 +120,17 @@ def prelim(header):
 	title = " "
 
 	if header == "GLOBAL":
-		title = "p_{T} > 10 GeV and |#eta| < 2.5"
+		title = "p_{T} > 10 GeV and |#eta| < 2.4"
 	elif header == "PT_10-20":
-		title = "10 < p_{T} < 20 GeV and |#eta| < 2.5"
+		title = "10 < p_{T} < 20 GeV and |#eta| < 2.4"
 	elif header == "PT_20-40":
-		title = "20 < p_{T} < 40 GeV and |#eta| < 2.5"
+		title = "20 < p_{T} < 40 GeV and |#eta| < 2.4"
 	elif header == "PT_40-99999" :
-		title = "p_{T} > 40 GeV and |#eta| < 2.5"
+		title = "p_{T} > 40 GeV and |#eta| < 2.4"
 	elif header == "ETA_0-1v5_PT_40-99999" :
 		title = "p_{T} > 40 GeV and 0 < |#eta| < 1.5"
 	else: #"ETA_1v5-2v5_PT_40-99999"
-		title = "p_{T} > 40 GeV and 1.5 < |#eta| < 2.5"
+		title = "p_{T} > 40 GeV and 1.5 < |#eta| < 2.4"
 
 	t.AddText(title)
 	t.SetTextSize(0.035)
@@ -193,9 +186,9 @@ def draw(mc, data, xTit, yTit, title, category, bintype, left, blind):
 	data.SetXTitle(xTit)
 	data.SetYTitle(yTit)
 
-	data.Draw("E")
+	data.Draw("E1")
 	stack.Draw("histsame")
-	data.Draw("sameE")
+	data.Draw("sameE1")
 
 	if left:
 		l = ROOT.TLegend(0.22, 0.73, 0.37, 0.88)
@@ -224,13 +217,13 @@ def draw(mc, data, xTit, yTit, title, category, bintype, left, blind):
 	c.cd()
 	ROOT.gPad.SetLogy(True)
 
-	f2 = 2.5
+	f2 = 3.0
         data.SetMaximum( max(data.GetMaximum(), mc[4].GetMaximum()) * f2)
         data.SetMinimum( 0.2 )
 
-	data.Draw("E")
+	data.Draw("E1")
 	stack.Draw("histsame")
-	data.Draw("sameE")
+	data.Draw("sameE1")
 
 	l.Draw()
 	keep.append(prelim(bintype))
@@ -240,7 +233,7 @@ def draw(mc, data, xTit, yTit, title, category, bintype, left, blind):
 
 ################################# RATIO PLOT ################################# 
 	c.cd()
-	ROOT.gPad.SetLogy(False)
+	ROOT.gPad.SetLogy(True)
 
 	hratio = data.Clone()
 	hratio.Clear()
@@ -248,13 +241,12 @@ def draw(mc, data, xTit, yTit, title, category, bintype, left, blind):
 	hratio.SetXTitle(xTit)
 	hratio.SetYTitle("data/MC ratio")
 
-	#hratio.Sumw2()
 	hratio.SetMarkerSize(1.2)
 	hratio.SetMarkerColor(4)
 	hratio.SetLineWidth(2)
-	hratio.GetYaxis().SetRangeUser(0., 3.)
+	#hratio.GetYaxis().SetRangeUser(0., 3.)
 	
-	hratio.Draw("e")
+	hratio.Draw("E1")
 	keep.append(prelim(bintype))
 
 	ratio = 'ratio_'+title
@@ -508,31 +500,34 @@ def main(args, left, blind):
 		mc3.Get("%s/%sALL" % (pfx, histo))
 		]
 
-
 #### Scale MC to data lumi ...Data/MC ratio
-## Data lumi = 0.244 + 0.609 = 0.853 nb-1 
-## Dijet Pt0to15: 0.0412 nb-1 
+## Data lumi = 0.919 nb-1
+## Dijet Pt0to15: 0.0412 nb-1
 ## Dijet Pt15to20: 3.45 nb-1
-## Dijet Pt20to30: 2.1nb-1
-## QCD Pt>30: 16nb-1
+## Dijet Pt20to30: 3.56 nb-1
+## QCD Pt>30: 83nb-1
 
-	scale = [ 20, 0.25, 0.41, 0.053 ]
-	for i in range(5):
-		mc0[i].Scale(scale[0])
-		mc1[i].Scale(scale[1])
-		mc2[i].Scale(scale[2])
-		#mc3[i].Scale(scale[3])
-
+	scale = [ 22.3 , 0.27, 0.26, 0.011 ]
+	
 ##################
 
+## Adding the histos:
+## scale[0]*mc0 + scale[1]*mc1 + scale[2]*mc2 + scale[3]*mc3 
 	for i in range(5):
-		#mc2[i].Add(mc2[i], mc3[i])
-		mc1[i].Add(mc1[i], mc2[i])
-		mc0[i].Add(mc0[i], mc1[i])
+		mc2[i].Add( mc2[i], mc3[i], float(scale[2]), float(scale[3]))
+		mc1[i].Add( mc1[i], mc2[i], float(scale[1]), 1.0)
+		mc0[i].Add( mc0[i], mc1[i], float(scale[0]), 1.0) 
 
 	mc = mc0
 
 	mc.append(data.Get("%s/%sALL" % (pfx, histo)))
+
+#### Now scale MC to the data area
+#### The MC histograms are normalized to the area of the data histograms
+	for i in range(5):
+		mc[i].Scale(mc[-1].Integral()/mc[4].Integral())
+
+##################
 
 	for i, j in enumerate(mc):
 		j.SetTitle("")
