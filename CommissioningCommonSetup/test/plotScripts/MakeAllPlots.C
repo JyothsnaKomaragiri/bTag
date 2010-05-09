@@ -1074,28 +1074,29 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   mc_stack_hpUp.Add(hists.mc_hist_loose);
   mc_stack_hpUp.Add(hists.mc_hist_tight);
   mc_stack_hpUp.Add(hists.mc_hist_high_purity);
-  mc_stack_hpUp.SetMaximum(max(data_stack_hpUp.GetMaximum(),mc_stack_hpUp.GetMaximum()));
 
   THStack mc_stack_hpDown((info.plotName+"_mc_stack_hpDown").c_str(),info.plotTitle.c_str());
   mc_stack_hpDown.Add(hists.mc_hist_high_purity);
   mc_stack_hpDown.Add(hists.mc_hist_tight);
   mc_stack_hpDown.Add(hists.mc_hist_loose);
   mc_stack_hpDown.Add(hists.mc_hist_undef);
-  mc_stack_hpDown.SetMaximum(max(data_stack_hpDown.GetMaximum(),mc_stack_hpDown.GetMaximum()));
 
   THStack data_stack_hpUp((info.plotName+"_data_stack_hpUp").c_str(),info.plotTitle.c_str());
   data_stack_hpUp.Add(hists.data_hist_undef);
   data_stack_hpUp.Add(hists.data_hist_loose);
   data_stack_hpUp.Add(hists.data_hist_tight);
   data_stack_hpUp.Add(hists.data_hist_high_purity);
-  data_stack_hpUp.SetMaximum(max(data_stack_hpUp.GetMaximum(),mc_stack_hpUp.GetMaximum()));
 
   THStack data_stack_hpDown((info.plotName+"_data_stack_hpDown").c_str(),info.plotTitle.c_str());
   data_stack_hpDown.Add(hists.data_hist_high_purity);
   data_stack_hpDown.Add(hists.data_hist_tight);
   data_stack_hpDown.Add(hists.data_hist_loose);
   data_stack_hpDown.Add(hists.data_hist_undef);
+
+  data_stack_hpUp.SetMaximum(max(data_stack_hpUp.GetMaximum(),mc_stack_hpUp.GetMaximum()));
   data_stack_hpDown.SetMaximum(max(data_stack_hpDown.GetMaximum(),mc_stack_hpDown.GetMaximum()));
+  mc_stack_hpDown.SetMaximum(max(data_stack_hpDown.GetMaximum(),mc_stack_hpDown.GetMaximum()));
+  mc_stack_hpUp.SetMaximum(max(data_stack_hpUp.GetMaximum(),mc_stack_hpUp.GetMaximum()));
   
 
   //Make Canvas
