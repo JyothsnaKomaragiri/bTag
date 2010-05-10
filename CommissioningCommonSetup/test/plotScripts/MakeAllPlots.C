@@ -578,7 +578,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bDown.Add(hists.mc_c_hist);
   mc_stack_bDown.Add(hists.mc_light_hist);
   mc_stack_bDown.Add(hists.mc_none_hist);
-  mc_stack_bUp.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()));
+  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()));
   mc_stack_bDown.Write();
   
   //Make Canvas
