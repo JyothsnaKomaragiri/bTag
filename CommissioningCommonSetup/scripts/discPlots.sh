@@ -1,7 +1,8 @@
 #!/bin/sh
 
 ### Loop over categories
-for category in `echo "loosePF" "standardPF" "looseCalo" "standardCalo"`
+#for category in `echo "loosePF" "standardPF" "looseCalo" "standardCalo"`
+for category in `echo "standardPF" "standardCalo"`
 do
 
 ### Loop over bins
