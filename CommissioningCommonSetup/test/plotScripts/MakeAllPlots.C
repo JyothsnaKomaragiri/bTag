@@ -613,6 +613,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend.Draw();
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.pdf").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.png").c_str());
+  canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.root").c_str());
   canvas_bUp.Clear();
   canvas_bUp.SetLogy();
   mc_stack_bUp.SetMinimum(0.1);
@@ -625,6 +626,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend.Draw();
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log.pdf").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log.png").c_str());
+  canvas_bUp.SaveAs((info.plotName+"_bUp_Log.root").c_str());
   hists.data_hist->SetMinimum(0);
   
   TCanvas canvas_bDown((info.plotName+"canvas_bDown").c_str(),info.plotTitle.c_str(),1024,1024);
@@ -636,6 +638,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend.Draw();
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.pdf").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.png").c_str());
+  canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.root").c_str());
   canvas_bDown.Clear();
   canvas_bDown.SetLogy();
   mc_stack_bDown.SetMinimum(0.1);
@@ -646,12 +649,14 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend.Draw();
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.pdf").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.png").c_str());
+  canvas_bDown.SaveAs((info.plotName+"_bDown_Log.root").c_str());
 
   TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_ratio.cd();
   ratio->Draw("E1X0");
   canvas_ratio.SaveAs((info.plotName+"_ratio.pdf").c_str());
   canvas_ratio.SaveAs((info.plotName+"_ratio.png").c_str());
+  canvas_ratio.SaveAs((info.plotName+"_ratio.root").c_str());
   
   return;
 }
@@ -724,6 +729,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   legend.Draw();
   canvas_highUp.SaveAs((info.plotName+"_highUp_Linear.pdf").c_str());
   canvas_highUp.SaveAs((info.plotName+"_highUp_Linear.png").c_str());
+  canvas_highUp.SaveAs((info.plotName+"_highUp_Linear.root").c_str());
   canvas_highUp.Clear();
   canvas_highUp.SetLogy();
   mc_stack_highUp.SetMinimum(0.1);
@@ -736,6 +742,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   legend.Draw();
   canvas_highUp.SaveAs((info.plotName+"_highUp_Log.pdf").c_str());
   canvas_highUp.SaveAs((info.plotName+"_highUp_Log.png").c_str());
+  canvas_highUp.SaveAs((info.plotName+"_highUp_Log.root").c_str());
   hists.data_hist->SetMinimum(0);
   
   TCanvas canvas_highDown((info.plotName+"canvas_highDown").c_str(),info.plotTitle.c_str(),1024,1024);
@@ -747,6 +754,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   legend.Draw();
   canvas_highDown.SaveAs((info.plotName+"_highDown_Linear.pdf").c_str());
   canvas_highDown.SaveAs((info.plotName+"_highDown_Linear.png").c_str());
+  canvas_highDown.SaveAs((info.plotName+"_highDown_Linear.root").c_str());
   canvas_highDown.Clear();
   canvas_highDown.SetLogy();
   mc_stack_highDown.SetMinimum(0.1);
@@ -757,6 +765,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   legend.Draw();
   canvas_highDown.SaveAs((info.plotName+"_highDown_Log.pdf").c_str());
   canvas_highDown.SaveAs((info.plotName+"_highDown_Log.png").c_str());
+  canvas_highDown.SaveAs((info.plotName+"_highDown_Log.root").c_str());
 
   TCanvas canvas_pthat((info.plotName+"canvas_pthat").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_pthat.cd();
@@ -764,12 +773,14 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   hists.pthat_hist->Draw();
   canvas_pthat.SaveAs((info.plotName+"_pthat_Linear.pdf").c_str());
   canvas_pthat.SaveAs((info.plotName+"_pthat_Linear.png").c_str());
+  canvas_pthat.SaveAs((info.plotName+"_pthat_Linear.root").c_str());
   hists.pthat_hist->SetMinimum(0.1);
   canvas_pthat.Clear();
   canvas_pthat.SetLogy();
   hists.pthat_hist->Draw();
   canvas_pthat.SaveAs((info.plotName+"_pthat_Log.pdf").c_str());
   canvas_pthat.SaveAs((info.plotName+"_pthat_Log.png").c_str());
+  canvas_pthat.SaveAs((info.plotName+"_pthat_Log.root").c_str());
   return;
 }
 
@@ -821,6 +832,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   legend.Draw();
   canvas.SaveAs((info.plotName+".pdf").c_str());
   canvas.SaveAs((info.plotName+".png").c_str());
+  canvas.SaveAs((info.plotName+".root").c_str());
 }
 
 void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale)
@@ -1029,9 +1041,13 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
   mc_comp.SaveAs(mc_name.c_str());
   mc_name = info.plotName+"_flavorComp.png";
   mc_comp.SaveAs(mc_name.c_str());
+  mc_name = info.plotName+"_flavorComp.root";
+  mc_comp.SaveAs(mc_name.c_str());
   string data_name = info.plotName+"_dataComp.pdf";
   data_comp.SaveAs(data_name.c_str());
   data_name = info.plotName+"_dataComp.png";
+  data_comp.SaveAs(data_name.c_str());
+  data_name = info.plotName+"_dataComp.root";
   data_comp.SaveAs(data_name.c_str());
   return;
 }
@@ -1134,6 +1150,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   datalegend.Draw();
   canvas_hpUp.SaveAs((info.plotName+"_hpUp_overlay_Linear.pdf").c_str());
   canvas_hpUp.SaveAs((info.plotName+"_hpUp_overlay_Linear.png").c_str());
+  canvas_hpUp.SaveAs((info.plotName+"_hpUp_overlay_Linear.root").c_str());
   canvas_hpUp.Clear();
   canvas_hpUp.SetLogy();
   mc_stack_hpUp.SetMinimum(0.1);
@@ -1145,6 +1162,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   datalegend.Draw();
   canvas_hpUp.SaveAs((info.plotName+"_hpUp_overlay_Log.pdf").c_str());
   canvas_hpUp.SaveAs((info.plotName+"_hpUp_overlay_Log.png").c_str());
+  canvas_hpUp.SaveAs((info.plotName+"_hpUp_overlay_Log.root").c_str());
   
   TCanvas canvas_hpDown((info.plotName+"canvas_hpDown").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_hpDown.cd();
@@ -1155,6 +1173,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   datalegend.Draw();
   canvas_hpDown.SaveAs((info.plotName+"_hpDown_overlay_Linear.pdf").c_str());
   canvas_hpDown.SaveAs((info.plotName+"_hpDown_overlay_Linear.png").c_str());
+  canvas_hpDown.SaveAs((info.plotName+"_hpDown_overlay_Linear.root").c_str());
   canvas_hpDown.Clear();
   canvas_hpDown.SetLogy();
   mc_stack_hpDown.SetMinimum(0.1);
@@ -1165,6 +1184,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   datalegend.Draw();
   canvas_hpUp.SaveAs((info.plotName+"_hpDown_overlay_Log.pdf").c_str());
   canvas_hpUp.SaveAs((info.plotName+"_hpDown_overlay_Log.png").c_str());
+  canvas_hpUp.SaveAs((info.plotName+"_hpDown_overlay_Log.root").c_str());
 
   mc_stack_hpUp.SetMinimum(0);
   data_stack_hpUp.SetMinimum(0);
@@ -1216,6 +1236,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   legend2.Draw();
   canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Linear.pdf").c_str());
   canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Linear.png").c_str());
+  canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Linear.root").c_str());
   canvasTwo_hpUp.Clear();
   mc_stack_hpUp.SetMinimum(0.1);
   data_stack2_hpUp.SetMinimum(0.1);
@@ -1232,6 +1253,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   legend2.Draw();
   canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Log.pdf").c_str());
   canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Log.png").c_str());
+  canvasTwo_hpUp.SaveAs((info.plotName+"_hpUp_Log.root").c_str());
 
   TCanvas canvasTwo_hpDown((info.plotName+"canvasTwo_hpDown").c_str(),info.plotTitle.c_str(),2048,1024);
   canvasTwo_hpDown.Divide(2,1);
@@ -1245,6 +1267,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   legend2.Draw();
   canvasTwo_hpDown.SaveAs((info.plotName+"_hpDown_Linear.pdf").c_str());
   canvasTwo_hpDown.SaveAs((info.plotName+"_hpDown_Linear.png").c_str());
+  canvasTwo_hpDown.SaveAs((info.plotName+"_hpDown_Linear.root").c_str());
   canvasTwo_hpDown.Clear();
   mc_stack_hpDown.SetMinimum(0.1);
   data_stack2_hpDown.SetMinimum(0.1);
@@ -1261,6 +1284,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   legend2.Draw();
   canvasTwo_hpDown.SaveAs((info.plotName+"_hpDown_Log.pdf").c_str());
   canvasTwo_hpDown.SaveAs((info.plotName+"_hpDown_Log.png").c_str());
+  canvasTwo_hpDown.SaveAs((info.plotName+"_hpDown_Log.root").c_str());
   
   return;
 }
@@ -1455,9 +1479,13 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale)
   mc_comp.SaveAs(mc_name.c_str());
   mc_name = info.plotName+"_flavorComp.png";
   mc_comp.SaveAs(mc_name.c_str());
+  mc_name = info.plotName+"_flavorComp.root";
+  mc_comp.SaveAs(mc_name.c_str());
   string data_name = info.plotName+"_dataComp.pdf";
   data_comp.SaveAs(data_name.c_str());
   data_name = info.plotName+"_dataComp.png";
+  data_comp.SaveAs(data_name.c_str());
+  data_name = info.plotName+"_dataComp.root";
   data_comp.SaveAs(data_name.c_str());
   return;
 }
@@ -2119,5 +2147,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     {
       MakeAJetTrackQualityPlot(iPlot->first,iPlot->second,finalNorm);
     }
+
+
   return;
 }
