@@ -10,6 +10,8 @@
 #include "TLegend.h"
 #include "TLatex.h"
 #include "TTree.h"
+#include "TSelectorMultiDraw.h"
+#include "TDirectory.h"
 
 #include <cmath>
 #include <string>
@@ -1460,15 +1462,13 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale)
   return;
 }
 
-
-void MakeATrackQualityHist(string type, TTree* thisTree, information1d info, qualityHists1D hists, string scale)
+void MakeATrackQualityHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, information1d info, qualityHists1D hists)
 {
   string undefCut,looseCut,tightCut,highPurityCut;
   undefCut = "("+info.label+"trackQuality==-1)";
   looseCut = "("+info.label+"trackQuality==0)";
   tightCut = "("+info.label+"trackQuality==1)";
   highPurityCut = "("+info.label+"trackQuality==2)";
-
   if(info.cut!="")
     {
       undefCut = "("+info.cut+")&&"+undefCut;
@@ -1477,40 +1477,18 @@ void MakeATrackQualityHist(string type, TTree* thisTree, information1d info, qua
       highPurityCut = "("+info.cut+")&&"+highPurityCut;
     }
   //Fill Histograms
-  if(type == "data")
-    {
-      TH1D* temp_data_hist_undef = (TH1D*)hists.data_hist_undef->Clone((info.plotName+"_temp_data_hist_undef").c_str());
-      TH1D* temp_data_hist_loose = (TH1D*)hists.data_hist_loose->Clone((info.plotName+"_temp_data_hist_loose").c_str());
-      TH1D* temp_data_hist_tight = (TH1D*)hists.data_hist_tight->Clone((info.plotName+"_temp_data_hist_tight").c_str());
-      TH1D* temp_data_hist_high_purity = (TH1D*)hists.data_hist_high_purity->Clone((info.plotName+"_temp_data_hist_high_purity").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_undef").c_str(),(scale+"*("+undefCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_loose").c_str(),(scale+"*("+looseCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_tight").c_str(),(scale+"*("+tightCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_high_purity").c_str(),(scale+"*("+highPurityCut+")").c_str(),"goff");
-      hists.data_hist_undef->Add(temp_data_hist_undef);
-      hists.data_hist_loose->Add(temp_data_hist_loose);
-      hists.data_hist_tight->Add(temp_data_hist_tight);
-      hists.data_hist_high_purity->Add(temp_data_hist_high_purity);
-    }
-  if(type == "mc")
-    {
-      TH1D* temp_mc_hist_undef = (TH1D*)hists.mc_hist_undef->Clone((info.plotName+"_temp_mc_hist_undef").c_str());
-      TH1D* temp_mc_hist_loose = (TH1D*)hists.mc_hist_loose->Clone((info.plotName+"_temp_mc_hist_loose").c_str());
-      TH1D* temp_mc_hist_tight = (TH1D*)hists.mc_hist_tight->Clone((info.plotName+"_temp_mc_hist_tight").c_str());
-      TH1D* temp_mc_hist_high_purity = (TH1D*)hists.mc_hist_high_purity->Clone((info.plotName+"_temp_mc_hist_high_purity").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_undef").c_str(),(scale+"*("+undefCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_loose").c_str(),(scale+"*("+looseCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_tight").c_str(),(scale+"*("+tightCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_high_purity").c_str(),(scale+"*("+highPurityCut+")").c_str(),"goff");
-      hists.mc_hist_undef->Add(temp_mc_hist_undef);
-      hists.mc_hist_loose->Add(temp_mc_hist_loose);
-      hists.mc_hist_tight->Add(temp_mc_hist_tight);
-      hists.mc_hist_high_purity->Add(temp_mc_hist_high_purity);
-    }
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_hist_undef->GetName()),(undefCut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_hist_loose->GetName()),(looseCut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_hist_tight->GetName()),(tightCut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_hist_high_purity->GetName()),(highPurityCut));
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist_undef->GetName()),(undefCut));
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist_loose->GetName()),(looseCut));
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist_tight->GetName()),(tightCut));
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist_high_purity->GetName()),(highPurityCut));
   return;
 }
 
-void MakeAJetTrackQualityHist(string type, TTree* thisTree, informationQuality info, qualityHists1D hists, string scale)
+void MakeAJetTrackQualityHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, informationQuality info, qualityHists1D hists)
 {
   string undefCut,looseCut,tightCut,highPurityCut;
   undefCut = "("+info.qualityVar+"==-1)";
@@ -1526,268 +1504,147 @@ void MakeAJetTrackQualityHist(string type, TTree* thisTree, informationQuality i
       highPurityCut = "("+info.cut+")&&"+highPurityCut;
     }
   //Fill Histograms
-  if(type == "data")
-    {
-      TH1D* temp_data_hist_undef = (TH1D*)hists.data_hist_undef->Clone((info.plotName+"_temp_data_hist_undef").c_str());
-      TH1D* temp_data_hist_loose = (TH1D*)hists.data_hist_loose->Clone((info.plotName+"_temp_data_hist_loose").c_str());
-      TH1D* temp_data_hist_tight = (TH1D*)hists.data_hist_tight->Clone((info.plotName+"_temp_data_hist_tight").c_str());
-      TH1D* temp_data_hist_high_purity = (TH1D*)hists.data_hist_high_purity->Clone((info.plotName+"_temp_data_hist_high_purity").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_undef").c_str(),(scale+"*("+undefCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_loose").c_str(),(scale+"*("+looseCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_tight").c_str(),(scale+"*("+tightCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist_high_purity").c_str(),(scale+"*("+highPurityCut+")").c_str(),"goff");
-      hists.data_hist_undef->Add(temp_data_hist_undef);
-      hists.data_hist_loose->Add(temp_data_hist_loose);
-      hists.data_hist_tight->Add(temp_data_hist_tight);
-      hists.data_hist_high_purity->Add(temp_data_hist_high_purity);
-    }
-  if(type == "mc")
-    {
-      TH1D* temp_mc_hist_undef = (TH1D*)hists.mc_hist_undef->Clone((info.plotName+"_temp_mc_hist_undef").c_str());
-      TH1D* temp_mc_hist_loose = (TH1D*)hists.mc_hist_loose->Clone((info.plotName+"_temp_mc_hist_loose").c_str());
-      TH1D* temp_mc_hist_tight = (TH1D*)hists.mc_hist_tight->Clone((info.plotName+"_temp_mc_hist_tight").c_str());
-      TH1D* temp_mc_hist_high_purity = (TH1D*)hists.mc_hist_high_purity->Clone((info.plotName+"_temp_mc_hist_high_purity").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_undef").c_str(),(scale+"*("+undefCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_loose").c_str(),(scale+"*("+looseCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_tight").c_str(),(scale+"*("+tightCut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_hist_high_purity").c_str(),(scale+"*("+highPurityCut+")").c_str(),"goff");
-      hists.mc_hist_undef->Add(temp_mc_hist_undef);
-      hists.mc_hist_loose->Add(temp_mc_hist_loose);
-      hists.mc_hist_tight->Add(temp_mc_hist_tight);
-      hists.mc_hist_high_purity->Add(temp_mc_hist_high_purity);
-    }
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_hist_undef->GetName()),(undefCut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_hist_loose->GetName()),(looseCut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_hist_tight->GetName()),(tightCut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_hist_high_purity->GetName()),(highPurityCut));
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist_undef->GetName()),(undefCut));
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist_loose->GetName()),(looseCut));
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist_tight->GetName()),(tightCut));
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist_high_purity->GetName()),(highPurityCut));
   return;
 }
 
-void MakeATrackHist(string type, TTree* thisTree, information1d info, flavorHists1D hists, string scale)
+void MakeATrackHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, information1d info, flavorHists1D hists)
 {
-  if(type=="data")
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
+  string bcut,ccut,lightcut,nonecut;
+  bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5)";
+  ccut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==4)";
+  lightcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==1 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==2 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==3 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==21)";
+  nonecut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==0)";
+  if(info.cut!="")  
     {
-      TH1D* temp_data_hist = (TH1D*)hists.data_hist->Clone((info.plotName+"_temp_data_hist").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist").c_str(),(scale+"*("+info.cut+")").c_str(),"goff");
-      hists.data_hist->Add(temp_data_hist);
-    }
-  if(type=="mc")
-    {
-      string bcut,ccut,lightcut,nonecut;
-      bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5)";
-      ccut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==4)";
-      lightcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==1 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==2 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==3 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==21)";
-      nonecut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==0)";
-      
-      if(info.cut!="")  
-	{
-	  bcut = "("+info.cut+")&&"+bcut;
-	  ccut = "("+info.cut+")&&"+ccut;
-	  lightcut ="("+info.cut+")&&"+lightcut;
-	  nonecut ="("+info.cut+")&&"+nonecut;
-	}      
-      TH1D* temp_mc_b_hist = (TH1D*)hists.mc_b_hist->Clone((info.plotName+"_temp_mc_b_hist").c_str());
-      TH1D* temp_mc_c_hist = (TH1D*)hists.mc_c_hist->Clone((info.plotName+"_temp_mc_c_hist").c_str());
-      TH1D* temp_mc_light_hist = (TH1D*)hists.mc_light_hist->Clone((info.plotName+"_temp_mc_light_hist").c_str());
-      TH1D* temp_mc_none_hist = (TH1D*)hists.mc_none_hist->Clone((info.plotName+"_temp_mc_none_hist").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_b_hist").c_str(),(scale+"*("+bcut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_c_hist").c_str(),(scale+"*("+ccut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_light_hist").c_str(),(scale+"*("+lightcut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_none_hist").c_str(),(scale+"*("+nonecut+")").c_str(),"goff");
-      hists.mc_b_hist->Add(temp_mc_b_hist);
-      hists.mc_c_hist->Add(temp_mc_c_hist);
-      hists.mc_light_hist->Add(temp_mc_light_hist);
-      hists.mc_none_hist->Add(temp_mc_none_hist);
-    }
+      bcut = "("+info.cut+")&&"+bcut;
+      ccut = "("+info.cut+")&&"+ccut;
+      lightcut ="("+info.cut+")&&"+lightcut;
+      nonecut ="("+info.cut+")&&"+nonecut;
+    }      
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_b_hist->GetName()),(bcut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_c_hist->GetName()),(ccut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_light_hist->GetName()),(lightcut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_none_hist->GetName()),(nonecut));
   return;
 }
 
-void MakeAHist(string type, TTree* thisTree, information1d info, flavorHists1D hists,string scale)
+void MakeAHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, information1d info, flavorHists1D hists)
 {
-  if(type=="data")
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
+  string bcut,ccut,lightcut,nonecut;
+  bcut = "("+info.label+"MCTrueFlavor==5)";
+  ccut = "("+info.label+"MCTrueFlavor==4)";
+  lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
+  nonecut = "("+info.label+"MCTrueFlavor==0)";     
+  if(info.cut!="")  
     {
-      TH1D* temp_data_hist = (TH1D*)hists.data_hist->Clone((info.plotName+"_temp_data_hist").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist").c_str(),(scale+"*("+info.cut+")").c_str(),"goff");
-      hists.data_hist->Add(temp_data_hist);
+      bcut = "("+info.cut+")&&"+bcut;
+      ccut = "("+info.cut+")&&"+ccut;
+      lightcut ="("+info.cut+")&&"+lightcut;
+      nonecut ="("+info.cut+")&&"+nonecut;
     }
-  if(type=="mc")
-    {
-      string bcut,ccut,lightcut,nonecut;
-      bcut = "("+info.label+"MCTrueFlavor==5)";
-      ccut = "("+info.label+"MCTrueFlavor==4)";
-      lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
-      nonecut = "("+info.label+"MCTrueFlavor==0)";
-       
-      if(info.cut!="")  
-	{
-	  bcut = "("+info.cut+")&&"+bcut;
-	  ccut = "("+info.cut+")&&"+ccut;
-	  lightcut ="("+info.cut+")&&"+lightcut;
-	  nonecut ="("+info.cut+")&&"+nonecut;
-	}
-      TH1D* temp_mc_b_hist = (TH1D*)hists.mc_b_hist->Clone((info.plotName+"_temp_mc_b_hist").c_str());
-      TH1D* temp_mc_c_hist = (TH1D*)hists.mc_c_hist->Clone((info.plotName+"_temp_mc_c_hist").c_str());
-      TH1D* temp_mc_light_hist = (TH1D*)hists.mc_light_hist->Clone((info.plotName+"_temp_mc_light_hist").c_str());
-      TH1D* temp_mc_none_hist = (TH1D*)hists.mc_none_hist->Clone((info.plotName+"_temp_mc_none_hist").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_b_hist").c_str(),(scale+"*("+bcut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_c_hist").c_str(),(scale+"*("+ccut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_light_hist").c_str(),(scale+"*("+lightcut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_mc_none_hist").c_str(),(scale+"*("+nonecut+")").c_str(),"goff");
-      hists.mc_b_hist->Add(temp_mc_b_hist);
-      hists.mc_c_hist->Add(temp_mc_c_hist);
-      hists.mc_light_hist->Add(temp_mc_light_hist);
-      hists.mc_none_hist->Add(temp_mc_none_hist);
-    }
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_b_hist->GetName()),(bcut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_c_hist->GetName()),(ccut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_light_hist->GetName()),(lightcut));
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_none_hist->GetName()),(nonecut));
   return;
 }
 
-void MakeAPtHatHist(string type, TTree* thisTree, informationPtHat info, ptHatHists1D hists,string scale)
+void MakeAPtHatHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, informationPtHat info, ptHatHists1D hists)
 {
-  if(type=="data")
+  dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
+  vector<double>::iterator iPtHat; 
+  vector<TH1D*>::iterator iPlot;
+  for(iPtHat = info.ptHatBins.begin() , iPlot = hists.mc_hists.begin(); (iPtHat+1)!=info.ptHatBins.end()||iPlot!=hists.mc_hists.end(); iPtHat++,iPlot++)
     {
-      TH1D* temp_data_hist = (TH1D*)hists.data_hist->Clone((info.plotName+"_temp_data_hist").c_str());
-      thisTree->Draw((info.aliasx+">>"+info.plotName+"_temp_data_hist").c_str(),(scale+"*("+info.cut+")").c_str(),"goff");
-      hists.data_hist->Add(temp_data_hist);
-    }
-  if(type=="mc")
-    {
-      vector<double>::iterator iPtHat; 
-      vector<TH1D*>::iterator iPlot;
-      for(iPtHat = info.ptHatBins.begin() , iPlot = hists.mc_hists.begin(); (iPtHat+1)!=info.ptHatBins.end()||iPlot!=hists.mc_hists.end(); iPtHat++,iPlot++)
-	  {
-	    stringstream lowBin;
-	    lowBin << *iPtHat;
-	    stringstream highBin;
-	    highBin << *(iPtHat+1);
-	    string cut = "("+info.label+"pthat>"+lowBin.str();
-	    if(*(iPtHat+1) != -1) cut = cut+"&&"+info.label+"pthat<"+highBin.str()+")";
-	    else cut = cut+")";
-	    if(info.cut!="") cut = "("+info.cut+")&&"+cut;
-	    TH1D* tempPlotPointer = (TH1D*) (*iPlot)->Clone((info.plotName+"_mc_hist_"+lowBin.str()+"_"+highBin.str()+"_temp").c_str());
-	    thisTree->Draw((info.aliasx+">>"+info.plotName+"_mc_hist_"+lowBin.str()+"_"+highBin.str()+"_temp").c_str(),(scale+"*("+cut+")").c_str(),"goff");
-	    (*iPlot)->Add(tempPlotPointer);
-	    delete tempPlotPointer;
-	  }
-      string cut ="";
-      if(info.pthatCut!="") cut = scale+"*("+info.pthatCut+")";
-      else cut=scale;
-      TH1D* temp_pthat_hist = (TH1D*)hists.pthat_hist->Clone((info.plotName+"_temp_pthat_hist").c_str());
-      thisTree->Draw((info.label+"pthat >>"+info.plotName+"_temp_pthat_hist").c_str(),cut.c_str(),"goff");
-      hists.pthat_hist->Add(temp_pthat_hist);
-    }
+      stringstream lowBin;
+      lowBin << *iPtHat;
+      stringstream highBin;
+      highBin << *(iPtHat+1);
+      string cut = "("+info.label+"pthat>"+lowBin.str();
+      if(*(iPtHat+1) != -1) cut = cut+"&&"+info.label+"pthat<"+highBin.str()+")";
+      else cut = cut+")";
+      if(info.cut!="") cut = "("+info.cut+")&&"+cut;
+      mcSelector->LoadVariables((info.aliasx+">>+"+(*iPlot)->GetName()),(cut));
+     }
+  string cut ="";
+  if(info.pthatCut!="") cut =info.pthatCut;
+  mcSelector->LoadVariables((info.aliasx+">>+"+hists.pthat_hist->GetName()),(cut));
   return;
 }
 
-void MakeA2DHist(string type, TTree* thisTree, information2d info,flavorHists2D hists, string scale)
+void MakeA2DHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, information2d info,flavorHists2D hists)
 {
-  if(type=="data")
+  dataSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
+  string bcut,ccut,lightcut,nonecut;
+  bcut = "("+info.label+"MCTrueFlavor==5)";
+  ccut = "("+info.label+"MCTrueFlavor==4)";
+  lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
+  nonecut = "("+info.label+"MCTrueFlavor==0)";
+  if(info.cut!="")  
     {
-      TH2D* temp_data_hist = (TH2D*)hists.data_hist->Clone((info.plotName+"_temp_data_hist").c_str());
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_data_hist").c_str(),(scale+"*("+info.cut+")").c_str(),"goff");
-      hists.data_hist->Add(temp_data_hist);
+      bcut = "("+info.cut+")&&"+bcut;
+      ccut = "("+info.cut+")&&"+ccut;
+      lightcut ="("+info.cut+")&&"+lightcut;
+      nonecut ="("+info.cut+")&&"+nonecut;
     }
-  if(type=="mc")
-    {
-      string bcut,ccut,lightcut,nonecut;
-      bcut = "("+info.label+"MCTrueFlavor==5)";
-      ccut = "("+info.label+"MCTrueFlavor==4)";
-      lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
-      nonecut = "("+info.label+"MCTrueFlavor==0)";
-       
-      if(info.cut!="")  
-	{
-	  bcut = "("+info.cut+")&&"+bcut;
-	  ccut = "("+info.cut+")&&"+ccut;
-	  lightcut ="("+info.cut+")&&"+lightcut;
-	  nonecut ="("+info.cut+")&&"+nonecut;
-	}
-      TH2D* temp_mc_b_hist = (TH2D*)hists.mc_b_hist->Clone((info.plotName+"_temp_mc_b_hist").c_str());
-      TH2D* temp_mc_c_hist = (TH2D*)hists.mc_c_hist->Clone((info.plotName+"_temp_mc_c_hist").c_str());
-      TH2D* temp_mc_light_hist = (TH2D*)hists.mc_light_hist->Clone((info.plotName+"_temp_mc_light_hist").c_str());
-      TH2D* temp_mc_none_hist = (TH2D*)hists.mc_none_hist->Clone((info.plotName+"_temp_mc_none_hist").c_str());
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_b_hist").c_str(),(scale+"*("+bcut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_c_hist").c_str(),(scale+"*("+ccut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_light_hist").c_str(),(scale+"*("+lightcut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_none_hist").c_str(),(scale+"*("+nonecut+")").c_str(),"goff");
-      hists.mc_b_hist->Add(temp_mc_b_hist);
-      hists.mc_c_hist->Add(temp_mc_c_hist);
-      hists.mc_light_hist->Add(temp_mc_light_hist);
-      hists.mc_none_hist->Add(temp_mc_none_hist);
-    }
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_b_hist->GetName()),(bcut));
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_c_hist->GetName()),(ccut));
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_light_hist->GetName()),(lightcut));
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_none_hist->GetName()),(nonecut));
   return;
 }
 
-void MakeA2DTrackHist(string type, TTree* thisTree, information2d info, flavorHists2D hists, string scale)
+void MakeA2DTrackHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector,  information2d info, flavorHists2D hists)
 {
-  if(type=="data")
+  dataSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
+  string bcut,ccut,lightcut,nonecut;
+  bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5)";
+  ccut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==4)";
+  lightcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==1 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==2 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==3 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==21)";
+  nonecut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==0)";
+  if(info.cut!="")  
     {
-      TH2D* temp_data_hist = (TH2D*)hists.data_hist->Clone((info.plotName+"_temp_data_hist").c_str());
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_data_hist").c_str(),(scale+"*("+info.cut+")").c_str(),"goff");
-      hists.data_hist->Add(temp_data_hist);
-    }
-  if(type=="mc")
-    {
-      string bcut,ccut,lightcut,nonecut;
-      bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5)";
-      ccut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==4)";
-      lightcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==1 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==2 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==3 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==21)";
-      nonecut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==0)";
-      
-      if(info.cut!="")  
-	{
-	  bcut = "("+info.cut+")&&"+bcut;
-	  ccut = "("+info.cut+")&&"+ccut;
-	  lightcut ="("+info.cut+")&&"+lightcut;
-	  nonecut ="("+info.cut+")&&"+nonecut;
-	}      
-      TH2D* temp_mc_b_hist = (TH2D*)hists.mc_b_hist->Clone((info.plotName+"_temp_mc_b_hist").c_str());
-      TH2D* temp_mc_c_hist = (TH2D*)hists.mc_c_hist->Clone((info.plotName+"_temp_mc_c_hist").c_str());
-      TH2D* temp_mc_light_hist = (TH2D*)hists.mc_light_hist->Clone((info.plotName+"_temp_mc_light_hist").c_str());
-      TH2D* temp_mc_none_hist = (TH2D*)hists.mc_none_hist->Clone((info.plotName+"_temp_mc_none_hist").c_str());
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_b_hist").c_str(),(scale+"*("+bcut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_c_hist").c_str(),(scale+"*("+ccut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_light_hist").c_str(),(scale+"*("+lightcut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_none_hist").c_str(),(scale+"*("+nonecut+")").c_str(),"goff");
-      hists.mc_b_hist->Add(temp_mc_b_hist);
-      hists.mc_c_hist->Add(temp_mc_c_hist);
-      hists.mc_light_hist->Add(temp_mc_light_hist);
-      hists.mc_none_hist->Add(temp_mc_none_hist);
-    }
+      bcut = "("+info.cut+")&&"+bcut;
+      ccut = "("+info.cut+")&&"+ccut;
+      lightcut ="("+info.cut+")&&"+lightcut;
+      nonecut ="("+info.cut+")&&"+nonecut;
+    }      
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_b_hist->GetName()),(bcut));
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_c_hist->GetName()),(ccut));
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_light_hist->GetName()),(lightcut));
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_none_hist->GetName()),(nonecut));
   return;
 }
 
-void MakeACutHist(string type, TTree* thisTree, informationCut info,flavorHists2D hists, string scale)
+void MakeACutHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, informationCut info,flavorHists2D hists)
 {
-  if(type=="data")
+  dataSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
+  string bcut,ccut,lightcut,nonecut;
+  bcut = "("+info.label+"MCTrueFlavor==5)";
+  ccut = "("+info.label+"MCTrueFlavor==4)";
+  lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
+  nonecut = "("+info.label+"MCTrueFlavor==0)";
+  if(info.cut!="")  
     {
-      TH2D* temp_data_hist = (TH2D*)hists.data_hist->Clone((info.plotName+"_temp_data_hist").c_str());
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_data_hist").c_str(),(scale+"*("+info.cut+")").c_str(),"goff");
-      hists.data_hist->Add(temp_data_hist);
+      bcut = "("+info.cut+")&&"+bcut;
+      ccut = "("+info.cut+")&&"+ccut;
+      lightcut ="("+info.cut+")&&"+lightcut;
+      nonecut ="("+info.cut+")&&"+nonecut;
     }
-  if(type=="mc")
-    {
-      string bcut,ccut,lightcut,nonecut;
-      bcut = "("+info.label+"MCTrueFlavor==5)";
-      ccut = "("+info.label+"MCTrueFlavor==4)";
-      lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
-      nonecut = "("+info.label+"MCTrueFlavor==0)";
-       
-      if(info.cut!="")  
-	{
-	  bcut = "("+info.cut+")&&"+bcut;
-	  ccut = "("+info.cut+")&&"+ccut;
-	  lightcut ="("+info.cut+")&&"+lightcut;
-	  nonecut ="("+info.cut+")&&"+nonecut;
-	}
-      TH2D* temp_mc_b_hist = (TH2D*)hists.mc_b_hist->Clone((info.plotName+"_temp_mc_b_hist").c_str());
-      TH2D* temp_mc_c_hist = (TH2D*)hists.mc_c_hist->Clone((info.plotName+"_temp_mc_c_hist").c_str());
-      TH2D* temp_mc_light_hist = (TH2D*)hists.mc_light_hist->Clone((info.plotName+"_temp_mc_light_hist").c_str());
-      TH2D* temp_mc_none_hist = (TH2D*)hists.mc_none_hist->Clone((info.plotName+"_temp_mc_none_hist").c_str());
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_b_hist").c_str(),(scale+"*("+bcut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_c_hist").c_str(),(scale+"*("+ccut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_light_hist").c_str(),(scale+"*("+lightcut+")").c_str(),"goff");
-      thisTree->Draw((info.aliasy+":"+info.aliasx+">>"+info.plotName+"_temp_mc_none_hist").c_str(),(scale+"*("+nonecut+")").c_str(),"goff");
-      hists.mc_b_hist->Add(temp_mc_b_hist);
-      hists.mc_c_hist->Add(temp_mc_c_hist);
-      hists.mc_light_hist->Add(temp_mc_light_hist);
-      hists.mc_none_hist->Add(temp_mc_none_hist);
-    }
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_b_hist->GetName()),(bcut));
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_c_hist->GetName()),(ccut));
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_light_hist->GetName()),(lightcut));
+  mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_none_hist->GetName()),(nonecut));
   return;
 }
 
@@ -1826,8 +1683,8 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   ifstream plotFiles;
   plotFiles.open(plotfilename.c_str());
 
-  list<pair<string, string> > mcList;
-  list<pair<string, string> > dataList;
+  list<pair<string,double> > mcList;
+  list<pair<string,double> > dataList;
 
   while (! mcFiles.eof()) {
     string line;
@@ -1836,8 +1693,8 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     size_t position = line.find(",");
     if(position == string::npos) continue;
     string thisFileName = line.substr(0,position);
-    string thisWeight = line.substr(position+1).c_str();
-    mcList.push_back(pair<string,string>(thisFileName,thisWeight));
+    double thisWeight = atof(line.substr(position+1).c_str());
+    mcList.push_back(pair<string,double>(thisFileName,thisWeight));
   }
   while (! dataFiles.eof()) {
     string line;
@@ -1846,8 +1703,8 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     size_t position = line.find(",");
     if(position == string::npos) continue;
     string thisFileName = line.substr(0,position);
-    string thisWeight = line.substr(position+1);
-    dataList.push_back(pair<string,string>(thisFileName,thisWeight));
+    double thisWeight = atof(line.substr(position+1).c_str());
+    dataList.push_back(pair<string,double>(thisFileName,thisWeight));
   }
 
   information1d defaultInformation1d;
@@ -2140,91 +1997,67 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     }
   }
 
-  for(list<pair<string,string> >::iterator iFile = mcList.begin(); iFile != mcList.end(); iFile++)
+  TSelectorMultiDraw* mcSelector = new TSelectorMultiDraw();
+  TSelectorMultiDraw* dataSelector = new TSelectorMultiDraw();
+
+  for(list< pair< information1d , flavorHists1D > >::iterator iPlot = jetPlots1D.begin(); iPlot != jetPlots1D.end(); iPlot++)
+    {
+      MakeAHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
+  for(list< pair< informationPtHat , ptHatHists1D > >::iterator iPlot = ptHatPlots.begin(); iPlot != ptHatPlots.end(); iPlot++)
+    {
+      MakeAPtHatHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
+  for(list< pair< information1d , flavorHists1D > >::iterator iPlot = trackPlots_flavorStack.begin(); iPlot != trackPlots_flavorStack.end(); iPlot++)
+    {
+      MakeATrackHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
+  for(list< pair< information1d , qualityHists1D > >::iterator iPlot = trackPlots_qualityStack.begin(); iPlot != trackPlots_qualityStack.end(); iPlot++)
+    {
+      MakeATrackQualityHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
+  for(list< pair< information2d , flavorHists2D > >::iterator iPlot = jetPlots2D.begin(); iPlot != jetPlots2D.end(); iPlot++)
+    {
+      MakeA2DHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
+  for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedPlots.begin(); iPlot != reweightedPlots.end(); iPlot++)
+    {   
+      MakeA2DHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
+  for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedTrackPlots.begin(); iPlot != reweightedTrackPlots.end(); iPlot++)
+    {	  
+      MakeA2DTrackHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
+  for(list< pair< informationCut , flavorHists2D > >::iterator iPlot = cutPlots.begin(); iPlot != cutPlots.end(); iPlot++)
+    {
+      MakeACutHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
+  for(list< pair< informationQuality , qualityHists1D > >::iterator iPlot = jetTrackQualityPlots.begin(); iPlot != jetTrackQualityPlots.end(); iPlot++)
+    {
+      MakeAJetTrackQualityHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
+
+  for(list<pair<string,double> >::iterator iFile = mcList.begin(); iFile != mcList.end(); iFile++)
     {  
       std::cout<<"opening file " << iFile->first << std::endl;
       TFile* thisFile = TFile::Open((iFile->first).c_str());
       TTree* thisTree = (TTree*)thisFile->Get("Events");
-      for(list< pair< information1d , flavorHists1D > >::iterator iPlot = jetPlots1D.begin(); iPlot != jetPlots1D.end(); iPlot++)
-	{
-	  MakeAHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< informationPtHat , ptHatHists1D > >::iterator iPlot = ptHatPlots.begin(); iPlot != ptHatPlots.end(); iPlot++)
-	{
-	  MakeAPtHatHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< information1d , flavorHists1D > >::iterator iPlot = trackPlots_flavorStack.begin(); iPlot != trackPlots_flavorStack.end(); iPlot++)
-	{
-	  MakeATrackHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< information1d , qualityHists1D > >::iterator iPlot = trackPlots_qualityStack.begin(); iPlot != trackPlots_qualityStack.end(); iPlot++)
-	{
-	  MakeATrackQualityHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< information2d , flavorHists2D > >::iterator iPlot = jetPlots2D.begin(); iPlot != jetPlots2D.end(); iPlot++)
-	{
-	  MakeA2DHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedPlots.begin(); iPlot != reweightedPlots.end(); iPlot++)
-	{
-	  MakeA2DHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedTrackPlots.begin(); iPlot != reweightedTrackPlots.end(); iPlot++)
-	{
-	  MakeA2DTrackHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< informationCut , flavorHists2D > >::iterator iPlot = cutPlots.begin(); iPlot != cutPlots.end(); iPlot++)
-	{
-	  MakeACutHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< informationQuality , qualityHists1D > >::iterator iPlot = jetTrackQualityPlots.begin(); iPlot != jetTrackQualityPlots.end(); iPlot++)
-	{
-	  MakeAJetTrackQualityHist("mc",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
+      thisTree->SetWeight(iFile->second);
+      Long64_t nentries = thisTree->GetEntries();
+      gDirectory->cd((rootFile+":/").c_str());
+      thisTree->Process(mcSelector,"goff",nentries,0);
       thisFile->Close();
     }
 
-  for(list<pair<string,string> >::iterator iFile = dataList.begin(); iFile != dataList.end(); iFile++)
+  for(list<pair<string,double> >::iterator iFile = dataList.begin(); iFile != dataList.end(); iFile++)
     {
       std::cout<<"opening file " << iFile->first << std::endl;
       TFile* thisFile = TFile::Open((iFile->first).c_str());
       TTree* thisTree = (TTree*)thisFile->Get("Events");
-      for(list< pair< information1d , flavorHists1D > >::iterator iPlot = jetPlots1D.begin(); iPlot != jetPlots1D.end(); iPlot++)
-	{
-	  MakeAHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< informationPtHat , ptHatHists1D > >::iterator iPlot = ptHatPlots.begin(); iPlot != ptHatPlots.end(); iPlot++)
-	{
-	  MakeAPtHatHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< information1d , flavorHists1D > >::iterator iPlot = trackPlots_flavorStack.begin(); iPlot != trackPlots_flavorStack.end(); iPlot++)
-	{
-	  MakeATrackHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< information1d , qualityHists1D > >::iterator iPlot = trackPlots_qualityStack.begin(); iPlot != trackPlots_qualityStack.end(); iPlot++)
-	{
-	  MakeATrackQualityHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< information2d , flavorHists2D > >::iterator iPlot = jetPlots2D.begin(); iPlot != jetPlots2D.end(); iPlot++)
-	{
-	  MakeA2DHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedPlots.begin(); iPlot != reweightedPlots.end(); iPlot++)
-	{   
-	  MakeA2DHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< information2d , flavorHists2D > >::iterator iPlot = reweightedTrackPlots.begin(); iPlot != reweightedTrackPlots.end(); iPlot++)
-	{	  
-	  MakeA2DTrackHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< informationCut , flavorHists2D > >::iterator iPlot = cutPlots.begin(); iPlot != cutPlots.end(); iPlot++)
-	{
-	  MakeACutHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
-      for(list< pair< informationQuality , qualityHists1D > >::iterator iPlot = jetTrackQualityPlots.begin(); iPlot != jetTrackQualityPlots.end(); iPlot++)
-	{
-	  MakeAJetTrackQualityHist("data",thisTree,iPlot->first,iPlot->second,iFile->second);
-	}
+      thisTree->SetWeight(iFile->second);
+      Long64_t nentries = thisTree->GetEntries();
+      gDirectory->cd((rootFile+":/").c_str());
+      thisTree->Process(dataSelector,"goff",nentries,0);
       thisFile->Close();
     }
 
