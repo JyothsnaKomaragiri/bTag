@@ -1,10 +1,15 @@
-run the plotting macro with the following command
+run the plotting macro in the following way:
+
+start root and compile the library:
+.L TSelectorMultiDraw.C++
+
+then run the macro:
 
 for lumi normalization:
-root -l -b -q MakeAllPlots.C+'("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 1, "plots.root", "plotname")'
+.x MakeAllPlots.C++("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 1, "plots.root", "plotname")
 
 for area normalization:
-root -l -b -q MakeAllPlots.C+'("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 0, "plots.root", "plotname")'
+.x MakeAllPlots.C++("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 0, "plots.root", "plotname")
 
 where MCfileList.cfg and DATAfileList.cfg are the list of files to read including their weight, separated by a comma.
 
@@ -15,6 +20,7 @@ Example list of files:
 (the weight is 1 in this case)
 
 
-"plots.root" is the output root file containing histograms (optional)
+"plots.root" is the output root file containing some histograms (optional)
 
 "plotname" is the name of the plot to be produced (optional). Use empty string "" to produce ALL plots defined in the plots.cfg.
+
