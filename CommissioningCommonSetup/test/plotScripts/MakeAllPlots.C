@@ -22,6 +22,149 @@
 #include <fstream>
 #include <list>
 #include <utility>
+#include "TStyle.h"
+
+void setTDRStyle() {
+  TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
+
+  // For the canvas:
+  tdrStyle->SetCanvasBorderMode(0);
+  tdrStyle->SetCanvasColor(kWhite);
+  tdrStyle->SetCanvasDefH(600); //Height of canvas
+  tdrStyle->SetCanvasDefW(600); //Width of canvas
+  tdrStyle->SetCanvasDefX(0);   //POsition on screen
+  tdrStyle->SetCanvasDefY(0);
+
+  // For the Pad:
+  tdrStyle->SetPadBorderMode(0);
+  // tdrStyle->SetPadBorderSize(Width_t size = 1);
+  tdrStyle->SetPadColor(kWhite);
+  tdrStyle->SetPadGridX(false);
+  tdrStyle->SetPadGridY(false);
+  tdrStyle->SetGridColor(0);
+  tdrStyle->SetGridStyle(3);
+  tdrStyle->SetGridWidth(1);
+
+  // For the frame:
+  tdrStyle->SetFrameBorderMode(0);
+  tdrStyle->SetFrameBorderSize(1);
+  tdrStyle->SetFrameFillColor(0);
+  tdrStyle->SetFrameFillStyle(0);
+  tdrStyle->SetFrameLineColor(1);
+  tdrStyle->SetFrameLineStyle(1);
+  tdrStyle->SetFrameLineWidth(1);
+
+  // For the histo:
+  tdrStyle->SetHistFillColor(63);
+  // tdrStyle->SetHistFillStyle(0);
+  tdrStyle->SetHistLineColor(1);
+  tdrStyle->SetHistLineStyle(0);
+  tdrStyle->SetHistLineWidth(1);
+  // tdrStyle->SetLegoInnerR(Float_t rad = 0.5);
+  // tdrStyle->SetNumberContours(Int_t number = 20);
+
+//  tdrStyle->SetEndErrorSize(0);
+  tdrStyle->SetErrorX(0.);
+//  tdrStyle->SetErrorMarker(20);
+  
+  tdrStyle->SetMarkerStyle(20);
+
+  //For the fit/function:
+  tdrStyle->SetOptFit(1);
+  tdrStyle->SetFitFormat("5.4g");
+  tdrStyle->SetFuncColor(2);
+  tdrStyle->SetFuncStyle(1);
+  tdrStyle->SetFuncWidth(1);
+
+  //For the date:
+  tdrStyle->SetOptDate(0);
+  // tdrStyle->SetDateX(Float_t x = 0.01);
+  // tdrStyle->SetDateY(Float_t y = 0.01);
+
+  // For the statistics box:
+  tdrStyle->SetOptFile(0);
+  tdrStyle->SetOptStat(0); // To display the mean and RMS:   SetOptStat("mr");
+  tdrStyle->SetStatColor(kWhite);
+  tdrStyle->SetStatFont(42);
+  tdrStyle->SetStatFontSize(0.025);
+  tdrStyle->SetStatTextColor(1);
+  tdrStyle->SetStatFormat("6.4g");
+  tdrStyle->SetStatBorderSize(1);
+  tdrStyle->SetStatH(0.1);
+  tdrStyle->SetStatW(0.15);
+  // tdrStyle->SetStatStyle(Style_t style = 1001);
+  // tdrStyle->SetStatX(Float_t x = 0);
+  // tdrStyle->SetStatY(Float_t y = 0);
+
+  // Margins:
+  tdrStyle->SetPadTopMargin(0.05);
+  tdrStyle->SetPadBottomMargin(0.13);
+  tdrStyle->SetPadLeftMargin(0.13);
+  tdrStyle->SetPadRightMargin(0.05);
+
+  // For the Global title:
+
+  //  tdrStyle->SetOptTitle(0);
+  tdrStyle->SetTitleFont(42);
+  tdrStyle->SetTitleColor(1);
+  tdrStyle->SetTitleTextColor(1);
+  tdrStyle->SetTitleFillColor(10);
+  tdrStyle->SetTitleFontSize(0.05);
+  // tdrStyle->SetTitleH(0); // Set the height of the title box
+  // tdrStyle->SetTitleW(0); // Set the width of the title box
+  // tdrStyle->SetTitleX(0); // Set the position of the title box
+  // tdrStyle->SetTitleY(0.985); // Set the position of the title box
+  // tdrStyle->SetTitleStyle(Style_t style = 1001);
+  // tdrStyle->SetTitleBorderSize(2);
+
+  // For the axis titles:
+
+  tdrStyle->SetTitleColor(1, "XYZ");
+  tdrStyle->SetTitleFont(42, "XYZ");
+  tdrStyle->SetTitleSize(0.06, "XYZ");
+  // tdrStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
+  // tdrStyle->SetTitleYSize(Float_t size = 0.02);
+  tdrStyle->SetTitleXOffset(0.9);
+  tdrStyle->SetTitleYOffset(1.05);
+  // tdrStyle->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
+
+  // For the axis labels:
+
+  tdrStyle->SetLabelColor(1, "XYZ");
+  tdrStyle->SetLabelFont(42, "XYZ");
+  tdrStyle->SetLabelOffset(0.007, "XYZ");
+  tdrStyle->SetLabelSize(0.05, "XYZ");
+
+  // For the axis:
+
+  tdrStyle->SetAxisColor(1, "XYZ");
+  tdrStyle->SetStripDecimals(kTRUE);
+  tdrStyle->SetTickLength(0.03, "XYZ");
+  tdrStyle->SetNdivisions(510, "XYZ");
+  tdrStyle->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
+  tdrStyle->SetPadTickY(1);
+
+  // Change for log plots:
+  tdrStyle->SetOptLogx(0);
+  tdrStyle->SetOptLogy(0);
+  tdrStyle->SetOptLogz(0);
+
+  // Postscript options:
+  // tdrStyle->SetPaperSize(15.,15.);
+  // tdrStyle->SetLineScalePS(Float_t scale = 3);
+  // tdrStyle->SetLineStyleString(Int_t i, const char* text);
+  // tdrStyle->SetHeaderPS(const char* header);
+  // tdrStyle->SetTitlePS(const char* pstitle);
+
+  // tdrStyle->SetBarOffset(Float_t baroff = 0.5);
+  // tdrStyle->SetBarWidth(Float_t barwidth = 0.5);
+  // tdrStyle->SetPaintTextFormat(const char* format = "g");
+  // tdrStyle->SetPalette(Int_t ncolors = 0, Int_t* colors = 0);
+  // tdrStyle->SetTimeOffset(Double_t toffset);
+  // tdrStyle->SetHistMinimumZero(kTRUE);
+
+  tdrStyle->cd();
+}
 
 struct information1d{
   std::string plotName;
@@ -540,12 +683,6 @@ informationCut paramCut(ifstream* plotFile, informationCut defaultParams)
 
 void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 {
-  hists.mc_all_hist->Write();
-  hists.mc_b_hist->Write();
-  hists.mc_c_hist->Write();
-  hists.mc_light_hist->Write();
-  hists.mc_none_hist->Write();
-  hists.data_hist->Write();
   if(scale==0)
     {
       //assume normalization to data
@@ -573,7 +710,6 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bUp.Add(hists.mc_c_hist);
   mc_stack_bUp.Add(hists.mc_b_hist);
   mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()));
-  mc_stack_bUp.Write();
 
   THStack mc_stack_bDown((info.plotName+"_mc_stack_bDown").c_str(),info.plotTitle.c_str());
   mc_stack_bDown.Add(hists.mc_b_hist);
@@ -581,7 +717,6 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bDown.Add(hists.mc_light_hist);
   mc_stack_bDown.Add(hists.mc_none_hist);
   mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()));
-  mc_stack_bDown.Write();
   
   //Make Canvas
 
@@ -593,7 +728,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   ratio->Divide(hists.mc_all_hist);
   ratio->SetMarkerStyle(20);
 
-  TLegend legend(0.8,0.8,0.95,0.95);
+  TLegend legend(0.7,0.7,0.95,0.95);
   legend.AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
   legend.AddEntry(hists.mc_b_hist,"MC Simulation: True b-jet","F");
@@ -689,7 +824,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
-  TLegend legend(0.8,0.6,0.95,0.95);
+  TLegend legend(0.7,0.5,0.95,0.95);
   legend.AddEntry(drawHelper,"Data","LPE");
 
   int iColor = 2;
@@ -812,7 +947,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
-  TLegend legend(0.8,0.8,0.95,0.95);
+  TLegend legend(0.7,0.7,0.95,0.95);
   legend.AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
   legend.AddEntry(hists.mc_all_hist,"MC Simulation","L");
@@ -837,12 +972,6 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
 
 void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale)
 {
-  hists.mc_all_hist->Write();
-  hists.mc_b_hist->Write();
-  hists.mc_c_hist->Write();
-  hists.mc_light_hist->Write();
-  hists.mc_none_hist->Write();
-  hists.data_hist->Write();
   double finalScale = scale;
   if(scale==0)
     {
@@ -921,12 +1050,6 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale)
 
 void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
 {
-  hists.mc_all_hist->Write();
-  hists.mc_b_hist->Write();
-  hists.mc_c_hist->Write();
-  hists.mc_light_hist->Write();
-  hists.mc_none_hist->Write();
-  hists.data_hist->Write();
   if(scale==0)
     {
       //assume normalization to data
@@ -1054,15 +1177,6 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
 
 void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scale)
 {
-  hists.data_hist_undef->Write();
-  hists.data_hist_loose->Write();
-  hists.data_hist_tight->Write();
-  hists.data_hist_high_purity->Write();
-  hists.mc_hist_undef->Write();
-  hists.mc_hist_loose->Write();
-  hists.mc_hist_tight->Write();
-  hists.mc_hist_high_purity->Write();
-
   if(scale==0)
     {
       //assume normalization to data
@@ -1119,7 +1233,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
 
   //Make Canvas
 
-  TLegend MClegend(0.8,0.65,0.98,0.8);
+  TLegend MClegend(0.7,0.45,0.95,0.7);
   MClegend.SetHeader("Monte Carlo Simulation");
   MClegend.AddEntry(hists.mc_hist_high_purity,"High Purity Tracks","F");
   MClegend.AddEntry(hists.mc_hist_tight,"Tight Tracks","F");
@@ -1129,7 +1243,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   MClegend.SetBorderSize(1);
   MClegend.SetFillColor(kWhite);
 
-  TLegend datalegend(0.8,0.8,0.98,0.95);
+  TLegend datalegend(0.7,0.7,0.95,0.95);
   datalegend.SetHeader("Data");
   datalegend.AddEntry(hists.data_hist_high_purity,"High Purity Tracks","PE");
   datalegend.AddEntry(hists.data_hist_tight,"Tight Tracks","PE");
@@ -1210,7 +1324,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   data_stack2_hpDown.Add(hists.data_hist_undef);
   data_stack2_hpDown.SetMaximum(max(data_stack2_hpDown.GetMaximum(),mc_stack_hpDown.GetMaximum()));
 
-  TLegend legend2(0.8,0.8,0.95,0.95);
+  TLegend legend2(0.7,0.7,0.95,0.95);
   legend2.AddEntry(hists.mc_hist_high_purity,"High Purity Tracks","F");
   legend2.AddEntry(hists.mc_hist_tight,"Tight Tracks","F");
   legend2.AddEntry(hists.mc_hist_loose,"Loose Tracks","F");
@@ -1704,6 +1818,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   gStyle->SetMarkerColor(1);
   gStyle->SetOptStat(000000000);
 
+  //setTDRStyle();
   ifstream mcFiles;
   mcFiles.open(mcfilename.c_str());
   ifstream dataFiles;
@@ -2147,7 +2262,6 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     {
       MakeAJetTrackQualityPlot(iPlot->first,iPlot->second,finalNorm);
     }
-
 
   return;
 }
