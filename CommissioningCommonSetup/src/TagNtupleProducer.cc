@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.6 2010/05/05 17:33:47 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.7 2010/05/07 09:46:43 alschmid Exp $
 //
 //
 
@@ -212,6 +212,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
       produces<vector<float> >( alias = label_ + "SVMasspiHyp"                                   ).setBranchAlias( alias );   
       produces<vector<int> >( alias = label_ + "SVnVertices"                                ).setBranchAlias( alias );   
       produces<vector<int> >( alias = label_ + "SVnVertexTracks"                            ).setBranchAlias( alias ); 
+      produces<vector<int> >( alias = label_ + "SVnVertexTracksAll"                         ).setBranchAlias( alias ); 
       produces<vector<float> >( alias = label_ + "SVjetDeltaR"                            ).setBranchAlias( alias ); 
       produces<vector<float> >( alias = label_ + "SVjetAngle"                            ).setBranchAlias( alias ); 
       produces<vector<float> >( alias = label_ + "SVjetCosAngle"                            ).setBranchAlias( alias ); 
@@ -506,6 +507,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<float> SVMasspiHyp;                                
   vector<int> SVnVertices;                             
   vector<int>   SVnVertexTracks;         
+  vector<int>   SVnVertexTracksAll;         
   vector<float> SVjetDeltaR;
   vector<float> SVjetAngle;
   vector<float> SVjetCosAngle;
@@ -721,7 +723,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      SVChi2.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).chi2());                                
 	      SVDegreesOfFreedom.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).ndof());                    
 	      SVNormChi2.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).normalizedChi2());
-  	      SVnVertexTracks.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).tracksSize());
+  	      SVnVertexTracksAll.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).tracksSize());
+	      SVnVertexTracks.push_back( svTagInfo[thisJetRef]->nVertexTracks()  );
 	      math::XYZTLorentzVector vertexP4(0,0,0,0);
 	      math::XYZTLorentzVector vertexP4piHyp(0,0,0,0);
 	      //	      for(vector<Track >::const_iterator iTrack = svTagInfo[thisJetRef]->secondaryVertex(0).refittedTracks().begin(); iTrack != svTagInfo[thisJetRef]->secondaryVertex(0).refittedTracks().end(); iTrack++)
@@ -977,6 +980,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVMasspiHyp)),label_+"SVMasspiHyp");
       iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertices)),label_+"SVnVertices");
       iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertexTracks)),label_+"SVnVertexTracks");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertexTracksAll)),label_+"SVnVertexTracksAll");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetDeltaR)),label_+"SVjetDeltaR");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetAngle)),label_+"SVjetAngle");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetCosAngle)),label_+"SVjetCosAngle");
