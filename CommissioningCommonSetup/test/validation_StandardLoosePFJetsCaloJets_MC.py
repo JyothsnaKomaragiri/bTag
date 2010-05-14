@@ -632,6 +632,18 @@ process.caloBTagAnalysis.tagConfig = cms.VPSet(
             label = cms.InputTag("looseSoftElectronCaloTagInfos")
         ) 
 )
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[0].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[0].vertexMass.max = 0.8
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.max = 0.8
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[0].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[0].vertexMass.max = 0.8
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[1].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[1].vertexMass.max = 0.8
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[2].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[2].vertexMass.max = 0.8
 #UNCOMMENT THESE LINES AT YOUR OWN RISK
 #for i in range(3 , 16):
 #  for j in range(i + 1, 16):
@@ -832,6 +844,18 @@ process.pfBTagAnalysis.tagConfig = cms.VPSet(
             label = cms.InputTag("looseSoftElectronPFTagInfos")
         ) 
 )
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[0].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[0].vertexMass.max = 0.8
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.max = 0.8
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[0].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[0].vertexMass.max = 0.8
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[1].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[1].vertexMass.max = 0.8
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[2].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[2].vertexMass.max = 0.8
 #UNCOMMENT THESE LINES AT YOUR OWN RISK
 #for i in range(3 , 16):
 #  for j in range(i + 1, 16):

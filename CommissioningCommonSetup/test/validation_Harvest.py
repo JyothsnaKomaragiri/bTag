@@ -496,7 +496,7 @@ process.dqmSaver.forceRunNumber = cms.untracked.int32(1)
 #)
 
 process.PoolSource.fileNames.append(
-  "file:BTagCommissioning2010_April20_7TeV_Data_PromptReco_v8.root"
+  "file:BTagCommissioning2010_April20_7TeV_MC.root"
 )
 
 
