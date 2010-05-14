@@ -1,17 +1,24 @@
 run the plotting macro in the following way:
 
+remove existing libraries with 
+rm *.so
+
 start root and compile the library:
 .L TSelectorMultiDraw.C++
+.L MakeAllPlots.C++
 
-then run the macro:
+then run the macro from the shell:
 
 for lumi normalization:
-.x MakeAllPlots.C++("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 1, "plots.root", "plotname")
+root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", 1, "plots.root", "plotname")'
 
-for area normalization:
-.x MakeAllPlots.C++("MCfileList.cfg", "DATAfileList.cfg", "plot.cfg", 0, "plots.root", "plotname")
+for area normalization WITHOUT overflow bins:
+root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", 0, "plots.root", "plotname")
 
-where MCfileList.cfg and DATAfileList.cfg are the list of files to read including their weight, separated by a comma.
+for area normalization WITH overflow bins:
+root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", -1, "plots.root", "plotname")
+
+where filelistMC.cfg and filelistData.cfg are the list of files to read including their weight, separated by a comma.
 
 Example list of files:
 /nfs/data6/alschmid/btagCommissioning/files/MC_QCDPt20_30/BTagCommissioning2010_April20_7TeV_MC_13_1.root,1
@@ -22,5 +29,5 @@ Example list of files:
 
 "plots.root" is the output root file containing some histograms (optional)
 
-"plotname" is the name of the plot to be produced (optional). Use empty string "" to produce ALL plots defined in the plots.cfg.
+"plotname" is the name of the plot to be produced (optional). Use empty string "" to produce ALL plots defined in the plots.cfg (very slow).
 
