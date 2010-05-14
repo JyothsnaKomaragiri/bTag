@@ -13,10 +13,10 @@ for lumi normalization:
 root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", 1, "plots.root", "plotname")'
 
 for area normalization WITHOUT overflow bins:
-root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", 0, "plots.root", "plotname")
+root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", 0, "plots.root", "plotname")'
 
 for area normalization WITH overflow bins:
-root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", -1, "plots.root", "plotname")
+root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", -1, "plots.root", "plotname")'
 
 where filelistMC.cfg and filelistData.cfg are the list of files to read including their weight, separated by a comma.
 
