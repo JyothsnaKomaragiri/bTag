@@ -96,6 +96,7 @@ struct information1d{
   double xlow;
   double xup;
   int nbinsx;
+  bool displayNoInfo;
 };
 
 struct informationQuality{
@@ -143,6 +144,7 @@ struct information2d{
   double ylow;
   double yup;
   int nbinsy;
+  bool displayNoInfo;
 };
 
 struct informationCut{
@@ -161,6 +163,7 @@ struct informationCut{
   double ylow;
   double yup;
   int nbinsy;
+  bool displayNoInfo;
 };
 
 struct flavorHists1D{
@@ -212,8 +215,9 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
   bool xlow = false;
   bool xup = false;
   bool nbinsx = false;
+  bool bDisplayNoInfo = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && bDisplayNoInfo)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -256,6 +260,10 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
     if(line.find("nbinsx")<position){
       nbinsx = true;
       thisPlot.nbinsx = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("displayNoInfo")<position){
+      bDisplayNoInfo = true;
+      thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
     }
   }
   return thisPlot;
@@ -441,8 +449,9 @@ information2d param2d(ifstream* plotFile, information2d defaultParams)
   bool ylow = false;
   bool yup = false;
   bool nbinsy = false;
+  bool bDisplayNoInfo = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && xlow && xup && nbinsx && ylow && yup && nbinsy)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && xlow && xup && nbinsx && ylow && yup && nbinsy && bDisplayNoInfo)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -506,6 +515,10 @@ information2d param2d(ifstream* plotFile, information2d defaultParams)
       nbinsy = true;
       thisPlot.nbinsy = atoi((line.substr(position+1)).c_str());
     }
+    if(line.find("displayNoInfo")<position){
+      bDisplayNoInfo = true;
+      thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
   }
   return thisPlot;
 }
@@ -528,8 +541,9 @@ informationCut paramCut(ifstream* plotFile, informationCut defaultParams)
   bool ylow = false;
   bool yup = false;
   bool nbinsy = false;
+  bool bDisplayNoInfo = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && direction && xlow && xup && nbinsx && ylow && yup && nbinsy)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && direction && xlow && xup && nbinsx && ylow && yup && nbinsy && bDisplayNoInfo)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -597,6 +611,10 @@ informationCut paramCut(ifstream* plotFile, informationCut defaultParams)
       nbinsy = true;
       thisPlot.nbinsy = atoi((line.substr(position+1)).c_str());
     }
+    if(line.find("displayNoInfo")<position){
+      bDisplayNoInfo = true;
+      thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
   }
   return thisPlot;
 }
@@ -625,7 +643,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.mc_b_hist->SetFillColor(kRed);
   
   THStack mc_stack_bUp((info.plotName+"_mc_stack_bUp").c_str(),info.plotTitle.c_str());
-  mc_stack_bUp.Add(hists.mc_none_hist);
+  if(info.displayNoInfo == true) mc_stack_bUp.Add(hists.mc_none_hist);
   mc_stack_bUp.Add(hists.mc_light_hist);
   mc_stack_bUp.Add(hists.mc_c_hist);
   mc_stack_bUp.Add(hists.mc_b_hist);
@@ -635,7 +653,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bDown.Add(hists.mc_b_hist);
   mc_stack_bDown.Add(hists.mc_c_hist);
   mc_stack_bDown.Add(hists.mc_light_hist);
-  mc_stack_bDown.Add(hists.mc_none_hist);
+  if(info.displayNoInfo == true) mc_stack_bDown.Add(hists.mc_none_hist);
   mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()));
   
   //Make Canvas
@@ -651,10 +669,10 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   TLegend legend(0.7,0.7,0.95,0.95);
   legend.AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
-  legend.AddEntry(hists.mc_b_hist,"MC (bottom)","F");
-  legend.AddEntry(hists.mc_c_hist,"MC (charm)","F");
   legend.AddEntry(hists.mc_light_hist,"MC (light)","F");
-  legend.AddEntry(hists.mc_none_hist,"MC (no info)","F");
+  legend.AddEntry(hists.mc_c_hist,"MC (charm)","F");
+  legend.AddEntry(hists.mc_b_hist,"MC (bottom)","F");
+  if(info.displayNoInfo == true) legend.AddEntry(hists.mc_none_hist,"MC (no info)","F");
 
   legend.SetBorderSize(0);
   legend.SetFillColor(kWhite);
@@ -856,7 +874,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   hists.mc_b_hist->SetFillStyle(0);
   hists.mc_all_hist->SetLineColor(kBlack);
   hists.mc_all_hist->SetFillStyle(0);
-  mc_stack.Add(hists.mc_none_hist);
+  if(info.displayNoInfo == true) mc_stack.Add(hists.mc_none_hist);
   mc_stack.Add(hists.mc_light_hist);
   mc_stack.Add(hists.mc_c_hist);
   mc_stack.Add(hists.mc_b_hist);
@@ -870,14 +888,14 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
- TLegend legend(0.7,0.7,0.95,0.95);
+  TLegend legend(0.7,0.7,0.95,0.95);
   legend.AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
   legend.AddEntry(hists.mc_all_hist,"MC Total","L");
-  legend.AddEntry(hists.mc_b_hist,"MC (bottom)","L");
-  legend.AddEntry(hists.mc_c_hist,"MC (charm)","L");
   legend.AddEntry(hists.mc_light_hist,"MC (light)","L");
-  legend.AddEntry(hists.mc_none_hist,"MC (no info)","L");
+  legend.AddEntry(hists.mc_c_hist,"MC (charm)","L");
+  legend.AddEntry(hists.mc_b_hist,"MC (bottom)","L");
+  if(info.displayNoInfo == true) legend.AddEntry(hists.mc_none_hist,"MC (no info)","L");
 
   legend.SetBorderSize(0);
   legend.SetFillColor(kWhite);
@@ -916,6 +934,7 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale)
 
   flavorHists1D reweightedHists;
   information1d reweightedInfo;
+  reweightedInfo.displayNoInfo = info.displayNoInfo;
 
   reweightedInfo.plotName = info.plotName;
   reweightedInfo.plotTitle = info.plotTitle;
@@ -993,6 +1012,7 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
 
   flavorHists1D profiles;
   information1d profInfo;
+  profInfo.displayNoInfo = info.displayNoInfo;
 
   TProfile* data_prof_x = hists.data_hist->ProfileX();
   TProfile* mc_all_prof_x = hists.mc_all_hist->ProfileX();
@@ -1448,6 +1468,7 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale)
 
   flavorHists1D profiles;
   information1d profInfo;
+  profInfo.displayNoInfo = info.displayNoInfo;
 
   TProfile* data_prof = data_int->ProfileX();
   TProfile* mc_all_prof = mc_all_int->ProfileX();
