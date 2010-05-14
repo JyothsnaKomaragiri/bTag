@@ -32,7 +32,10 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+#For QCD MC Samples
 process.GlobalTag.globaltag = 'START3X_V26A::All'
+#For MinBias MC Samples
+#process.GlobalTag.globaltag = 'START3X_V26A::All'
 
 process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
@@ -459,7 +462,8 @@ process.load("Validation.RecoB.bTagAnalysis_firststep_cfi")
 process.caloBTagAnalysis = process.bTagValidationFirstStep.clone()
 process.caloBTagAnalysis.jetMCSrc = "AK5byValAlgo"
 process.caloBTagAnalysis.finalizePlots = False 
-process.caloBTagAnalysis.finalizeOnly = False 
+process.caloBTagAnalysis.finalizeOnly = False
+process.caloBTagAnalysis.differentialPlots = False 
 process.caloBTagAnalysis.ptRecJetMin = 10.0
 process.caloBTagAnalysis.etaMax = 2.5
 process.caloBTagAnalysis.ptRanges = cms.vdouble(10.0, 20.0, 40.0, 99999.0)
@@ -628,6 +632,39 @@ process.caloBTagAnalysis.tagConfig = cms.VPSet(
             label = cms.InputTag("looseSoftElectronCaloTagInfos")
         ) 
 )
+#UNCOMMENT THESE LINES AT YOUR OWN RISK
+#for i in range(3 , 16):
+#  for j in range(i + 1, 16):
+#    process.caloBTagAnalysis.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.caloBTagAnalysis.tagConfig[i].label,
+#        label2 = process.caloBTagAnalysis.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.caloBTagAnalysis.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.caloBTagAnalysis.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.caloBTagAnalysis.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.caloBTagAnalysis.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
+#for i in range(21 , 34):
+#  for j in range(i + 1, 34):
+#    process.caloBTagAnalysis.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.caloBTagAnalysis.tagConfig[i].label,
+#        label2 = process.caloBTagAnalysis.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.caloBTagAnalysis.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.caloBTagAnalysis.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.caloBTagAnalysis.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.caloBTagAnalysis.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
 
 process.pfBTagAnalysis = process.caloBTagAnalysis.clone()
 process.pfBTagAnalysis.jetMCSrc = "AK5PFbyValAlgo"
@@ -795,6 +832,39 @@ process.pfBTagAnalysis.tagConfig = cms.VPSet(
             label = cms.InputTag("looseSoftElectronPFTagInfos")
         ) 
 )
+#UNCOMMENT THESE LINES AT YOUR OWN RISK
+#for i in range(3 , 16):
+#  for j in range(i + 1, 16):
+#    process.pfBTagAnalysis.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.pfBTagAnalysis.tagConfig[i].label,
+#        label2 = process.pfBTagAnalysis.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.pfBTagAnalysis.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.pfBTagAnalysis.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.pfBTagAnalysis.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.pfBTagAnalysis.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
+#for i in range(21 , 34):
+#  for j in range(i + 1, 34):
+#    process.pfBTagAnalysis.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.pfBTagAnalysis.tagConfig[i].label,
+#        label2 = process.pfBTagAnalysis.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.pfBTagAnalysis.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.pfBTagAnalysis.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.pfBTagAnalysis.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.pfBTagAnalysis.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
 
 
 
@@ -1063,9 +1133,10 @@ process.bTagNtuples = cms.Sequence(
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
 )
+
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-    '/store/mc/Spring10/MinBias/GEN-SIM-RECO/START3X_V26A_356ReReco-v1/0009/FAA1F905-F53D-DF11-BD36-00261894386A.root'
+'/store/mc/Spring10/QCDDiJet_Pt15to20/GEN-SIM-RECO/START3X_V26_S09-v1/0014/F4CA13C9-9146-DF11-A1C9-E41F13181B0C.root'
     )
 )
 

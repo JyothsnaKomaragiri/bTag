@@ -25,16 +25,18 @@ process.DQMStore.collateHistograms = True
 process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 #For harvesting of data
-#process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
+process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
 #For harvesting of MC
-process.load("Validation.RecoB.bTagAnalysis_harvesting_cfi")
+#process.load("Validation.RecoB.bTagAnalysis_harvesting_cfi")
 #For harvesting of data
-#process.bTagAnalysisHarvest = process.bTagAnalysis.clone()
+process.bTagAnalysisHarvest = process.bTagAnalysis.clone()
 #For harvesting of MC
-process.bTagAnalysisHarvest = process.bTagValidationHarvest.clone()
+#process.bTagAnalysisHarvest = process.bTagValidationHarvest.clone()
 process.bTagAnalysisHarvest.finalizePlots = True
 process.bTagAnalysisHarvest.finalizeOnly = True
+process.bTagAnalysisHarvest.differentialPlots = cms.bool(False)
 process.bTagAnalysisHarvest.ptRecJetMin = 10.0
+process.bTagAnalysisHarvest.etaMax = 2.5
 process.bTagAnalysisHarvest.ptRanges = cms.vdouble(10.0, 20.0, 40.0, 99999.0)
 process.bTagAnalysisHarvest.etaRanges = cms.vdouble(0.0, 1.5, 2.5)
 process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
@@ -363,6 +365,94 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             label = cms.InputTag("looseSoftElectronPFTagInfos")
         ) 
 )
+process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[0].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[0].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[1].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[1].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[0].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[0].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[1].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[1].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[2].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[2].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[0].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[0].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[1].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[1].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[2].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[2].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[0].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[0].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[1].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[1].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[2].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[2].vertexMass.max = 0.8
+#for i in range(3 , 16):
+#  for j in range(i + 1, 16):
+#    process.bTagAnalysisHarvest.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.bTagAnalysisHarvest.tagConfig[i].label,
+#        label2 = process.bTagAnalysisHarvest.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
+#for i in range(21 , 34):
+#  for j in range(i + 1, 34):
+#    process.bTagAnalysisHarvest.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.bTagAnalysisHarvest.tagConfig[i].label,
+#        label2 = process.bTagAnalysisHarvest.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
+#for i in range(39 , 52):
+#  for j in range(i + 1, 52):
+#    process.bTagAnalysisHarvest.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.bTagAnalysisHarvest.tagConfig[i].label,
+#        label2 = process.bTagAnalysisHarvest.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
+#for i in range(57 , 70):
+#  for j in range(i + 1, 70):
+#    process.bTagAnalysisHarvest.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.bTagAnalysisHarvest.tagConfig[i].label,
+#        label2 = process.bTagAnalysisHarvest.tagConfig[j].label,
+#       parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
 
 ## both the EDM FWK and the DQM FWK (with collate=on) add up the histograms: the above setting should switch off the EDM one
 ## https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideEDMParametersForModules
@@ -394,11 +484,19 @@ process.dqmSaver.saveAtJobEnd =cms.untracked.bool(True)
 process.dqmSaver.forceRunNumber = cms.untracked.int32(1)
 
 ## Dijet pT 0 to 15
-for i in range(1,52):
-  process.PoolSource.fileNames.append("rfio:///castor/cern.ch/user/a/alschmid/btagApr30/BTagCommissioning2010_April20_7TeV_MC_"+str(i)+"_1.root")
+#for i in range(1,52):
+#  process.PoolSource.fileNames.append("rfio:///castor/cern.ch/user/a/alschmid/btagApr30/BTagCommissioning2010_April20_7TeV_MC_"+str(i)+"_1.root")
 
 ## Dijet pT 15 to 20
 #for i in range(1,52):
 #  process.PoolSource.fileNames.append("rfio:///castor/cern.ch/user/a/alschmid/btagApr30_mid/BTagCommissioning2010_April20_7TeV_MC_"+str(i)+"_1.root")
+
+#process.PoolSource.fileNames.append(
+#  "file:/uscms_data/d2/jkeller7/bTagDevelopment/CMSSW_3_5_8/src/BTagCommissioning2010_April20_7TeV_MC.root"
+#)
+
+process.PoolSource.fileNames.append(
+  "file:BTagCommissioning2010_April20_7TeV_Data_PromptReco_v8.root"
+)
 
 

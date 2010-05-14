@@ -32,10 +32,10 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
 process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-#For use with propt reco
-process.GlobalTag.globaltag = 'GR10_P_V4::All'
-#For use with April 1st rereco
-#process.GlobalTag.globaltag = 'GR_R_35X_V6::All'
+#For use with prompt reco
+process.GlobalTag.globaltag = 'GR10_P_V5::All'
+#For use with April 20th rereco
+#process.GlobalTag.globaltag = 'GR_R_35X_V7A::All'
 
 process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
@@ -613,6 +613,50 @@ process.caloBTagAnalysis.tagConfig = cms.VPSet(
             label = cms.InputTag("looseSoftElectronCaloTagInfos")
         ) 
 )
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[0].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[0].vertexMass.max = 0.8
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.max = 0.8
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[0].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[0].vertexMass.max = 0.8
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[1].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[1].vertexMass.max = 0.8
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[2].vertexMass.min = 0.3
+process.caloBTagAnalysis.tagConfig[20].parameters.categories[2].vertexMass.max = 0.8
+#for i in range(3 , 16):
+#  for j in range(i + 1, 16):
+#    process.caloBTagAnalysis.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.caloBTagAnalysis.tagConfig[i].label,
+#        label2 = process.caloBTagAnalysis.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.caloBTagAnalysis.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.caloBTagAnalysis.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.caloBTagAnalysis.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.caloBTagAnalysis.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
+#for i in range(21 , 34):
+#  for j in range(i + 1, 34):
+#    process.caloBTagAnalysis.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.caloBTagAnalysis.tagConfig[i].label,
+#        label2 = process.caloBTagAnalysis.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.caloBTagAnalysis.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.caloBTagAnalysis.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.caloBTagAnalysis.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.caloBTagAnalysis.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
 
 process.pfBTagAnalysis = process.caloBTagAnalysis.clone()
 process.pfBTagAnalysis.tagConfig = cms.VPSet(
@@ -779,6 +823,50 @@ process.pfBTagAnalysis.tagConfig = cms.VPSet(
             label = cms.InputTag("looseSoftElectronPFTagInfos")
         ) 
 )
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[0].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[0].vertexMass.max = 0.8
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.max = 0.8
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[0].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[0].vertexMass.max = 0.8
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[1].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[1].vertexMass.max = 0.8
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[2].vertexMass.min = 0.3
+process.pfBTagAnalysis.tagConfig[20].parameters.categories[2].vertexMass.max = 0.8
+#for i in range(3 , 16):
+#  for j in range(i + 1, 16):
+#    process.pfBTagAnalysis.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.pfBTagAnalysis.tagConfig[i].label,
+#        label2 = process.pfBTagAnalysis.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.pfBTagAnalysis.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.pfBTagAnalysis.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.pfBTagAnalysis.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.pfBTagAnalysis.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
+#for i in range(21 , 34):
+#  for j in range(i + 1, 34):
+#    process.pfBTagAnalysis.tagConfig.append(
+#      cms.PSet(
+#        type = cms.string("TagCorrelation"),
+#        label1 = process.pfBTagAnalysis.tagConfig[i].label,
+#        label2 = process.pfBTagAnalysis.tagConfig[j].label,
+#        parameters = cms.PSet(
+#          CreateProfile = cms.bool(True),
+#          Discr1Start = process.pfBTagAnalysis.tagConfig[i].parameters.discriminatorStart,
+#          Discr1End = process.pfBTagAnalysis.tagConfig[i].parameters.discriminatorEnd,
+#          Discr2Start = process.pfBTagAnalysis.tagConfig[j].parameters.discriminatorStart,
+#          Discr2End = process.pfBTagAnalysis.tagConfig[j].parameters.discriminatorEnd
+#        )
+#      )
+#    )
 
 process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 
@@ -1052,76 +1140,8 @@ process.maxEvents = cms.untracked.PSet(
 )
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-    '/store/data/Commissioning10/MinimumBias/RECO/Apr1ReReco-v2/0139/F26CDE14-933E-DF11-B693-001A92971B04.root'
+    '/store/data/Commissioning10/MinimumBias/RECO/v9/000/134/721/D620A591-8656-DF11-ACDD-003048D479DE.root'
     )
-)
-process.evtLumiFilter = cms.EDFilter("EventLumiFilter",
-  lumisToProcess = cms.VLuminosityBlockRange(
-	'132440:85-132440:138',
-	'132440:141-132440:401',
-	'132473:1-132473:29',
-	'132476:23-132476:28',
-	'132476:54-132476:57',
-	'132477:1-132477:5',
-	'132477:34-132477:35',
-	'132477:63-132477:64',
-	'132477:90-132477:93',
-	'132477:118-132477:121',
-	'132477:148-132477:149',
-	'132477:176-132477:179',
-	'132477:225-132477:236',
-	'132477:368-132477:384',
-	'132477:517-132477:520',
-	'132596:382-132596:383',
-	'132596:447-132596:453',
-	'132598:80-132598:82',
-	'132598:174-132598:188',
-	'132599:1-132599:379',
-	'132599:381-132599:538',
-	'132601:1-132601:207',
-	'132601:209-132601:259',
-	'132601:261-132601:1131',
-	'132602:1-132602:83',
-	'132605:1-132605:444',
-	'132605:446-132605:622',
-	'132605:624-132605:829',
-	'132605:831-132605:968',
-	'132606:1-132606:37',
-	'132656:1-132656:140',
-	'132658:1-132658:177',
-	'132659:1-132659:84',
-	'132661:1-132661:130',
-	'132662:1-132662:130',
-	'132662:132-132662:217',
-	'132716:220-132716:591',
-	'132716:593-132716:640',
-	'132959:1-132959:276',
-	'132959:278-132959:417',
-	'132960:1-132960:190',
-	'132961:1-132961:427',
-	'132965:1-132965:107',
-	'132968:1-132968:173',
-	'133029:101-133029:115',
-	'133029:129-133029:350',
-	'133031:1-133031:18',
-	'133034:131-133034:325',
-	'133046:1-133046:43',
-	'133046:45-133046:323',
-	'133082:1-133082:336',
-	'133082:523-133082:592',
-	'133082:595-133082:608',
-	'133158:65-133158:786',
-	'133321:1-133321:383',
-	'133450:1-133450:329',
-	'133450:332-133450:658',
-	'133472:92-133472:106',
-	'133474:1-133474:95',
-	'133474:157-133474:189',
-	'133483:94-133483:159',
-	'133483:161-133483:591',
-	'133483:652-133483:658',
-	'133509:60-133509:75'
-)
 )
 
 process.EDM = cms.OutputModule("PoolOutputModule",
@@ -1250,10 +1270,9 @@ process.bTagValidation = cms.Sequence(
 )
 
 process.plots = cms.Path(
-  process.evtLumiFilter +
   process.bit40 +
   process.bptxAnd +
-  process.physDecl +
+#  process.physDecl +
   process.noscraping +
   process.oneGoodVertexFilter +
   cms.ignore(process.PFJetsFilter) *
