@@ -12,6 +12,7 @@
 #include "TTree.h"
 #include "TSelectorMultiDraw.h"
 #include "TDirectory.h"
+#include "TPaveText.h"
 
 #include <cmath>
 #include <string>
@@ -666,7 +667,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   ratio->Divide(hists.mc_all_hist);
   ratio->SetMarkerStyle(20);
 
-  TLegend legend(0.7,0.7,0.95,0.95);
+  TLegend legend(0.725,0.6, 0.925, 0.85);
   legend.AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
   legend.AddEntry(hists.mc_light_hist,"MC (light)","F");
@@ -687,6 +688,17 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
   legend.Draw();
+
+  //include the official CMS label
+  TPaveText *pt = new TPaveText(0.4,0.92,0.9,0.97,"brNDC");   
+  pt->SetBorderSize(0);   
+  pt->SetFillStyle(0);  
+  pt->SetTextAlign(13);   
+  pt->SetTextFont(42);   
+  pt->SetTextSize(0.035);   
+  TText *text = pt->AddText("CMS Preliminary 2010");   
+  pt->Draw();
+
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.pdf").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.png").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.root").c_str());
@@ -712,6 +724,10 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
   legend.Draw();
+
+  //include the official CMS label
+  pt->Draw();
+
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.pdf").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.png").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.root").c_str());
@@ -730,6 +746,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_ratio.cd();
   ratio->Draw("E1X0");
+  pt->Draw();
   canvas_ratio.SaveAs((info.plotName+"_ratio.pdf").c_str());
   canvas_ratio.SaveAs((info.plotName+"_ratio.png").c_str());
   canvas_ratio.SaveAs((info.plotName+"_ratio.root").c_str());
@@ -765,7 +782,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
-  TLegend legend(0.7,0.5,0.95,0.95);
+  TLegend legend(0.725,0.6, 0.925, 0.85);
   legend.AddEntry(drawHelper,"Data","LPE");
 
   int iColor = 2;
@@ -888,7 +905,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
-  TLegend legend(0.7,0.7,0.95,0.95);
+  TLegend legend(0.725,0.6, 0.925, 0.85);
   legend.AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
   legend.AddEntry(hists.mc_all_hist,"MC Total","L");
@@ -907,6 +924,17 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   drawHelper->Draw("PSAME");
   hists.data_hist->Draw("E1X0SAME");
   legend.Draw();
+
+  //include the official CMS label
+  TPaveText *pt = new TPaveText(0.4,0.92,0.9,0.97,"brNDC");   
+  pt->SetBorderSize(0);   
+  pt->SetFillStyle(0);  
+  pt->SetTextAlign(13);   
+  pt->SetTextFont(42);   
+  pt->SetTextSize(0.035);   
+  TText *text = pt->AddText("CMS Preliminary 2010");   
+  pt->Draw();
+
   canvas.SaveAs((info.plotName+".pdf").c_str());
   canvas.SaveAs((info.plotName+".png").c_str());
   canvas.SaveAs((info.plotName+".root").c_str());
@@ -1762,6 +1790,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   //  gStyle->SetMarkerSize(1);
   gStyle->SetMarkerColor(1);
   gStyle->SetOptStat(000000000);
+  gStyle->SetOptTitle(0);
 
   setTDRStyle();
   ifstream mcFiles;
@@ -1811,6 +1840,10 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   list< pair< information2d , flavorHists2D > > reweightedPlots;
   list< pair< information2d , flavorHists2D > > reweightedTrackPlots;
 
+  TString normalizationText = "";
+  if(finalNorm<=0) normalizationText = "MC normalized to Data";
+  else normalizationText = "normalized to Luminosity";
+
   while (! plotFiles.eof()) {
     string line;
     getline (plotFiles,line);
@@ -1839,6 +1872,12 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.data_hist->GetYaxis()->SetTitle( normalizationText  );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle( normalizationText  );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle( normalizationText );
 	theseHists.data_hist->Sumw2();
 	theseHists.mc_all_hist->Sumw2();
 	theseHists.mc_b_hist->Sumw2();
@@ -1950,12 +1989,12 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
-	theseHists.data_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	theseHists.mc_all_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.data_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle(normalizationText );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle(normalizationText  );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle(normalizationText  );
 	theseHists.data_hist->Sumw2();
 	theseHists.mc_all_hist->Sumw2();
 	theseHists.mc_b_hist->Sumw2();
@@ -1981,12 +2020,12 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
-	theseHists.data_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	theseHists.mc_all_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.data_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle( normalizationText );
 	theseHists.data_hist->Sumw2();
 	theseHists.mc_all_hist->Sumw2();
 	theseHists.mc_b_hist->Sumw2();
@@ -2043,6 +2082,12 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.data_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle(normalizationText );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle( normalizationText );
 	theseHists.data_hist->Sumw2();
 	theseHists.mc_all_hist->Sumw2();
 	theseHists.mc_b_hist->Sumw2();
