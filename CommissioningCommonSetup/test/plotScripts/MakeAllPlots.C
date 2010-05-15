@@ -712,6 +712,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
   legend.Draw();
+  pt->Draw();
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log.pdf").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log.png").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log.root").c_str());
@@ -739,6 +740,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
   legend.Draw();
+  pt->Draw();
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.pdf").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.png").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.root").c_str());
