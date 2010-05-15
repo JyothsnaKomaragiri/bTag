@@ -80,7 +80,7 @@ void setTDRStyle() {
   tdrStyle->SetHistLineWidth(2);
   tdrStyle->SetLineWidth(1);
   
-  tdrStyle->SetOptTitle(1);
+  tdrStyle->SetOptTitle(kFALSE);
   tdrStyle->SetOptStat(0);
 
   tdrStyle->cd();
@@ -1790,7 +1790,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   //  gStyle->SetMarkerSize(1);
   gStyle->SetMarkerColor(1);
   gStyle->SetOptStat(000000000);
-  gStyle->SetOptTitle(0);
+  gStyle->SetOptTitle(kFALSE);
 
   setTDRStyle();
   ifstream mcFiles;
