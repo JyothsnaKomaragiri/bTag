@@ -124,87 +124,6 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
         cms.PSet(
             bTagTrackIPAnalysisBlock,
             type = cms.string('TrackIP'),
-            label = cms.InputTag("looseImpactParameterCaloTagInfos")
-        ), 
-        cms.PSet(
-            bTagCombinedSVAnalysisBlock,
-            ipTagInfos = cms.InputTag("looseImpactParameterCaloTagInfos"),
-            type = cms.string('GenericMVA'),
-            svTagInfos = cms.InputTag("looseSecondaryVertexCaloTagInfos"),
-            label = cms.InputTag("looseCombinedSecondaryVertexCalo")
-        ), 
-        cms.PSet(
-            bTagCombinedSVAnalysisBlock,
-            ipTagInfos = cms.InputTag("looseImpactParameterCaloTagInfos"),
-            type = cms.string('GenericMVA'),
-            svTagInfos = cms.InputTag("looseSecondaryVertexV0CaloTagInfos"),
-            label = cms.InputTag("looseCombinedSecondaryVertexV0Calo")
-        ), 
-        cms.PSet(
-            bTagTrackCountingAnalysisBlock,
-            label = cms.InputTag("looseTrackCountingHighEffCaloBJetTags")
-        ), 
-        cms.PSet(
-            bTagTrackCountingAnalysisBlock,
-            label = cms.InputTag("looseTrackCountingHighPurCaloBJetTags")
-        ), 
-        cms.PSet(
-            bTagProbabilityAnalysisBlock,
-            label = cms.InputTag("looseJetProbabilityCaloBJetTags")
-        ), 
-        cms.PSet(
-            bTagBProbabilityAnalysisBlock,
-            label = cms.InputTag("looseJetBProbabilityCaloBJetTags")
-        ), 
-        cms.PSet(
-            bTagSimpleSVAnalysisBlock,
-            label = cms.InputTag("looseSimpleSecondaryVertexCaloBJetTags")
-        ), 
-        cms.PSet(
-            bTagSimpleSVAnalysisBlock,
-            label = cms.InputTag("looseSimpleSecondaryVertexHighPurCaloBJetTags")
-        ), 
-        cms.PSet(
-            bTagGenericAnalysisBlock,
-            label = cms.InputTag("looseCombinedSecondaryVertexCaloBJetTags")
-        ), 
-        cms.PSet(
-            bTagGenericAnalysisBlock,
-            label = cms.InputTag("looseCombinedSecondaryVertexMVACaloBJetTags")
-        ), 
-        cms.PSet(
-            bTagSoftLeptonAnalysisBlock,
-            label = cms.InputTag("looseSoftMuonCaloBJetTags")
-        ),
-        cms.PSet(
-            bTagSoftLeptonByIPAnalysisBlock,
-            label = cms.InputTag("looseSoftMuonByIP3dCaloBJetTags")
-        ), 
-        cms.PSet(
-            bTagSoftLeptonByPtAnalysisBlock,
-            label = cms.InputTag("looseSoftMuonByPtCaloBJetTags")
-        ),
-        cms.PSet(
-            bTagSoftLeptonByIPAnalysisBlock,
-            label = cms.InputTag("looseSoftElectronByIP3dCaloBJetTags")
-        ), 
-        cms.PSet(
-            bTagSoftLeptonByPtAnalysisBlock,
-            label = cms.InputTag("looseSoftElectronByPtCaloBJetTags")
-        ),
-        cms.PSet(
-            bTagSoftLeptonAnalysisBlock,
-            type = cms.string("SoftLepton"),
-            label = cms.InputTag("looseSoftMuonCaloTagInfos")
-        ),
-        cms.PSet(
-            bTagSoftLeptonAnalysisBlock,
-            type = cms.string("SoftLepton"),
-            label = cms.InputTag("looseSoftElectronCaloTagInfos")
-        ),
-        cms.PSet(
-            bTagTrackIPAnalysisBlock,
-            type = cms.string('TrackIP'),
             label = cms.InputTag("standardImpactParameterPFTagInfos")
         ), 
         cms.PSet(
@@ -282,87 +201,6 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
             bTagSoftLeptonAnalysisBlock,
             type = cms.string("SoftLepton"),
             label = cms.InputTag("standardSoftElectronPFTagInfos")
-        ), 
-        cms.PSet(
-            bTagTrackIPAnalysisBlock,
-            type = cms.string('TrackIP'),
-            label = cms.InputTag("looseImpactParameterPFTagInfos")
-        ), 
-        cms.PSet(
-            bTagCombinedSVAnalysisBlock,
-            ipTagInfos = cms.InputTag("looseImpactParameterPFTagInfos"),
-            type = cms.string('GenericMVA'),
-            svTagInfos = cms.InputTag("looseSecondaryVertexPFTagInfos"),
-            label = cms.InputTag("looseCombinedSecondaryVertexPF")
-        ), 
-        cms.PSet(
-            bTagCombinedSVAnalysisBlock,
-            ipTagInfos = cms.InputTag("looseImpactParameterPFTagInfos"),
-            type = cms.string('GenericMVA'),
-            svTagInfos = cms.InputTag("looseSecondaryVertexV0PFTagInfos"),
-            label = cms.InputTag("looseCombinedSecondaryVertexV0PF")
-        ), 
-        cms.PSet(
-            bTagTrackCountingAnalysisBlock,
-            label = cms.InputTag("looseTrackCountingHighEffPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagTrackCountingAnalysisBlock,
-            label = cms.InputTag("looseTrackCountingHighPurPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagProbabilityAnalysisBlock,
-            label = cms.InputTag("looseJetProbabilityPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagBProbabilityAnalysisBlock,
-            label = cms.InputTag("looseJetBProbabilityPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagSimpleSVAnalysisBlock,
-            label = cms.InputTag("looseSimpleSecondaryVertexPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagSimpleSVAnalysisBlock,
-            label = cms.InputTag("looseSimpleSecondaryVertexHighPurPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagGenericAnalysisBlock,
-            label = cms.InputTag("looseCombinedSecondaryVertexPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagGenericAnalysisBlock,
-            label = cms.InputTag("looseCombinedSecondaryVertexMVAPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagSoftLeptonAnalysisBlock,
-            label = cms.InputTag("looseSoftMuonPFBJetTags")
-        ),
-        cms.PSet(
-            bTagSoftLeptonByIPAnalysisBlock,
-            label = cms.InputTag("looseSoftMuonByIP3dPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagSoftLeptonByPtAnalysisBlock,
-            label = cms.InputTag("looseSoftMuonByPtPFBJetTags")
-        ),
-        cms.PSet(
-            bTagSoftLeptonByIPAnalysisBlock,
-            label = cms.InputTag("looseSoftElectronByIP3dPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagSoftLeptonByPtAnalysisBlock,
-            label = cms.InputTag("looseSoftElectronByPtPFBJetTags")
-        ),
-        cms.PSet(
-            bTagSoftLeptonAnalysisBlock,
-            type = cms.string("SoftLepton"),
-            label = cms.InputTag("looseSoftMuonPFTagInfos")
-        ),
-        cms.PSet(
-            bTagSoftLeptonAnalysisBlock,
-            type = cms.string("SoftLepton"),
-            label = cms.InputTag("looseSoftElectronPFTagInfos")
         ) 
 )
 process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[0].vertexMass.min = 0.3
@@ -377,82 +215,38 @@ process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[1].vertexMass.mi
 process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[1].vertexMass.max = 0.8
 process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[2].vertexMass.min = 0.3
 process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[2].vertexMass.max = 0.8
-process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[0].vertexMass.min = 0.3
-process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[0].vertexMass.max = 0.8
-process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[1].vertexMass.min = 0.3
-process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[1].vertexMass.max = 0.8
-process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[2].vertexMass.min = 0.3
-process.bTagAnalysisHarvest.tagConfig[38].parameters.categories[2].vertexMass.max = 0.8
-process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[0].vertexMass.min = 0.3
-process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[0].vertexMass.max = 0.8
-process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[1].vertexMass.min = 0.3
-process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[1].vertexMass.max = 0.8
-process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[2].vertexMass.min = 0.3
-process.bTagAnalysisHarvest.tagConfig[56].parameters.categories[2].vertexMass.max = 0.8
-#for i in range(3 , 16):
-#  for j in range(i + 1, 16):
-#    process.bTagAnalysisHarvest.tagConfig.append(
-#      cms.PSet(
-#        type = cms.string("TagCorrelation"),
-#        label1 = process.bTagAnalysisHarvest.tagConfig[i].label,
-#        label2 = process.bTagAnalysisHarvest.tagConfig[j].label,
-#        parameters = cms.PSet(
-#          CreateProfile = cms.bool(True),
-#          Discr1Start = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorStart,
-#          Discr1End = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorEnd,
-#          Discr2Start = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorStart,
-#          Discr2End = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorEnd
-#        )
-#      )
-#    )
-#for i in range(21 , 34):
-#  for j in range(i + 1, 34):
-#    process.bTagAnalysisHarvest.tagConfig.append(
-#      cms.PSet(
-#        type = cms.string("TagCorrelation"),
-#        label1 = process.bTagAnalysisHarvest.tagConfig[i].label,
-#        label2 = process.bTagAnalysisHarvest.tagConfig[j].label,
-#        parameters = cms.PSet(
-#          CreateProfile = cms.bool(True),
-#          Discr1Start = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorStart,
-#          Discr1End = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorEnd,
-#          Discr2Start = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorStart,
-#          Discr2End = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorEnd
-#        )
-#      )
-#    )
-#for i in range(39 , 52):
-#  for j in range(i + 1, 52):
-#    process.bTagAnalysisHarvest.tagConfig.append(
-#      cms.PSet(
-#        type = cms.string("TagCorrelation"),
-#        label1 = process.bTagAnalysisHarvest.tagConfig[i].label,
-#        label2 = process.bTagAnalysisHarvest.tagConfig[j].label,
-#        parameters = cms.PSet(
-#          CreateProfile = cms.bool(True),
-#          Discr1Start = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorStart,
-#          Discr1End = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorEnd,
-#          Discr2Start = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorStart,
-#          Discr2End = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorEnd
-#        )
-#      )
-#    )
-#for i in range(57 , 70):
-#  for j in range(i + 1, 70):
-#    process.bTagAnalysisHarvest.tagConfig.append(
-#      cms.PSet(
-#        type = cms.string("TagCorrelation"),
-#        label1 = process.bTagAnalysisHarvest.tagConfig[i].label,
-#        label2 = process.bTagAnalysisHarvest.tagConfig[j].label,
-#       parameters = cms.PSet(
-#          CreateProfile = cms.bool(True),
-#          Discr1Start = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorStart,
-#          Discr1End = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorEnd,
-#          Discr2Start = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorStart,
-#          Discr2End = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorEnd
-#        )
-#      )
-#    )
+for i in range(3 , 16):
+  for j in range(i + 1, 16):
+    process.bTagAnalysisHarvest.tagConfig.append(
+      cms.PSet(
+        type = cms.string("TagCorrelation"),
+        label1 = process.bTagAnalysisHarvest.tagConfig[i].label,
+        label2 = process.bTagAnalysisHarvest.tagConfig[j].label,
+        parameters = cms.PSet(
+          CreateProfile = cms.bool(True),
+          Discr1Start = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorStart,
+          Discr1End = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorEnd,
+          Discr2Start = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorStart,
+          Discr2End = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorEnd
+        )
+      )
+    )
+for i in range(21 , 34):
+  for j in range(i + 1, 34):
+    process.bTagAnalysisHarvest.tagConfig.append(
+      cms.PSet(
+        type = cms.string("TagCorrelation"),
+        label1 = process.bTagAnalysisHarvest.tagConfig[i].label,
+        label2 = process.bTagAnalysisHarvest.tagConfig[j].label,
+        parameters = cms.PSet(
+          CreateProfile = cms.bool(True),
+          Discr1Start = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorStart,
+          Discr1End = process.bTagAnalysisHarvest.tagConfig[i].parameters.discriminatorEnd,
+          Discr2Start = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorStart,
+          Discr2End = process.bTagAnalysisHarvest.tagConfig[j].parameters.discriminatorEnd
+        )
+      )
+    )
 
 ## both the EDM FWK and the DQM FWK (with collate=on) add up the histograms: the above setting should switch off the EDM one
 ## https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideEDMParametersForModules
@@ -491,12 +285,12 @@ process.dqmSaver.forceRunNumber = cms.untracked.int32(1)
 #for i in range(1,52):
 #  process.PoolSource.fileNames.append("rfio:///castor/cern.ch/user/a/alschmid/btagApr30_mid/BTagCommissioning2010_April20_7TeV_MC_"+str(i)+"_1.root")
 
-#process.PoolSource.fileNames.append(
-#  "file:/uscms_data/d2/jkeller7/bTagDevelopment/CMSSW_3_5_8/src/BTagCommissioning2010_April20_7TeV_MC.root"
-#)
-
 process.PoolSource.fileNames.append(
-  "file:BTagCommissioning2010_April20_7TeV_MC.root"
+  "file:/uscms_data/d2/jkeller7/bTagDevelopment/CMSSW_3_5_8/src/BTagCommissioning2010_April20_7TeV_MC.root"
 )
+
+#process.PoolSource.fileNames.append(
+#  "file:/uscms_data/d2/jkeller7/bTagDevelopment/CMSSW_3_5_8/src/BTagCommissioning2010_April20_7TeV_Data_PromptReco_v8.root"
+#)
 
 
