@@ -9,6 +9,7 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TLatex.h"
+#include "TPaveText.h"
 #include "TTree.h"
 #include "TSelectorMultiDraw.h"
 #include "TDirectory.h"
@@ -61,7 +62,7 @@ void setTDRStyle() {
   tdrStyle->SetTitleFont(42,"xyz");
   tdrStyle->SetLabelSize(0.045,"xyz"); //0.035
   tdrStyle->SetTitleSize(0.045,"xyz");
-  tdrStyle->SetTitleOffset(1.5,"y");
+  tdrStyle->SetTitleOffset(1.6,"y");
     
   tdrStyle->SetTitleX(0.16);
   tdrStyle->SetTitleY(0.93);
@@ -663,11 +664,23 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   drawHelper->SetMarkerStyle(20);
 
   TH1D* ratio = (TH1D*)hists.data_hist->Clone((info.plotName+"ratio").c_str());
-  ratio->SetTitle((info.plotTitle+": Data to Monte Carlo Simulation Ratio").c_str());  
+  ratio->SetTitle("");
+  //  TText *text = pt->AddText((info.plotTitle+": Data to Monte Carlo Simulation Ratio").c_str());  
   ratio->Divide(hists.mc_all_hist);
   ratio->SetMarkerStyle(20);
 
+<<<<<<< MakeAllPlots.C
+  TPaveText *pt = new TPaveText(0.175,0.92,0.9,0.97,"brNDC");
+  pt->SetBorderSize(0);
+  pt->SetFillStyle(0);
+  pt->SetTextAlign(13);
+  pt->SetTextFont(42);
+  pt->SetTextSize(0.035);
+
+  TLegend legend(0.73,0.63,0.95,0.88);
+=======
   TLegend legend(0.725,0.6, 0.925, 0.85);
+>>>>>>> 1.22
   legend.AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
   legend.AddEntry(hists.mc_light_hist,"MC (light)","F");
@@ -679,15 +692,20 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend.SetFillColor(kWhite);
   legend.SetMargin(0.12);
   legend.SetTextSize(0.035);
-
   //legend.SetFillStyle(1);
 
   TCanvas canvas_bUp((info.plotName+"canvas_bUp").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bUp.cd();
+  mc_stack_bUp.SetTitle("");
+  hists.data_hist->SetTitle("");
   mc_stack_bUp.Draw("HIST");
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
   legend.Draw();
+<<<<<<< MakeAllPlots.C
+  TText *text = pt->AddText(info.plotTitle.c_str());  
+  pt->Draw();
+=======
 
   //include the official CMS label
   TPaveText *pt = new TPaveText(0.4,0.92,0.9,0.97,"brNDC");   
@@ -699,6 +717,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   TText *text = pt->AddText("CMS Preliminary 2010");   
   pt->Draw();
 
+>>>>>>> 1.22
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.pdf").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.png").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.root").c_str());
@@ -720,15 +739,20 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   
   TCanvas canvas_bDown((info.plotName+"canvas_bDown").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bDown.cd();
+  mc_stack_bDown.SetTitle("");
   mc_stack_bDown.Draw("HIST");
   hists.data_hist->SetMarkerStyle(1);
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
   legend.Draw();
+<<<<<<< MakeAllPlots.C
+  pt->Draw();
+=======
 
   //include the official CMS label
   pt->Draw();
 
+>>>>>>> 1.22
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.pdf").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.png").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.root").c_str());
@@ -748,7 +772,12 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_ratio.cd();
   ratio->Draw("E1X0");
+<<<<<<< MakeAllPlots.C
+  text = pt->AddText((info.plotTitle+": Data to Monte Carlo Simulation Ratio").c_str());  
   pt->Draw();
+=======
+  pt->Draw();
+>>>>>>> 1.22
   canvas_ratio.SaveAs((info.plotName+"_ratio.pdf").c_str());
   canvas_ratio.SaveAs((info.plotName+"_ratio.png").c_str());
   canvas_ratio.SaveAs((info.plotName+"_ratio.root").c_str());
@@ -784,7 +813,12 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
+<<<<<<< MakeAllPlots.C
+  //  TLegend legend(0.7,0.5,0.95,0.95);
+  TLegend legend(0.73,0.73,0.95,0.88);
+=======
   TLegend legend(0.725,0.6, 0.925, 0.85);
+>>>>>>> 1.22
   legend.AddEntry(drawHelper,"Data","LPE");
 
   int iColor = 2;
@@ -907,7 +941,11 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
+<<<<<<< MakeAllPlots.C
+  TLegend legend(0.73,0.63,0.95,0.88);
+=======
   TLegend legend(0.725,0.6, 0.925, 0.85);
+>>>>>>> 1.22
   legend.AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
   legend.AddEntry(hists.mc_all_hist,"MC Total","L");
@@ -920,12 +958,26 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   legend.SetFillColor(kWhite);
   legend.SetMargin(0.12);
   legend.SetTextSize(0.035);
+
+  TPaveText *pt = new TPaveText(0.1,0.92,0.9,0.97,"brNDC");
+  pt->SetBorderSize(0);
+  pt->SetFillStyle(0);
+  pt->SetTextAlign(13);
+  pt->SetTextFont(42);
+  pt->SetTextSize(0.035);
+  
   TCanvas canvas((info.plotName+"canvas").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas.cd();
+  mc_stack.SetTitle("");
   mc_stack.Draw("HISTNOSTACK");
   drawHelper->Draw("PSAME");
   hists.data_hist->Draw("E1X0SAME");
   legend.Draw();
+<<<<<<< MakeAllPlots.C
+  TText *text = pt->AddText(info.plotTitle.c_str());
+  pt->Draw();
+
+=======
 
   //include the official CMS label
   TPaveText *pt = new TPaveText(0.4,0.92,0.9,0.97,"brNDC");   
@@ -937,6 +989,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   TText *text = pt->AddText("CMS Preliminary 2010");   
   pt->Draw();
 
+>>>>>>> 1.22
   canvas.SaveAs((info.plotName+".pdf").c_str());
   canvas.SaveAs((info.plotName+".png").c_str());
   canvas.SaveAs((info.plotName+".root").c_str());

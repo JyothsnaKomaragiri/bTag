@@ -248,7 +248,7 @@ for i in range(21 , 34):
       )
     )
 
-## both the EDM FWK and the DQM FWK (with collate=on) add up the histograms: the above setting should switch off the EDM one
+## both the EDM FWK and the DQM FWK (with collate=on) add up the histograms: the below setting should switch off the EDM one
 ## https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideEDMParametersForModules
 process.options = cms.untracked.PSet(
     fileMode = cms.untracked.string('NOMERGE')
