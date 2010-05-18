@@ -52,10 +52,10 @@ process.physDecl = hltHighLevelDev.clone(HLTPaths = ['HLT_PhysicsDeclared'], HLT
 # Use the instructions provided at:
 # http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/HLTrigger/HLTfilters/python/hltHighLevel_cfi.py?hideattic=1&revision=1.5&view=markup
 import HLTrigger.HLTfilters.hltHighLevel_cfi
-singleJetHLTFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
-singleJetHLTFilter.TriggerResultsTag = cms.InputTag("TriggerResults","","REDIGI")
-singleJetHLTFilter.HLTPaths = ["HLT_L1Jet6U", "HLT_L1Jet10U", "HLT_Jet15U"]
-singleJetHLTFilter.andOr = cms.bool(True) # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
+process.singleJetHLTFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
+process.singleJetHLTFilter.TriggerResultsTag = cms.InputTag("TriggerResults","","REDIGI")
+process.singleJetHLTFilter.HLTPaths = ["HLT_L1Jet6U", "HLT_L1Jet10U", "HLT_Jet15U"]
+process.singleJetHLTFilter.andOr = cms.bool(True) # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
 
 #Require a good vertex
 process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
@@ -755,6 +755,9 @@ process.plots = cms.Path(
 process.outpath = cms.EndPath(process.EDM)
 
 ## Added for getting the L1 and HLT summary report
-process.options.wantSummary = cms.untracked.bool(True)
+process.options = cms.untracked.PSet(
+  wantSummary = cms.untracked.bool(True)
+)
+
 process.MessageLogger.categories.append('L1GtTrigReport')
 process.MessageLogger.categories.append('HLTrigReport')
