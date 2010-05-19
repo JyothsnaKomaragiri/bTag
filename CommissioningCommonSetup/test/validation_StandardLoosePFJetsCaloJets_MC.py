@@ -503,6 +503,8 @@ process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 
 process.standardCaloBTagNtuple = process.bTagNtuple.clone()
 process.standardCaloBTagNtuple.jetSrc = cms.InputTag( "caloJetIDFilter" )
+process.standardCaloBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexCalo" )
+process.standardCaloBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI")
 process.standardCaloBTagNtuple.jetMCSrc = cms.InputTag( "AK5byValAlgo" )
 process.standardCaloBTagNtuple.jetTracks = cms.InputTag( "ak5CaloJetTracksAssociatorAtVertex" )
 process.standardCaloBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexCaloTagInfos" )
@@ -567,6 +569,8 @@ process.standardCaloBTagNtuple.bTagConfig = cms.VPSet(
 
 process.standardPFBTagNtuple = process.bTagNtuple.clone()
 process.standardPFBTagNtuple.jetSrc = cms.InputTag( "PFJetsFilter" )
+process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
+process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI")
 process.standardPFBTagNtuple.jetMCSrc = cms.InputTag( "AK5PFbyValAlgo" )
 process.standardPFBTagNtuple.jetTracks = cms.InputTag( "ak5PFJetTracksAssociatorAtVertex" )
 process.standardPFBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexPFTagInfos" )
@@ -640,7 +644,9 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-'/store/mc/Spring10/QCDDiJet_Pt15to20/GEN-SIM-RECO/START3X_V26_S09-v1/0014/F4CA13C9-9146-DF11-A1C9-E41F13181B0C.root'
+  'file:F4B5DB64-5746-DF11-9CEE-90E6BA0D09AD.root',
+  'file:FC75A7E4-5246-DF11-9894-90E6BA442F41.root'
+ 
     )
 )
 

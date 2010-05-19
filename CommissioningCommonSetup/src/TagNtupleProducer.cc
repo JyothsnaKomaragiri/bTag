@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.7 2010/05/07 09:46:43 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.8 2010/05/14 18:53:51 alschmid Exp $
 //
 //
 
@@ -35,6 +35,9 @@
 
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "FWCore/Framework/interface/TriggerNames.h"
 
 #include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
 #include "DataFormats/BTauReco/interface/SecondaryVertexTagInfo.h"
@@ -67,7 +70,15 @@
 #include "TrackingTools/IPTools/interface/IPTools.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
+#include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputer.h"
+#include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputerWrapper.h"
+#include "RecoBTau/JetTagComputer/interface/JetTagComputer.h"
+#include "RecoBTau/JetTagComputer/interface/JetTagComputerRecord.h"
+#include "RecoBTag/SecondaryVertex/interface/CombinedSVComputer.h"
 
+#include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
+#include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
+#include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
 //
 // class declaration
 //
@@ -82,7 +93,8 @@ class TagNtupleProducer : public edm::EDProducer {
       virtual void produce(edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
 
-      
+      void getSharedHitsInfo(unsigned int layer, const reco::TrackRefVector & tracks, int &nSharedHits, int &nTotalHits);
+      int  hasSharedHit(unsigned int layer, size_t location, const reco::TrackRefVector & tracks);      
       // ----------member data ---------------------------
 
       bool getMCTruth_;
@@ -91,6 +103,8 @@ class TagNtupleProducer : public edm::EDProducer {
       bool get_SE_tag_infos_;
       bool get_SM_tag_infos_;
       edm::InputTag jet_src_;
+      edm::InputTag SVComputer_;
+  edm::InputTag triggerTag_;
       edm::InputTag jet_MC_src_;
       edm::InputTag jet_tracks_;
       edm::InputTag primaryVertexProducer_;
@@ -138,6 +152,8 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   get_SE_tag_infos_= iConfig.getParameter<bool>( "getSETagInfo" );
   get_SM_tag_infos_= iConfig.getParameter<bool>( "getSMTagInfo" );
   jet_src_        = iConfig.getParameter<edm::InputTag>( "jetSrc" );
+  SVComputer_     = iConfig.getParameter<edm::InputTag>( "svComputer");
+   triggerTag_ = iConfig.getParameter<edm::InputTag>("TriggerTag");
   jet_MC_src_     = iConfig.getParameter<edm::InputTag>( "jetMCSrc" );
   jet_tracks_     = iConfig.getParameter<edm::InputTag>( "jetTracks" ); 
   primaryVertexProducer_   = iConfig.getParameter<InputTag>("primaryVertex"); 
@@ -148,6 +164,11 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   muon_tag_infos_ = iConfig.getParameter<edm::InputTag>( "MuonTagInfos" );
   label_ = iConfig.getParameter<string>( "Label" );
   
+  // Trigger info
+  produces<bool>( alias = label_ + "triggerHLTL1Jet6U"  ).setBranchAlias( alias );
+  produces<bool>( alias = label_ + "triggerHLTL1Jet10U"  ).setBranchAlias( alias );
+  produces<bool>( alias = label_ + "triggerHLTJet15U"  ).setBranchAlias( alias );
+
    //Basic Jet Information
   produces<vector<math::XYZTLorentzVector> >( alias = label_ + "jetP4"                  ).setBranchAlias( alias );
   produces<vector<float> >( alias = label_ + "jetPt"                                    ).setBranchAlias( alias );
@@ -186,7 +207,10 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   produces<vector<float> >(alias = label_ + "trackIP2d" ).setBranchAlias( alias );
   produces<vector<float> >(alias = label_ + "trackIP3dError" ).setBranchAlias( alias );
   produces<vector<float> >(alias = label_ + "trackIP2dError" ).setBranchAlias( alias );
-
+  produces<vector<int> >(alias = label_ + "trackHasSharedPix1" ).setBranchAlias( alias );
+  produces<vector<int> >(alias = label_ + "trackHasSharedPix2" ).setBranchAlias( alias );
+  produces<vector<int> >(alias = label_ + "trackHasSharedPix3" ).setBranchAlias( alias );
+  produces<vector<int> >(alias = label_ + "trackHasSharedPixAll" ).setBranchAlias( alias );
 
   if(getMCTruth_)
     {
@@ -209,10 +233,12 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
       produces<vector<float> >( alias = label_ + "SVNormChi2"                               ).setBranchAlias( alias );   
       produces<vector<int> >( alias = label_ + "SVnSelectedTracks"                                  ).setBranchAlias( alias );   
       produces<vector<float> >( alias = label_ + "SVMass"                                   ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = label_ + "SVMasspiHyp"                                   ).setBranchAlias( alias );   
+      produces<vector<float> >( alias = label_ + "SVEnergyRatio"                                   ).setBranchAlias( alias );   
       produces<vector<int> >( alias = label_ + "SVnVertices"                                ).setBranchAlias( alias );   
       produces<vector<int> >( alias = label_ + "SVnVertexTracks"                            ).setBranchAlias( alias ); 
       produces<vector<int> >( alias = label_ + "SVnVertexTracksAll"                         ).setBranchAlias( alias ); 
+      produces<vector<int> >( alias = label_ + "SVnFirstVertexTracks"                            ).setBranchAlias( alias ); 
+      produces<vector<int> >( alias = label_ + "SVnFirstVertexTracksAll"                         ).setBranchAlias( alias ); 
       produces<vector<float> >( alias = label_ + "SVjetDeltaR"                            ).setBranchAlias( alias ); 
       produces<vector<float> >( alias = label_ + "SVjetAngle"                            ).setBranchAlias( alias ); 
       produces<vector<float> >( alias = label_ + "SVjetCosAngle"                            ).setBranchAlias( alias ); 
@@ -229,6 +255,16 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
       produces<vector<float> >( alias = label_ + "IPghostTrackEta"                          ).setBranchAlias( alias );
       produces<vector<float> >( alias = label_ + "IPghostTrackPhi"                          ).setBranchAlias( alias );
       produces<vector<float> >( alias = label_ + "IPghostTrackDeltaR"                       ).setBranchAlias( alias );
+      produces<vector<int> >( alias = label_ + "IPPix1SharedHits"                       ).setBranchAlias( alias );
+      produces<vector<int> >( alias = label_ + "IPPix1TotalHits"                       ).setBranchAlias( alias );
+      produces<vector<int> >( alias = label_ + "IPPix2SharedHits"                       ).setBranchAlias( alias );
+      produces<vector<int> >( alias = label_ + "IPPix2TotalHits"                       ).setBranchAlias( alias );
+      produces<vector<int> >( alias = label_ + "IPPix3SharedHits"                       ).setBranchAlias( alias );
+      produces<vector<int> >( alias = label_ + "IPPix3TotalHits"                       ).setBranchAlias( alias );
+      produces<vector<int> >( alias = label_ + "IPPixAllSharedHits"                       ).setBranchAlias( alias );
+      produces<vector<int> >( alias = label_ + "IPPixAllTotalHits"                       ).setBranchAlias( alias );
+
+
       for(unsigned int iTrack = 0; iTrack < IP_n_saved_tracks_; iTrack++)
 	{
 	  stringstream trackNum;
@@ -237,6 +273,15 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
 	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
 	  alias = label_ + "IP3d"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dHasSharedPix1"+trackNum.str();
+	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dHasSharedPix2"+trackNum.str();
+	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dHasSharedPix3"+trackNum.str();
+	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dHasSharedPixAll"+trackNum.str();
+	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
+
 	  alias = label_ + "IP3dError"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
 	  alias = label_ + "IP3dProbability"+trackNum.str();
@@ -337,7 +382,29 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   using namespace reco;
   
   //Get The Various collections defined in the configuration file
+  bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U;
+  triggerHLTL1Jet6U= triggerHLTL1Jet10U= triggerHLTJet15U = 0;
+
+  edm::Handle<edm::TriggerResults>  hltresults;
+  iEvent.getByLabel(triggerTag_, hltresults);
   
+  edm::TriggerNames triggerNames_;
+  triggerNames_.init(* hltresults);
+  
+  int ntrigs = hltresults->size();
+
+  bool bFoundTrig=0;
+  for (int itrig = 0; itrig != ntrigs; ++itrig){
+    string trigName=triggerNames_.triggerName(itrig);
+    if (trigName=="HLT_L1Jet6U")  {bFoundTrig = 1; triggerHLTL1Jet6U  = hltresults->accept(itrig) ;}
+    if (trigName=="HLT_L1Jet10U") triggerHLTL1Jet10U = hltresults->accept(itrig) ; 
+    if (trigName=="HLT_Jet15U")   triggerHLTJet15U   = hltresults->accept(itrig) ;
+  }  
+  if(bFoundTrig==0){
+    std::cout<<"  ERROR: trigger name not found in event" << std::endl;
+    exit(1);
+  }
+
   Handle< View<Jet> > jets;
   iEvent.getByLabel(jet_src_,jets);
 
@@ -445,6 +512,21 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       bTags[ibTag->getParameter<string>("alias")] = *bTagHandle;
     }
 
+  
+  //instantiate a tagging variable computer for unification of some calculations like vertex mass corrections
+  edm::ESHandle<JetTagComputer> computerHandle;;
+  iSetup.get<JetTagComputerRecord>().get(SVComputer_.label(), computerHandle);
+  const GenericMVAJetTagComputer *computer =
+    dynamic_cast<const GenericMVAJetTagComputer*>(
+						  computerHandle.product());
+  if (!computer){
+    std::cout<<" computer missing !!!"<< std::endl;
+    exit(1);
+  }
+  computer->passEventSetup(iSetup);
+  
+  
+
   //Defining Data Storage:
   
   //Basic Jet Information
@@ -489,6 +571,10 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<float> trackIP2d;
   vector<float> trackIP3dError;
   vector<float> trackIP2dError;
+  vector<int> trackHasSharedPix1;
+  vector<int> trackHasSharedPix2;
+  vector<int> trackHasSharedPix3;
+  vector<int> trackHasSharedPixAll;
 
   //MC Truth Information
   vector<float> MCTrueFlavor;                          
@@ -504,10 +590,12 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<float> SVNormChi2;                            
   vector<int> SVnSelectedTracks;                               
   vector<float> SVMass;                                
-  vector<float> SVMasspiHyp;                                
+  vector<float> SVEnergyRatio;                                
   vector<int> SVnVertices;                             
   vector<int>   SVnVertexTracks;         
   vector<int>   SVnVertexTracksAll;         
+  vector<int>   SVnFirstVertexTracks;         
+  vector<int>   SVnFirstVertexTracksAll;         
   vector<float> SVjetDeltaR;
   vector<float> SVjetAngle;
   vector<float> SVjetCosAngle;
@@ -521,8 +609,21 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<float> IPghostTrackPtRel;                        
   vector<float> IPghostTrackEta;                       
   vector<float> IPghostTrackPhi;                       
-  vector<float> IPghostTrackDeltaR;                
+  vector<float> IPghostTrackDeltaR;        
+  vector<int>   IPPix1SharedHits;
+  vector<int>   IPPix1TotalHits;
+  vector<int>   IPPix2SharedHits;
+  vector<int>   IPPix2TotalHits;
+  vector<int>   IPPix3SharedHits;
+  vector<int>   IPPix3TotalHits;
+  vector<int>   IPPixAllSharedHits;
+  vector<int>   IPPixAllTotalHits;
+
   vector< vector<int> > IP3dTrackQuality(IP_n_saved_tracks_);    
+  vector< vector<int> > IP3dHasSharedPix1(IP_n_saved_tracks_);
+  vector< vector<int> > IP3dHasSharedPix2(IP_n_saved_tracks_);
+  vector< vector<int> > IP3dHasSharedPix3(IP_n_saved_tracks_);
+  vector< vector<int> > IP3dHasSharedPixAll(IP_n_saved_tracks_);
   vector< vector<float> > IP3d(IP_n_saved_tracks_);
   vector< vector<float> > IP3dError(IP_n_saved_tracks_);
   vector< vector<float> > IP3dProbability(IP_n_saved_tracks_);
@@ -646,7 +747,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
 
       //End Stealing
-
+      size_t counter=0;
       for(track_iterator iTrack = (*jetTracks)[thisJetRef].begin(); iTrack != (*jetTracks)[thisJetRef].end(); iTrack++)
 	{ 
 	  trackJetIndex.push_back(iJet);
@@ -698,7 +799,14 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  }
 	  trackDistJetAxis.push_back( IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value() );
 	  trackDeltaR.push_back( ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),(*iTrack)->momentum()) );
-      	}       
+	  int tsharedP1, tsharedP2, tsharedP3;
+	  trackHasSharedPix1.push_back( tsharedP1 = hasSharedHit(1, counter, (*jetTracks)[thisJetRef]));
+	  trackHasSharedPix2.push_back( tsharedP2 = hasSharedHit(2, counter, (*jetTracks)[thisJetRef]));
+	  trackHasSharedPix3.push_back( tsharedP3 = hasSharedHit(3, counter, (*jetTracks)[thisJetRef]));
+	  trackHasSharedPixAll.push_back( tsharedP1 || tsharedP2 || tsharedP3 );
+	  
+	  counter++;
+	}       
 
       //MC Truth Information
       MCTrueFlavor.push_back(flavor[thisJetRef]);                          
@@ -709,6 +817,19 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  bool hasVertex = svTagInfo[thisJetRef]->nVertices() > 0;
 	  if(hasVertex)
 	    {
+	      // Compute tagging variables
+	      std::vector<const reco::BaseTagInfo*>  baseTagInfos;
+	      baseTagInfos.push_back( &(*ipTagInfo[thisJetRef]) ); 
+	      baseTagInfos.push_back( &(*svTagInfo[thisJetRef]) );
+	      JetTagComputer::TagInfoHelper helper(baseTagInfos);
+	      TaggingVariableList vars = computer->taggingVariables(helper);
+	      
+	      // check presence of some values, otherwise give error message
+	      if( !vars.checkTag(reco::btau::vertexMass) ||  !vars.checkTag(reco::btau::vertexEnergyRatio) || !vars.checkTag(reco::btau::vertexJetDeltaR    )   ){
+		std::cout<<" something is wrong with tagging variables ! " << std::endl;
+		exit(1);
+	      }
+
 	      math::XYZVector thisVertex(svTagInfo[thisJetRef]->secondaryVertex(0).x(),svTagInfo[thisJetRef]->secondaryVertex(0).y(),svTagInfo[thisJetRef]->secondaryVertex(0).z());
 	      math::XYZVector jetVertex(thisJetRef->vx(),thisJetRef->vy(),thisJetRef->vz());
 	      math::XYZVector vertexDirection(thisVertex-jetVertex);
@@ -723,20 +844,14 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      SVChi2.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).chi2());                                
 	      SVDegreesOfFreedom.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).ndof());                    
 	      SVNormChi2.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).normalizedChi2());
-  	      SVnVertexTracksAll.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).tracksSize());
+  	      SVnFirstVertexTracksAll.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).tracksSize());
+	      SVnFirstVertexTracks.push_back( svTagInfo[thisJetRef]->nVertexTracks(0)  );
 	      SVnVertexTracks.push_back( svTagInfo[thisJetRef]->nVertexTracks()  );
-	      math::XYZTLorentzVector vertexP4(0,0,0,0);
-	      math::XYZTLorentzVector vertexP4piHyp(0,0,0,0);
-	      //	      for(vector<Track >::const_iterator iTrack = svTagInfo[thisJetRef]->secondaryVertex(0).refittedTracks().begin(); iTrack != svTagInfo[thisJetRef]->secondaryVertex(0).refittedTracks().end(); iTrack++)
-	      for(Vertex::trackRef_iterator iTrack = svTagInfo[thisJetRef]->secondaryVertex(0).tracks_begin(); iTrack != svTagInfo[thisJetRef]->secondaryVertex(0).tracks_end(); iTrack++)
-		{
-		  Track thisTrack = *(iTrack->get());
-		  addTracksVertex+=math::XYZVector(thisTrack.px(), thisTrack.py(), thisTrack.pz());
-		  vertexP4+=math::XYZTLorentzVector(thisTrack.px(), thisTrack.py(), thisTrack.pz(), thisTrack.p()); // massless hypothesis
-		  vertexP4piHyp+=math::XYZTLorentzVector(thisTrack.px(), thisTrack.py(), thisTrack.pz(), sqrt(0.01948816 + thisTrack.p() * thisTrack.p()) ); // pion mass hypothesis
-		}
-	      SVMass.push_back(vertexP4.M());
-	      SVMasspiHyp.push_back(vertexP4piHyp.M());
+	      int nVertexTrackSize = 0;
+	      for(unsigned int i=0; i< svTagInfo[thisJetRef]->nVertices(); i++) nVertexTrackSize+= svTagInfo[thisJetRef]->secondaryVertex(i).tracksSize();
+  	      SVnVertexTracksAll.push_back( nVertexTrackSize );
+	      SVMass.push_back( vars.get( reco::btau::vertexMass));
+	      SVEnergyRatio.push_back( vars.get(reco::btau::vertexEnergyRatio) );
 	      SVjetDeltaR.push_back(deltaR(thisJetRef->eta(), thisJetRef->phi(), addTracksVertex.eta(), addTracksVertex.phi()) );	      
 	      double cosAngle = addTracksVertex.Dot(jetVector)/sqrt(addTracksVertex.mag2()*jetVector.mag2());
 	      SVjetAngle.push_back(cosAngle);
@@ -758,7 +873,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      SVNormChi2.push_back(-1);                                                           
 	      SVnVertexTracks.push_back(-1);
 	      SVMass.push_back(-1);
-	      SVMasspiHyp.push_back(-1);
+	      SVEnergyRatio.push_back(-1);
 	      SVjetDeltaR.push_back(-1);
 	      SVjetAngle.push_back(-10);
 	      SVjetCosAngle.push_back(-10);
@@ -780,6 +895,19 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  IPghostTrackEta.push_back(ipTagInfo[thisJetRef]->ghostTrack()->eta());                       
 	  IPghostTrackPhi.push_back(ipTagInfo[thisJetRef]->ghostTrack()->phi());                       
 	  IPghostTrackDeltaR.push_back(deltaR(thisJetRef->eta(), thisJetRef->phi(), ipTagInfo[thisJetRef]->ghostTrack()->eta(), ipTagInfo[thisJetRef]->ghostTrack()->phi()));                    
+
+	  int nPix1Shared, nPix1Total;
+	  int nPix2Shared, nPix2Total;
+	  int nPix3Shared, nPix3Total;
+	  getSharedHitsInfo(1, ipTagInfo[thisJetRef]->selectedTracks(), nPix1Shared, nPix1Total);
+	  getSharedHitsInfo(2, ipTagInfo[thisJetRef]->selectedTracks(), nPix2Shared, nPix2Total);
+	  getSharedHitsInfo(3, ipTagInfo[thisJetRef]->selectedTracks(), nPix3Shared, nPix3Total);
+
+	  IPPix1TotalHits.push_back(nPix1Total); IPPix1SharedHits.push_back(nPix1Shared);
+	  IPPix2TotalHits.push_back(nPix2Total); IPPix2SharedHits.push_back(nPix2Shared);
+	  IPPix3TotalHits.push_back(nPix3Total); IPPix3SharedHits.push_back(nPix3Shared);
+	  IPPixAllTotalHits.push_back(nPix1Total + nPix2Total + nPix3Total); IPPixAllSharedHits.push_back(nPix1Shared + nPix2Shared + nPix3Shared);
+
 	  for(unsigned int iTrack = 0; iTrack < IP_n_saved_tracks_; iTrack++)
 	    {
 	      if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
@@ -791,6 +919,12 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		      continue;
 		    }
 		  }
+		  int sharedP1, sharedP2, sharedP3;
+		  IP3dHasSharedPix1[iTrack].push_back(sharedP1=hasSharedHit(1, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
+		  IP3dHasSharedPix2[iTrack].push_back(sharedP2=hasSharedHit(2, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
+		  IP3dHasSharedPix3[iTrack].push_back(sharedP3=hasSharedHit(3, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
+		  IP3dHasSharedPixAll[iTrack].push_back( sharedP1 || sharedP2 || sharedP3  );
+
 		  IP3d[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.value());
 		  IP3dError[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.error());
 		  IP3dProbability[iTrack].push_back(ipTagInfo[thisJetRef]->probabilities(0)[location3D]);
@@ -810,6 +944,11 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 	      else
 		{
+                  IP3dHasSharedPix1[iTrack].push_back(-1);
+		  IP3dHasSharedPix2[iTrack].push_back(-1);
+		  IP3dHasSharedPix3[iTrack].push_back(-1);
+		  IP3dHasSharedPixAll[iTrack].push_back(-1);
+
 		  IP3dTrackQuality[iTrack].push_back(-100);
 		  IP3d[iTrack].push_back(-100.0);
 		  IP3dError[iTrack].push_back(-1.0);
@@ -917,6 +1056,10 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   //Putting Information into the Event
 
+  iEvent.put(auto_ptr< bool >        ( new bool(triggerHLTL1Jet6U) ),       label_+"triggerHLTL1Jet6U");
+  iEvent.put(auto_ptr< bool >        ( new bool(triggerHLTL1Jet10U) ),      label_+"triggerHLTL1Jet10U");
+  iEvent.put(auto_ptr< bool >        ( new bool(triggerHLTJet15U) ),        label_+"triggerHLTJet15U");
+
   //Basic Jet Information
   iEvent.put(auto_ptr< vector< math::XYZTLorentzVector> >(new vector< math::XYZTLorentzVector>(jetP4)),label_+"jetP4");
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetPt)),label_+"jetPt");
@@ -957,6 +1100,10 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP3dError)),label_ + "trackIP3dError" );
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP2dError)),label_ + "trackIP2dError" );
 
+  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackHasSharedPix1)),label_ + "trackHasSharedPix1" );
+  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackHasSharedPix2)),label_ + "trackHasSharedPix2" );
+  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackHasSharedPix3)),label_ + "trackHasSharedPix3" );
+  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackHasSharedPixAll)),label_ + "trackHasSharedPixAll" );
   //MC Truth Information
   if(getMCTruth_)
     {
@@ -977,9 +1124,11 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVNormChi2)),label_+"SVNormChi2");
       iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnSelectedTracks)),label_+"SVnSelectedTracks");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVMass)),label_+"SVMass");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVMasspiHyp)),label_+"SVMasspiHyp");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVEnergyRatio)),label_+"SVEnergyRatio");
       iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertices)),label_+"SVnVertices");
       iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertexTracks)),label_+"SVnVertexTracks");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnFirstVertexTracksAll)),label_+"SVnFirstVertexTracksAll");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnFirstVertexTracks)),label_+"SVnFirstVertexTracks");
       iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertexTracksAll)),label_+"SVnVertexTracksAll");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetDeltaR)),label_+"SVjetDeltaR");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetAngle)),label_+"SVjetAngle");
@@ -997,6 +1146,15 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackEta)),label_+"IPghostTrackEta");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackPhi)),label_+"IPghostTrackPhi");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackDeltaR)),label_+"IPghostTrackDeltaR");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix1SharedHits)),label_+"IPPix1SharedHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix1TotalHits)),label_+"IPPix1TotalHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix2SharedHits)),label_+"IPPix2SharedHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix2TotalHits)),label_+"IPPix2TotalHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix3SharedHits)),label_+"IPPix3SharedHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix3TotalHits)),label_+"IPPix3TotalHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPixAllSharedHits)),label_+"IPPixAllSharedHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPixAllTotalHits)),label_+"IPPixAllTotalHits");
+
       for(unsigned int iTrack = 0; iTrack < IP_n_saved_tracks_; iTrack++)
 	{
 	  string alias;
@@ -1006,6 +1164,16 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dTrackQuality[iTrack])),alias);
 	  alias = label_ + "IP3d"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3d[iTrack])),alias);
+	  alias = label_ + "IP3dHasSharedPix1"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dHasSharedPix1[iTrack])),alias);
+	  alias = label_ + "IP3dHasSharedPix2"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dHasSharedPix2[iTrack])),alias);
+	  alias = label_ + "IP3dHasSharedPix3"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dHasSharedPix3[iTrack])),alias);
+	  alias = label_ + "IP3dHasSharedPixAll"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dHasSharedPixAll[iTrack])),alias);
+
+
 	  alias = label_ + "IP3dError"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dError[iTrack])),alias);
 	  alias = label_ + "IP3dProbability"+trackNum.str();
@@ -1097,6 +1265,115 @@ TagNtupleProducer::beginJob()
 void 
 TagNtupleProducer::endJob() {
 }
+
+
+void TagNtupleProducer::getSharedHitsInfo(unsigned int layer, const reco::TrackRefVector & tracks, int &nSharedHits, int &nTotalHits){
+
+  nSharedHits=0;
+  nTotalHits=0;
+
+  //iterate over tracks
+  for(track_iterator itTrack = tracks.begin(); itTrack!=tracks.end(); itTrack++){
+    //iterate over hits of this track
+    for(trackingRecHit_iterator hitIt = (*itTrack)->recHitsBegin(); hitIt != (*itTrack)->recHitsEnd(); hitIt++  ){
+      if( !(*hitIt)->isValid() ) continue;
+      DetId detid = (*hitIt)->geographicalId();
+      unsigned int subdet = detid.subdetId();
+
+      unsigned int thislayer = -1;
+      if(subdet==PixelSubdetector::PixelBarrel){//PXB
+	PXBDetId pxbdet=(detid);
+	thislayer=pxbdet.layer();
+
+      }
+      else if(subdet==PixelSubdetector::PixelEndcap){
+	PXFDetId pxfdet(detid);
+	thislayer=pxfdet.disk();
+      }
+
+      // if they are on the desired layer
+      if(layer == thislayer){
+	nTotalHits++;
+	//iterate over all other tracks avoiding double counting
+	track_iterator itTrack2 = itTrack;
+	itTrack2++;
+	if(itTrack2 == tracks.end()) continue;
+	for(; itTrack2!=tracks.end(); itTrack2++){
+	  // iterate again over hits
+	  for(trackingRecHit_iterator hitIt2 = (*itTrack2)->recHitsBegin(); hitIt2 != (*itTrack2)->recHitsEnd(); hitIt2++  ){
+	    if( !(*hitIt2)->isValid() ) continue;
+	    DetId detid2 = (*hitIt2)->geographicalId();
+	    if( detid.rawId() == detid2.rawId()  ){
+	      // check identity via
+	      if( (*hitIt)->sharesInput( &(**hitIt2), TrackingRecHit::some )) nSharedHits++; 
+	    }
+	  }
+	}
+      }
+    }
+  }
+}
+
+
+int TagNtupleProducer::hasSharedHit(unsigned int layer, size_t location, const reco::TrackRefVector & tracks){
+
+  int bFoundHits=0;
+
+  unsigned int iFoundOverlaps = 0;
+
+  //iterate over hits of this track
+  unsigned int iHitCounter=0;
+  for(trackingRecHit_iterator hitIt = tracks[location]->recHitsBegin(); hitIt != tracks[location]->recHitsEnd(); hitIt++  ){
+    if( !(*hitIt)->isValid() ) continue;
+   
+
+    DetId detid = (*hitIt)->geographicalId();
+    unsigned int subdet = detid.subdetId();
+    
+    unsigned int thislayer = -1;
+    if(subdet==PixelSubdetector::PixelBarrel){//PXB
+      PXBDetId pxbdet=(detid);
+      thislayer=pxbdet.layer();
+      
+    }
+    else if(subdet==PixelSubdetector::PixelEndcap){
+      PXFDetId pxfdet(detid);
+      thislayer=pxfdet.disk();
+    }
+    
+    // if they are on the desired layer
+    if(layer == thislayer){
+       iHitCounter++;
+      //iterate over all other tracks avoiding double counting
+      
+      size_t counter = 0;
+   
+      for(track_iterator itTrack2 = tracks.begin(); itTrack2!=tracks.end(); itTrack2++){
+	if(counter==location){
+
+	  iFoundOverlaps++; counter++;continue;}
+	// iterate again over hits
+	for(trackingRecHit_iterator hitIt2 = (*itTrack2)->recHitsBegin(); hitIt2 != (*itTrack2)->recHitsEnd(); hitIt2++  ){
+	  if( !(*hitIt2)->isValid() ) continue;
+	  DetId detid2 = (*hitIt2)->geographicalId();
+	  if( detid.rawId() == detid2.rawId()  ){
+	    // check identity via
+	    if( (*hitIt)->sharesInput( &(**hitIt2), TrackingRecHit::some )) bFoundHits=1; 
+	  }
+	}
+	counter++;
+      }
+    }
+  }
+
+  // cross check
+  if(iFoundOverlaps!=iHitCounter){
+    std::cout<<"overlap cross-check failes" << std::endl;
+    exit(1);
+  }
+  return bFoundHits;
+}
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(TagNtupleProducer);
