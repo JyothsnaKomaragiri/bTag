@@ -932,6 +932,12 @@ process.plots = cms.Path(
 #  process.physDecl +
   process.singleJetHLTFilter +
   process.noscraping +
+  ################################################
+  ####include refitting
+  #################################################
+  process.generalTracks*
+  process.offlinePrimaryVertices*
+  ##################################################   
   process.oneGoodVertexFilter +
   cms.ignore(process.PFJetsFilter) *
   process.ak5JetID *
