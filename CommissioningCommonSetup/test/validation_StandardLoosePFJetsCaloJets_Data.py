@@ -64,6 +64,73 @@ process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
    filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
 )
 
+#################################################################
+##refit tracks with new alignment geometry from Jula Draeger
+#################################################################
+#####################################################################
+### Apply corrections to local reco - needed only if you run on TK-DECO data (i.e., MinBias) !!!! For cosmics in PEAK mode, comment them out
+#####################################################################
+process.load("RecoLocalTracker.SiStripRecHitConverter.OutOfTime_cff")
+process.OutOfTime.TOBlateBP=0.071
+process.OutOfTime.TIBlateBP=0.036
+
+from CondCore.DBCommon.CondDBSetup_cfi import *
+#from CalibTracker.Configuration.Common.PoolDBESSource_cfi import poolDBESSource
+##include private db object
+##
+#import CalibTracker.Configuration.Common.PoolDBESSource_cfi
+
+process.stripLorentzAngle = cms.ESSource("PoolDBESSource",CondDBSetup,
+                                         connect = cms.string('sqlite_file:SiStripLorentzAngle_Deco.db'),
+                                         toGet = cms.VPSet(cms.PSet(record = cms.string('SiStripLorentzAngleRcd'),
+                                                                    tag = cms.string('SiStripLorentzAngle_Deco') ))
+                                         )
+process.es_prefer_stripLorentzAngle = cms.ESPrefer("PoolDBESSource", "stripLorentzAngle")
+
+### Load the new geometry
+process.trackerAlignmentICHEP2010 = cms.ESSource("PoolDBESSource",
+                                        CondDBSetup,
+                                        toGet = cms.VPSet(cms.PSet(
+                                                record = cms.string('TrackerAlignmentRcd'),
+                                                tag = cms.string('Alignments')
+                                                )),
+                                        connect = cms.string('sqlite_file:TOBCenteredObjectICHEP2010.db')
+                                        )
+process.es_prefer_trackerAlignment = cms.ESPrefer("PoolDBESSource", "trackerAlignmentICHEP2010")
+
+### Load the new Tracker APE
+process.trackerAPEICHEP2010 = cms.ESSource("PoolDBESSource",CondDBSetup,
+                           connect = cms.string('sqlite_file:APEforICHEP30umFPIX.db'),
+                           toGet = cms.VPSet(cms.PSet(record = cms.string('TrackerAlignmentErrorRcd'),tag = cms.string('AlignmentErrors') ))
+                           )
+process.es_prefer_trackerAPE = cms.ESPrefer("PoolDBESSource", "trackerAPEICHEP2010")
+
+
+####################################################
+# refitting
+####################################################
+process.load("RecoTracker.TrackProducer.TrackRefitters_cff")
+
+process.generalTracks = process.TrackRefitter.clone(    
+    src ='generalTracks',#'ALCARECOTkAlCosmicsCTF0T',
+    TrajectoryInEvent = True,
+    NavigationSchool = "",
+    TTRHBuilder = "WithAngleAndTemplate" #default
+)
+
+
+############################################################################
+##Produce Primary Vertex Collection needed for later analysis
+############################################################################
+process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
+process.offlinePrimaryVertices.TrackLabel = 'generalTracks'
+
+
+############################################################################################################
+##end of refitting inlcude
+############################################################################################################
+
+
 #Filter for PFJets
 process.PFJetsFilter = cms.EDFilter("PFJetSelector",
   src = cms.InputTag("ak5PFJets"),
@@ -776,7 +843,7 @@ process.source = cms.Source("PoolSource",
 process.EDM = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('drop *',
                        "keep *_*_*_validation",
-                       "keep recoTracks_generalTracks_*_*",
+                       #"keep recoTracks_generalTracks_*_*",
                        "keep recoTracks_globalMuons_*_*",
                        "keep *_offlineBeamSpot_*_*",
                        "keep *_gsfElectrons_*_*",
