@@ -64,6 +64,73 @@ process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
    filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
 )
 
+#################################################################
+##refit tracks with new alignment geometry from Jula Draeger
+#################################################################
+#####################################################################
+### Apply corrections to local reco - needed only if you run on TK-DECO data (i.e., MinBias) !!!! For cosmics in PEAK mode, comment them out
+#####################################################################
+process.load("RecoLocalTracker.SiStripRecHitConverter.OutOfTime_cff")
+process.OutOfTime.TOBlateBP=0.071
+process.OutOfTime.TIBlateBP=0.036
+
+from CondCore.DBCommon.CondDBSetup_cfi import *
+#from CalibTracker.Configuration.Common.PoolDBESSource_cfi import poolDBESSource
+##include private db object
+##
+#import CalibTracker.Configuration.Common.PoolDBESSource_cfi
+
+process.stripLorentzAngle = cms.ESSource("PoolDBESSource",CondDBSetup,
+                                         connect = cms.string('sqlite_file:SiStripLorentzAngle_Deco.db'),
+                                         toGet = cms.VPSet(cms.PSet(record = cms.string('SiStripLorentzAngleRcd'),
+                                                                    tag = cms.string('SiStripLorentzAngle_Deco') ))
+                                         )
+process.es_prefer_stripLorentzAngle = cms.ESPrefer("PoolDBESSource", "stripLorentzAngle")
+
+### Load the new geometry
+process.trackerAlignmentICHEP2010 = cms.ESSource("PoolDBESSource",
+                                        CondDBSetup,
+                                        toGet = cms.VPSet(cms.PSet(
+                                                record = cms.string('TrackerAlignmentRcd'),
+                                                tag = cms.string('Alignments')
+                                                )),
+                                        connect = cms.string('sqlite_file:TOBCenteredObjectICHEP2010.db')
+                                        )
+process.es_prefer_trackerAlignment = cms.ESPrefer("PoolDBESSource", "trackerAlignmentICHEP2010")
+
+### Load the new Tracker APE
+process.trackerAPEICHEP2010 = cms.ESSource("PoolDBESSource",CondDBSetup,
+                           connect = cms.string('sqlite_file:APEforICHEP30umFPIX.db'),
+                           toGet = cms.VPSet(cms.PSet(record = cms.string('TrackerAlignmentErrorRcd'),tag = cms.string('AlignmentErrors') ))
+                           )
+process.es_prefer_trackerAPE = cms.ESPrefer("PoolDBESSource", "trackerAPEICHEP2010")
+
+
+####################################################
+# refitting
+####################################################
+process.load("RecoTracker.TrackProducer.TrackRefitters_cff")
+
+process.generalTracks = process.TrackRefitter.clone(    
+    src ='generalTracks',#'ALCARECOTkAlCosmicsCTF0T',
+    TrajectoryInEvent = True,
+    NavigationSchool = "",
+    TTRHBuilder = "WithAngleAndTemplate" #default
+)
+
+
+############################################################################
+##Produce Primary Vertex Collection needed for later analysis
+############################################################################
+process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
+process.offlinePrimaryVertices.TrackLabel = 'generalTracks'
+
+
+############################################################################################################
+##end of refitting inlcude
+############################################################################################################
+
+
 #Filter for PFJets
 process.PFJetsFilter = cms.EDFilter("PFJetSelector",
   src = cms.InputTag("ak5PFJets"),
@@ -622,14 +689,161 @@ process.maxEvents = cms.untracked.PSet(
 )
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-       '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2C198163-1F4E-DF11-9A9A-00248C0BE013.root'
+       '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2C198163-1F4E-DF11-9A9A-00248C0BE013.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2AE90310-1D4E-DF11-804E-0026189437FD.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2AE1AEB5-244E-DF11-AE92-0026189438C9.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2A8264E5-1B4E-DF11-9670-0018F3D0965C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2A6C0888-1D4E-DF11-B136-002618943953.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2A5A108C-194E-DF11-80FB-0026189438C1.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2A50D2BD-1B4E-DF11-97F1-002618943849.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2A22581F-264E-DF11-AF1D-002618943870.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/28CD50F7-244E-DF11-AD87-00261894396D.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/286EE7A9-214E-DF11-A783-00304867920C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/28664E47-204E-DF11-8989-00261894387E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/28513F3D-1C4E-DF11-BE06-002354EF3BDD.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2804503F-1A4E-DF11-ABD8-002618943849.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/26E44FBA-204E-DF11-82AD-003048678E6E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/26D61DF9-214E-DF11-AE87-00261894389C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/26D2533F-184E-DF11-B998-0030486792BA.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/26BE3D8D-264E-DF11-8A26-0026189437FE.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/26A2E7A7-234E-DF11-B124-00304867920C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/267EE6D4-254E-DF11-A81E-0026189437F0.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2638E268-184E-DF11-8167-0026189438C2.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/26322135-184E-DF11-BE50-00248C0BE018.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/261EFDF7-234E-DF11-8BD7-002618943886.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2606792D-264E-DF11-B339-0026189438D7.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/24AC4F9C-1E4E-DF11-AD4E-00261894390C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/24A4E53A-1F4E-DF11-9F70-003048D3FC94.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/247EC35B-234E-DF11-83B2-002618943946.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2478109C-1E4E-DF11-BB39-00261894386F.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/243B75E7-1E4E-DF11-822D-00261894398C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/22A50C5C-234E-DF11-A4AC-00248C0BE018.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/22751D0F-214E-DF11-8393-0026189437F0.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2249B835-184E-DF11-AB18-00304867929E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/224960EA-244E-DF11-8C9C-00261894390C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2246224C-224E-DF11-A523-002618943894.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2201B385-1F4E-DF11-BA2B-00248C0BE018.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/20CDF0E9-1C4E-DF11-9A1F-002354EF3BDD.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/208C8987-1D4E-DF11-BCA8-00261894388F.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/204CF3FF-1B4E-DF11-8AFD-0030486792B8.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2008A93F-1A4E-DF11-B284-00261894390E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1EDE2E60-184E-DF11-94E3-00261894390E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1E148CF4-184E-DF11-A0AA-0030486792BA.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1CFDFB4C-1E4E-DF11-AB24-00261894387E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1CD7644D-214E-DF11-8581-0026189438BD.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1CD5BC3F-1A4E-DF11-AA7C-0026189438E9.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1C9E989B-1E4E-DF11-BB88-002354EF3BDA.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1C845817-1B4E-DF11-B19D-00248C0BE018.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1C5868E7-204E-DF11-872B-00248C0BE018.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1C2635D5-1F4E-DF11-8C64-0018F3D09678.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1C24CCBF-224E-DF11-A8F7-00261894388F.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1AF881F9-1F4E-DF11-9012-0026189438BD.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1AE72863-1B4E-DF11-AFCA-00261894388D.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1ABCE44A-254E-DF11-BF3B-0026189438B4.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1AB9E24A-254E-DF11-8062-0026189438B4.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1A77E874-1E4E-DF11-8251-003048D3FC94.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1A5239C2-224E-DF11-A1F3-0030486792BA.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1A08D3F4-184E-DF11-99B2-003048679076.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/18F93316-1B4E-DF11-8C35-002618943868.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/18E896FD-1D4E-DF11-AC77-002354EF3BD2.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/18CFAED3-254E-DF11-9E90-00261894393B.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/188B531A-244E-DF11-920C-0026189438B0.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/180C554D-1E4E-DF11-A9F1-0026189438D7.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1802C942-194E-DF11-A89D-0026189437F0.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/16E45EF8-244E-DF11-8A02-002618943956.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/16CF6416-254E-DF11-A9B4-003048678B36.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/16BF2470-204E-DF11-8CB9-002618943849.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1698CA2F-234E-DF11-82AC-002618943800.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1687262D-1C4E-DF11-A750-00261894389C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1678E73E-264E-DF11-BDB4-002618943908.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1644FCC6-1C4E-DF11-B9E3-002618943899.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/163A6E37-214E-DF11-8F20-0026189438B0.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/16299296-224E-DF11-8C3A-003048679076.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/16250CEA-1C4E-DF11-BCFD-00304867929E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/14FAD48F-264E-DF11-A5BF-002618943833.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/14885C71-204E-DF11-A8FA-002618943953.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/14849AF6-1F4E-DF11-BDE1-002618943868.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/145FA242-194E-DF11-BDB9-00261894390C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1451B526-264E-DF11-BE22-002618943946.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/14039404-264E-DF11-B214-002618943868.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/14034D6B-244E-DF11-A9FA-002618943800.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/12FDBFBD-204E-DF11-8933-001BFCDBD160.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/12EDCEA9-214E-DF11-8780-0026189438C2.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/12A312FF-1D4E-DF11-9B7B-00261894386F.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/129BA230-234E-DF11-80BF-0026189438E9.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1295E8E9-1A4E-DF11-A007-002618943915.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/128BD4BB-204E-DF11-8A00-00261894390C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/125C5088-1B4E-DF11-BF19-00261894390E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/10EFE361-1D4E-DF11-B266-002618943899.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/10E0B4BA-204E-DF11-A2DB-002618943915.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/10C00DE4-224E-DF11-BC44-0026189438C1.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/10B7982A-1E4E-DF11-97B0-002618943953.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/108066C1-224E-DF11-A6E3-003048D3FC94.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/10548FD1-1F4E-DF11-827B-0026189438EF.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/10443EB8-264E-DF11-84B2-002618943896.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/1041B8D2-214E-DF11-8BCD-0026189438D7.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0EF57E2B-1E4E-DF11-BC6C-0026189438FF.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0EF0CAAF-1B4E-DF11-BD51-003048679076.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0EEEAB44-204E-DF11-814A-0026189438B0.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0EB00112-1D4E-DF11-A4F2-003048D3FC94.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0EA50038-214E-DF11-9E45-0026189438F4.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0E6AB045-264E-DF11-8A23-002618943879.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0E47347B-1C4E-DF11-AA91-00304867918A.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0E0AE963-1B4E-DF11-8094-0026189438D7.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0CDC9413-1D4E-DF11-AA13-001BFCDBD160.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0CD32FCB-234E-DF11-B44E-0026189438D7.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0CD0E6B6-244E-DF11-9F37-0030486792B8.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0CC2B978-254E-DF11-BC1B-00261894389C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0CB172D1-244E-DF11-B4BE-001BFCDBD11E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0C6E1DEA-1C4E-DF11-A20F-002618943886.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0C23A4A9-214E-DF11-8549-00304867929E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0AFD1228-254E-DF11-A932-002618943838.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0AF925D1-214E-DF11-9084-002618943800.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0AC0E797-184E-DF11-B808-00261894398C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0A8250F4-184E-DF11-8323-0026189438A9.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0A7AE63B-1B4E-DF11-8EBA-002354EF3BD2.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0A3170AF-1B4E-DF11-9E9C-002618943868.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0A273380-234E-DF11-8BC1-0026189438C1.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0A0FD8A7-234E-DF11-9A64-003048678B92.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/08EEB45E-214E-DF11-AC0C-002618943953.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/08E1EB1F-224E-DF11-93B9-00248C0BE018.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/08AFAA71-204E-DF11-898C-0018F3D0965C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/08A705AC-1F4E-DF11-A33D-001BFCDBD160.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/08942371-224E-DF11-A7F7-00304867929E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/084FF170-1C4E-DF11-BB3B-003048678B92.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0824071A-244E-DF11-A7E3-002618943896.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/08208F44-204E-DF11-B8F1-00304867920C.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/06DD2885-214E-DF11-8F26-002618943946.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/06CE72FF-1B4E-DF11-AB6F-00248C0BE013.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/06C65130-234E-DF11-ABB9-00261894387E.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/067D06DC-244E-DF11-B816-0026189438EF.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/06747462-1B4E-DF11-A803-0030486792BA.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/065AD944-204E-DF11-B4DE-002618943896.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/065277D2-1F4E-DF11-BC1A-002618943821.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/060D7AE0-264E-DF11-9DF7-0030486792B6.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/04EBFCCA-234E-DF11-967A-00248C0BE013.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/04BAD602-254E-DF11-9D5F-002618943800.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/04A859C1-224E-DF11-832A-003048B95B30.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/02E8C471-1E4E-DF11-8292-003048D15DB6.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/02D8F9BF-1E4E-DF11-9545-002354EF3BE2.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/028BEB0E-214E-DF11-BEFB-002618943946.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0288E070-224E-DF11-8C45-0026189438E9.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0265DD5B-214E-DF11-9876-002618943886.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0263422B-264E-DF11-AB6B-002618943930.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/02316477-1C4E-DF11-99CB-0026189438B0.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/02126D1E-184E-DF11-9390-00261894396F.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/009F1B68-264E-DF11-AA01-002618943821.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/009EE8EE-194E-DF11-94C1-003048678ED4.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/009A0D7E-234E-DF11-AC3A-0026189438BD.root',
+        '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/0082F0AA-214E-DF11-9C43-002618943849.root'
+     
     )
 )
 
 process.EDM = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('drop *',
                        "keep *_*_*_validation",
-                       "keep recoTracks_generalTracks_*_*",
+                       #"keep recoTracks_generalTracks_*_*",
                        "keep recoTracks_globalMuons_*_*",
                        "keep *_offlineBeamSpot_*_*",
                        "keep *_gsfElectrons_*_*",
@@ -718,6 +932,12 @@ process.plots = cms.Path(
 #  process.physDecl +
   process.singleJetHLTFilter +
   process.noscraping +
+  ################################################
+  ####include refitting
+  #################################################
+  process.generalTracks*
+  process.offlinePrimaryVertices*
+  ##################################################   
   process.oneGoodVertexFilter +
   cms.ignore(process.PFJetsFilter) *
   process.ak5JetID *
