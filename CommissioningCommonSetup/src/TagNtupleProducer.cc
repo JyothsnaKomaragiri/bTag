@@ -823,13 +823,6 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      baseTagInfos.push_back( &(*svTagInfo[thisJetRef]) );
 	      JetTagComputer::TagInfoHelper helper(baseTagInfos);
 	      TaggingVariableList vars = computer->taggingVariables(helper);
-	      
-	      // check presence of some values, otherwise give error message
-	      if( !vars.checkTag(reco::btau::vertexMass) ||  !vars.checkTag(reco::btau::vertexEnergyRatio) || !vars.checkTag(reco::btau::vertexJetDeltaR    )   ){
-		std::cout<<" something is wrong with tagging variables ! " << std::endl;
-		exit(1);
-	      }
-
 	      math::XYZVector thisVertex(svTagInfo[thisJetRef]->secondaryVertex(0).x(),svTagInfo[thisJetRef]->secondaryVertex(0).y(),svTagInfo[thisJetRef]->secondaryVertex(0).z());
 	      math::XYZVector jetVertex(thisJetRef->vx(),thisJetRef->vy(),thisJetRef->vz());
 	      math::XYZVector vertexDirection(thisVertex-jetVertex);
@@ -850,9 +843,12 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      int nVertexTrackSize = 0;
 	      for(unsigned int i=0; i< svTagInfo[thisJetRef]->nVertices(); i++) nVertexTrackSize+= svTagInfo[thisJetRef]->secondaryVertex(i).tracksSize();
   	      SVnVertexTracksAll.push_back( nVertexTrackSize );
-	      SVMass.push_back( vars.get( reco::btau::vertexMass));
-	      SVEnergyRatio.push_back( vars.get(reco::btau::vertexEnergyRatio) );
-	      SVjetDeltaR.push_back(deltaR(thisJetRef->eta(), thisJetRef->phi(), addTracksVertex.eta(), addTracksVertex.phi()) );	      
+	      if(vars.checkTag(reco::btau::vertexMass)) SVMass.push_back( vars.get( reco::btau::vertexMass));
+	      else  SVMass.push_back( -9999 );
+	      if(vars.checkTag(reco::btau::vertexEnergyRatio)) SVEnergyRatio.push_back( vars.get(reco::btau::vertexEnergyRatio) );
+	      else SVEnergyRatio.push_back( -9999 );
+	      if(vars.checkTag(reco::btau::vertexJetDeltaR)) SVjetDeltaR.push_back(deltaR(thisJetRef->eta(), thisJetRef->phi(), addTracksVertex.eta(), addTracksVertex.phi()) );
+	      else SVjetDeltaR.push_back( -9999 )
 	      double cosAngle = addTracksVertex.Dot(jetVector)/sqrt(addTracksVertex.mag2()*jetVector.mag2());
 	      SVjetAngle.push_back(cosAngle);
 	      SVjetCosAngle.push_back(acos(cosAngle));
