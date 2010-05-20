@@ -122,10 +122,12 @@ process.standardSecondaryVertexV0PFTagInfos.vertexCuts.v0Filter = cms.PSet(k0sMa
 process.standardCombinedSecondaryVertexV0Calo = process.standardCombinedSecondaryVertexCalo.clone()
 process.standardCombinedSecondaryVertexV0Calo.trackPairV0Filter = cms.PSet(k0sMassWindow = cms.double(-1.0))
 process.standardCombinedSecondaryVertexV0Calo.pseudoVertexV0Filter = cms.PSet(k0sMassWindow = cms.double(-1.0)) 
+process.standardCombinedSecondaryVertexV0Calo.trackMultiplicityMin = 2 
 
 process.standardCombinedSecondaryVertexV0PF = process.standardCombinedSecondaryVertexPF.clone()
 process.standardCombinedSecondaryVertexV0PF.trackPairV0Filter = cms.PSet(k0sMassWindow = cms.double(-1.0))
 process.standardCombinedSecondaryVertexV0PF.pseudoVertexV0Filter = cms.PSet(k0sMassWindow = cms.double(-1.0)) 
+process.standardCombinedSecondaryVertexV0PF.trackMultiplicityMin = 2
 
 process.standardTrackCountingHighEffCaloBJetTags = process.trackCountingHighEffBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterCaloTagInfos"))
