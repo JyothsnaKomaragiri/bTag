@@ -848,7 +848,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if(vars.checkTag(reco::btau::vertexEnergyRatio)) SVEnergyRatio.push_back( vars.get(reco::btau::vertexEnergyRatio) );
 	      else SVEnergyRatio.push_back( -9999 );
 	      if(vars.checkTag(reco::btau::vertexJetDeltaR)) SVjetDeltaR.push_back(deltaR(thisJetRef->eta(), thisJetRef->phi(), addTracksVertex.eta(), addTracksVertex.phi()) );
-	      else SVjetDeltaR.push_back( -9999 )
+	      else SVjetDeltaR.push_back( -9999 );
 	      double cosAngle = addTracksVertex.Dot(jetVector)/sqrt(addTracksVertex.mag2()*jetVector.mag2());
 	      SVjetAngle.push_back(cosAngle);
 	      SVjetCosAngle.push_back(acos(cosAngle));
