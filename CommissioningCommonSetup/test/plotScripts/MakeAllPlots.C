@@ -856,21 +856,21 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   TCanvas canvas_data_correlations((info.plotName+"canvas_data_correlations").c_str(),info.plotTitle.c_str(),1024,1024);
   //Following code snippet stolen from http://www.slac.stanford.edu/BFROOT/www/Computing/Offline/ROOT/info/binLabels.C
   canvas_data_correlations.SetGrid();
-  canvas_data_correlations.SetLeftMargin(0.15);
-  canvas_data_correlations.SetBottomMargin(0.15);
+  canvas_data_correlations.SetLeftMargin(0.20);
+  canvas_data_correlations.SetBottomMargin(0.20);
   dataCorrelations->GetXaxis()->SetLabelOffset(99);
   dataCorrelations->GetYaxis()->SetLabelOffset(99);
   dataCorrelations->Draw("text");
   // draw labels along X
-  Float_t x, y;
-  y = gPad->GetUymin() - 0.8*dataCorrelations->GetYaxis()->GetBinWidth(1);
-  TText t;
+  TLatex t;
+  double x,y;
+  y = gPad->GetUymin() - 0.1*mcCorrelations->GetYaxis()->GetBinWidth(1);
   t.SetTextAngle(60);
   t.SetTextSize(0.02);
-  t.SetTextAlign(23);
+  t.SetTextAlign(33);
   for (int i=0;i<info.labelList.size();i++) {
-    x = dataCorrelations->GetXaxis()->GetBinCenter(i+1);
-    t.DrawText(x,y,info.labelList[i].c_str());
+    x = mcCorrelations->GetXaxis()->GetBinCenter(i+1);
+    t.DrawLatex(x,y,info.labelList[i].c_str());
   }
   // draw labels along y
   x = gPad->GetUxmin() - 0.1*dataCorrelations->GetXaxis()->GetBinWidth(1);
@@ -878,7 +878,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   t.SetTextAngle(0);
   for (int i=0;i<info.labelList.size();i++) {
     y = dataCorrelations->GetYaxis()->GetBinCenter(i+1);
-    t.DrawText(x,y,info.labelList[i].c_str());
+    t.DrawLatex(x,y,info.labelList[i].c_str());
   }
   pt->Draw();
   canvas_data_correlations.SaveAs((info.plotName+"_data_correlations.pdf").c_str());
@@ -894,13 +894,13 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   mcCorrelations->GetYaxis()->SetLabelOffset(99);
   mcCorrelations->Draw("text");
   // draw labels along X
-  y = gPad->GetUymin() - 0.8*mcCorrelations->GetYaxis()->GetBinWidth(1);
+  y = gPad->GetUymin() - 0.1*mcCorrelations->GetYaxis()->GetBinWidth(1);
   t.SetTextAngle(60);
   t.SetTextSize(0.02);
-  t.SetTextAlign(23);
+  t.SetTextAlign(33);
   for (int i=0;i<info.labelList.size();i++) {
     x = mcCorrelations->GetXaxis()->GetBinCenter(i+1);
-    t.DrawText(x,y,info.labelList[i].c_str());
+    t.DrawLatex(x,y,info.labelList[i].c_str());
   }
   // draw labels along y
   x = gPad->GetUxmin() - 0.1*mcCorrelations->GetXaxis()->GetBinWidth(1);
@@ -908,7 +908,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   t.SetTextAngle(0);
   for (int i=0;i<info.labelList.size();i++) {
     y = mcCorrelations->GetYaxis()->GetBinCenter(i+1);
-    t.DrawText(x,y,info.labelList[i].c_str());
+    t.DrawLatex(x,y,info.labelList[i].c_str());
   }
   pt->Draw();
   canvas_mc_correlations.SaveAs((info.plotName+"_mc_correlations.pdf").c_str());
@@ -974,7 +974,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   legend.AddEntry(mcEfficiencies,"MC","F");
 
   TCanvas canvas_efficiencies((info.plotName+"efficiencies").c_str(),info.plotTitle.c_str(),1024,1024);
-  canvas_efficiencies.SetBottomMargin(0.15);
+  canvas_efficiencies.SetBottomMargin(0.20);
   mcEfficiencies->GetXaxis()->SetLabelOffset(99);
   dataEfficiencies->GetXaxis()->SetLabelOffset(99);
   drawHelper->GetXaxis()->SetLabelOffset(99);
@@ -983,13 +983,13 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   dataEfficiencies->Draw("E1SAME");
   drawHelper->Draw("PSAME");
   // draw labels along X
-  y = gPad->GetUymin() - 0.14*mcEfficiencies->GetYaxis()->GetBinWidth(1);
+  y = gPad->GetUymin() - 0.01*mcCorrelations->GetYaxis()->GetBinWidth(1);
   t.SetTextAngle(60);
   t.SetTextSize(0.02);
-  t.SetTextAlign(23);
+  t.SetTextAlign(33);
   for (int i=0;i<info.labelList.size();i++) {
-    x = mcEfficiencies->GetXaxis()->GetBinCenter(i+1);
-    t.DrawText(x,y,info.labelList[i].c_str());
+    x = mcCorrelations->GetXaxis()->GetBinCenter(i+1);
+    t.DrawLatex(x,y,info.labelList[i].c_str());
   }
   legend.Draw();
   pt->Draw();
