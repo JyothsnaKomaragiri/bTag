@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.8 2010/05/14 18:53:51 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.11 2010/05/20 07:40:35 alschmid Exp $
 //
 //
 
@@ -1313,12 +1313,9 @@ void TagNtupleProducer::getSharedHitsInfo(unsigned int layer, const reco::TrackR
 
 int TagNtupleProducer::hasSharedHit(unsigned int layer, size_t location, const reco::TrackRefVector & tracks){
 
-  int bFoundHits=0;
+  int bFoundHit=0;
 
-  unsigned int iFoundOverlaps = 0;
-
-  //iterate over hits of this track
-  unsigned int iHitCounter=0;
+  //iterate over hits of this track 
   for(trackingRecHit_iterator hitIt = tracks[location]->recHitsBegin(); hitIt != tracks[location]->recHitsEnd(); hitIt++  ){
     if( !(*hitIt)->isValid() ) continue;
    
@@ -1339,22 +1336,18 @@ int TagNtupleProducer::hasSharedHit(unsigned int layer, size_t location, const r
     
     // if they are on the desired layer
     if(layer == thislayer){
-       iHitCounter++;
       //iterate over all other tracks avoiding double counting
-      
       size_t counter = 0;
-   
+       
       for(track_iterator itTrack2 = tracks.begin(); itTrack2!=tracks.end(); itTrack2++){
-	if(counter==location){
-
-	  iFoundOverlaps++; counter++;continue;}
+	if(counter==location){ counter++; continue;}  //avoid double counting track 
 	// iterate again over hits
 	for(trackingRecHit_iterator hitIt2 = (*itTrack2)->recHitsBegin(); hitIt2 != (*itTrack2)->recHitsEnd(); hitIt2++  ){
 	  if( !(*hitIt2)->isValid() ) continue;
 	  DetId detid2 = (*hitIt2)->geographicalId();
 	  if( detid.rawId() == detid2.rawId()  ){
 	    // check identity via
-	    if( (*hitIt)->sharesInput( &(**hitIt2), TrackingRecHit::some )) bFoundHits=1; 
+	    if( (*hitIt)->sharesInput( &(**hitIt2), TrackingRecHit::some )) bFoundHit=1; 
 	  }
 	}
 	counter++;
@@ -1362,12 +1355,7 @@ int TagNtupleProducer::hasSharedHit(unsigned int layer, size_t location, const r
     }
   }
 
-  // cross check
-  if(iFoundOverlaps!=iHitCounter){
-    std::cout<<"overlap cross-check failes" << std::endl;
-    exit(1);
-  }
-  return bFoundHits;
+  return bFoundHit;
 }
 
 
