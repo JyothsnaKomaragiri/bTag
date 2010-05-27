@@ -63,7 +63,7 @@ def style():
 	tdrStyle.SetTitleFont(42,"xyz")
 	tdrStyle.SetLabelSize(0.045,"xyz") #0.035
 	tdrStyle.SetTitleSize(0.045,"xyz")
-	tdrStyle.SetTitleOffset(1.5,"y")
+	tdrStyle.SetTitleOffset(1.6,"y")
     
 	tdrStyle.SetTitleX(0.16)
 	tdrStyle.SetTitleY(0.93)
@@ -258,11 +258,10 @@ def draw(mc, data, xTit, yTit, title, category, bintype, left, blind):
 
 def main(args, left, blind):
 
-	mc0 = ROOT.TFile.Open("MC_MinBias.root")
-	mc1 = ROOT.TFile.Open("MC_QCD_Pt_0_15.root")
-	mc2 = ROOT.TFile.Open("MC_QCD_Pt_15_20.root")
-	mc3 = ROOT.TFile.Open("MC_QCD_Pt_20_30.root")
-	mc4 = ROOT.TFile.Open("MC_QCD_Pt_30.root")
+	mc0 = ROOT.TFile.Open("MC_QCD_Pt_0_15.root")
+	mc1 = ROOT.TFile.Open("MC_QCD_Pt_15_20.root")
+	mc2 = ROOT.TFile.Open("MC_QCD_Pt_20_30.root")
+	mc3 = ROOT.TFile.Open("MC_QCD_Pt_30.root")
 
 	data = ROOT.TFile.Open("data.root")
 
@@ -358,7 +357,7 @@ def main(args, left, blind):
         #####################			
 	print pfx, histo
 
-        #MinBias
+        #pT 0-15
 	mc0 = [
 		mc0.Get("%s/%sNI" % (pfx, histo)),
 		mc0.Get("%s/%sDUSG" % (pfx, histo)),
@@ -366,7 +365,7 @@ def main(args, left, blind):
 		mc0.Get("%s/%sB" % (pfx, histo)),
 		mc0.Get("%s/%sALL" % (pfx, histo))
 		]
-        #pT 0-15
+        #pT 15-20
 	mc1 = [
 		mc1.Get("%s/%sNI" % (pfx, histo)),
 		mc1.Get("%s/%sDUSG" % (pfx, histo)),
@@ -374,7 +373,7 @@ def main(args, left, blind):
 		mc1.Get("%s/%sB" % (pfx, histo)),
 		mc1.Get("%s/%sALL" % (pfx, histo))
 		]
-        #pT 15-20
+	#pT 20-30
 	mc2 = [
 		mc2.Get("%s/%sNI" % (pfx, histo)),
 		mc2.Get("%s/%sDUSG" % (pfx, histo)),
@@ -383,7 +382,7 @@ def main(args, left, blind):
 		mc2.Get("%s/%sALL" % (pfx, histo))
 		]
 
-	#pT 20-30
+	#pT 30
 	mc3 = [
 		mc3.Get("%s/%sNI" % (pfx, histo)),
 		mc3.Get("%s/%sDUSG" % (pfx, histo)),
@@ -391,19 +390,9 @@ def main(args, left, blind):
 		mc3.Get("%s/%sB" % (pfx, histo)),
 		mc3.Get("%s/%sALL" % (pfx, histo))
 		]
-	#pT 30
-	mc4 = [
-		mc4.Get("%s/%sNI" % (pfx, histo)),
-		mc4.Get("%s/%sDUSG" % (pfx, histo)),
-		mc4.Get("%s/%sC" % (pfx, histo)),
-		mc4.Get("%s/%sB" % (pfx, histo)),
-		mc4.Get("%s/%sALL" % (pfx, histo))
-		]
-
 
 #### Scale MC to data lumi ...Data/MC ratio
 #Data total luminosity 4.79 nb-1
-#/MinBias/Spring10-START3X_V26A_357ReReco-v3/GEN-SIM-RECO 0.151 nb-1
 #/QCDDiJet_Pt0to15/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 0.0403 nb-1
 #/QCDDiJet_Pt15to20/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 3.21 nb-1
 #/QCDDiJet_Pt20to30/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 3.77 nb-1
@@ -411,15 +400,14 @@ def main(args, left, blind):
 
 # MC weights = 31.72, 118.86, 1.49, 1.27, 0.23
 
-	scale = [ 31.72, 118.86, 1.49, 1.27, 0.23 ]
+	scale = [ 118.86, 1.49, 1.27, 0.23 ]
     
 ##################
 
 ## Adding the histos:
 ## scale[0]*mc0 + scale[1]*mc1 + scale[2]*mc2 + scale[3]*mc3 + scale[4]*mc4 
 	for i in range(5):
-		mc3[i].Add( mc3[i], mc4[i], float(scale[3]), float(scale[4]) )		
-		mc2[i].Add( mc2[i], mc3[i], float(scale[2]), 1.0 )
+		mc2[i].Add( mc2[i], mc3[i], float(scale[2]), float(scale[3]) )
 		mc1[i].Add( mc1[i], mc2[i], float(scale[1]), 1.0 )
 		mc0[i].Add( mc0[i], mc1[i], float(scale[0]), 1.0 )
 
