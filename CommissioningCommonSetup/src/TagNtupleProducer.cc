@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.11 2010/05/20 07:40:35 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.12 2010/05/26 11:36:09 alschmid Exp $
 //
 //
 
@@ -168,6 +168,10 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   produces<bool>( alias = label_ + "triggerHLTL1Jet6U"  ).setBranchAlias( alias );
   produces<bool>( alias = label_ + "triggerHLTL1Jet10U"  ).setBranchAlias( alias );
   produces<bool>( alias = label_ + "triggerHLTJet15U"  ).setBranchAlias( alias );
+
+  produces<unsigned int> ( alias = label_ + "eventNumber"  ).setBranchAlias( alias );
+  produces<unsigned int> ( alias = label_ + "runNumber"  ).setBranchAlias( alias );
+  produces<unsigned int> ( alias = label_ + "lumiBlockNumber"  ).setBranchAlias( alias );
 
    //Basic Jet Information
   produces<vector<math::XYZTLorentzVector> >( alias = label_ + "jetP4"                  ).setBranchAlias( alias );
@@ -404,6 +408,10 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     std::cout<<"  ERROR: trigger name not found in event" << std::endl;
     exit(1);
   }
+
+  unsigned int eventNumber = iEvent.eventAuxiliary().event();
+  unsigned int runNumber = iEvent.eventAuxiliary().run();
+  unsigned int lumiBlockNumber = iEvent.eventAuxiliary().luminosityBlock();
 
   Handle< View<Jet> > jets;
   iEvent.getByLabel(jet_src_,jets);
@@ -1055,6 +1063,10 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put(auto_ptr< bool >        ( new bool(triggerHLTL1Jet6U) ),       label_+"triggerHLTL1Jet6U");
   iEvent.put(auto_ptr< bool >        ( new bool(triggerHLTL1Jet10U) ),      label_+"triggerHLTL1Jet10U");
   iEvent.put(auto_ptr< bool >        ( new bool(triggerHLTJet15U) ),        label_+"triggerHLTJet15U");
+
+  iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(eventNumber) ),        label_+"eventNumber");
+  iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(runNumber) ),        label_+"runNumber");
+  iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(lumiBlockNumber) ),        label_+"lumiBlockNumber");
 
   //Basic Jet Information
   iEvent.put(auto_ptr< vector< math::XYZTLorentzVector> >(new vector< math::XYZTLorentzVector>(jetP4)),label_+"jetP4");
