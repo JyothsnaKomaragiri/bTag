@@ -18,4 +18,6 @@ class Canvas:
 		self.c.cd()
 
 	def Print(self, p):
-                self.c.Print("%s.png" % p) 
+                self.c.Print("%s.png" % p)
+                self.c.Print("%s.pdf" % p)
+                self.c.Print("%s.root" % p) 		
