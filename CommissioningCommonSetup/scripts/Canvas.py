@@ -17,7 +17,13 @@ class Canvas:
 	def cd(self):
 		self.c.cd()
 
+	def Modified(self):
+		self.c.Modified()
+
+	def Update(self):
+		self.c.Update()
+
 	def Print(self, p):
                 self.c.Print("%s.png" % p)
-                self.c.Print("%s.pdf" % p)
-                self.c.Print("%s.root" % p) 		
+                #self.c.Print("%s.pdf" % p)
+                #self.c.Print("%s.root" % p) 		

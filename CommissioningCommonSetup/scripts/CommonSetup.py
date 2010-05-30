@@ -103,17 +103,17 @@ class CommonSetup:
                 title = " "
 
                 if header == "GLOBAL":
-                        title = "p_{T} > 10 GeV and |#eta| < 2.5"
+                        title = "p_{T} > 10 GeV and | #eta | < 2.5"
                 elif header == "PT_10-20":
-                        title = "10 < p_{T} < 20 GeV and |#eta| < 2.5"
+                        title = "10 < p_{T} < 20 GeV and | #eta | < 2.5"
                 elif header == "PT_20-40":
-                        title = "20 < p_{T} < 40 GeV and |#eta| < 2.5"
+                        title = "20 < p_{T} < 40 GeV and | #eta | < 2.5"
                 elif header == "PT_40-99999" :
-                        title = "p_{T} > 40 GeV and |#eta| < 2.5"
+                        title = "p_{T} > 40 GeV and | #eta | < 2.5"
                 elif header == "ETA_0-1v5_PT_40-99999" :
-                        title = "p_{T} > 40 GeV and 0 < |#eta| < 1.5"
+                        title = "p_{T} > 40 GeV and 0 < | #eta | < 1.5"
                 elif header == "ETA_1v5-2v5_PT_40-99999" :
-                        title = "p_{T} > 40 GeV and 1.5 < |#eta| < 2.5"
+                        title = "p_{T} > 40 GeV and 1.5 < | #eta | < 2.5"
                 else:
                         title = "CMS Preliminary 2010"
 
@@ -505,16 +505,17 @@ class CommonSetup:
                 datastack.Add(data[1])
                 datastack.Add(data[0])
 
-                f1 = 1.4
-        #        datastack.SetMaximum( max(datastack.GetMaximum(), mcstack.GetMaximum()) * f1)
+                f1 = 1.2
+		datastack.SetMaximum( max(datastack.GetMaximum(), mcstack.GetMaximum()) * f1)
 
                 datastack.SetTitle("")
-        #	datastack.GetXaxis().SetTitle(xTit)
-        #	datastack.GetYaxis().SetTitle(yTit)
 
                 datastack.Draw("E1")
                 mcstack.Draw("histsame")
                 datastack.Draw("sameE1")
+        	datastack.GetXaxis().SetTitle(xTit)
+        	datastack.GetYaxis().SetTitle(yTit)
+		c.Modified()
 
                 if left:
                         l = ROOT.TLegend(0.22, 0.63, 0.37, 0.88)
@@ -535,6 +536,8 @@ class CommonSetup:
                 l.Draw()
                 keep.append(self.prelim(bintype))
 
+		c.Update()
+
                 if norm == 'area':
                         c.Print('PlotsArea/'+title)
                 else: 
@@ -544,8 +547,8 @@ class CommonSetup:
                 c.cd()
                 ROOT.gPad.SetLogy(True)
 
-                f2 = 3.0
-        #        datastack.SetMaximum( max(data.GetMaximum(), mcstack.GetMaximum()) * f2)
+                f2 = 4.0
+		datastack.SetMaximum( max(datastack.GetMaximum(), mcstack.GetMaximum()) * f2)
                 datastack.SetMinimum( 0.2 )
 
                 datastack.Draw("E1")
@@ -554,6 +557,8 @@ class CommonSetup:
 
                 l.Draw()
                 keep.append(self.prelim(bintype))
+
+		c.Update()
 
                 newtitle = 'log_'+title
                 if norm == 'area':
