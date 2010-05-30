@@ -14,9 +14,9 @@ TrackQualplot.py : Script to plot IP TagInfo plots by track quality (Loose, Tigh
 Shell scripts:
 --------------------------------
 allnormcompare.sh : Plots all the IP, SV, SL TagInfos and jet plots normalized by area and lumi for different categories (standardPF, standardCalo) and bins (GLOBAL, PT10-20 etc).
-discPlots.sh      :  Plots all the discriminators normalized by area and lumi for different categories (standardPF, standardCalo) and bins (GLOBAL, PT10-20 etc).
+discPlots.sh      : Plots all the discriminators normalized by area and lumi for different categories (standardPF, standardCalo) and bins (GLOBAL, PT10-20 etc).
 
-profilePlots.sh :  Plots all the profile plots normalized by area and lumi for different categories (standardPF, standardCalo) and bins (GLOBAL, PT10-20 etc).
+profilePlots.sh : Plots all the profile plots normalized by area and lumi for different categories (standardPF, standardCalo) and bins (GLOBAL, PT10-20 etc).
 trackQual.sh    : Plots all the IP TagInfo track quality plots normalized by area and lumi for different categories (standardPF, standardCalo) and bins (GLOBAL, PT10-20 etc).
 
 --------------------------------
