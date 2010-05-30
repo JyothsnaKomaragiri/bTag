@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.12 2010/05/26 11:36:09 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.13 2010/05/30 12:46:31 alschmid Exp $
 //
 //
 
@@ -766,7 +766,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		{
 		  if((*iTrack)==(*jTrack)) {
 		    isSelected = true;
-		    continue;
+		    break;
 		  }
 		}
 	    }
@@ -783,7 +783,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  for(int i = 2; i>-2; i--){
 	    if((*iTrack)->quality(reco::TrackBase::TrackQuality(i))){
 	      trackQuality.push_back(i);
-	      continue;
+	      break;
 	    }
 	  }
 	  trackLongitudinalImpactParameter.push_back((*iTrack)->dz(pv->position()));
@@ -920,7 +920,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  for(int i = 2; i>-2; i--){
 		    if(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->quality(reco::TrackBase::TrackQuality(i))){
 		      IP3dTrackQuality[iTrack].push_back(i);
-		      continue;
+		      break;
 		    }
 		  }
 		  int sharedP1, sharedP2, sharedP3;
@@ -973,7 +973,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  for(int i = 2; i>-2; i--){
 		    if(ipTagInfo[thisJetRef]->selectedTracks()[location2D]->quality(reco::TrackBase::TrackQuality(i))){
 		      IP2dTrackQuality[iTrack].push_back(i);
-		      continue;
+		      break;
 		    }
 		  }
 		  IP2d[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location2D].ip2d.value());
