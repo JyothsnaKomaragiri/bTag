@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.13 2010/05/30 12:46:31 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.14 2010/05/30 15:32:12 alschmid Exp $
 //
 //
 
@@ -1058,6 +1058,12 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
     }
 
+  // small cross check
+  if(trackMomentum.size() != trackQuality.size()){
+    std::cout<<"trackMomentum.size() != trackQuality.size() !!!!"<< std::endl;
+    exit(1);
+  }
+  
   //Putting Information into the Event
 
   iEvent.put(auto_ptr< bool >        ( new bool(triggerHLTL1Jet6U) ),       label_+"triggerHLTL1Jet6U");
