@@ -133,6 +133,14 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
                                 thresh = cms.untracked.double(0.25)
                                 )
 
+#Filter to remove pthat>15 events in MinBias samples
+process.pthat_filter = cms.EDFilter("MCProcessFilter",
+	  MaxPthat = cms.untracked.vdouble(15.0),
+	  ProcessID = cms.untracked.vint32(0),
+	  MinPthat = cms.untracked.vdouble(1.0)
+)
+
+
 process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 
 process.ak5CaloJetTracksAssociatorAtVertex = cms.EDProducer("JetTracksAssociatorAtVertex",
@@ -697,7 +705,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-    'file:/storage/4/jyothsna/QCDDiJet_Pt15to20-Spring10-START3X_V26_S09-v1/F262F73A-9746-DF11-8EBE-00215E2222D4.root'
+    'file:FEC37749-0348-DF11-AB4B-E0CB4E1A1193.root'
     )
 )
 
@@ -789,6 +797,7 @@ process.bTagValidation = cms.Sequence(
 )
 
 process.plots = cms.Path(
+#  process.pthat_filter+
   process.bit40 +
   process.singleJetHLTFilter +
   process.noscraping +
