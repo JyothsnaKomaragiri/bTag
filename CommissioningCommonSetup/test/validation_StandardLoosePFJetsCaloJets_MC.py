@@ -24,9 +24,6 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("DQMServices.Core.DQM_cfg")
 
 process.load("RecoBTag.Configuration.RecoBTag_cff")
-#Include these for the simpleSecondaryVertexHighPurity tagger
-process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertex3TrkES_cfi")
-process.load("RecoBTag.SecondaryVertex.simpleSecondaryVertexHighPurBJetTags_cfi")
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
@@ -117,6 +114,14 @@ process.standardSecondaryVertexPFTagInfos = process.standardSecondaryVertexCaloT
   trackIPTagInfos = "standardImpactParameterPFTagInfos"
 )
 
+process.standardGhostTrackVertexCaloTagInfos = process.standardSecondaryVertexCaloTagInfos.clone()
+process.standardGhostTrackVertexCaloTagInfos.vertexReco = process.ghostTrackVertexRecoBlock.vertexReco
+process.standardGhostTrackVertexCaloTagInfos.vertexCuts.multiplicityMin = 1
+
+process.standardGhostTrackVertexPFTagInfos = process.standardSecondaryVertexPFTagInfos.clone()
+process.standardGhostTrackVertexPFTagInfos.vertexReco = process.ghostTrackVertexRecoBlock.vertexReco
+process.standardGhostTrackVertexPFTagInfos.vertexCuts.multiplicityMin = 1
+
 process.standardCombinedSecondaryVertexCalo = process.combinedSecondaryVertex.clone()
 
 process.standardCombinedSecondaryVertexPF = process.standardCombinedSecondaryVertexCalo.clone()
@@ -169,11 +174,11 @@ process.standardJetBProbabilityPFBJetTags = process.jetBProbabilityBJetTags.clon
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterPFTagInfos")) 
 )
 
-process.standardSimpleSecondaryVertexCaloBJetTags = process.simpleSecondaryVertexBJetTags.clone(
+process.standardSimpleSecondaryVertexHighEffCaloBJetTags = process.simpleSecondaryVertexHighEffBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardSecondaryVertexCaloTagInfos"))
 )
 
-process.standardSimpleSecondaryVertexPFBJetTags = process.simpleSecondaryVertexBJetTags.clone(
+process.standardSimpleSecondaryVertexHighEffPFBJetTags = process.simpleSecondaryVertexHighEffBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardSecondaryVertexPFTagInfos"))
 )
 
@@ -183,6 +188,16 @@ process.standardSimpleSecondaryVertexHighPurCaloBJetTags = process.simpleSeconda
 
 process.standardSimpleSecondaryVertexHighPurPFBJetTags = process.simpleSecondaryVertexHighPurBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardSecondaryVertexPFTagInfos"))
+)
+
+process.standardGhostTrackCaloBJetTags = process.ghostTrackBJetTags.clone(
+  tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterCaloTagInfos"),
+	                         cms.InputTag("standardGhostTrackVertexCaloTagInfos"))
+)
+
+process.standardGhostTrackPFBJetTags = process.ghostTrackBJetTags.clone(
+  tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterPFTagInfos"),
+	                         cms.InputTag("standardGhostTrackVertexPFTagInfos"))
 )
 
 process.standardCombinedSecondaryVertexCaloBJetTags = process.combinedSecondaryVertexBJetTags.clone(
@@ -287,9 +302,9 @@ process.caloBTagAnalysis.jetMCSrc = "AK5byValAlgo"
 process.caloBTagAnalysis.finalizePlots = False 
 process.caloBTagAnalysis.finalizeOnly = False
 process.caloBTagAnalysis.differentialPlots = False 
-process.caloBTagAnalysis.ptRecJetMin = 10.0
+process.caloBTagAnalysis.ptRecJetMin = 30.0
 process.caloBTagAnalysis.etaMax = 2.5
-process.caloBTagAnalysis.ptRanges = cms.vdouble(10.0, 20.0, 40.0, 99999.0)
+process.caloBTagAnalysis.ptRanges = cms.vdouble(30.0, 80.0, 99999.0)
 process.caloBTagAnalysis.etaRanges = cms.vdouble(0.0, 1.5, 2.5)
 process.caloBTagAnalysis.tagConfig = cms.VPSet(
         cms.PSet(
@@ -329,11 +344,15 @@ process.caloBTagAnalysis.tagConfig = cms.VPSet(
         ), 
         cms.PSet(
             bTagSimpleSVAnalysisBlock,
-            label = cms.InputTag("standardSimpleSecondaryVertexCaloBJetTags")
+            label = cms.InputTag("standardSimpleSecondaryVertexHighEffCaloBJetTags")
         ), 
         cms.PSet(
             bTagSimpleSVAnalysisBlock,
             label = cms.InputTag("standardSimpleSecondaryVertexHighPurCaloBJetTags")
+        ), 
+        cms.PSet(
+            bTagGenericAnalysisBlock,
+            label = cms.InputTag("standardGhostTrackCaloBJetTags")
         ), 
         cms.PSet(
             bTagGenericAnalysisBlock,
@@ -381,8 +400,8 @@ process.caloBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.max = 
 process.caloBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
 process.caloBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
 #UNCOMMENT THESE LINES AT YOUR OWN RISK
-for i in range(3 , 16):
-  for j in range(i + 1, 16):
+for i in range(3 , 17):
+  for j in range(i + 1, 17):
     process.caloBTagAnalysis.tagConfig.append(
       cms.PSet(
         type = cms.string("TagCorrelation"),
@@ -438,11 +457,15 @@ process.pfBTagAnalysis.tagConfig = cms.VPSet(
         ), 
         cms.PSet(
             bTagSimpleSVAnalysisBlock,
-            label = cms.InputTag("standardSimpleSecondaryVertexPFBJetTags")
+            label = cms.InputTag("standardSimpleSecondaryVertexHighEffPFBJetTags")
         ), 
         cms.PSet(
             bTagSimpleSVAnalysisBlock,
             label = cms.InputTag("standardSimpleSecondaryVertexHighPurPFBJetTags")
+        ), 
+        cms.PSet(
+            bTagGenericAnalysisBlock,
+            label = cms.InputTag("standardGhostTrackPFBJetTags")
         ), 
         cms.PSet(
             bTagGenericAnalysisBlock,
@@ -490,8 +513,8 @@ process.pfBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.max = 0.
 process.pfBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
 process.pfBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
 #UNCOMMENT THESE LINES AT YOUR OWN RISK
-for i in range(3 , 16):
-  for j in range(i + 1, 16):
+for i in range(3 , 17):
+  for j in range(i + 1, 17):
     process.pfBTagAnalysis.tagConfig.append(
       cms.PSet(
         type = cms.string("TagCorrelation"),
@@ -540,12 +563,16 @@ process.standardCaloBTagNtuple.bTagConfig = cms.VPSet(
     label = cms.InputTag("standardJetBProbabilityCaloBJetTags")
     ), 
     cms.PSet(
-    alias = cms.string("standardSimpleSecondaryVertexCaloBJetTags"),
-    label = cms.InputTag("standardSimpleSecondaryVertexCaloBJetTags")
+    alias = cms.string("standardSimpleSecondaryVertexHighEffCaloBJetTags"),
+    label = cms.InputTag("standardSimpleSecondaryVertexHighEffCaloBJetTags")
     ), 
     cms.PSet(
     alias = cms.string("standardSimpleSecondaryVertexHighPurCaloBJetTags"),
     label = cms.InputTag("standardSimpleSecondaryVertexHighPurCaloBJetTags")
+    ), 
+    cms.PSet(
+    alias = cms.string("standardGhostTrackCaloBJetTags"),
+    label = cms.InputTag("standardGhostTrackCaloBJetTags")
     ), 
     cms.PSet(
     alias = cms.string("standardCombinedSecondaryVertexCaloBJetTags"),
@@ -606,8 +633,8 @@ process.standardPFBTagNtuple.bTagConfig = cms.VPSet(
     label = cms.InputTag("standardJetBProbabilityPFBJetTags")
     ), 
     cms.PSet(
-    alias = cms.string("standardSimpleSecondaryVertexPFBJetTags"),
-    label = cms.InputTag("standardSimpleSecondaryVertexPFBJetTags")
+    alias = cms.string("standardSimpleSecondaryVertexHighEffPFBJetTags"),
+    label = cms.InputTag("standardSimpleSecondaryVertexHighEffPFBJetTags")
     ), 
     cms.PSet(
     alias = cms.string("standardSimpleSecondaryVertexHighPurPFBJetTags"),
@@ -616,6 +643,10 @@ process.standardPFBTagNtuple.bTagConfig = cms.VPSet(
     cms.PSet(
     alias = cms.string("standardCombinedSecondaryVertexPFBJetTags"),
     label = cms.InputTag("standardCombinedSecondaryVertexPFBJetTags")
+    ), 
+    cms.PSet(
+    alias = cms.string("standardGhostTrackPFBJetTags"),
+    label = cms.InputTag("standardGhostTrackPFBJetTags")
     ), 
     cms.PSet(
     alias = cms.string("standardCombinedSecondaryVertexMVAPFBJetTags"),
@@ -697,7 +728,9 @@ process.svTagInfos = cms.Sequence(
     process.standardSecondaryVertexCaloTagInfos +
     process.standardSecondaryVertexPFTagInfos +
     process.standardSecondaryVertexV0CaloTagInfos +
-    process.standardSecondaryVertexV0PFTagInfos 
+    process.standardSecondaryVertexV0PFTagInfos + 
+    process.standardGhostTrackVertexCaloTagInfos +
+    process.standardGhostTrackVertexPFTagInfos 
 )
 
 process.ipTaggers = cms.Sequence(
@@ -712,10 +745,12 @@ process.ipTaggers = cms.Sequence(
 )
 
 process.svTaggers = cms.Sequence(
-    process.standardSimpleSecondaryVertexCaloBJetTags +
-    process.standardSimpleSecondaryVertexPFBJetTags +
+    process.standardSimpleSecondaryVertexHighEffCaloBJetTags +
+    process.standardSimpleSecondaryVertexHighEffPFBJetTags +
     process.standardSimpleSecondaryVertexHighPurCaloBJetTags +
     process.standardSimpleSecondaryVertexHighPurPFBJetTags +
+    process.standardGhostTrackCaloBJetTags +
+    process.standardGhostTrackPFBJetTags +
     process.standardCombinedSecondaryVertexCaloBJetTags +
     process.standardCombinedSecondaryVertexPFBJetTags +
     process.standardCombinedSecondaryVertexMVACaloBJetTags +
@@ -725,8 +760,10 @@ process.svTaggers = cms.Sequence(
 process.slTagInfos = cms.Sequence(
     process.standardSoftMuonCaloTagInfos +
     process.standardSoftMuonPFTagInfos +
+    process.softElectronCands * (
     process.standardSoftElectronCaloTagInfos +
-    process.standardSoftElectronPFTagInfos 
+    process.standardSoftElectronPFTagInfos
+    ) 
 )
 
 process.slTaggers = cms.Sequence(

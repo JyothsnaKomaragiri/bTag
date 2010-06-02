@@ -35,9 +35,9 @@ process.bTagAnalysisHarvest = process.bTagAnalysis.clone()
 process.bTagAnalysisHarvest.finalizePlots = True
 process.bTagAnalysisHarvest.finalizeOnly = True
 process.bTagAnalysisHarvest.differentialPlots = cms.bool(False)
-process.bTagAnalysisHarvest.ptRecJetMin = 10.0
+process.bTagAnalysisHarvest.ptRecJetMin = 30.0
 process.bTagAnalysisHarvest.etaMax = 2.5
-process.bTagAnalysisHarvest.ptRanges = cms.vdouble(10.0, 20.0, 40.0, 99999.0)
+process.bTagAnalysisHarvest.ptRanges = cms.vdouble(30.0, 80.0)
 process.bTagAnalysisHarvest.etaRanges = cms.vdouble(0.0, 1.5, 2.5)
 process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
         cms.PSet(
@@ -82,6 +82,10 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
         cms.PSet(
             bTagSimpleSVAnalysisBlock,
             label = cms.InputTag("standardSimpleSecondaryVertexHighPurCaloBJetTags")
+        ), 
+        cms.PSet(
+            bTagGenericAnalysisBlock,
+            label = cms.InputTag("standardGhostTrackCaloBJetTags")
         ), 
         cms.PSet(
             bTagGenericAnalysisBlock,
@@ -166,6 +170,10 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
         ), 
         cms.PSet(
             bTagGenericAnalysisBlock,
+            label = cms.InputTag("standardGhostTrackPFBJetTags")
+        ), 
+        cms.PSet(
+            bTagGenericAnalysisBlock,
             label = cms.InputTag("standardCombinedSecondaryVertexPFBJetTags")
         ), 
         cms.PSet(
@@ -209,14 +217,14 @@ process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[1].vertexMass.min
 process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[1].vertexMass.max = 0.8
 process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
 process.bTagAnalysisHarvest.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
-process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[0].vertexMass.min = 0.3
-process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[0].vertexMass.max = 0.8
-process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[1].vertexMass.min = 0.3
-process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[1].vertexMass.max = 0.8
-process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[2].vertexMass.min = 0.3
-process.bTagAnalysisHarvest.tagConfig[20].parameters.categories[2].vertexMass.max = 0.8
-for i in range(3 , 16):
-  for j in range(i + 1, 16):
+process.bTagAnalysisHarvest.tagConfig[21].parameters.categories[0].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[21].parameters.categories[0].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[21].parameters.categories[1].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[21].parameters.categories[1].vertexMass.max = 0.8
+process.bTagAnalysisHarvest.tagConfig[21].parameters.categories[2].vertexMass.min = 0.3
+process.bTagAnalysisHarvest.tagConfig[21].parameters.categories[2].vertexMass.max = 0.8
+for i in range(3 , 17):
+  for j in range(i + 1, 17):
     process.bTagAnalysisHarvest.tagConfig.append(
       cms.PSet(
         type = cms.string("TagCorrelation"),
@@ -231,8 +239,8 @@ for i in range(3 , 16):
         )
       )
     )
-for i in range(21 , 34):
-  for j in range(i + 1, 34):
+for i in range(22 , 36):
+  for j in range(i + 1, 36):
     process.bTagAnalysisHarvest.tagConfig.append(
       cms.PSet(
         type = cms.string("TagCorrelation"),
