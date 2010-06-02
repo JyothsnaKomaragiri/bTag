@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.14 2010/05/30 15:32:12 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.15 2010/05/30 15:36:36 alschmid Exp $
 //
 //
 
@@ -37,7 +37,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "DataFormats/Common/interface/TriggerResults.h"
-#include "FWCore/Framework/interface/TriggerNames.h"
+//#include "FWCore/Framework/interface/TriggerNames.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 
 #include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
 #include "DataFormats/BTauReco/interface/SecondaryVertexTagInfo.h"
@@ -392,9 +393,10 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<edm::TriggerResults>  hltresults;
   iEvent.getByLabel(triggerTag_, hltresults);
   
-  edm::TriggerNames triggerNames_;
-  triggerNames_.init(* hltresults);
-  
+  //  edm::TriggerNames triggerNames_;
+  //  triggerNames_.init(* hltresults);
+  const edm::TriggerNames & triggerNames_ = iEvent.triggerNames(*hltresults);  
+
   int ntrigs = hltresults->size();
 
   bool bFoundTrig=0;
