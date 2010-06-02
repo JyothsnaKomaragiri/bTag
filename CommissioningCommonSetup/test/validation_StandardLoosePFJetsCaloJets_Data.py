@@ -29,10 +29,14 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
 process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+
 #For use with prompt reco
 #process.GlobalTag.globaltag = 'GR10_P_V5::All'
 #For use with April 20th rereco
-process.GlobalTag.globaltag = 'GR_R_35X_V7A::All'
+#process.GlobalTag.globaltag = 'GR_R_35X_V7A::All'
+
+#Global tag for 36X
+process.GlobalTag.globaltag = 'GR_R_36X_V11A::All'
 
 process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
@@ -61,15 +65,20 @@ process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
    filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
 )
 
+# JEC for both ak5PF and Calo jets
+process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+
 #Filter for PFJets
 process.PFJetsFilter = cms.EDFilter("PFJetSelector",
-  src = cms.InputTag("ak5PFJets"),
+  src = cms.InputTag("ak5PFJetsL2L3"),
   cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 1.0 && neutralEmEnergyFraction < 1.0 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 1.0"),
   filter = cms.bool(True)
 )
 
 #Filter for CaloJets
 process.load("bTag.CommissioningCommonSetup.caloJetIDFilter_cff")
+#process.caloJetIDFilter.CaloJetsTag = cms.InputTag("ak5CaloJetsL2L3")
+
 
 #Filter for removing scraping events
 process.noscraping = cms.EDFilter("FilterOutScraping",
@@ -651,12 +660,13 @@ process.bTagNtuples = cms.Sequence(
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(1)
 )
+
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-       '/store/data/Commissioning10/MinimumBias/RAW-RECO/Apr20Skim_GOODCOLL-v1/0179/2C198163-1F4E-DF11-9A9A-00248C0BE013.root'
-    )
+  'file:/storage/5/jyothsna/MinimumBias_Commissioning10-SD_JetMETTauMonitor-v9_RECO/D03394B5-6962-DF11-B0D3-0025B3E05C7E.root'
+  )
 )
 
 process.EDM = cms.OutputModule("PoolOutputModule",
@@ -727,10 +737,10 @@ process.svTaggers = cms.Sequence(
 process.slTagInfos = cms.Sequence(
     process.standardSoftMuonCaloTagInfos +
     process.standardSoftMuonPFTagInfos +
-    process.softElectronsCands * (
+#    process.softElectronsCands * (
     process.standardSoftElectronCaloTagInfos +
     process.standardSoftElectronPFTagInfos 
-    )
+#    )
 )
 
 process.slTaggers = cms.Sequence(
@@ -758,8 +768,10 @@ process.plots = cms.Path(
   process.singleJetHLTFilter +
   process.noscraping +
   process.oneGoodVertexFilter +
+  cms.ignore(process.ak5PFJetsL2L3) *
   cms.ignore(process.PFJetsFilter) *
   process.ak5JetID *
+  cms.ignore(process.ak5CaloJetsL2L3) *
   cms.ignore(process.caloJetIDFilter) *
   process.trackAssociation *
   process.ipTagInfos *
