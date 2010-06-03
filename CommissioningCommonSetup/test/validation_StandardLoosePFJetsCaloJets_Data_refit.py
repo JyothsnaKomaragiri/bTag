@@ -127,16 +127,20 @@ process.offlinePrimaryVertices.TrackLabel = 'generalTracks'
 ##end of refitting inlcude
 ############################################################################################################
 
+# JEC for both ak5PF and Calo jets
+process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
 #Filter for PFJets
 process.PFJetsFilter = cms.EDFilter("PFJetSelector",
-  src = cms.InputTag("ak5PFJets"),
+  src = cms.InputTag("ak5PFJetsL2L3"),
   cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 1.0 && neutralEmEnergyFraction < 1.0 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 1.0"),
   filter = cms.bool(True)
 )
 
 #Filter for CaloJets
 process.load("bTag.CommissioningCommonSetup.caloJetIDFilter_cff")
+process.ak5JetID.src = "ak5CaloJetsL2L3"
+process.caloJetIDFilter.CaloJetsTag = "ak5CaloJetsL2L3"
 
 #Filter for removing scraping events
 process.noscraping = cms.EDFilter("FilterOutScraping",
@@ -978,7 +982,9 @@ process.plots = cms.Path(
   process.offlinePrimaryVertices*
   ##################################################   
   process.oneGoodVertexFilter +
+  process.ak5PFJetsL2L3 *
   cms.ignore(process.PFJetsFilter) *
+  process.ak5CaloJetsL2L3 *
   process.ak5JetID *
   cms.ignore(process.caloJetIDFilter) *
   process.trackAssociation *

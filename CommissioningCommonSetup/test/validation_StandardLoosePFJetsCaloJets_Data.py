@@ -77,7 +77,8 @@ process.PFJetsFilter = cms.EDFilter("PFJetSelector",
 
 #Filter for CaloJets
 process.load("bTag.CommissioningCommonSetup.caloJetIDFilter_cff")
-#process.caloJetIDFilter.CaloJetsTag = cms.InputTag("ak5CaloJetsL2L3")
+process.ak5JetID.src = "ak5CaloJetsL2L3"
+process.caloJetIDFilter.CaloJetsTag = "ak5CaloJetsL2L3"
 
 
 #Filter for removing scraping events
@@ -660,12 +661,17 @@ process.bTagNtuples = cms.Sequence(
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1)
+    input = cms.untracked.int32(1000)
 )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-  'file:/storage/5/jyothsna/MinimumBias_Commissioning10-SD_JetMETTauMonitor-v9_RECO/D03394B5-6962-DF11-B0D3-0025B3E05C7E.root'
+   '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FEA3BECA-7569-DF11-86FA-002354EF3BD2.root',
+        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE6FE723-7369-DF11-AF74-0026189438ED.root',
+        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE4EF777-7669-DF11-8546-0018F3D09636.root',
+        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE243325-7669-DF11-8CA4-0018F3D09636.root',
+        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE18F74E-7669-DF11-943A-0026189438A5.root',
+        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FCC4F3A4-7469-DF11-9882-002618943977.root' 
   )
 )
 
@@ -737,10 +743,10 @@ process.svTaggers = cms.Sequence(
 process.slTagInfos = cms.Sequence(
     process.standardSoftMuonCaloTagInfos +
     process.standardSoftMuonPFTagInfos +
-#    process.softElectronsCands * (
+    process.softElectronCands * (
     process.standardSoftElectronCaloTagInfos +
     process.standardSoftElectronPFTagInfos 
-#    )
+    )
 )
 
 process.slTaggers = cms.Sequence(
@@ -768,10 +774,10 @@ process.plots = cms.Path(
   process.singleJetHLTFilter +
   process.noscraping +
   process.oneGoodVertexFilter +
-  cms.ignore(process.ak5PFJetsL2L3) *
+  process.ak5PFJetsL2L3 *
   cms.ignore(process.PFJetsFilter) *
+  process.ak5CaloJetsL2L3 *
   process.ak5JetID *
-  cms.ignore(process.ak5CaloJetsL2L3) *
   cms.ignore(process.caloJetIDFilter) *
   process.trackAssociation *
   process.ipTagInfos *
