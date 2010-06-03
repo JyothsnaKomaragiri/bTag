@@ -125,8 +125,6 @@ process.PFJetsFilter = cms.EDFilter("PFJetSelector",
 
 #Filter for CaloJets
 process.load("bTag.CommissioningCommonSetup.caloJetIDFilter_cff")
-process.ak5JetID.src = "ak5CaloJetsL2L3"
-process.caloJetIDFilter.CaloJetsTag = "ak5CaloJetsL2L3"
 
 #Filter for removing scraping events
 process.noscraping = cms.EDFilter("FilterOutScraping",
@@ -853,9 +851,9 @@ process.plots = cms.Path(
   process.oneGoodVertexFilter +
   process.ak5PFJetsL2L3 *
   cms.ignore(process.PFJetsFilter) *
-  process.ak5CaloJetsL2L3 *
   process.ak5JetID *
   cms.ignore(process.caloJetIDFilter) *
+  process.ak5CaloJetsL2L3 *
   process.trackAssociation *
   process.ipTagInfos *
   process.svTagInfos *
