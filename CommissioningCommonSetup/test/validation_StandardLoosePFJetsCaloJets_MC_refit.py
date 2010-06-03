@@ -114,6 +114,7 @@ process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
 
 # JEC for both ak5PF and Calo jets
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+process.ak5CaloJetsL2L3.src = "caloJetIDFilter"
 
 #Filter for PFJets
 process.PFJetsFilter = cms.EDFilter("PFJetSelector",
@@ -147,7 +148,7 @@ process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 
 process.ak5CaloJetTracksAssociatorAtVertex = cms.EDProducer("JetTracksAssociatorAtVertex",
    process.j2tParametersVX,
-   jets = cms.InputTag("caloJetIDFilter")
+   jets = cms.InputTag("ak5CaloJetsL2L3")
 )
 
 process.ak5PFJetTracksAssociatorAtVertex = process.ak5CaloJetTracksAssociatorAtVertex.clone(
@@ -279,7 +280,7 @@ process.standardCombinedSecondaryVertexMVAPFBJetTags = process.combinedSecondary
 )
 
 process.standardSoftMuonCaloTagInfos = process.softMuonTagInfos.clone(
-  jets = "caloJetIDFilter"
+  jets = "ak5CaloJetsL2L3"
 )
 
 process.standardSoftMuonPFTagInfos = process.standardSoftMuonCaloTagInfos.clone(
@@ -287,7 +288,7 @@ process.standardSoftMuonPFTagInfos = process.standardSoftMuonCaloTagInfos.clone(
 )
 
 process.standardSoftElectronCaloTagInfos = process.softElectronTagInfos.clone(
-  jets = "caloJetIDFilter"
+  jets = "ak5CaloJetsL2L3"
 )
 
 process.standardSoftElectronPFTagInfos = process.standardSoftElectronCaloTagInfos.clone(
@@ -335,7 +336,7 @@ process.standardSoftElectronByIP3dPFBJetTags = process.softElectronByIP3dBJetTag
 )
 
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
-process.AK5byRef.jets = "caloJetIDFilter"
+process.AK5byRef.jets = "ak5CaloJetsL2L3"
 process.AK5PFbyRef = process.AK5byRef.clone(
   jets = "PFJetsFilter"
 )
@@ -591,7 +592,7 @@ for i in range(3 , 17):
 process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 
 process.standardCaloBTagNtuple = process.bTagNtuple.clone()
-process.standardCaloBTagNtuple.jetSrc = cms.InputTag( "caloJetIDFilter" )
+process.standardCaloBTagNtuple.jetSrc = cms.InputTag( "ak5CaloJetsL2L3" )
 process.standardCaloBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexCalo" )
 process.standardCaloBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI")
 process.standardCaloBTagNtuple.jetMCSrc = cms.InputTag( "AK5byValAlgo" )
