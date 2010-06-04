@@ -29,10 +29,9 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
 process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-#For use with prompt reco
-#process.GlobalTag.globaltag = 'GR10_P_V5::All'
-#For use with April 20th rereco
-process.GlobalTag.globaltag = 'GR_R_35X_V7A::All'
+
+#Global tag for 3_6_1
+process.GlobalTag.globaltag = 'GR_R_36X_V10A:All'
 
 process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed

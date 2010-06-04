@@ -29,10 +29,9 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-#For QCD MC Samples
-process.GlobalTag.globaltag = 'START3X_V26A::All'
-#For MinBias MC Samples
-#process.GlobalTag.globaltag = 'START3X_V26A::All'
+
+#Global tag for 3_6_1
+process.GlobalTag.globaltag = 'START36_V9A::All'
 
 process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
