@@ -31,7 +31,7 @@ process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #Global tag for 3_6_1
-process.GlobalTag.globaltag = 'GR_R_36X_V10A:All'
+process.GlobalTag.globaltag = 'GR_R_36X_V10A::All'
 
 process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
@@ -52,6 +52,12 @@ process.singleJetHLTFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.
 process.singleJetHLTFilter.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
 process.singleJetHLTFilter.HLTPaths = ["HLT_L1Jet6U", "HLT_L1Jet10U", "HLT_Jet15U"]
 process.singleJetHLTFilter.andOr = cms.bool(True) # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
+
+import HLTrigger.HLTfilters.hltHighLevel_cfi
+process.HLT_Jet15U = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
+process.HLT_Jet15U.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
+process.HLT_Jet15U.HLTPaths = ["HLT_Jet15U"]
+process.HLT_Jet15U.andOr = cms.bool(True) # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
 
 #Require a good vertex
 process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
@@ -171,9 +177,15 @@ process.standardSecondaryVertexCaloTagInfos = process.secondaryVertexTagInfos.cl
   trackIPTagInfos = "standardImpactParameterCaloTagInfos"
 )
 
+process.standardSecondaryVertex3TrkCaloTagInfos = process.standardSecondaryVertexCaloTagInfos.clone()
+process.standardSecondaryVertex3TrkCaloTagInfos.vertexCuts.multiplicityMin = 3
+
 process.standardSecondaryVertexPFTagInfos = process.standardSecondaryVertexCaloTagInfos.clone(
   trackIPTagInfos = "standardImpactParameterPFTagInfos"
 )
+
+process.standardSecondaryVertex3TrkPFTagInfos = process.standardSecondaryVertexPFTagInfos.clone()
+process.standardSecondaryVertex3TrkPFTagInfos.vertexCuts.multiplicityMin = 3
 
 process.standardGhostTrackVertexCaloTagInfos = process.standardSecondaryVertexCaloTagInfos.clone()
 process.standardGhostTrackVertexCaloTagInfos.vertexReco = process.ghostTrackVertexRecoBlock.vertexReco
@@ -185,7 +197,11 @@ process.standardGhostTrackVertexPFTagInfos.vertexCuts.multiplicityMin = 1
 
 process.standardCombinedSecondaryVertexCalo = process.combinedSecondaryVertex.clone()
 
+process.standardCombinedSecondaryVertex3TrkCalo = process.combinedSecondaryVertex.clone()
+
 process.standardCombinedSecondaryVertexPF = process.standardCombinedSecondaryVertexCalo.clone()
+
+process.standardCombinedSecondaryVertex3TrkPF = process.standardCombinedSecondaryVertexCalo.clone()
 
 process.standardSecondaryVertexV0CaloTagInfos = process.standardSecondaryVertexCaloTagInfos.clone()
 process.standardSecondaryVertexV0CaloTagInfos.vertexCuts.v0Filter = cms.PSet(k0sMassWindow = cms.double(-1.0))
@@ -369,6 +385,13 @@ process.caloBTagAnalysis.tagConfig = cms.VPSet(
             label = cms.InputTag("standardCombinedSecondaryVertexV0Calo")
         ), 
         cms.PSet(
+            bTagCombinedSVAnalysisBlock,
+            ipTagInfos = cms.InputTag("standardImpactParameterCaloTagInfos"),
+            type = cms.string('GenericMVA'),
+            svTagInfos = cms.InputTag("standardSecondaryVertex3TrkCaloTagInfos"),
+            label = cms.InputTag("standardCombinedSecondaryVertex3TrkCalo")
+        ), 
+        cms.PSet(
             bTagTrackCountingAnalysisBlock,
             label = cms.InputTag("standardTrackCountingHighEffCaloBJetTags")
         ), 
@@ -441,7 +464,7 @@ process.caloBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.min = 
 process.caloBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.max = 0.8
 process.caloBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
 process.caloBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
-for i in range(3 , 17):
+for i in range(4, 17):
   for j in range(i + 1, 17):
     process.caloBTagAnalysis.tagConfig.append(
       cms.PSet(
@@ -478,6 +501,13 @@ process.pfBTagAnalysis.tagConfig = cms.VPSet(
             type = cms.string('GenericMVA'),
             svTagInfos = cms.InputTag("standardSecondaryVertexV0PFTagInfos"),
             label = cms.InputTag("standardCombinedSecondaryVertexV0PF")
+        ), 
+        cms.PSet(
+            bTagCombinedSVAnalysisBlock,
+            ipTagInfos = cms.InputTag("standardImpactParameterPFTagInfos"),
+            type = cms.string('GenericMVA'),
+            svTagInfos = cms.InputTag("standardSecondaryVertex3TrkPFTagInfos"),
+            label = cms.InputTag("standardCombinedSecondaryVertex3TrkPF")
         ), 
         cms.PSet(
             bTagTrackCountingAnalysisBlock,
@@ -552,7 +582,7 @@ process.pfBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.min = 0.
 process.pfBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.max = 0.8
 process.pfBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
 process.pfBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
-for i in range(3 , 17):
+for i in range(4, 17):
   for j in range(i + 1, 17):
     process.pfBTagAnalysis.tagConfig.append(
       cms.PSet(
@@ -890,9 +920,9 @@ process.EDM = cms.OutputModule("PoolOutputModule",
                        "keep *_*BTagNtuple_*_*"
     ),
     fileName = cms.untracked.string('BTagCommissioning2010_April20_7TeV_Data_PromptReco_v8.root'),
-    SelectEvents = cms.untracked.PSet(
-       SelectEvents = cms.vstring("plots")
-    )
+#    SelectEvents = cms.untracked.PSet(
+#       SelectEvents = cms.vstring("plots")
+#    )
 )
 
 process.load("DQMServices.Components.MEtoEDMConverter_cfi")
@@ -912,6 +942,8 @@ process.svTagInfos = cms.Sequence(
     process.standardSecondaryVertexPFTagInfos +
     process.standardSecondaryVertexV0CaloTagInfos +
     process.standardSecondaryVertexV0PFTagInfos + 
+    process.standardSecondaryVertex3TrkCaloTagInfos +
+    process.standardSecondaryVertex3TrkPFTagInfos +
     process.standardGhostTrackVertexCaloTagInfos +
     process.standardGhostTrackVertexPFTagInfos 
 )
@@ -993,6 +1025,7 @@ process.plots = cms.Path(
   process.slTagInfos *
   process.slTaggers *
   process.bTagNtuples *
+  process.HLT_Jet15U *
   process.bTagValidation * 
   process.MEtoEDMConverter
 )
