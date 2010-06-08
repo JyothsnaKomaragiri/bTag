@@ -77,7 +77,7 @@ void setTDRStyle() {
 
   // use bold lines and markers
   tdrStyle->SetMarkerStyle(8);
-  tdrStyle->SetHistLineWidth(2);
+  tdrStyle->SetHistLineWidth(3);
   tdrStyle->SetLineWidth(1);
   
   tdrStyle->SetOptTitle(kFALSE);
@@ -98,6 +98,7 @@ struct information1d{
   double xup;
   int nbinsx;
   bool displayNoInfo;
+  bool legendPosition;
 };
 
 struct informationCutComp{
@@ -113,6 +114,7 @@ struct informationCutComp{
   double xup;
   int nbinsx;
   bool displayNoInfo;
+  bool legendPosition;
 };
 
 struct informationQuality{
@@ -161,6 +163,7 @@ struct information2d{
   double yup;
   int nbinsy;
   bool displayNoInfo;
+  bool legendPosition;
 };
 
 struct informationCut{
@@ -180,6 +183,7 @@ struct informationCut{
   double yup;
   int nbinsy;
   bool displayNoInfo;
+  bool legendPosition;
 };
 
 struct flavorHists1D{
@@ -243,8 +247,9 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
   bool xup = false;
   bool nbinsx = false;
   bool bDisplayNoInfo = false;
+  bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && bDisplayNoInfo)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -292,6 +297,11 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
       bDisplayNoInfo = true;
       thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
     }
+    if(line.find("legendPosition")<position){
+      blegendPosition = true;
+      thisPlot.legendPosition = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
+
   }
   return thisPlot;
 }
@@ -311,8 +321,9 @@ informationCutComp paramCutComp(ifstream* plotFile, informationCutComp defaultPa
   bool xup = false;
   bool nbinsx = false;
   bool bDisplayNoInfo = false;
+  bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && cutList && labelList && xlow && xup && nbinsx && bDisplayNoInfo)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && cutList && labelList && xlow && xup && nbinsx && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -389,6 +400,10 @@ informationCutComp paramCutComp(ifstream* plotFile, informationCutComp defaultPa
     if(line.find("displayNoInfo")<position){
       bDisplayNoInfo = true;
       thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
+    if(line.find("legendPosition")<position){
+      blegendPosition = true;
+      thisPlot.legendPosition = (bool)(atoi((line.substr(position+1)).c_str()));
     }
   }
   return thisPlot;
@@ -575,8 +590,9 @@ information2d param2d(ifstream* plotFile, information2d defaultParams)
   bool yup = false;
   bool nbinsy = false;
   bool bDisplayNoInfo = false;
+  bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && xlow && xup && nbinsx && ylow && yup && nbinsy && bDisplayNoInfo)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && xlow && xup && nbinsx && ylow && yup && nbinsy && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -644,6 +660,10 @@ information2d param2d(ifstream* plotFile, information2d defaultParams)
       bDisplayNoInfo = true;
       thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
     }
+    if(line.find("legendPosition")<position){
+      blegendPosition = true;
+      thisPlot.legendPosition = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
   }
   return thisPlot;
 }
@@ -667,8 +687,9 @@ informationCut paramCut(ifstream* plotFile, informationCut defaultParams)
   bool yup = false;
   bool nbinsy = false;
   bool bDisplayNoInfo = false;
+  bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && direction && xlow && xup && nbinsx && ylow && yup && nbinsy && bDisplayNoInfo)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && direction && xlow && xup && nbinsx && ylow && yup && nbinsy && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -739,6 +760,10 @@ informationCut paramCut(ifstream* plotFile, informationCut defaultParams)
     if(line.find("displayNoInfo")<position){
       bDisplayNoInfo = true;
       thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
+    if(line.find("legendPosition")<position){
+      blegendPosition = true;
+      thisPlot.legendPosition = (bool)(atoi((line.substr(position+1)).c_str()));
     }
   }
   return thisPlot;
@@ -1032,14 +1057,14 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bUp.Add(hists.mc_light_hist);
   mc_stack_bUp.Add(hists.mc_c_hist);
   mc_stack_bUp.Add(hists.mc_b_hist);
-  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()));
+  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
 
   THStack mc_stack_bDown((info.plotName+"_mc_stack_bDown").c_str(),info.plotTitle.c_str());
   mc_stack_bDown.Add(hists.mc_b_hist);
   mc_stack_bDown.Add(hists.mc_c_hist);
   mc_stack_bDown.Add(hists.mc_light_hist);
   if(info.displayNoInfo == true) mc_stack_bDown.Add(hists.mc_none_hist);
-  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()));
+  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
   
   //Make Canvas
 
@@ -1051,18 +1076,22 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   ratio->Divide(hists.mc_all_hist);
   ratio->SetMarkerStyle(20);
 
-  TLegend legend(0.725,0.6, 0.925, 0.85);
-  legend.AddEntry(drawHelper,"Data","LPE");
+  TLegend *legend;
+  if(info.legendPosition == true)
+    legend = new TLegend(0.725,0.6, 0.925, 0.85);  
+  else
+    legend = new TLegend(0.225,0.6, 0.425, 0.85);//By default legend is on the left side of the canvas
+  legend->AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
-  legend.AddEntry(hists.mc_light_hist,"MC (light)","F");
-  legend.AddEntry(hists.mc_c_hist,"MC (charm)","F");
-  legend.AddEntry(hists.mc_b_hist,"MC (bottom)","F");
-  if(info.displayNoInfo == true) legend.AddEntry(hists.mc_none_hist,"MC (no info)","F");
+  legend->AddEntry(hists.mc_light_hist,"MC (light)","F");
+  legend->AddEntry(hists.mc_c_hist,"MC (charm)","F");
+  legend->AddEntry(hists.mc_b_hist,"MC (bottom)","F");
+  if(info.displayNoInfo == true) legend->AddEntry(hists.mc_none_hist,"MC (no info)","F");
 
-  legend.SetBorderSize(0);
-  legend.SetFillColor(kWhite);
-  legend.SetMargin(0.12);
-  legend.SetTextSize(0.035);
+  legend->SetBorderSize(0);
+  legend->SetFillColor(kWhite);
+  legend->SetMargin(0.12);
+  legend->SetTextSize(0.035);
 
   //legend.SetFillStyle(1);
 
@@ -1071,7 +1100,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bUp.Draw("HIST");
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
-  legend.Draw();
+  legend->Draw();
 
   //include the official CMS label
   TPaveText *pt = new TPaveText(0.4,0.92,0.9,0.97,"brNDC");   
@@ -1095,7 +1124,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.data_hist->SetMarkerStyle(1);
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
-  legend.Draw();
+  legend->Draw();
   pt->Draw();
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log.pdf").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log.png").c_str());
@@ -1108,7 +1137,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.data_hist->SetMarkerStyle(1);
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
-  legend.Draw();
+  legend->Draw();
 
   //include the official CMS label
   pt->Draw();
@@ -1123,7 +1152,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bDown.Draw("HIST");
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
-  legend.Draw();
+  legend->Draw();
   pt->Draw();
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.pdf").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log.png").c_str());
@@ -1193,8 +1222,8 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
 	    mc_stack_highDown.Add(*irPlot);
 	  }
 
-  mc_stack_highUp.SetMaximum(max(mc_stack_highUp.GetMaximum(),hists.data_hist->GetMaximum()));
-  mc_stack_highDown.SetMaximum(max(mc_stack_highDown.GetMaximum(),hists.data_hist->GetMaximum()));
+  mc_stack_highUp.SetMaximum(max(mc_stack_highUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  mc_stack_highDown.SetMaximum(max(mc_stack_highDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
 
   legend.SetBorderSize(1);
   legend.SetFillColor(kWhite);
@@ -1268,14 +1297,19 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
 
   THStack mc_stack((info.plotName+"mc_stack").c_str(),info.plotTitle.c_str());
   hists.mc_none_hist->SetLineColor(kMagenta);
+  hists.mc_none_hist->SetLineWidth(3);
   hists.mc_none_hist->SetFillStyle(0);
   hists.mc_light_hist->SetLineColor(kBlue);
+  hists.mc_light_hist->SetLineWidth(3);
   hists.mc_light_hist->SetFillStyle(0);
   hists.mc_c_hist->SetLineColor(kGreen);
+  hists.mc_c_hist->SetLineWidth(3);
   hists.mc_c_hist->SetFillStyle(0);
   hists.mc_b_hist->SetLineColor(kRed);
+  hists.mc_b_hist->SetLineWidth(3);
   hists.mc_b_hist->SetFillStyle(0);
   hists.mc_all_hist->SetLineColor(kBlack);
+  hists.mc_all_hist->SetLineWidth(3);
   hists.mc_all_hist->SetFillStyle(0);
   if(info.displayNoInfo == true) mc_stack.Add(hists.mc_none_hist);
   mc_stack.Add(hists.mc_light_hist);
@@ -1291,25 +1325,29 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
-  TLegend legend(0.725,0.6, 0.925, 0.85);
-  legend.AddEntry(drawHelper,"Data","LPE");
+  TLegend *legend;
+  if(info.legendPosition == true)
+    legend = new TLegend(0.725,0.15, 0.925, 0.4);
+  else
+    legend = new TLegend(0.225,0.6, 0.425, 0.85); //By default legend is on the left side of the canvas
+  legend->AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
-  legend.AddEntry(hists.mc_all_hist,"MC Total","L");
-  legend.AddEntry(hists.mc_light_hist,"MC (light)","L");
-  legend.AddEntry(hists.mc_c_hist,"MC (charm)","L");
-  legend.AddEntry(hists.mc_b_hist,"MC (bottom)","L");
-  if(info.displayNoInfo == true) legend.AddEntry(hists.mc_none_hist,"MC (no info)","L");
+  legend->AddEntry(hists.mc_all_hist,"MC Total","L");
+  legend->AddEntry(hists.mc_light_hist,"MC (light)","L");
+  legend->AddEntry(hists.mc_c_hist,"MC (charm)","L");
+  legend->AddEntry(hists.mc_b_hist,"MC (bottom)","L");
+  if(info.displayNoInfo == true) legend->AddEntry(hists.mc_none_hist,"MC (no info)","L");
 
-  legend.SetBorderSize(0);
-  legend.SetFillColor(kWhite);
-  legend.SetMargin(0.12);
-  legend.SetTextSize(0.035);
+  legend->SetBorderSize(0);
+  legend->SetFillColor(kWhite);
+  legend->SetMargin(0.12);
+  legend->SetTextSize(0.035);
   TCanvas canvas((info.plotName+"canvas").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas.cd();
   mc_stack.Draw("HISTNOSTACK");
   drawHelper->Draw("PSAME");
   hists.data_hist->Draw("E1X0SAME");
-  legend.Draw();
+  legend->Draw();
 
   //include the official CMS label
   TPaveText *pt = new TPaveText(0.4,0.92,0.9,0.97,"brNDC");   
@@ -1583,10 +1621,10 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   data_stack_hpDown.Add(hists.data_hist_loose);
   data_stack_hpDown.Add(hists.data_hist_undef);
 
-  data_stack_hpUp.SetMaximum(max(data_stack_hpUp.GetMaximum(),mc_stack_hpUp.GetMaximum()));
-  data_stack_hpDown.SetMaximum(max(data_stack_hpDown.GetMaximum(),mc_stack_hpDown.GetMaximum()));
-  mc_stack_hpDown.SetMaximum(max(data_stack_hpDown.GetMaximum(),mc_stack_hpDown.GetMaximum()));
-  mc_stack_hpUp.SetMaximum(max(data_stack_hpUp.GetMaximum(),mc_stack_hpUp.GetMaximum()));
+  data_stack_hpUp.SetMaximum(max(data_stack_hpUp.GetMaximum(),mc_stack_hpUp.GetMaximum()) * 1.2);
+  data_stack_hpDown.SetMaximum(max(data_stack_hpDown.GetMaximum(),mc_stack_hpDown.GetMaximum()) * 1.2);
+  mc_stack_hpDown.SetMaximum(max(data_stack_hpDown.GetMaximum(),mc_stack_hpDown.GetMaximum()) * 1.2);
+  mc_stack_hpUp.SetMaximum(max(data_stack_hpUp.GetMaximum(),mc_stack_hpUp.GetMaximum()) * 1.2);
   
 
   //Make Canvas
@@ -1673,14 +1711,14 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   data_stack2_hpUp.Add(hists.data_hist_loose);
   data_stack2_hpUp.Add(hists.data_hist_tight);
   data_stack2_hpUp.Add(hists.data_hist_high_purity);
-  data_stack2_hpUp.SetMaximum(max(data_stack2_hpUp.GetMaximum(),mc_stack_hpUp.GetMaximum()));
+  data_stack2_hpUp.SetMaximum(max(data_stack2_hpUp.GetMaximum(),mc_stack_hpUp.GetMaximum()) * 1.2);
 
   THStack data_stack2_hpDown((info.plotName+"_data_stack2_hpDown").c_str(),info.plotTitle.c_str());
   data_stack2_hpDown.Add(hists.data_hist_high_purity);
   data_stack2_hpDown.Add(hists.data_hist_tight);
   data_stack2_hpDown.Add(hists.data_hist_loose);
   data_stack2_hpDown.Add(hists.data_hist_undef);
-  data_stack2_hpDown.SetMaximum(max(data_stack2_hpDown.GetMaximum(),mc_stack_hpDown.GetMaximum()));
+  data_stack2_hpDown.SetMaximum(max(data_stack2_hpDown.GetMaximum(),mc_stack_hpDown.GetMaximum()) * 1.2);
 
   TLegend legend2(0.7,0.7,0.95,0.95);
   legend2.AddEntry(hists.mc_hist_high_purity,"High Purity Tracks","F");
@@ -2063,7 +2101,7 @@ void MakeAHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector,
 void MakeACutCompHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, informationCutComp info, cutCompHists hists)
 {
   stringstream binaryBinningStream;
-  for(int i = 0; i<info.cutList.size(); i++)
+  for(unsigned int i = 0; i<info.cutList.size(); i++)
     {
       int binaryBinner = pow(2,i);
       binaryBinningStream << binaryBinner << "*("<< info.cutList[i] <<")";
