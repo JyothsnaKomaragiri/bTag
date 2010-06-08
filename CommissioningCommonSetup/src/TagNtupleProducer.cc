@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.15 2010/05/30 15:36:36 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.16 2010/06/02 15:13:54 alschmid Exp $
 //
 //
 
@@ -236,6 +236,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
       produces<vector<float> >( alias = label_ + "SVChi2"                                   ).setBranchAlias( alias );   
       produces<vector<float> >( alias = label_ + "SVDegreesOfFreedom"                       ).setBranchAlias( alias );   
       produces<vector<float> >( alias = label_ + "SVNormChi2"                               ).setBranchAlias( alias );   
+     produces<vector<float> >( alias = label_ + "SVIPFirstAboveCharm"                               ).setBranchAlias( alias );   
       produces<vector<int> >( alias = label_ + "SVnSelectedTracks"                                  ).setBranchAlias( alias );   
       produces<vector<float> >( alias = label_ + "SVMass"                                   ).setBranchAlias( alias );   
       produces<vector<float> >( alias = label_ + "SVEnergyRatio"                                   ).setBranchAlias( alias );   
@@ -595,7 +596,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<float> SV3dDistanceError;                     
   vector<float> SV2dDistance;                          
   vector<float> SV2dDistanceError;                     
-  vector<float> SVChi2;                                
+  vector<float> SVChi2;                
+ vector<float> SVIPFirstAboveCharm;                                
   vector<float> SVDegreesOfFreedom;                    
   vector<float> SVNormChi2;                            
   vector<int> SVnSelectedTracks;                               
@@ -757,6 +759,11 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
 
       //End Stealing
+      
+      //some counters
+      size_t nSelectedTracks=0;
+      size_t nSelectedAndDecayLengthAndJetAsixTracks=0;
+
       size_t counter=0;
       for(track_iterator iTrack = (*jetTracks)[thisJetRef].begin(); iTrack != (*jetTracks)[thisJetRef].end(); iTrack++)
 	{ 
@@ -772,6 +779,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  }
 		}
 	    }
+	  if(isSelected) nSelectedTracks++;
+
 	  trackSelected.push_back(isSelected);
 	  track3Momentum.push_back(math::XYZVector((*iTrack)->px(),(*iTrack)->py(),(*iTrack)->pz()));
 	  trackTransverseMomentum.push_back((*iTrack)->pt());
@@ -797,17 +806,21 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   	  trackIP2d.push_back(ip2d.value());
   	  trackIP3dError.push_back(ip3d.error());
   	  trackIP2dError.push_back(ip2d.error());
+	  double decayLength=-1;
 	  TrajectoryStateOnSurface closest =
 	    IPTools::closestApproachToJet(transientTrack.impactPointState(),
 					  *pv, direction,
 					  transientTrack.field());
 	  if (closest.isValid()){
-	    trackDecayLength.push_back( (closest.globalPosition()-   RecoVertex::convertPos(pv->position())).mag() );
+	    decayLength =  (closest.globalPosition()-   RecoVertex::convertPos(pv->position())).mag() ;
 	  }
 	  else{
-	    trackDecayLength.push_back(-1);
+	    decayLength = -1;
 	  }
-	  trackDistJetAxis.push_back( IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value() );
+	  trackDecayLength.push_back(decayLength);
+
+	  double distJetAxis =  IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value();
+	  trackDistJetAxis.push_back( distJetAxis );
 	  trackDeltaR.push_back( ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),(*iTrack)->momentum()) );
 	  int tsharedP1, tsharedP2, tsharedP3;
 	  trackHasSharedPix1.push_back( tsharedP1 = hasSharedHit(1, counter, (*jetTracks)[thisJetRef]));
@@ -815,6 +828,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  trackHasSharedPix3.push_back( tsharedP3 = hasSharedHit(3, counter, (*jetTracks)[thisJetRef]));
 	  trackHasSharedPixAll.push_back( tsharedP1 || tsharedP2 || tsharedP3 );
 	  
+	  if(isSelected && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixTracks++;   //cut is hardcoded for now
+
 	  counter++;
 	}       
 
@@ -857,8 +872,13 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      else  SVMass.push_back( -9999 );
 	      if(vars.checkTag(reco::btau::vertexEnergyRatio)) SVEnergyRatio.push_back( vars.get(reco::btau::vertexEnergyRatio) );
 	      else SVEnergyRatio.push_back( -9999 );
-	      if(vars.checkTag(reco::btau::vertexJetDeltaR)) SVjetDeltaR.push_back(deltaR(thisJetRef->eta(), thisJetRef->phi(), addTracksVertex.eta(), addTracksVertex.phi()) );
+	      //     if(vars.checkTag(reco::btau::vertexJetDeltaR)) SVjetDeltaR.push_back(  deltaR(thisJetRef->eta(), thisJetRef->phi(), addTracksVertex.eta(), addTracksVertex.phi()) );
+	      if(vars.checkTag(reco::btau::vertexJetDeltaR)) SVjetDeltaR.push_back(  vars.get( reco::btau::vertexJetDeltaR) );
 	      else SVjetDeltaR.push_back( -9999 );
+
+	      if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) SVIPFirstAboveCharm.push_back(  vars.get( reco::btau::trackSip3dSigAboveCharm ));
+	      else SVIPFirstAboveCharm.push_back(  -9999 );
+
 	      double cosAngle = addTracksVertex.Dot(jetVector)/sqrt(addTracksVertex.mag2()*jetVector.mag2());
 	      SVjetAngle.push_back(cosAngle);
 	      SVjetCosAngle.push_back(acos(cosAngle));
@@ -894,7 +914,9 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  const GlobalVector jetAxis = ipTagInfo[thisJetRef]->axis();
 	  const math::XYZVector axis( jetAxis.x(), jetAxis.y(), jetAxis.z());
 	  const math::XYZVector ghostTrack(ipTagInfo[thisJetRef]->ghostTrack()->px(),ipTagInfo[thisJetRef]->ghostTrack()->py(),ipTagInfo[thisJetRef]->ghostTrack()->pz());
-	  IPnSelectedTracks.push_back(ipTagInfo[thisJetRef]->selectedTracks().size());                       
+
+	  //	  IPnSelectedTracks.push_back(ipTagInfo[thisJetRef]->selectedTracks().size());                       
+	  IPnSelectedTracks.push_back( nSelectedAndDecayLengthAndJetAsixTracks );                       
 	  IPghostTrackP3.push_back(ghostTrack);
 	  IPghostTrackPt.push_back(ipTagInfo[thisJetRef]->ghostTrack()->pt());                        
 	  IPghostTrackPtRel.push_back(Perp(ghostTrack,axis));
@@ -1138,6 +1160,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVChi2)),label_+"SVChi2");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVDegreesOfFreedom)),label_+"SVDegreesOfFreedom");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVNormChi2)),label_+"SVNormChi2");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVIPFirstAboveCharm)),label_+"SVIPFirstAboveCharm");
       iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnSelectedTracks)),label_+"SVnSelectedTracks");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVMass)),label_+"SVMass");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVEnergyRatio)),label_+"SVEnergyRatio");
