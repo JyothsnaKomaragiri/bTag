@@ -55,7 +55,7 @@ process.singleJetHLTFilter.andOr = cms.bool(True) # how to deal with multiple tr
 
 import HLTrigger.HLTfilters.hltHighLevel_cfi
 process.HLT_Jet15U = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
-process.HLT_Jet15U.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
+process.HLT_Jet15U.TriggerResultsTag = cms.InputTag("TriggerResults","","REDIGI")
 process.HLT_Jet15U.HLTPaths = ["HLT_Jet15U"]
 process.HLT_Jet15U.andOr = cms.bool(True) # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
 
