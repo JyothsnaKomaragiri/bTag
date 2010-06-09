@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.17 2010/06/08 17:01:30 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.18 2010/06/08 18:28:04 alschmid Exp $
 //
 //
 
@@ -362,7 +362,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   bTag_Config_ = iConfig.getParameter< vector<edm::ParameterSet> >("bTagConfig");
   for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
     {
-      alias = ibTag->getParameter<string>("alias");
+      alias = label_+ ibTag->getParameter<string>("alias");
       produces<vector<float> >( alias ).setBranchAlias( alias ); 
     }
 
