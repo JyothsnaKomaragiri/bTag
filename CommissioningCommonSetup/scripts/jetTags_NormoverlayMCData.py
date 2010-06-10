@@ -5,10 +5,11 @@ import CommonSetup
 
 def main(args, left, blind):
 
-	mc0 = ROOT.TFile.Open("MC_QCD_Pt_0_15.root")
-	mc1 = ROOT.TFile.Open("MC_QCD_Pt_15_20.root")
-	mc2 = ROOT.TFile.Open("MC_QCD_Pt_20_30.root")
-	mc3 = ROOT.TFile.Open("MC_QCD_Pt_30.root") 
+	mc0 = ROOT.TFile.Open("MC_MinBias_TuneD6T.root")
+	mc1 = ROOT.TFile.Open("MC_QCD_Pt_0_15.root")
+	mc2 = ROOT.TFile.Open("MC_QCD_Pt_15_20.root")
+	mc3 = ROOT.TFile.Open("MC_QCD_Pt_20_30.root")
+	mc4 = ROOT.TFile.Open("MC_QCD_Pt_30.root")
 
 	data = ROOT.TFile.Open("data.root")
 
@@ -76,17 +77,17 @@ def main(args, left, blind):
 	###################### 	SSV High Eff (>=2 tracks)
 	elif histo[0] == 'S' and histo[1] == 'E' :		
 		if args[1] == 'loosePF':
-			histo = histo[2:] + "_looseSimpleSecondaryVertexPFBJetTags_"+args[2]
-			pfx = "DQMData/Run 1/Btag/Run summary/JetTag_looseSimpleSecondaryVertexPFBJetTags_"+args[2]
+			histo = histo[2:] + "_looseSimpleSecondaryVertexHighEffPFBJetTags_"+args[2]
+			pfx = "DQMData/Run 1/Btag/Run summary/JetTag_looseSimpleSecondaryVertexHighEffPFBJetTags_"+args[2]
 		elif args[1] == 'standardPF':
-			histo = histo[2:] + "_standardSimpleSecondaryVertexPFBJetTags_"+args[2]
-			pfx = "DQMData/Run 1/Btag/Run summary/JetTag_standardSimpleSecondaryVertexPFBJetTags_"+args[2]
+			histo = histo[2:] + "_standardSimpleSecondaryVertexHighEffPFBJetTags_"+args[2]
+			pfx = "DQMData/Run 1/Btag/Run summary/JetTag_standardSimpleSecondaryVertexHighEffPFBJetTags_"+args[2]
 		elif args[1] == 'looseCalo':
-			histo = histo[2:] + "_looseSimpleSecondaryVertexCaloBJetTags_"+args[2]
-			pfx = "DQMData/Run 1/Btag/Run summary/JetTag_looseSimpleSecondaryVertexCaloBJetTags_"+args[2]
+			histo = histo[2:] + "_looseSimpleSecondaryVertexHighEffCaloBJetTags_"+args[2]
+			pfx = "DQMData/Run 1/Btag/Run summary/JetTag_looseSimpleSecondaryVertexHighEffCaloBJetTags_"+args[2]
 		else :
-			histo = histo[2:] + "_standardSimpleSecondaryVertexCaloBJetTags_"+args[2]
-			pfx = "DQMData/Run 1/Btag/Run summary/JetTag_standardSimpleSecondaryVertexCaloBJetTags_"+args[2]
+			histo = histo[2:] + "_standardSimpleSecondaryVertexHighEffCaloBJetTags_"+args[2]
+			pfx = "DQMData/Run 1/Btag/Run summary/JetTag_standardSimpleSecondaryVertexHighEffCaloBJetTags_"+args[2]
 
 	###################### 	SSV High Purity (>=3 tracks)
 	elif histo[0] == 'S' and histo[1] == 'P' :			
@@ -216,7 +217,7 @@ def main(args, left, blind):
 
 	print pfx, histo
 
-	#pT 0-15
+        #MinBias
 	mc0 = [
 		mc0.Get("%s/%sNI" % (pfx, histo)),
 		mc0.Get("%s/%sDUSG" % (pfx, histo)),
@@ -224,7 +225,7 @@ def main(args, left, blind):
 		mc0.Get("%s/%sB" % (pfx, histo)),
 		mc0.Get("%s/%sALL" % (pfx, histo))
 		]
-	#pT 15-20
+        #pT 0-15
 	mc1 = [
 		mc1.Get("%s/%sNI" % (pfx, histo)),
 		mc1.Get("%s/%sDUSG" % (pfx, histo)),
@@ -232,7 +233,7 @@ def main(args, left, blind):
 		mc1.Get("%s/%sB" % (pfx, histo)),
 		mc1.Get("%s/%sALL" % (pfx, histo))
 		]
-        #pT 20-30
+	#pT 15-20
 	mc2 = [
 		mc2.Get("%s/%sNI" % (pfx, histo)),
 		mc2.Get("%s/%sDUSG" % (pfx, histo)),
@@ -240,7 +241,8 @@ def main(args, left, blind):
 		mc2.Get("%s/%sB" % (pfx, histo)),
 		mc2.Get("%s/%sALL" % (pfx, histo))
 		]
-	#pT 30
+
+	#pT 20-30
 	mc3 = [
 		mc3.Get("%s/%sNI" % (pfx, histo)),
 		mc3.Get("%s/%sDUSG" % (pfx, histo)),
@@ -248,22 +250,42 @@ def main(args, left, blind):
 		mc3.Get("%s/%sB" % (pfx, histo)),
 		mc3.Get("%s/%sALL" % (pfx, histo))
 		]
-	
+
+	#pT 30
+	mc4 = [
+		mc4.Get("%s/%sNI" % (pfx, histo)),
+		mc4.Get("%s/%sDUSG" % (pfx, histo)),
+		mc4.Get("%s/%sC" % (pfx, histo)),
+		mc4.Get("%s/%sB" % (pfx, histo)),
+		mc4.Get("%s/%sALL" % (pfx, histo))
+		]	
+
+###################################################
 #### Scale MC to data lumi ...Data/MC ratio
-#Data total luminosity 4.79 nb-1
-#/QCDDiJet_Pt0to15/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 0.0403 nb-1
-#/QCDDiJet_Pt15to20/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 3.21 nb-1
-#/QCDDiJet_Pt20to30/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 3.77 nb-1
-#/QCD_Pt30/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 21.26 nb-1
+####	
+#Data total luminosity 12.44 nb-1
 
-        scale = [ 118.86, 1.49, 1.27, 0.23 ]
+#/MinBias_TuneD6T_7TeV-pythia6/Spring10-START3X_V26B-v2/GEN-SIM-RECO       0.773 nb-1
+#/QCDDiJet_Pt0to15/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                0.0412 nb-1
+#                                              So we have 0.0412 + 0.773 = 0.814 nb-1
+#The scale factor for pt0to15 and MinBias would then be                    12.44/0.814 = 15.28
 
+#/QCDDiJet_Pt15to20/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO               3.45 nb-1
+#/QCDDiJet_Pt20to30/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO               4.23 nb-1
+#/QCD_Pt30/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                        50.3 nb-1
+
+
+# MC weights = 15.28, 15.28, 3.61, 2.94, 0.25
+
+	scale = [ 15.28, 15.28, 3.61, 2.94, 0.25 ]
+		
 ##################
-					  
+
 ## Adding the histos:
-## scale[0]*mc0 + scale[1]*mc1 + scale[2]*mc2 + scale[3]*mc3 
+## scale[0]*mc0 + scale[1]*mc1 + scale[2]*mc2 + scale[3]*mc3 + scale[4]*mc4 
 	for i in range(5):
-		mc2[i].Add( mc2[i], mc3[i], float(scale[2]), float(scale[3]))
+		mc3[i].Add( mc3[i], mc4[i], float(scale[3]), float(scale[4]) )		
+		mc2[i].Add( mc2[i], mc3[i], float(scale[2]), 1.0 )
 		mc1[i].Add( mc1[i], mc2[i], float(scale[1]), 1.0 )
 		mc0[i].Add( mc0[i], mc1[i], float(scale[0]), 1.0 )
 
