@@ -250,6 +250,48 @@ class CommonSetup:
                 else: 
                     c.Print('PlotsLumi/'+ratio)
 
+		### Draw the plot and the ratio on the same canvas
+                c.cd()
+		c.Clear()
+		c.Divide(1,2,0.01,0.0)
+
+		c.Cd(1)
+                ROOT.gPad.SetLogy(True)
+		ROOT.gPad.SetPad( 0.0, 0.25, 1.0, 1.0 )
+		ROOT.gPad.SetTopMargin(0.1)
+		ROOT.gPad.SetLeftMargin(0.13)
+		ROOT.gPad.SetRightMargin(0.05)
+
+		c.Cd(2)
+                ROOT.gPad.SetLogy(True)
+		ROOT.gPad.SetPad( 0.0, 0.0,  1.0, 0.25 )
+		ROOT.gPad.SetBottomMargin(0.375)
+		ROOT.gPad.SetLeftMargin(0.13)
+		ROOT.gPad.SetRightMargin(0.05)
+		
+		###
+		c.Cd(1)
+                data.Draw("E1")
+                if not blind:
+                        stack.Draw("histsame")
+                else:
+                        mc[4].Draw("histsame")
+                data.Draw("sameE1")
+                l.Draw()
+                keep.append(self.prelim(bintype))
+
+		###
+		c.Cd(2)
+		hratio.SetYTitle("data/MC")
+                hratio.Draw("E1")
+
+                ntitle = 'LOG_'+title
+                if norm == 'area':
+                    c.Print('PlotsArea/'+ntitle)
+                else: 
+                    c.Print('PlotsLumi/'+ntitle)
+
+
         #################################
 
         ##### bUp stacking order : light first, then charm, then bottom

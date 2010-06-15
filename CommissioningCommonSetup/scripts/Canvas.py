@@ -17,11 +17,20 @@ class Canvas:
 	def cd(self):
 		self.c.cd()
 
+	def Cd(self, pad):
+		self.c.cd(pad)
+
 	def Modified(self):
 		self.c.Modified()
 
 	def Update(self):
 		self.c.Update()
+
+	def Clear(self):
+		self.c.Clear()
+
+	def Divide(self, nx, ny, xmargin, ymargin):
+		self.c.Divide(nx, ny, xmargin, ymargin)
 
 	def Print(self, p):
                 self.c.Print("%s.png" % p)
