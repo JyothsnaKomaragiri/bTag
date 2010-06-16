@@ -1057,14 +1057,14 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bUp.Add(hists.mc_light_hist);
   mc_stack_bUp.Add(hists.mc_c_hist);
   mc_stack_bUp.Add(hists.mc_b_hist);
-  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.4);
 
   THStack mc_stack_bDown((info.plotName+"_mc_stack_bDown").c_str(),info.plotTitle.c_str());
   mc_stack_bDown.Add(hists.mc_b_hist);
   mc_stack_bDown.Add(hists.mc_c_hist);
   mc_stack_bDown.Add(hists.mc_light_hist);
   if(info.displayNoInfo == true) mc_stack_bDown.Add(hists.mc_none_hist);
-  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.4);
   
   //Make Canvas
 
@@ -1117,6 +1117,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.root").c_str());
   canvas_bUp.Clear();
   canvas_bUp.SetLogy();
+  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 3.0);
   mc_stack_bUp.SetMinimum(0.1);
   hists.data_hist->SetMinimum(0.1);
   hists.data_hist->SetMarkerStyle(1);
@@ -1147,6 +1148,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.root").c_str());
   canvas_bDown.Clear();
   canvas_bDown.SetLogy();
+  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 3.0);
   mc_stack_bDown.SetMinimum(0.1);
   hists.data_hist->SetMinimum(0.1);
   mc_stack_bDown.Draw("HIST");
@@ -1166,6 +1168,58 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_ratio.SaveAs((info.plotName+"_ratio.png").c_str());
   canvas_ratio.SaveAs((info.plotName+"_ratio.root").c_str());
   
+  //Draw the plot and ratio on the same canvas
+  TCanvas canvas_bDownLog((info.plotName+"canvas_bDownLog").c_str(),info.plotTitle.c_str(),1024,1024);
+  canvas_bDownLog.cd();
+
+  canvas_bDownLog.Divide(1,2,0.01,0.0);
+  
+  canvas_bDownLog.cd(1);
+  gPad->SetLogy();
+  gPad->SetPad( 0.0, 0.25, 1.0, 1.0 );
+  gPad->SetTopMargin(0.1);
+  gPad->SetLeftMargin(0.16);
+  gPad->SetRightMargin(0.04);
+
+  canvas_bDownLog.cd(2);
+  gPad->SetLogy();
+  gPad->SetPad( 0.0, 0.0,  1.0, 0.25 );
+  gPad->SetBottomMargin(0.375);
+  gPad->SetLeftMargin(0.16);
+  gPad->SetRightMargin(0.04);
+
+  canvas_bDownLog.cd(1);
+  mc_stack_bDown.GetYaxis()->CenterTitle(1);
+  mc_stack_bDown.GetYaxis()->SetTitleSize( 0.055 );
+  mc_stack_bDown.GetYaxis()->SetTitleOffset( 1.3 );
+  mc_stack_bDown.GetYaxis()->SetLabelSize( 0.055 );
+  mc_stack_bDown.Draw("HIST");
+  hists.data_hist->Draw("E1X0SAME");
+  drawHelper->Draw("PSAME");
+  legend->Draw();
+  pt->Draw();
+
+  canvas_bDownLog.cd(2);
+  ratio->GetYaxis()->CenterTitle(1);
+  ratio->GetYaxis()->SetTitleSize( 0.165 );
+  ratio->GetYaxis()->SetTitleOffset( 0.4 );
+  ratio->GetYaxis()->SetLabelSize( 0.16 );
+  ratio->GetYaxis()->SetNdivisions( 505 );
+
+  ratio->GetXaxis()->SetTitleSize( 0.16 );
+  ratio->GetXaxis()->SetLabelSize( 0.16 );
+  ratio->GetXaxis()->SetTitleOffset( 1 );
+  ratio->GetXaxis()->SetLabelOffset( 0.006 );
+  ratio->GetXaxis()->SetNdivisions( 510 );
+  ratio->GetXaxis()->SetTickLength( ratio->GetXaxis()->GetTickLength() * 3.0 );
+
+  ratio->SetYTitle("Data/MC");
+  ratio->Draw("E1X0");
+
+  canvas_bDownLog.SaveAs((info.plotName+"_bDown_LOG.pdf").c_str());
+  canvas_bDownLog.SaveAs((info.plotName+"_bDown_LOG.png").c_str());
+  canvas_bDownLog.SaveAs((info.plotName+"_bDown_LOG.root").c_str());
+
   return;
 }
 
