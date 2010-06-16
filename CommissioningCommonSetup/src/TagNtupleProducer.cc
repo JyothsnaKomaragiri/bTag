@@ -13,7 +13,7 @@
 //
 // Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
 //         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.18 2010/06/08 18:28:04 alschmid Exp $
+// $Id: TagNtupleProducer.cc,v 1.19 2010/06/09 09:27:26 alschmid Exp $
 //
 //
 
@@ -55,6 +55,7 @@
 
 #include "DataFormats/Math/interface/deltaR.h"
 #include "Math/GenVector/VectorUtil.h"
+#include "DataFormats/GeometryVector/interface/VectorUtil.h"
 
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
@@ -76,6 +77,7 @@
 #include "RecoBTau/JetTagComputer/interface/JetTagComputer.h"
 #include "RecoBTau/JetTagComputer/interface/JetTagComputerRecord.h"
 #include "RecoBTag/SecondaryVertex/interface/CombinedSVComputer.h"
+#include "RecoBTag/SecondaryVertex/interface/TrackKinematics.h"
 
 #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
 #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
@@ -174,6 +176,8 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   produces<unsigned int> ( alias = label_ + "runNumber"  ).setBranchAlias( alias );
   produces<unsigned int> ( alias = label_ + "lumiBlockNumber"  ).setBranchAlias( alias );
 
+  produces<unsigned int> ( alias = label_ + "numberOfPrimaryVertices"  ).setBranchAlias( alias );
+
    //Basic Jet Information
   produces<vector<math::XYZTLorentzVector> >( alias = label_ + "jetP4"                  ).setBranchAlias( alias );
   produces<vector<float> >( alias = label_ + "jetPt"                                    ).setBranchAlias( alias );
@@ -198,6 +202,8 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   produces<vector<bool> >  (alias = label_ + "trackSelected"                  ).setBranchAlias( alias );
   produces<vector<math::XYZVector> >( alias = label_ + "track3Momentum"                ).setBranchAlias( alias );
   produces<vector<float> >(alias = label_ + "trackTransverseMomentum"                 ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "trackEta"                 ).setBranchAlias( alias );
+  produces<vector<float> >(alias = label_ + "trackPhi"                 ).setBranchAlias( alias );
   produces<vector<float> >(alias = label_ + "trackMomentum"                   ).setBranchAlias( alias );
   produces<vector<int> >(alias = label_ + "trackNHits"                   ).setBranchAlias( alias );
   produces<vector<int> >(alias = label_ + "trackNPixelHits"                   ).setBranchAlias( alias );
@@ -246,10 +252,9 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
       produces<vector<int> >( alias = label_ + "SVnFirstVertexTracks"                            ).setBranchAlias( alias ); 
       produces<vector<int> >( alias = label_ + "SVnFirstVertexTracksAll"                         ).setBranchAlias( alias ); 
       produces<vector<float> >( alias = label_ + "SVjetDeltaR"                            ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = label_ + "SVjetAngle"                            ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = label_ + "SVjetCosAngle"                            ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = label_ + "SVdeltaCosAngle"                            ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = label_ + "SVdeltaAngle"                            ).setBranchAlias( alias );   
+      produces<vector<float> >( alias = label_ + "SVvtxSumJetDeltaR"                            ).setBranchAlias( alias ); 
+      produces<vector<float> >( alias = label_ + "SVvtxSumVtxDirDeltaR"                            ).setBranchAlias( alias ); 
+    
     } 
   if(get_IP_tag_infos_)
     {
@@ -304,6 +309,10 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
 	  alias = label_ + "IP3dTransverseMomentum"+trackNum.str();
 	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dEta"+trackNum.str();
+	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
+	  alias = label_ + "IP3dPhi"+trackNum.str();
+	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
 	  alias = label_ + "IP3dNHits"+trackNum.str();
 	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
 	  alias = label_ + "IP3dNPixelHits"+trackNum.str();
@@ -329,15 +338,22 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
       produces<vector<float> >(alias = label_ + "electronPt"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronEta"  			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronPhi"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronNHits"   			       ).setBranchAlias( alias );
+      produces<vector<int> >(alias = label_ + "electronNPixelHits"   			       ).setBranchAlias( alias );
+      produces<vector<int> >(alias = label_ + "electronNHits"   			       ).setBranchAlias( alias );
+      produces<vector<int> >(alias = label_ + "electronNExpectedOuterHits"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronNChi2"			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronPtRel"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronSip2d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronIp2d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronIpe2d"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronSip3d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronIp3d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "electronIpe3d"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronP0Par"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronDeltaR"  			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronEtaRel"  			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronRatio"   			       ).setBranchAlias( alias );
+      produces<vector<int> >(alias = label_ + "electronTrackQuality" 			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "electronRatioRel"                          ).setBranchAlias( alias );
     }
   if(get_SM_tag_infos_)
@@ -347,15 +363,22 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
       produces<vector<float> >(alias = label_ + "muonPt"   			               ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonEta"  			               ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonPhi"  			               ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonNHits"   			       ).setBranchAlias( alias );
+      produces<vector<int> >(alias = label_ + "muonNHits"   			       ).setBranchAlias( alias );
+      produces<vector<int> >(alias = label_ + "muonNExpectedOuterHits"   			       ).setBranchAlias( alias );
+      produces<vector<int> >(alias = label_ + "muonNPixelHits"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonNChi2"	         		       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonPtRel"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonSip2d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonIp2d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonIpe2d"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonSip3d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonIp3d"   			       ).setBranchAlias( alias );
+      produces<vector<float> >(alias = label_ + "muonIpe3d"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonP0Par"   			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonDeltaR"  			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonEtaRel"  			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonRatio"   			       ).setBranchAlias( alias );
+      produces<vector<int> >(alias = label_ + "muonTrackQuality" 			       ).setBranchAlias( alias );
       produces<vector<float> >(alias = label_ + "muonRatioRel"                              ).setBranchAlias( alias );
     }
   //b tagger outputs configured in python file
@@ -416,7 +439,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   unsigned int runNumber = iEvent.eventAuxiliary().run();
   unsigned int lumiBlockNumber = iEvent.eventAuxiliary().luminosityBlock();
 
-  Handle< View<Jet> > jets;
+   Handle< View<Jet> > jets;
   iEvent.getByLabel(jet_src_,jets);
 
   Handle<JetTracksAssociation::Container > jetTracks;
@@ -424,6 +447,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   Handle<reco::VertexCollection> primaryVertex;
   iEvent.getByLabel(primaryVertexProducer_, primaryVertex);
+
+  unsigned int numberOfPrimaryVertices = primaryVertex->size();
 
   edm::ESHandle<TransientTrackBuilder> builder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
@@ -567,6 +592,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<bool> trackSelected;
   vector<math::XYZVector> track3Momentum;
   vector<float> trackTransverseMomentum;
+  vector<float> trackEta;
+  vector<float> trackPhi;
   vector<float> trackMomentum;
   vector<int> trackNHits;
   vector<int> trackNPixelHits;
@@ -609,10 +636,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<int>   SVnFirstVertexTracks;         
   vector<int>   SVnFirstVertexTracksAll;         
   vector<float> SVjetDeltaR;
-  vector<float> SVjetAngle;
-  vector<float> SVjetCosAngle;
-  vector<float> SVdeltaCosAngle;
-  vector<float> SVdeltaAngle;
+  vector<float> SVvtxSumVtxDirDeltaR;
+  vector<float> SVvtxSumJetDeltaR;
                
   //impactParameterTagInfos
   vector<int> IPnSelectedTracks;                       
@@ -645,6 +670,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector< vector<float> > IP3dDeltaR(IP_n_saved_tracks_);
   vector< vector<float> > IP3dMomentum(IP_n_saved_tracks_);
   vector< vector<float> > IP3dTransverseMomentum(IP_n_saved_tracks_);
+  vector< vector<float> > IP3dEta(IP_n_saved_tracks_);
+  vector< vector<float> > IP3dPhi(IP_n_saved_tracks_);
   vector< vector<int> >   IP3dNHits(IP_n_saved_tracks_);
   vector< vector<int> >   IP3dNPixelHits(IP_n_saved_tracks_);
   vector< vector<float> > IP3dNormChi2(IP_n_saved_tracks_);
@@ -659,15 +686,22 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<float> electronPt;   			       
   vector<float> electronEta;  			       
   vector<float> electronPhi;  			       
-  vector<float> electronNHits;   		       
+  vector<int> electronNHits;   		     
+  vector<int> electronNExpectedOuterHits;   		       
+  vector<int> electronNPixelHits;   		       
   vector<float> electronNChi2;			       
   vector<float> electronPtRel;   		       
   vector<float> electronSip2d;   		       
-  vector<float> electronSip3d;   		       
+  vector<float> electronIp2d;   		       
+  vector<float> electronIpe2d;   		       
+  vector<float> electronSip3d;
+  vector<float> electronIp3d;
+  vector<float> electronIpe3d;   		          		          		       
   vector<float> electronP0Par;   		       
   vector<float> electronDeltaR;  		       
   vector<float> electronEtaRel;  		       
-  vector<float> electronRatio;   		       
+  vector<float> electronRatio;   		     
+  vector<int> electronTrackQuality;   		       
   vector<float> electronRatioRel;                      
 						       
   //softMuonTagInfos	
@@ -675,15 +709,22 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<float> muonPt;   			       
   vector<float> muonEta;  			       
   vector<float> muonPhi;  			       
-  vector<float> muonNHits;   			       
+  vector<int> muonNHits;   	
+  vector<int> muonNExpectedOuterHits;   			       
+  vector<int> muonNPixelHits;   			       
   vector<float> muonNChi2;	         	       
-  vector<float> muonPtRel;   			       
-  vector<float> muonSip2d;   			       
-  vector<float> muonSip3d;   			       
+  vector<float> muonPtRel;   
+  vector<float> muonSip2d;   		       
+  vector<float> muonIp2d;   		       
+  vector<float> muonIpe2d;   		       
+  vector<float> muonSip3d;
+  vector<float> muonIp3d;
+  vector<float> muonIpe3d;   	
   vector<float> muonP0Par;   			       
   vector<float> muonDeltaR;  			       
   vector<float> muonEtaRel;  			       
-  vector<float> muonRatio;   			       
+  vector<float> muonRatio;   			    
+  vector<int> muonTrackQuality;   			       
   vector<float> muonRatioRel;                          
 
   map< string, vector< float > > bTagVectors;
@@ -784,6 +825,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  trackSelected.push_back(isSelected);
 	  track3Momentum.push_back(math::XYZVector((*iTrack)->px(),(*iTrack)->py(),(*iTrack)->pz()));
 	  trackTransverseMomentum.push_back((*iTrack)->pt());
+	  trackEta.push_back((*iTrack)->eta());
+	  trackPhi.push_back((*iTrack)->phi());
 	  trackMomentum.push_back((*iTrack)->p());
 	  trackNHits.push_back((*iTrack)->hitPattern().numberOfValidHits());
 	  trackNPixelHits.push_back((*iTrack)->hitPattern().numberOfValidPixelHits());
@@ -849,10 +892,10 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      JetTagComputer::TagInfoHelper helper(baseTagInfos);
 	      TaggingVariableList vars = computer->taggingVariables(helper);
 	      math::XYZVector thisVertex(svTagInfo[thisJetRef]->secondaryVertex(0).x(),svTagInfo[thisJetRef]->secondaryVertex(0).y(),svTagInfo[thisJetRef]->secondaryVertex(0).z());
-	      math::XYZVector jetVertex(thisJetRef->vx(),thisJetRef->vy(),thisJetRef->vz());
-	      math::XYZVector vertexDirection(thisVertex-jetVertex);
-	      math::XYZVector jetVector(thisJetRef->p4().x(),thisJetRef->p4().y(),thisJetRef->p4().z());
-	      math::XYZVector addTracksVertex(0,0,0);
+	      
+	      edm::RefToBase<Jet> jet = ipTagInfo[thisJetRef]->jet();
+	      math::XYZVector jetDir = jet->momentum().Unit();
+
 	      SVnVertices.push_back(svTagInfo[thisJetRef]->nVertices());
 	      SecondaryVertex.push_back(thisVertex);
 	      SV3dDistance.push_back(svTagInfo[thisJetRef]->flightDistance(0).value());                          
@@ -872,19 +915,40 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      else  SVMass.push_back( -9999 );
 	      if(vars.checkTag(reco::btau::vertexEnergyRatio)) SVEnergyRatio.push_back( vars.get(reco::btau::vertexEnergyRatio) );
 	      else SVEnergyRatio.push_back( -9999 );
-	      //     if(vars.checkTag(reco::btau::vertexJetDeltaR)) SVjetDeltaR.push_back(  deltaR(thisJetRef->eta(), thisJetRef->phi(), addTracksVertex.eta(), addTracksVertex.phi()) );
+	     
 	      if(vars.checkTag(reco::btau::vertexJetDeltaR)) SVjetDeltaR.push_back(  vars.get( reco::btau::vertexJetDeltaR) );
 	      else SVjetDeltaR.push_back( -9999 );
 
 	      if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) SVIPFirstAboveCharm.push_back(  vars.get( reco::btau::trackSip3dSigAboveCharm ));
 	      else SVIPFirstAboveCharm.push_back(  -9999 );
 
-	      double cosAngle = addTracksVertex.Dot(jetVector)/sqrt(addTracksVertex.mag2()*jetVector.mag2());
-	      SVjetAngle.push_back(cosAngle);
-	      SVjetCosAngle.push_back(acos(cosAngle));
-	      cosAngle = addTracksVertex.Dot(vertexDirection)/sqrt(addTracksVertex.mag2()*vertexDirection.mag2());
-	      SVdeltaCosAngle.push_back(cosAngle);
-	      SVdeltaAngle.push_back(acos(cosAngle));
+	      TrackKinematics vertexKinematics;
+	      const Vertex &vertex = svTagInfo[thisJetRef]->secondaryVertex(0);
+	      bool hasRefittedTracks = vertex.hasRefittedTracks();
+	      TrackRefVector tracks = svTagInfo[thisJetRef]->vertexTracks(0);
+	      for(TrackRefVector::const_iterator track = tracks.begin();
+		  track != tracks.end(); track++) {
+		double w = svTagInfo[thisJetRef]->trackWeight(0, *track);
+		if (w < 0.5)
+		  continue;
+		if (hasRefittedTracks) {
+		  Track actualTrack = vertex.refittedTrack(*track);
+		  vertexKinematics.add(actualTrack, w);
+		  
+		} else {
+		  vertexKinematics.add(**track, w);
+		}
+	      }
+	      bool useTrackWeights = true;
+	      math::XYZTLorentzVector vertexSum = useTrackWeights
+		? vertexKinematics.weightedVectorSum()
+		: vertexKinematics.vectorSum();
+
+	      math::XYZTLorentzVector flightDir( svTagInfo[thisJetRef]->flightDirection(0).x(), svTagInfo[thisJetRef]->flightDirection(0).y(), svTagInfo[thisJetRef]->flightDirection(0).z(), 0  );
+	      SVvtxSumJetDeltaR.push_back( Geom::deltaR(vertexSum, jetDir) );
+	      SVvtxSumVtxDirDeltaR.push_back( Geom::deltaR( flightDir, vertexSum ) );
+	
+
 	    }
 	  else
 	    {
@@ -898,13 +962,16 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      SVDegreesOfFreedom.push_back(-1);                    
 	      SVNormChi2.push_back(-1);                                                           
 	      SVnVertexTracks.push_back(-1);
+	      SVnVertexTracksAll.push_back(-1);
+	      SVnFirstVertexTracksAll.push_back(-1);
+	      SVnFirstVertexTracks.push_back(-1);
 	      SVMass.push_back(-1);
 	      SVEnergyRatio.push_back(-1);
 	      SVjetDeltaR.push_back(-1);
-	      SVjetAngle.push_back(-10);
-	      SVjetCosAngle.push_back(-10);
-	      SVdeltaCosAngle.push_back(-10);
-	      SVdeltaAngle.push_back(-10);
+	     
+	      SVIPFirstAboveCharm.push_back(  -9999 );
+	      SVvtxSumVtxDirDeltaR.push_back( -9999 );
+	      SVvtxSumJetDeltaR.push_back ( -9999 );
 	    }
 	}
 
@@ -966,6 +1033,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  IP3dDeltaR[iTrack].push_back(  ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),ipTagInfo[thisJetRef]->selectedTracks()[location3D]->momentum()) );
 		  IP3dMomentum[iTrack].push_back(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->p() );
 		  IP3dTransverseMomentum[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->pt() );
+		  IP3dEta[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->eta() );
+		  IP3dPhi[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->phi() );
 		  IP3dNHits[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->hitPattern().numberOfValidHits() ); 
 		  IP3dNPixelHits[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->hitPattern().numberOfValidPixelHits() ); 
 		  IP3dNormChi2[iTrack].push_back(  ipTagInfo[thisJetRef]->selectedTracks()[location3D]->normalizedChi2() );
@@ -987,6 +1056,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  IP3dDeltaR[iTrack].push_back(-100);
 		  IP3dMomentum[iTrack].push_back(-100);
 		  IP3dTransverseMomentum[iTrack].push_back(-100);
+		  IP3dEta[iTrack].push_back(-100);
+		  IP3dPhi[iTrack].push_back(-100);
 		  IP3dNHits[iTrack].push_back( -100);
 		  IP3dNPixelHits[iTrack].push_back(-100);
 		  IP3dNormChi2[iTrack].push_back( -100 );
@@ -1036,17 +1107,63 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      electronPt.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->pt());   			       
 	      electronEta.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->eta());  			       
 	      electronPhi.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->phi());  			       
-	      electronNHits.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->found());   		       
+	      electronNHits.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->hitPattern().numberOfValidHits() );   
+	      electronNExpectedOuterHits.push_back( softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->trackerExpectedHitsOuter().numberOfHits() );   
+	      electronNPixelHits.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->hitPattern().numberOfValidPixelHits() );   
 	      electronNChi2.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->normalizedChi2());			       
-	      electronPtRel.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ptRel);   		       
-	      electronSip2d.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).sip2d);   		       
-	      electronSip3d.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).sip3d);   		       
+	      electronPtRel.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ptRel);   
+	      
+	      for(int i = 2; i>-2; i--){
+		if( (*softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)).quality(reco::TrackBase::TrackQuality(i))){
+		  electronTrackQuality.push_back(i);
+		  break;
+		}
+	      }
+
+	      TransientTrack transientTrack = builder->build( *softElectronTagInfo[thisJetRef]->lepton(maxPtElectron) );
+	      GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
+	      Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
+	      Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
+		       
+	      electronSip2d.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).sip2d);   
+	      electronIp2d.push_back( ip2d.value() );   
+	      electronIpe2d.push_back( ip2d.error() );   		       
+   
+
+	      electronSip3d.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).sip3d);   
+	      electronIp3d.push_back( ip3d.value() );   
+	      electronIpe3d.push_back( ip3d.error() );   
+	   
+
 	      electronP0Par.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).p0Par);   		       
 	      electronDeltaR.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).deltaR);  		       
 	      electronEtaRel.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).etaRel);  		       
 	      electronRatio.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ratio);   		       
 	      electronRatioRel.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ratioRel);                      
-	    }	       
+	    }
+	  else{
+	    nElectrons.push_back( 0 );
+	    electronPt.push_back(-9999 );   			       
+	    electronEta.push_back(-9999);  			       
+	    electronPhi.push_back(-9999);  			       
+	    electronNHits.push_back(-9999 );   
+	    electronNExpectedOuterHits.push_back( -9999 );
+	    electronNPixelHits.push_back(-9999 );   
+	    electronNChi2.push_back(-9999);			       
+	    electronPtRel.push_back(-9999);   
+	    electronTrackQuality.push_back(-9999 );
+	    electronSip2d.push_back(-9999);   
+	    electronIp2d.push_back(-9999 );   
+	    electronIpe2d.push_back( -9999 );   		       
+	    electronSip3d.push_back(-9999);   
+	    electronIp3d.push_back(-9999 );   
+	    electronIpe3d.push_back( -9999 );   
+	    electronP0Par.push_back(-9999);   		       
+	    electronDeltaR.push_back(-9999);  		       
+	    electronEtaRel.push_back(-9999);  		       
+	    electronRatio.push_back(-9999);   		       
+	    electronRatioRel.push_back(-9999);  
+	  }
 	}
       //softMuonTagInfos
       if(get_SM_tag_infos_)
@@ -1064,29 +1181,69 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      muonPt.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->pt());   			       
 	      muonEta.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->eta());  			       
 	      muonPhi.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->phi());  			       
-	      muonNHits.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->found());   		       
+	      muonNHits.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->hitPattern().numberOfValidHits() );   
+	      muonNExpectedOuterHits.push_back( softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->trackerExpectedHitsOuter().numberOfHits() );   
+	      muonNPixelHits.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->hitPattern().numberOfValidPixelHits() );     		       
 	      muonNChi2.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->normalizedChi2());			       
-	      muonPtRel.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ptRel);   		       
-	      muonSip2d.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).sip2d);   		       
-	      muonSip3d.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).sip3d);   		       
+	      muonPtRel.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ptRel); 
+
+	      for(int i = 2; i>-2; i--){
+		if( (*softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)).quality(reco::TrackBase::TrackQuality(i))){
+		  muonTrackQuality.push_back(i);
+		  break;
+		}
+	      }
+	      TransientTrack transientTrack = builder->build( *softMuonTagInfo[thisJetRef]->lepton(maxPtMuon) );
+	      GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
+	      Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
+	      Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;  	
+	       
+	      muonSip2d.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).sip2d);   		
+	      muonIp2d.push_back( ip2d.value() );   
+	      muonIpe2d.push_back( ip2d.error() );   	
+       
+	      muonSip3d.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).sip3d);   	
+	      muonIp3d.push_back( ip3d.value() );   
+	      muonIpe3d.push_back( ip3d.error() );   
+	       
 	      muonP0Par.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).p0Par);   		       
 	      muonDeltaR.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).deltaR);  		       
 	      muonEtaRel.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).etaRel);  		       
 	      muonRatio.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ratio);   		       
 	      muonRatioRel.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ratioRel);                      
-	    }	 
-	}      
+	    }
+	  else{
+	    nMuons.push_back( 0 );
+	    muonPt.push_back(-9999 );   			       
+	    muonEta.push_back(-9999);  			       
+	    muonPhi.push_back(-9999);  			       
+	    muonNHits.push_back(-9999 );
+	    muonNExpectedOuterHits.push_back(-9999 );
+	    muonNPixelHits.push_back(-9999 );   
+	    muonNChi2.push_back(-9999);			       
+	    muonPtRel.push_back(-9999);   
+	    muonTrackQuality.push_back(-9999 );
+	    muonSip2d.push_back(-9999);   
+	    muonIp2d.push_back(-9999 );   
+	    muonIpe2d.push_back( -9999 );   		       
+	    muonSip3d.push_back(-9999);   
+	    muonIp3d.push_back(-9999 );   
+	    muonIpe3d.push_back( -9999 );   
+	    muonP0Par.push_back(-9999);   		       
+	    muonDeltaR.push_back(-9999);  		       
+	    muonEtaRel.push_back(-9999);  		       
+	    muonRatio.push_back(-9999);   		       
+	    muonRatioRel.push_back(-9999);  
+	  }
+	}
+
+      
       for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
 	{
 	  bTagVectors[ibTag->getParameter<string>("alias")].push_back((bTags[ibTag->getParameter<string>("alias")])[thisJetRef]);
 	}
     }
-
-  // small cross check
-  if(trackMomentum.size() != trackQuality.size()){
-    std::cout<<"trackMomentum.size() != trackQuality.size() !!!!"<< std::endl;
-    exit(1);
-  }
+  
   
   //Putting Information into the Event
 
@@ -1097,6 +1254,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(eventNumber) ),        label_+"eventNumber");
   iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(runNumber) ),        label_+"runNumber");
   iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(lumiBlockNumber) ),        label_+"lumiBlockNumber");
+
+  iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(numberOfPrimaryVertices) ),        label_+"numberOfPrimaryVertices");
 
   //Basic Jet Information
   iEvent.put(auto_ptr< vector< math::XYZTLorentzVector> >(new vector< math::XYZTLorentzVector>(jetP4)),label_+"jetP4");
@@ -1123,6 +1282,8 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put(auto_ptr< vector<bool> >(new vector<bool>(trackSelected)), label_ + "trackSelected" );
   iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(track3Momentum)),label_ + "track3Momentum");
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackTransverseMomentum)),label_ + "trackTransverseMomentum" );
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackEta)),label_ + "trackEta" );
+  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackPhi)),label_ + "trackPhi" );
   iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackMomentum)),label_ + "trackMomentum");
   iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackNHits)),label_ + "trackNHits");
   iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackNPixelHits)),label_ + "trackNPixelHits");
@@ -1170,10 +1331,9 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnFirstVertexTracks)),label_+"SVnFirstVertexTracks");
       iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertexTracksAll)),label_+"SVnVertexTracksAll");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetDeltaR)),label_+"SVjetDeltaR");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetAngle)),label_+"SVjetAngle");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetCosAngle)),label_+"SVjetCosAngle");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVdeltaCosAngle)),label_+"SVdeltaCosAngle");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVdeltaAngle)),label_+"SVdeltaAngle");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVvtxSumJetDeltaR)),label_+"SVvtxSumJetDeltaR");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVvtxSumVtxDirDeltaR)),label_+"SVvtxSumVtxDirDeltaR");
+   
     }          
   //impactParameterTagInfos
   if(get_IP_tag_infos_)
@@ -1235,6 +1395,10 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dMomentum[iTrack])),alias);
 	  alias = label_ + "IP3dTransverseMomentum"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dTransverseMomentum[iTrack])),alias);
+	  alias = label_ + "IP3dEta"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dEta[iTrack])),alias);
+	  alias = label_ + "IP3dPhi"+trackNum.str();
+	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dPhi[iTrack])),alias);
 	  alias = label_ + "IP2dTrackQuality"+trackNum.str();
 	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP2dTrackQuality[iTrack])),alias);
 	  alias = label_ + "IP2d"+trackNum.str();
@@ -1255,15 +1419,22 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPt)),label_+"electronPt");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronEta)),label_+"electronEta");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPhi)),label_+"electronPhi");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronNHits)),label_+"electronNHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(electronNHits)),label_+"electronNHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(electronNExpectedOuterHits)),label_+"electronNExpectedOuterHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(electronNPixelHits)),label_+"electronNPixelHits");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronNChi2)),label_+"electronNChi2");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPtRel)),label_+"electronPtRel");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronSip2d)),label_+"electronSip2d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronIp2d)),label_+"electronIp2d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronIpe2d)),label_+"electronIpe2d");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronSip3d)),label_+"electronSip3d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronIp3d)),label_+"electronIp3d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronIpe3d)),label_+"electronIpe3d");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronP0Par)),label_+"electronP0Par");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronDeltaR)),label_+"electronDeltaR");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronEtaRel)),label_+"electronEtaRel");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronRatio)),label_+"electronRatio");
+     iEvent.put(auto_ptr< vector<int> >(new vector<int>(electronTrackQuality)),label_+"electronTrackQuality");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronRatioRel)),label_+"electronRatioRel");
     }
 							               
@@ -1274,15 +1445,22 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPt)),label_+"muonPt");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonEta)),label_+"muonEta");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPhi)),label_+"muonPhi");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonNHits)),label_+"muonNHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(muonNHits)),label_+"muonNHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(muonNExpectedOuterHits)),label_+"muonNExpectedOuterHits");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(muonNPixelHits)),label_+"muonNPixelHits");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonNChi2)),label_+"muonNChi2");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPtRel)),label_+"muonPtRel");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonSip2d)),label_+"muonSip2d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonIp2d)),label_+"muonIp2d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonIpe2d)),label_+"muonIpe2d");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonSip3d)),label_+"muonSip3d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonIp3d)),label_+"muonIp3d");
+      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonIpe3d)),label_+"muonIpe3d");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonP0Par)),label_+"muonP0Par");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonDeltaR)),label_+"muonDeltaR");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonEtaRel)),label_+"muonEtaRel");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonRatio)),label_+"muonRatio");
+      iEvent.put(auto_ptr< vector<int> >(new vector<int>(muonTrackQuality)),label_+"muonTrackQuality");
       iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonRatioRel)),label_+"muonRatioRel");
     }
 
