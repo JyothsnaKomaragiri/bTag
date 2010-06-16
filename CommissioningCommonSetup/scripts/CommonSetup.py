@@ -100,22 +100,20 @@ class CommonSetup:
 
         def prelim(self, header):
                 t = ROOT.TPaveText(0.4, 0.92, 0.9, 0.97, "brNDC")
-                title = " "
+                title = "CMS Preliminary 2010"
 
-                if header == "GLOBAL":
-                        title = "p_{T} > 10 GeV and | #eta | < 2.5"
-                elif header == "PT_10-20":
-                        title = "10 < p_{T} < 20 GeV and | #eta | < 2.5"
-                elif header == "PT_20-40":
-                        title = "20 < p_{T} < 40 GeV and | #eta | < 2.5"
-                elif header == "PT_40-99999" :
-                        title = "p_{T} > 40 GeV and | #eta | < 2.5"
-                elif header == "ETA_0-1v5_PT_40-99999" :
-                        title = "p_{T} > 40 GeV and 0 < | #eta | < 1.5"
-                elif header == "ETA_1v5-2v5_PT_40-99999" :
-                        title = "p_{T} > 40 GeV and 1.5 < | #eta | < 2.5"
-                else:
-                        title = "CMS Preliminary 2010"
+#                if header == "GLOBAL":
+#                        title = "p_{T} > 10 GeV and | #eta | < 2.5"
+#                elif header == "PT_10-20":
+#                        title = "10 < p_{T} < 20 GeV and | #eta | < 2.5"
+#                elif header == "PT_20-40":
+#                        title = "20 < p_{T} < 40 GeV and | #eta | < 2.5"
+#                elif header == "ETA_0-1v5_PT_40-99999" :
+#                        title = "p_{T} > 40 GeV and 0 < | #eta | < 1.5"
+#                elif header == "ETA_1v5-2v5_PT_40-99999" :
+#                        title = "p_{T} > 40 GeV and 1.5 < | #eta | < 2.5"
+#                else:
+#                        title = "CMS Preliminary 2010"
 
                 t.AddText(title)
                 t.SetTextSize(0.035)
@@ -259,18 +257,22 @@ class CommonSetup:
                 ROOT.gPad.SetLogy(True)
 		ROOT.gPad.SetPad( 0.0, 0.25, 1.0, 1.0 )
 		ROOT.gPad.SetTopMargin(0.1)
-		ROOT.gPad.SetLeftMargin(0.13)
-		ROOT.gPad.SetRightMargin(0.05)
+		ROOT.gPad.SetLeftMargin(0.16) #0.13
+		ROOT.gPad.SetRightMargin(0.04) #0.05
 
 		c.Cd(2)
                 ROOT.gPad.SetLogy(True)
 		ROOT.gPad.SetPad( 0.0, 0.0,  1.0, 0.25 )
 		ROOT.gPad.SetBottomMargin(0.375)
-		ROOT.gPad.SetLeftMargin(0.13)
-		ROOT.gPad.SetRightMargin(0.05)
-		
+		ROOT.gPad.SetLeftMargin(0.16) #0.13
+		ROOT.gPad.SetRightMargin(0.04) #0.05
+
 		###
 		c.Cd(1)
+		data.GetYaxis().CenterTitle(1)
+		data.GetYaxis().SetTitleSize( 0.055 )
+		data.GetYaxis().SetTitleOffset( 1.3 )
+		data.GetYaxis().SetLabelSize( 0.055 )
                 data.Draw("E1")
                 if not blind:
                         stack.Draw("histsame")
@@ -279,10 +281,25 @@ class CommonSetup:
                 data.Draw("sameE1")
                 l.Draw()
                 keep.append(self.prelim(bintype))
+		
 
 		###
 		c.Cd(2)
-		hratio.SetYTitle("data/MC")
+
+		hratio.GetYaxis().CenterTitle(1)
+		hratio.GetYaxis().SetTitleSize( 0.165 ) #0.11
+		hratio.GetYaxis().SetTitleOffset( 0.4 ) #0.55
+		hratio.GetYaxis().SetLabelSize( 0.16 )
+		hratio.GetYaxis().SetNdivisions( 505 )
+
+		hratio.GetXaxis().SetTitleSize( 0.16 )
+		hratio.GetXaxis().SetLabelSize( 0.16 )
+		hratio.GetXaxis().SetTitleOffset( 1 )
+		hratio.GetXaxis().SetLabelOffset( 0.006 )
+		hratio.GetXaxis().SetNdivisions( 510 )
+		hratio.GetXaxis().SetTickLength( hratio.GetXaxis().GetTickLength() * 3.0 )
+
+		hratio.SetYTitle("Data/MC")
                 hratio.Draw("E1")
 
                 ntitle = 'LOG_'+title
