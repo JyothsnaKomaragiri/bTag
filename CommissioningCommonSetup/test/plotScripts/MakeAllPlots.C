@@ -97,6 +97,8 @@ struct information1d{
   double xlow;
   double xup;
   int nbinsx;
+  double ratioMin;
+  double ratioMax;
   bool displayNoInfo;
   bool legendPosition;
 };
@@ -113,6 +115,8 @@ struct informationCutComp{
   double xlow;
   double xup;
   int nbinsx;
+  double ratioMin;
+  double ratioMax;
   bool displayNoInfo;
   bool legendPosition;
 };
@@ -246,10 +250,12 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
   bool xlow = false;
   bool xup = false;
   bool nbinsx = false;
+  bool ratioMin = false;
+  bool ratioMax = false;
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && bDisplayNoInfo && blegendPosition)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && ratioMin && ratioMax && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -293,6 +299,14 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
       nbinsx = true;
       thisPlot.nbinsx = atoi((line.substr(position+1)).c_str());
     }
+    if(line.find("ratioMin")<position){
+      ratioMin = true;
+      thisPlot.ratioMin = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("ratioMax")<position){
+      ratioMax = true;
+      thisPlot.ratioMax = atof((line.substr(position+1)).c_str());
+    }
     if(line.find("displayNoInfo")<position){
       bDisplayNoInfo = true;
       thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
@@ -320,10 +334,12 @@ informationCutComp paramCutComp(ifstream* plotFile, informationCutComp defaultPa
   bool xlow = false;
   bool xup = false;
   bool nbinsx = false;
+  bool ratioMin = false;
+  bool ratioMax = false;
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && cutList && labelList && xlow && xup && nbinsx && bDisplayNoInfo && blegendPosition)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && cutList && labelList && xlow && xup && nbinsx && ratioMin && ratioMax && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -396,6 +412,14 @@ informationCutComp paramCutComp(ifstream* plotFile, informationCutComp defaultPa
     if(line.find("nbinsx")<position){
       nbinsx = true;
       thisPlot.nbinsx = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("ratioMin")<position){
+      ratioMin = true;
+      thisPlot.ratioMin = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("ratioMax")<position){
+      ratioMax = true;
+      thisPlot.ratioMax = atof((line.substr(position+1)).c_str());
     }
     if(line.find("displayNoInfo")<position){
       bDisplayNoInfo = true;
@@ -774,7 +798,7 @@ double binarySummer(int dimension,vector<int> *whichCut, int cutPoint, int start
   //recursive summation for cut correlation calculations
   //cout << "in the summer" << endl;
   double sum = 0;
-  for(int k = start; k<whichCut->size(); k++)
+  for(unsigned int k = start; k<whichCut->size(); k++)
     {
       bool kMatch = false;
       for(int i = 0; i<dimension; i++)
@@ -831,7 +855,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
     }
   integral_mc_error=sqrt(integral_mc_error);
   integral_data_error=sqrt(integral_data_error);
-  for(int i = 0; i < whichCut.size(); i++)
+  for(unsigned int i = 0; i < whichCut.size(); i++)
     {
       whichCut[0]=i;
       double dataBinContent = transcribe_data[pow(2,i)];
@@ -846,7 +870,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
       dataCorrelations->SetBinError(i+1,i+1,sqrt(dataBinError));
       mcCorrelations->SetBinContent(i+1,i+1,mcBinContent);
       mcCorrelations->SetBinError(i+1,i+1,sqrt(mcBinError));
-      for(int j = i+1; j < whichCut.size(); j++)
+      for(unsigned int j = i+1; j < whichCut.size(); j++)
 	{
 	  whichCut[1]=j;
 	  dataBinContent = transcribe_data[pow(2,i)+pow(2,j)];
@@ -893,7 +917,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   t.SetTextAngle(60);
   t.SetTextSize(0.02);
   t.SetTextAlign(33);
-  for (int i=0;i<info.labelList.size();i++) {
+  for (unsigned int i=0;i<info.labelList.size();i++) {
     x = mcCorrelations->GetXaxis()->GetBinCenter(i+1);
     t.DrawLatex(x,y,info.labelList[i].c_str());
   }
@@ -901,7 +925,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   x = gPad->GetUxmin() - 0.1*dataCorrelations->GetXaxis()->GetBinWidth(1);
   t.SetTextAlign(32);
   t.SetTextAngle(0);
-  for (int i=0;i<info.labelList.size();i++) {
+  for (unsigned int i=0;i<info.labelList.size();i++) {
     y = dataCorrelations->GetYaxis()->GetBinCenter(i+1);
     t.DrawLatex(x,y,info.labelList[i].c_str());
   }
@@ -923,7 +947,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   t.SetTextAngle(60);
   t.SetTextSize(0.02);
   t.SetTextAlign(33);
-  for (int i=0;i<info.labelList.size();i++) {
+  for (unsigned int i=0;i<info.labelList.size();i++) {
     x = mcCorrelations->GetXaxis()->GetBinCenter(i+1);
     t.DrawLatex(x,y,info.labelList[i].c_str());
   }
@@ -931,7 +955,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   x = gPad->GetUxmin() - 0.1*mcCorrelations->GetXaxis()->GetBinWidth(1);
   t.SetTextAlign(32);
   t.SetTextAngle(0);
-  for (int i=0;i<info.labelList.size();i++) {
+  for (unsigned int i=0;i<info.labelList.size();i++) {
     y = mcCorrelations->GetYaxis()->GetBinCenter(i+1);
     t.DrawLatex(x,y,info.labelList[i].c_str());
   }
@@ -957,7 +981,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   mcEfficiencies->Sumw2();
 
 
-  for (int i=0;i<info.labelList.size();i++) {
+  for (unsigned int i=0;i<info.labelList.size();i++) {
     //dataPassed->SetBinContent(i+1,dataCorrelations->GetBinContent(i+1,i+1));
     //dataPassed->SetBinError(i+1,dataCorrelations->GetBinError(i+1,i+1));
     //mcPassed->SetBinContent(i+1,mcCorrelations->GetBinContent(i+1,i+1));
@@ -1012,7 +1036,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
   t.SetTextAngle(60);
   t.SetTextSize(0.02);
   t.SetTextAlign(33);
-  for (int i=0;i<info.labelList.size();i++) {
+  for (unsigned int i=0;i<info.labelList.size();i++) {
     x = mcCorrelations->GetXaxis()->GetBinCenter(i+1);
     t.DrawLatex(x,y,info.labelList[i].c_str());
   }
@@ -1057,14 +1081,14 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bUp.Add(hists.mc_light_hist);
   mc_stack_bUp.Add(hists.mc_c_hist);
   mc_stack_bUp.Add(hists.mc_b_hist);
-  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.4);
+  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
 
   THStack mc_stack_bDown((info.plotName+"_mc_stack_bDown").c_str(),info.plotTitle.c_str());
   mc_stack_bDown.Add(hists.mc_b_hist);
   mc_stack_bDown.Add(hists.mc_c_hist);
   mc_stack_bDown.Add(hists.mc_light_hist);
   if(info.displayNoInfo == true) mc_stack_bDown.Add(hists.mc_none_hist);
-  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.4);
+  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
   
   //Make Canvas
 
@@ -1078,9 +1102,9 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 
   TLegend *legend;
   if(info.legendPosition == true)
-    legend = new TLegend(0.725,0.6, 0.925, 0.85);  
+    legend = new TLegend(0.725,0.65, 0.925, 0.85);  
   else
-    legend = new TLegend(0.225,0.6, 0.425, 0.85);//By default legend is on the left side of the canvas
+    legend = new TLegend(0.225,0.65, 0.425, 0.85);//By default legend is on the left side of the canvas
   legend->AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
   legend->AddEntry(hists.mc_light_hist,"MC (light)","F");
@@ -1118,8 +1142,8 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bUp.Clear();
   canvas_bUp.SetLogy();
   mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
-  mc_stack_bUp.SetMinimum(0.1);
-  hists.data_hist->SetMinimum(0.1);
+  mc_stack_bUp.SetMinimum(0.2);
+  hists.data_hist->SetMinimum(0.2);
   hists.data_hist->SetMarkerStyle(1);
   mc_stack_bUp.Draw("HIST");
   hists.data_hist->SetMarkerStyle(1);
@@ -1149,8 +1173,8 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bDown.Clear();
   canvas_bDown.SetLogy();
   mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
-  mc_stack_bDown.SetMinimum(0.1);
-  hists.data_hist->SetMinimum(0.1);
+  mc_stack_bDown.SetMinimum(0.2);
+  hists.data_hist->SetMinimum(0.2);
   mc_stack_bDown.Draw("HIST");
   hists.data_hist->Draw("E1X0SAME");
   drawHelper->Draw("PSAME");
@@ -1162,6 +1186,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 
   TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_ratio.cd();
+  ratio->SetYTitle("Data/MC ratio");
   ratio->Draw("E1X0");
   pt->Draw();
   canvas_ratio.SaveAs((info.plotName+"_ratio.pdf").c_str());
@@ -1171,6 +1196,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   //Draw the plot and ratio on the same canvas
   TCanvas canvas_bDownLin((info.plotName+"canvas_bDownLin").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bDownLin.cd();
+  canvas_bDownLin.Clear();
 
   canvas_bDownLin.Divide(1,2,0.01,0.0);
   
@@ -1187,26 +1213,30 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   gPad->SetRightMargin(0.04);
 
   canvas_bDownLin.cd(1);
-  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.4);
+  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
   mc_stack_bDown.GetYaxis()->CenterTitle(1);
   mc_stack_bDown.GetYaxis()->SetTitleSize( 0.055 );
   mc_stack_bDown.GetYaxis()->SetTitleOffset( 1.3 );
-  mc_stack_bDown.GetYaxis()->SetLabelSize( 0.055 );
+  //  mc_stack_bDown.GetYaxis()->SetLabelSize( 0.055 );
   mc_stack_bDown.Draw("HIST");
   hists.data_hist->Draw("E1X0SAME");
-  //drawHelper->Draw("PSAME");
+  drawHelper->Draw("PSAME");
   legend->Draw();
   pt->Draw();
+  gPad->Update();
 
   canvas_bDownLin.cd(2);
+  //set the Y-axis range for the ratio
+  ratio->GetYaxis()->SetRangeUser(info.ratioMin,info.ratioMax);
+
   ratio->GetYaxis()->CenterTitle(1);
-  ratio->GetYaxis()->SetTitleSize( 0.165 );
-  ratio->GetYaxis()->SetTitleOffset( 0.4 );
-  ratio->GetYaxis()->SetLabelSize( 0.16 );
+  ratio->GetYaxis()->SetTitleSize( 0.13 );
+  ratio->GetYaxis()->SetTitleOffset( 0.525 );
+  ratio->GetYaxis()->SetLabelSize( 0.13 );
   ratio->GetYaxis()->SetNdivisions( 505 );
 
-  ratio->GetXaxis()->SetTitleSize( 0.16 );
-  ratio->GetXaxis()->SetLabelSize( 0.16 );
+  ratio->GetXaxis()->SetTitleSize( 0.13 );
+  ratio->GetXaxis()->SetLabelSize( 0.13 );
   ratio->GetXaxis()->SetTitleOffset( 1 );
   ratio->GetXaxis()->SetLabelOffset( 0.006 );
   ratio->GetXaxis()->SetNdivisions( 510 );
@@ -1214,6 +1244,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 
   ratio->SetYTitle("Data/MC");
   ratio->Draw("E1X0");
+  gPad->Update();
 
   canvas_bDownLin.SaveAs((info.plotName+"_bDown_LINEAR.pdf").c_str());
   canvas_bDownLin.SaveAs((info.plotName+"_bDown_LINEAR.png").c_str());
@@ -1238,16 +1269,19 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   gPad->SetLeftMargin(0.16);
   gPad->SetRightMargin(0.04);
 
-  canvas_bDownLog.cd(1);
-  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
-  mc_stack_bDown.Draw("HIST");
-  hists.data_hist->Draw("E1X0SAME");
-  //drawHelper->Draw("PSAME");
-  legend->Draw();
-  pt->Draw();
-
   canvas_bDownLog.cd(2);
   ratio->Draw("E1X0");
+
+  canvas_bDownLog.cd(1);
+  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  mc_stack_bDown.SetMinimum(0.2);
+  hists.data_hist->SetMinimum(0.2);
+  drawHelper->SetMinimum(0.2);
+  mc_stack_bDown.Draw("HIST");
+  hists.data_hist->Draw("E1X0SAME");
+  drawHelper->Draw("PSAME");
+  legend->Draw();
+  pt->Draw();
 
   canvas_bDownLog.SaveAs((info.plotName+"_bDown_LOG.pdf").c_str());
   canvas_bDownLog.SaveAs((info.plotName+"_bDown_LOG.png").c_str());
@@ -1284,7 +1318,7 @@ void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
-  TLegend legend(0.725,0.6, 0.925, 0.85);
+  TLegend legend(0.725,0.65, 0.925, 0.85);
   legend.AddEntry(drawHelper,"Data","LPE");
 
   int iColor = 2;
@@ -1716,7 +1750,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
 
   //Make Canvas
 
-  TLegend MClegend(0.7,0.45,0.95,0.7);
+  TLegend MClegend(0.7,0.7,0.95,0.95);
   MClegend.SetHeader("Monte Carlo Simulation");
   MClegend.AddEntry(hists.mc_hist_high_purity,"High Purity Tracks","F");
   MClegend.AddEntry(hists.mc_hist_tight,"Tight Tracks","F");
@@ -1726,7 +1760,7 @@ void MakeATrackQualityPlot(information1d info, qualityHists1D hists, double scal
   MClegend.SetBorderSize(1);
   MClegend.SetFillColor(kWhite);
 
-  TLegend datalegend(0.7,0.7,0.95,0.95);
+  TLegend datalegend(0.05,0.7,0.3,0.95);
   datalegend.SetHeader("Data");
   datalegend.AddEntry(hists.data_hist_high_purity,"High Purity Tracks","PE");
   datalegend.AddEntry(hists.data_hist_tight,"Tight Tracks","PE");
