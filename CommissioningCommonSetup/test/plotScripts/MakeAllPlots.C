@@ -99,6 +99,7 @@ struct information1d{
   int nbinsx;
   double ratioMin;
   double ratioMax;
+  int ratioRebin;
   bool displayNoInfo;
   bool legendPosition;
 };
@@ -117,6 +118,7 @@ struct informationCutComp{
   int nbinsx;
   double ratioMin;
   double ratioMax;
+  int ratioRebin;
   bool displayNoInfo;
   bool legendPosition;
 };
@@ -252,10 +254,11 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
   bool nbinsx = false;
   bool ratioMin = false;
   bool ratioMax = false;
+  bool ratioRebin = false;
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && ratioMin && ratioMax && bDisplayNoInfo && blegendPosition)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && ratioMin && ratioMax && ratioRebin && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -307,6 +310,10 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
       ratioMax = true;
       thisPlot.ratioMax = atof((line.substr(position+1)).c_str());
     }
+    if(line.find("ratioRebin")<position){
+      ratioRebin = true;
+      thisPlot.ratioRebin = atof((line.substr(position+1)).c_str());
+    }
     if(line.find("displayNoInfo")<position){
       bDisplayNoInfo = true;
       thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
@@ -336,10 +343,11 @@ informationCutComp paramCutComp(ifstream* plotFile, informationCutComp defaultPa
   bool nbinsx = false;
   bool ratioMin = false;
   bool ratioMax = false;
+  bool ratioRebin = false;
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && cutList && labelList && xlow && xup && nbinsx && ratioMin && ratioMax && bDisplayNoInfo && blegendPosition)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && cutList && labelList && xlow && xup && nbinsx && ratioMin && ratioMax && ratioRebin && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -420,6 +428,10 @@ informationCutComp paramCutComp(ifstream* plotFile, informationCutComp defaultPa
     if(line.find("ratioMax")<position){
       ratioMax = true;
       thisPlot.ratioMax = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("ratioRebin")<position){
+      ratioRebin = true;
+      thisPlot.ratioRebin = atof((line.substr(position+1)).c_str());
     }
     if(line.find("displayNoInfo")<position){
       bDisplayNoInfo = true;
@@ -1095,9 +1107,17 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
+  
   TH1D* ratio = (TH1D*)hists.data_hist->Clone((info.plotName+"ratio").c_str());
+  TH1D* ratioMC = (TH1D*)hists.mc_all_hist->Clone((info.plotName+"ratioMC").c_str());
   ratio->SetTitle((info.plotTitle+": Data to Monte Carlo Simulation Ratio").c_str());  
-  ratio->Divide(hists.mc_all_hist);
+  
+  if(info.ratioRebin >=2){
+    ratio->Rebin(info.ratioRebin);
+    ratioMC->Rebin(info.ratioRebin);
+  }
+
+  ratio->Divide(ratioMC);
   ratio->SetMarkerStyle(20);
 
   TLegend *legend;
@@ -1136,9 +1156,9 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   TText *text = pt->AddText("CMS Preliminary 2010");   
   pt->Draw();
 
-  canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.pdf").c_str());
-  canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.png").c_str());
-  canvas_bUp.SaveAs((info.plotName+"_bUp_Linear.root").c_str());
+  canvas_bUp.SaveAs((info.plotName+"_bUp_Linear_noRatio.pdf").c_str());
+  canvas_bUp.SaveAs((info.plotName+"_bUp_Linear_noRatio.png").c_str());
+  canvas_bUp.SaveAs((info.plotName+"_bUp_Linear_noRatio.root").c_str());
   canvas_bUp.Clear();
   canvas_bUp.SetLogy();
   mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
@@ -1151,9 +1171,9 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   drawHelper->Draw("PSAME");
   legend->Draw();
   pt->Draw();
-  canvas_bUp.SaveAs((info.plotName+"_bUp_Log.pdf").c_str());
-  canvas_bUp.SaveAs((info.plotName+"_bUp_Log.png").c_str());
-  canvas_bUp.SaveAs((info.plotName+"_bUp_Log.root").c_str());
+  canvas_bUp.SaveAs((info.plotName+"_bUp_Log_noRatio.pdf").c_str());
+  canvas_bUp.SaveAs((info.plotName+"_bUp_Log_noRatio.png").c_str());
+  canvas_bUp.SaveAs((info.plotName+"_bUp_Log_noRatio.root").c_str());
   hists.data_hist->SetMinimum(0);
   
   TCanvas canvas_bDown((info.plotName+"canvas_bDown").c_str(),info.plotTitle.c_str(),1024,1024);
@@ -1167,9 +1187,9 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   //include the official CMS label
   pt->Draw();
 
-  canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.pdf").c_str());
-  canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.png").c_str());
-  canvas_bDown.SaveAs((info.plotName+"_bDown_Linear.root").c_str());
+  canvas_bDown.SaveAs((info.plotName+"_bDown_Linear_noRatio.pdf").c_str());
+  canvas_bDown.SaveAs((info.plotName+"_bDown_Linear_noRatio.png").c_str());
+  canvas_bDown.SaveAs((info.plotName+"_bDown_Linear_noRatio.root").c_str());
   canvas_bDown.Clear();
   canvas_bDown.SetLogy();
   mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
@@ -1180,9 +1200,9 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   drawHelper->Draw("PSAME");
   legend->Draw();
   pt->Draw();
-  canvas_bDown.SaveAs((info.plotName+"_bDown_Log.pdf").c_str());
-  canvas_bDown.SaveAs((info.plotName+"_bDown_Log.png").c_str());
-  canvas_bDown.SaveAs((info.plotName+"_bDown_Log.root").c_str());
+  canvas_bDown.SaveAs((info.plotName+"_bDown_Log_noRatio.pdf").c_str());
+  canvas_bDown.SaveAs((info.plotName+"_bDown_Log_noRatio.png").c_str());
+  canvas_bDown.SaveAs((info.plotName+"_bDown_Log_noRatio.root").c_str());
 
   TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_ratio.cd();
@@ -1211,7 +1231,8 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   gPad->SetBottomMargin(0.375);
   gPad->SetLeftMargin(0.16);
   gPad->SetRightMargin(0.04);
-
+  gPad->SetGridy();
+ 
   canvas_bDownLin.cd(1);
   mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
   mc_stack_bDown.GetYaxis()->CenterTitle(1);
@@ -1246,9 +1267,9 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   ratio->Draw("E1X0");
   gPad->Update();
 
-  canvas_bDownLin.SaveAs((info.plotName+"_bDown_LINEAR.pdf").c_str());
-  canvas_bDownLin.SaveAs((info.plotName+"_bDown_LINEAR.png").c_str());
-  canvas_bDownLin.SaveAs((info.plotName+"_bDown_LINEAR.root").c_str());
+  canvas_bDownLin.SaveAs((info.plotName+"_bDown_Linear.pdf").c_str());
+  canvas_bDownLin.SaveAs((info.plotName+"_bDown_Linear.png").c_str());
+  canvas_bDownLin.SaveAs((info.plotName+"_bDown_Linear.root").c_str());
   //
   //
   TCanvas canvas_bDownLog((info.plotName+"canvas_bDownLog").c_str(),info.plotTitle.c_str(),1024,1024);
@@ -1268,6 +1289,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   gPad->SetBottomMargin(0.375);
   gPad->SetLeftMargin(0.16);
   gPad->SetRightMargin(0.04);
+  gPad->SetGridy();
 
   canvas_bDownLog.cd(2);
   ratio->Draw("E1X0");
@@ -1283,9 +1305,9 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend->Draw();
   pt->Draw();
 
-  canvas_bDownLog.SaveAs((info.plotName+"_bDown_LOG.pdf").c_str());
-  canvas_bDownLog.SaveAs((info.plotName+"_bDown_LOG.png").c_str());
-  canvas_bDownLog.SaveAs((info.plotName+"_bDown_LOG.root").c_str());
+  canvas_bDownLog.SaveAs((info.plotName+"_bDown_Log.pdf").c_str());
+  canvas_bDownLog.SaveAs((info.plotName+"_bDown_Log.png").c_str());
+  canvas_bDownLog.SaveAs((info.plotName+"_bDown_Log.root").c_str());
 
   return;
 }
