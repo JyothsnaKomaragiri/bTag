@@ -100,6 +100,7 @@ struct information1d{
   double ratioMin;
   double ratioMax;
   int ratioRebin;
+  bool displayOverUnderflowBin;
   bool displayNoInfo;
   bool legendPosition;
 };
@@ -255,10 +256,11 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
   bool ratioMin = false;
   bool ratioMax = false;
   bool ratioRebin = false;
+  bool displayOverUnderflowBin = false;
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && ratioMin && ratioMax && ratioRebin && bDisplayNoInfo && blegendPosition)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -313,6 +315,10 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
     if(line.find("ratioRebin")<position){
       ratioRebin = true;
       thisPlot.ratioRebin = atof((line.substr(position+1)).c_str());
+    }
+   if(line.find("displayOverUnderflowBin")<position){
+      displayOverUnderflowBin = true;
+      thisPlot.displayOverUnderflowBin = (bool)atoi((line.substr(position+1)).c_str());
     }
     if(line.find("displayNoInfo")<position){
       bDisplayNoInfo = true;
@@ -1088,6 +1094,23 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   hists.mc_c_hist->SetFillColor(kGreen);
   hists.mc_b_hist->SetFillColor(kRed);
   
+  // calculate over and underflow bin if requested
+  if(info.displayOverUnderflowBin == true){
+    double nBinX=hists.mc_all_hist->GetNbinsX();
+    hists.mc_all_hist->SetBinContent(nBinX, hists.mc_all_hist->GetBinContent(nBinX) + hists.mc_all_hist->GetBinContent(nBinX+1));
+    hists.mc_all_hist->SetBinContent(1, hists.mc_all_hist->GetBinContent(1) + hists.mc_all_hist->GetBinContent(0));
+    hists.mc_b_hist->SetBinContent(nBinX, hists.mc_b_hist->GetBinContent(nBinX) + hists.mc_b_hist->GetBinContent(nBinX+1));
+    hists.mc_b_hist->SetBinContent(1, hists.mc_b_hist->GetBinContent(1) + hists.mc_b_hist->GetBinContent(0));
+    hists.mc_c_hist->SetBinContent(nBinX, hists.mc_c_hist->GetBinContent(nBinX) + hists.mc_c_hist->GetBinContent(nBinX+1));
+    hists.mc_c_hist->SetBinContent(1, hists.mc_c_hist->GetBinContent(1) + hists.mc_c_hist->GetBinContent(0));
+    hists.mc_light_hist->SetBinContent(nBinX, hists.mc_light_hist->GetBinContent(nBinX) + hists.mc_light_hist->GetBinContent(nBinX+1));
+    hists.mc_light_hist->SetBinContent(1, hists.mc_light_hist->GetBinContent(1) + hists.mc_light_hist->GetBinContent(0));
+    hists.mc_none_hist->SetBinContent(nBinX, hists.mc_none_hist->GetBinContent(nBinX) + hists.mc_none_hist->GetBinContent(nBinX+1));
+    hists.mc_none_hist->SetBinContent(1, hists.mc_none_hist->GetBinContent(1) + hists.mc_none_hist->GetBinContent(0));
+    hists.data_hist->SetBinContent(nBinX, hists.data_hist->GetBinContent(nBinX) + hists.data_hist->GetBinContent(nBinX+1));
+    hists.data_hist->SetBinContent(1, hists.data_hist->GetBinContent(1) + hists.data_hist->GetBinContent(0));
+  }
+
   THStack mc_stack_bUp((info.plotName+"_mc_stack_bUp").c_str(),info.plotTitle.c_str());
   if(info.displayNoInfo == true) mc_stack_bUp.Add(hists.mc_none_hist);
   mc_stack_bUp.Add(hists.mc_light_hist);
