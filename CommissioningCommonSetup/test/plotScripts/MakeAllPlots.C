@@ -1332,6 +1332,87 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bDownLog.SaveAs((info.plotName+"_bDown_Log.png").c_str());
   canvas_bDownLog.SaveAs((info.plotName+"_bDown_Log.root").c_str());
 
+
+  ////////////////////////////////////////
+ //Draw the plot and ratio on the same canvas
+  TCanvas canvas_bUpLin((info.plotName+"canvas_bUpLin").c_str(),info.plotTitle.c_str(),1024,1024);
+  canvas_bUpLin.cd();
+  canvas_bUpLin.Clear();
+
+  canvas_bUpLin.Divide(1,2,0.01,0.0);
+  
+  canvas_bUpLin.cd(1);
+  gPad->SetPad( 0.0, 0.25, 1.0, 1.0 );
+  gPad->SetTopMargin(0.1);
+  gPad->SetLeftMargin(0.16);
+  gPad->SetRightMargin(0.04);
+
+  canvas_bUpLin.cd(2);
+  gPad->SetPad( 0.0, 0.0,  1.0, 0.25 );
+  gPad->SetBottomMargin(0.375);
+  gPad->SetLeftMargin(0.16);
+  gPad->SetRightMargin(0.04);
+  gPad->SetGridy();
+ 
+  canvas_bUpLin.cd(1);
+  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  mc_stack_bUp.GetYaxis()->CenterTitle(1);
+  mc_stack_bUp.GetYaxis()->SetTitleSize( 0.055 );
+  mc_stack_bUp.GetYaxis()->SetTitleOffset( 1.3 );
+  //  mc_stack_bUp.GetYaxis()->SetLabelSize( 0.055 );
+  mc_stack_bUp.Draw("HIST");
+  hists.data_hist->Draw("E1X0SAME");
+  drawHelper->Draw("PSAME");
+  legend->Draw();
+  pt->Draw();
+  gPad->Update();
+
+  canvas_bUpLin.cd(2);
+  //set the Y-axis range for the ratio
+ 
+  ratio->Draw("E1X0");
+  gPad->Update();
+
+  canvas_bUpLin.SaveAs((info.plotName+"_bUp_Linear.pdf").c_str());
+  canvas_bUpLin.SaveAs((info.plotName+"_bUp_Linear.png").c_str());
+  canvas_bUpLin.SaveAs((info.plotName+"_bUp_Linear.root").c_str());
+  //
+  //
+  TCanvas canvas_bUpLog((info.plotName+"canvas_bUpLog").c_str(),info.plotTitle.c_str(),1024,1024);
+  canvas_bUpLog.cd();
+
+  canvas_bUpLog.Divide(1,2,0.01,0.0);
+  
+  canvas_bUpLog.cd(1);
+  gPad->SetLogy();
+  gPad->SetPad( 0.0, 0.25, 1.0, 1.0 );
+  gPad->SetTopMargin(0.1);
+  gPad->SetLeftMargin(0.16);
+  gPad->SetRightMargin(0.04);
+
+  canvas_bUpLog.cd(2);
+  gPad->SetPad( 0.0, 0.0,  1.0, 0.25 );
+  gPad->SetBottomMargin(0.375);
+  gPad->SetLeftMargin(0.16);
+  gPad->SetRightMargin(0.04);
+  gPad->SetGridy();
+
+  canvas_bUpLog.cd(2);
+  ratio->Draw("E1X0");
+
+  canvas_bUpLog.cd(1);
+
+  drawHelper->SetMinimum(0.2);
+  mc_stack_bUp.Draw("HIST");
+  hists.data_hist->Draw("E1X0SAME");
+  drawHelper->Draw("PSAME");
+  legend->Draw();
+  pt->Draw();
+
+  canvas_bUpLog.SaveAs((info.plotName+"_bUp_Log.pdf").c_str());
+  canvas_bUpLog.SaveAs((info.plotName+"_bUp_Log.png").c_str());
+  canvas_bUpLog.SaveAs((info.plotName+"_bUp_Log.root").c_str());
+
   return;
 }
 
