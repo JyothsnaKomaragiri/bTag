@@ -1147,13 +1147,13 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   if(info.legendPosition == true)
     legend = new TLegend(0.725,0.65, 0.925, 0.85);  
   else
-    legend = new TLegend(0.225,0.65, 0.425, 0.85);//By default legend is on the left side of the canvas
+    legend = new TLegend(0.195,0.65, 0.350, 0.85);//By default legend is on the left side of the canvas
   legend->AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
-  legend->AddEntry(hists.mc_light_hist,"MC (light)","F");
-  legend->AddEntry(hists.mc_c_hist,"MC (charm)","F");
-  legend->AddEntry(hists.mc_b_hist,"MC (bottom)","F");
-  if(info.displayNoInfo == true) legend->AddEntry(hists.mc_none_hist,"MC (no info)","F");
+  legend->AddEntry(hists.mc_light_hist,"Sim.(light)","F");
+  legend->AddEntry(hists.mc_c_hist,"Sim.(charm)","F");
+  legend->AddEntry(hists.mc_b_hist,"Sim.(bottom)","F");
+  if(info.displayNoInfo == true) legend->AddEntry(hists.mc_none_hist,"Sim.(no info)","F");
 
   legend->SetBorderSize(0);
   legend->SetFillColor(kWhite);
@@ -1170,13 +1170,13 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend->Draw();
 
   //include the official CMS label
-  TPaveText *pt = new TPaveText(0.4,0.92,0.9,0.97,"brNDC");   
+  TPaveText *pt = new TPaveText(0.25,0.945,0.98,0.995,"brNDC");   
   pt->SetBorderSize(0);   
   pt->SetFillStyle(0);  
   pt->SetTextAlign(13);   
   pt->SetTextFont(42);   
-  pt->SetTextSize(0.035);   
-  TText *text = pt->AddText("CMS Preliminary 2010");   
+  pt->SetTextSize(0.04);   
+  TText *text = pt->AddText("CMS Preliminary 2010, #sqrt{s} = 7 TeV, L= 15 nb^{-1}");   
   pt->Draw();
 
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear_noRatio.pdf").c_str());
@@ -1579,11 +1579,11 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
     legend = new TLegend(0.225,0.6, 0.425, 0.85); //By default legend is on the left side of the canvas
   legend->AddEntry(drawHelper,"Data","LPE");
   //  dataEntry->SetMarkerStyle(20);
-  legend->AddEntry(hists.mc_all_hist,"MC Total","L");
-  legend->AddEntry(hists.mc_light_hist,"MC (light)","L");
-  legend->AddEntry(hists.mc_c_hist,"MC (charm)","L");
-  legend->AddEntry(hists.mc_b_hist,"MC (bottom)","L");
-  if(info.displayNoInfo == true) legend->AddEntry(hists.mc_none_hist,"MC (no info)","L");
+  legend->AddEntry(hists.mc_all_hist,"Sim.(total)","L");
+  legend->AddEntry(hists.mc_light_hist,"Sim.(light)","L");
+  legend->AddEntry(hists.mc_c_hist,"Sim.(charm)","L");
+  legend->AddEntry(hists.mc_b_hist,"Sim.(bottom)","L");
+  if(info.displayNoInfo == true) legend->AddEntry(hists.mc_none_hist,"Sim.(no info)","L");
 
   legend->SetBorderSize(0);
   legend->SetFillColor(kWhite);
@@ -1596,15 +1596,16 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   hists.data_hist->Draw("E1X0SAME");
   legend->Draw();
 
-  //include the official CMS label
-  TPaveText *pt = new TPaveText(0.4,0.92,0.9,0.97,"brNDC");   
+
+  TPaveText *pt = new TPaveText(0.25,0.945,0.98,0.995,"brNDC");   
   pt->SetBorderSize(0);   
   pt->SetFillStyle(0);  
   pt->SetTextAlign(13);   
   pt->SetTextFont(42);   
-  pt->SetTextSize(0.035);   
-  TText *text = pt->AddText("CMS Preliminary 2010");   
+  pt->SetTextSize(0.04);   
+  TText *text = pt->AddText("CMS Preliminary 2010, #sqrt{s} = 7 TeV, L= 15 nb^{-1}");   
   pt->Draw();
+
 
   canvas.SaveAs((info.plotName+".pdf").c_str());
   canvas.SaveAs((info.plotName+".png").c_str());
