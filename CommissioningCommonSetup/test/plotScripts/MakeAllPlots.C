@@ -97,6 +97,8 @@ struct information1d{
   double xlow;
   double xup;
   int nbinsx;
+  std::string yTitle;
+  double yMin;
   double ratioMin;
   double ratioMax;
   int ratioRebin;
@@ -253,6 +255,8 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
   bool xlow = false;
   bool xup = false;
   bool nbinsx = false;
+  bool yTitle = false;
+  bool yMin = false;
   bool ratioMin = false;
   bool ratioMax = false;
   bool ratioRebin = false;
@@ -260,7 +264,7 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -303,6 +307,14 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
     if(line.find("nbinsx")<position){
       nbinsx = true;
       thisPlot.nbinsx = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("yTitle")<position){
+      yTitle = true;
+      thisPlot.yTitle = line.substr(position+1);
+    }
+    if(line.find("yMin")<position){
+      yMin = true;
+      thisPlot.yMin = line.substr(position+1);
     }
     if(line.find("ratioMin")<position){
       ratioMin = true;
@@ -1116,14 +1128,12 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bUp.Add(hists.mc_light_hist);
   mc_stack_bUp.Add(hists.mc_c_hist);
   mc_stack_bUp.Add(hists.mc_b_hist);
-  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
 
   THStack mc_stack_bDown((info.plotName+"_mc_stack_bDown").c_str(),info.plotTitle.c_str());
   mc_stack_bDown.Add(hists.mc_b_hist);
   mc_stack_bDown.Add(hists.mc_c_hist);
   mc_stack_bDown.Add(hists.mc_light_hist);
   if(info.displayNoInfo == true) mc_stack_bDown.Add(hists.mc_none_hist);
-  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
   
   //Make Canvas
 
@@ -1164,8 +1174,10 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 
   TCanvas canvas_bUp((info.plotName+"canvas_bUp").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bUp.cd();
-  mc_stack_bUp.Draw("HIST");
-  hists.data_hist->Draw("E1X0SAME");
+
+  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  hists.data_hist->Draw("E1X0");
+  mc_stack_bUp.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
 
@@ -1176,7 +1188,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   pt->SetTextAlign(13);   
   pt->SetTextFont(42);   
   pt->SetTextSize(0.04);   
-  TText *text = pt->AddText("CMS Preliminary 2010, #sqrt{s} = 7 TeV, L= 15 nb^{-1}");   
+  TText *text = pt->AddText("CMS Preliminary 2010, #sqrt{s} = 7 TeV, L = 15 nb^{-1}");   
   pt->Draw();
 
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear_noRatio.pdf").c_str());
@@ -1184,13 +1196,12 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear_noRatio.root").c_str());
   canvas_bUp.Clear();
   canvas_bUp.SetLogy();
-  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
-  mc_stack_bUp.SetMinimum(0.2);
-  hists.data_hist->SetMinimum(0.2);
+
+  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  hists.data_hist->SetMinimum(info.yMin);
   hists.data_hist->SetMarkerStyle(1);
-  mc_stack_bUp.Draw("HIST");
-  hists.data_hist->SetMarkerStyle(1);
-  hists.data_hist->Draw("E1X0SAME");
+  hists.data_hist->Draw("E1X0");
+  mc_stack_bUp.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
   pt->Draw();
@@ -1201,9 +1212,10 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   
   TCanvas canvas_bDown((info.plotName+"canvas_bDown").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bDown.cd();
-  mc_stack_bDown.Draw("HIST");
+  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
   hists.data_hist->SetMarkerStyle(1);
-  hists.data_hist->Draw("E1X0SAME");
+  hists.data_hist->Draw("E1X0");
+  mc_stack_bDown.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
 
@@ -1215,11 +1227,10 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear_noRatio.root").c_str());
   canvas_bDown.Clear();
   canvas_bDown.SetLogy();
-  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
-  mc_stack_bDown.SetMinimum(0.2);
-  hists.data_hist->SetMinimum(0.2);
-  mc_stack_bDown.Draw("HIST");
-  hists.data_hist->Draw("E1X0SAME");
+  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  hists.data_hist->SetMinimum(info.yMin);
+  hists.data_hist->Draw("E1X0");
+  mc_stack_bDown.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
   pt->Draw();
@@ -1257,13 +1268,13 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   gPad->SetGridy();
  
   canvas_bDownLin.cd(1);
-  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
-  mc_stack_bDown.GetYaxis()->CenterTitle(1);
-  mc_stack_bDown.GetYaxis()->SetTitleSize( 0.055 );
-  mc_stack_bDown.GetYaxis()->SetTitleOffset( 1.3 );
-  //  mc_stack_bDown.GetYaxis()->SetLabelSize( 0.055 );
-  mc_stack_bDown.Draw("HIST");
-  hists.data_hist->Draw("E1X0SAME");
+  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  hists.data_hist->GetYaxis()->CenterTitle(1);
+  hists.data_hist->GetYaxis()->SetTitleSize( 0.055 );
+  hists.data_hist->GetYaxis()->SetTitleOffset( 1.3 );
+  hists.data_hist->SetMinimum(0);
+  hists.data_hist->Draw("E1X0");
+  mc_stack_bDown.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
   pt->Draw();
@@ -1318,12 +1329,10 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   ratio->Draw("E1X0");
 
   canvas_bDownLog.cd(1);
-  mc_stack_bDown.SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
-  mc_stack_bDown.SetMinimum(0.2);
-  hists.data_hist->SetMinimum(0.2);
-  drawHelper->SetMinimum(0.2);
-  mc_stack_bDown.Draw("HIST");
-  hists.data_hist->Draw("E1X0SAME");
+  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  hists.data_hist->SetMinimum(info.yMin);
+  hists.data_hist->Draw("E1X0");
+  mc_stack_bDown.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
   pt->Draw();
@@ -1355,13 +1364,13 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   gPad->SetGridy();
  
   canvas_bUpLin.cd(1);
-  mc_stack_bUp.SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
-  mc_stack_bUp.GetYaxis()->CenterTitle(1);
-  mc_stack_bUp.GetYaxis()->SetTitleSize( 0.055 );
-  mc_stack_bUp.GetYaxis()->SetTitleOffset( 1.3 );
-  //  mc_stack_bUp.GetYaxis()->SetLabelSize( 0.055 );
-  mc_stack_bUp.Draw("HIST");
-  hists.data_hist->Draw("E1X0SAME");
+  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  hists.data_hist->GetYaxis()->CenterTitle(1);
+  hists.data_hist->GetYaxis()->SetTitleSize( 0.055 );
+  hists.data_hist->GetYaxis()->SetTitleOffset( 1.3 );
+  hists.data_hist->SetMinimum(0);
+  hists.data_hist->Draw("E1X0");
+  mc_stack_bUp.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
   pt->Draw();
@@ -1402,9 +1411,10 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 
   canvas_bUpLog.cd(1);
 
-  drawHelper->SetMinimum(0.2);
-  mc_stack_bUp.Draw("HIST");
-  hists.data_hist->Draw("E1X0SAME");
+  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  hists.data_hist->SetMinimum(info.yMin);
+  hists.data_hist->Draw("E1X0");
+  mc_stack_bUp.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
   pt->Draw();
@@ -2554,9 +2564,9 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   list< pair< information2d , flavorHists2D > > reweightedTrackPlots;
   list< pair< informationCutComp , cutCompHists > > cutCompPlots;
 
-  TString normalizationText = "";
-  if(finalNorm<=0) normalizationText = "MC normalized to Data";
-  else normalizationText = "normalized to Luminosity";
+  //  TString normalizationText = "";
+  //  if(finalNorm<=0) normalizationText = "MC normalized to Data";
+  //  else normalizationText = "normalized to Luminosity";
 
   while (! plotFiles.eof()) {
     string line;
@@ -2587,12 +2597,12 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
-	theseHists.data_hist->GetYaxis()->SetTitle( normalizationText  );
-	theseHists.mc_all_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_b_hist->GetYaxis()->SetTitle( normalizationText  );
-	theseHists.mc_c_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_light_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_none_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.data_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	theseHists.data_hist->Sumw2();
 	theseHists.mc_all_hist->Sumw2();
 	theseHists.mc_b_hist->Sumw2();
@@ -2747,12 +2757,12 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
-	theseHists.data_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_all_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_b_hist->GetYaxis()->SetTitle(normalizationText );
-	theseHists.mc_c_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_light_hist->GetYaxis()->SetTitle(normalizationText  );
-	theseHists.mc_none_hist->GetYaxis()->SetTitle(normalizationText  );
+	theseHists.data_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle(thisPlot.yTitle.c_str() );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle(thisPlot.yTitle.c_str()  );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle(thisPlot.yTitle.c_str()  );
 	theseHists.data_hist->Sumw2();
 	theseHists.mc_all_hist->Sumw2();
 	theseHists.mc_b_hist->Sumw2();
@@ -2778,12 +2788,12 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
-	theseHists.data_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_all_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_b_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_c_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_light_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_none_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.data_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	theseHists.data_hist->Sumw2();
 	theseHists.mc_all_hist->Sumw2();
 	theseHists.mc_b_hist->Sumw2();
@@ -2840,12 +2850,12 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
-	theseHists.data_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_all_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_b_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_c_hist->GetYaxis()->SetTitle( normalizationText );
-	theseHists.mc_light_hist->GetYaxis()->SetTitle(normalizationText );
-	theseHists.mc_none_hist->GetYaxis()->SetTitle( normalizationText );
+	theseHists.data_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle(thisPlot.yTitle.c_str() );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	theseHists.data_hist->Sumw2();
 	theseHists.mc_all_hist->Sumw2();
 	theseHists.mc_b_hist->Sumw2();
