@@ -1574,7 +1574,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
 
   TLegend *legend;
   if(info.legendPosition == true)
-    legend = new TLegend(0.725,0.15, 0.925, 0.4);
+    legend = new TLegend(0.725,0.15, 0.925, 0.35);
   else
     legend = new TLegend(0.225,0.6, 0.425, 0.85); //By default legend is on the left side of the canvas
   legend->AddEntry(drawHelper,"Data","LPE");
@@ -1597,12 +1597,12 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   legend->Draw();
 
 
-  TPaveText *pt = new TPaveText(0.25,0.945,0.98,0.995,"brNDC");   
+  TPaveText *pt = new TPaveText(0.2,0.945,0.98,0.995,"brNDC");   
   pt->SetBorderSize(0);   
   pt->SetFillStyle(0);  
   pt->SetTextAlign(13);   
   pt->SetTextFont(42);   
-  pt->SetTextSize(0.04);   
+  pt->SetTextSize(0.035);   
   TText *text = pt->AddText("CMS Preliminary 2010, #sqrt{s} = 7 TeV, L= 15 nb^{-1}");   
   pt->Draw();
 
@@ -1713,6 +1713,7 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
   flavorHists1D profiles;
   information1d profInfo;
   profInfo.displayNoInfo = info.displayNoInfo;
+  profInfo.legendPosition = info.legendPosition;
 
   TProfile* data_prof_x = hists.data_hist->ProfileX();
   TProfile* mc_all_prof_x = hists.mc_all_hist->ProfileX();
@@ -1744,7 +1745,7 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale)
 
   profInfo.plotName = info.plotName+"_x_profile";
   profInfo.plotTitle = info.plotTitle+" : "+" "+info.xTitle+" Profile";
-
+ 
   MakeAProfilePlot(profInfo,profiles);
 
   TProfile* data_prof_y = hists.data_hist->ProfileY();
@@ -2169,6 +2170,7 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale)
   flavorHists1D profiles;
   information1d profInfo;
   profInfo.displayNoInfo = info.displayNoInfo;
+  profInfo.legendPosition = info.legendPosition;
 
   TProfile* data_prof = data_int->ProfileX();
   TProfile* mc_all_prof = mc_all_int->ProfileX();
