@@ -314,7 +314,7 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
     }
     if(line.find("yMin")<position){
       yMin = true;
-      thisPlot.yMin = line.substr(position+1);
+      thisPlot.yMin = atof((line.substr(position+1)).c_str());
     }
     if(line.find("ratioMin")<position){
       ratioMin = true;
