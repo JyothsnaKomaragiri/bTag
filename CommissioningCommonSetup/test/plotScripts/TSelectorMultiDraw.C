@@ -24,8 +24,10 @@
 //
 
 #include "TSelectorMultiDraw.h"
+#include "TrackSelector.h"
 #include <TH2.h>
 #include <TStyle.h>
+#include "informationTrackCuts.h"
 
 using namespace std;
 
@@ -37,6 +39,10 @@ void TSelectorMultiDraw::Begin(TTree * tree)
 
    TString option = GetOption();
    for(list<TSelectorDraw*>::iterator iSelector = fSelectors.begin(); iSelector!=fSelectors.end(); iSelector++)
+     {
+       (*iSelector)->Begin(tree);
+     }
+   for(list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
      {
        (*iSelector)->Begin(tree);
      }
@@ -75,6 +81,10 @@ Bool_t TSelectorMultiDraw::Process(Long64_t entry)
      {
        if((*iSelector)->ProcessCut(entry)) (*iSelector)->ProcessFill(entry);
      }
+   for(list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
+     {
+         (*iSelector)->Process(entry);
+     }
 
    return kTRUE;
 }
@@ -95,6 +105,10 @@ void TSelectorMultiDraw::Terminate()
      {
        (*iSelector)->Terminate();
      }
+   for(list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
+   {
+       (*iSelector)->Terminate();
+     }
 }
 
 void TSelectorMultiDraw::LoadVariables(string varexp, string selection)
@@ -107,3 +121,8 @@ void TSelectorMultiDraw::LoadVariables(string varexp, string selection)
   fSelectors.push_back(thisSelector);
 }
 
+void TSelectorMultiDraw::AddTrackSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationTrackCuts info){
+  TrackSelector *trackSel = new TrackSelector();
+  trackSel->SetUp(isData, dataHist, mcHistb, mcHistc, mcHistl, mcHistn, info);
+  fTrackSelectors.push_back(trackSel);
+}

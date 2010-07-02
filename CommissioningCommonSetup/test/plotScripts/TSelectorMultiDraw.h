@@ -16,10 +16,13 @@
 #include <list>
 #include <string>
 
+#include "TrackSelector.h"
+
 class TSelectorMultiDraw : public TSelector {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    std::list<TSelectorDraw*> fSelectors; //list of TSelectorDraws
+   std::list<TrackSelector*> fTrackSelectors; //list of TrackSelectors
     // Declaration of leaf types
 
    // List of branches
@@ -38,6 +41,10 @@ public :
        {
 	 (*iSelector)->SetOption(option);
        }
+     for(std::list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
+       {
+	 (*iSelector)->SetOption(option);
+       }
    }
    virtual void    SetObject(TObject *obj) { fObject = obj; }
    virtual void    SetInputList(TList *input) { fInput = input; }
@@ -45,6 +52,7 @@ public :
    virtual void    SlaveTerminate();
    virtual void    Terminate();
    virtual void    LoadVariables(std::string varexp, std::string selection);
+   virtual void   AddTrackSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationTrackCuts info);
    //   virtual void    SetOption(const char* option);
 
    ClassDef(TSelectorMultiDraw,0);
@@ -68,6 +76,10 @@ void TSelectorMultiDraw::Init(TTree *tree)
    fChain = tree;
    fChain->SetMakeClass(1);
    for(list<TSelectorDraw*>::iterator iSelector = fSelectors.begin(); iSelector!=fSelectors.end(); iSelector++)
+     {
+       (*iSelector)->Init(tree);
+     }
+   for(list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
      {
        (*iSelector)->Init(tree);
      }

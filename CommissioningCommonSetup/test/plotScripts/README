@@ -4,6 +4,7 @@ remove existing libraries with
 rm *.so
 
 start root and compile the library:
+.L TrackSelector.C++
 .L TSelectorMultiDraw.C++
 .L MakeAllPlots.C++
 

@@ -24,6 +24,30 @@
 #include <list>
 #include <utility>
 #include "TStyle.h"
+#include "informationTrackCuts.h"
+
+struct information1d{
+  std::string plotName;
+  std::string plotTitle;
+  std::string label;
+  std::string aliasx;
+  std::string xTitle;
+  std::string cut;
+  double xlow;
+  double xup;
+  int nbinsx;
+  std::string yTitle;
+  double yMin;
+  double ratioMin;
+  double ratioMax;
+  int ratioRebin;
+  bool displayOverUnderflowBin;
+  bool displayNoInfo;
+  bool legendPosition;
+};
+
+
+information1d get1DInfoFromTrackCut(informationTrackCuts info);
 
 void setTDRStyle() {
 
@@ -85,27 +109,6 @@ void setTDRStyle() {
 
   tdrStyle->cd();
 }
-
-
-struct information1d{
-  std::string plotName;
-  std::string plotTitle;
-  std::string label;
-  std::string aliasx;
-  std::string xTitle;
-  std::string cut;
-  double xlow;
-  double xup;
-  int nbinsx;
-  std::string yTitle;
-  double yMin;
-  double ratioMin;
-  double ratioMax;
-  int ratioRebin;
-  bool displayOverUnderflowBin;
-  bool displayNoInfo;
-  bool legendPosition;
-};
 
 struct informationCutComp{
   std::string plotName;
@@ -339,6 +342,167 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
     if(line.find("legendPosition")<position){
       blegendPosition = true;
       thisPlot.legendPosition = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
+
+  }
+  return thisPlot;
+}
+
+
+informationTrackCuts paramTrackCuts(ifstream* plotFile)
+{
+  informationTrackCuts thisPlot;
+  bool plotName = false;
+  bool plotTitle = false;
+  bool label = false;
+  bool aliasx = false;
+  bool xTitle = false;
+  bool cut = false;
+  bool xlow = false;
+  bool xup = false;
+  bool nbinsx = false;
+  bool yTitle = false;
+  bool yMin = false;
+  bool ratioMin = false;
+  bool ratioMax = false;
+  bool ratioRebin = false;
+  bool displayOverUnderflowBin = false;
+  bool bDisplayNoInfo = false;
+  bool blegendPosition = false;
+
+  bool bstandardPFtriggerHLTJet15U = false;
+  bool bjetPtCut = false;
+  bool bjetEtaCut = false;
+  bool bnHitsCut = false;
+  bool bnPixHitsCut = false;
+  bool bChi2Cut = false;
+  bool btrackPtCut = false;
+  bool bdistJetAxisCut = false;
+  bool bdecayLengthCut = false;
+  bool bIP2dCut = false;
+  bool blongIPCut = false;
+
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition && bjetPtCut && bjetEtaCut && bnHitsCut && bnPixHitsCut && bChi2Cut && btrackPtCut && bdistJetAxisCut && bdecayLengthCut && bIP2dCut && blongIPCut && bstandardPFtriggerHLTJet15U)) {
+    string line;
+    size_t position;
+    getline(*plotFile,line);
+    if (line.find("#")==0) continue;
+    if (line.find("end_plot")!=string::npos) return thisPlot;
+    if (line.find("end_default")!=string::npos) return thisPlot;
+    position = line.find("=");
+    if(line.find("plotName")<position){
+      plotName = true; 
+      thisPlot.plotName = line.substr(position+1);
+      //  thisPlot.plotName += "_TC";
+    }
+    if(line.find("plotTitle")<position){
+      plotTitle = true; 
+      thisPlot.plotTitle = line.substr(position+1);
+    }
+    if(line.find("label")<position){
+      label = true; 
+      thisPlot.label = line.substr(position+1);
+    }
+    if(line.find("aliasx")<position){
+      aliasx = true;
+      thisPlot.aliasx = line.substr(position+1);
+    }
+    if(line.find("xTitle")<position){
+      xTitle = true;
+      thisPlot.xTitle = line.substr(position+1);
+    }
+    if(line.find("cut")<position){
+      cut = true;
+      thisPlot.cut = line.substr(position+1);
+    }
+    if(line.find("xlow")<position){
+      xlow = true;
+      thisPlot.xlow = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("xup")<position){
+      xup = true;
+      thisPlot.xup = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("nbinsx")<position){
+      nbinsx = true;
+      thisPlot.nbinsx = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("yTitle")<position){
+      yTitle = true;
+      thisPlot.yTitle = line.substr(position+1);
+    }
+    if(line.find("yMin")<position){
+      yMin = true;
+      thisPlot.yMin = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("ratioMin")<position){
+      ratioMin = true;
+      thisPlot.ratioMin = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("ratioMax")<position){
+      ratioMax = true;
+      thisPlot.ratioMax = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("ratioRebin")<position){
+      ratioRebin = true;
+      thisPlot.ratioRebin = atof((line.substr(position+1)).c_str());
+    }
+   if(line.find("displayOverUnderflowBin")<position){
+      displayOverUnderflowBin = true;
+      thisPlot.displayOverUnderflowBin = (bool)atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("displayNoInfo")<position){
+      bDisplayNoInfo = true;
+      thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
+    if(line.find("legendPosition")<position){
+      blegendPosition = true;
+      thisPlot.legendPosition = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
+
+    if(line.find("jetPtCut")<position){
+      bjetPtCut = true;
+      thisPlot.jetPtCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("jetEtaCut")<position){
+      bjetEtaCut = true;
+      thisPlot.jetEtaCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("nHitsCut")<position){
+      bnHitsCut = true;
+      thisPlot.nHitsCut = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("nPixHitsCut")<position){
+      bnPixHitsCut = true;
+      thisPlot.nPixHitsCut = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("Chi2Cut")<position){
+      bChi2Cut = true;
+      thisPlot.Chi2Cut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("trackPtCut")<position){
+      btrackPtCut = true;
+      thisPlot.trackPtCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("distJetAxisCut")<position){
+      bdistJetAxisCut = true;
+      thisPlot.distJetAxisCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("decayLengthCut")<position){
+      bdecayLengthCut = true;
+      thisPlot.decayLengthCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("IP2dCut")<position){
+      bIP2dCut = true;
+      thisPlot.IP2dCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("longIPCut")<position){
+      blongIPCut = true;
+      thisPlot.longIPCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("standardPFtriggerHLTJet15U")<position){
+      bstandardPFtriggerHLTJet15U = true;
+      thisPlot.standardPFtriggerHLTJet15U = (bool)(atoi((line.substr(position+1)).c_str()));
     }
 
   }
@@ -1197,7 +1361,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bUp.Clear();
   canvas_bUp.SetLogy();
 
-  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  //  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
   hists.data_hist->SetMinimum(info.yMin);
   hists.data_hist->SetMarkerStyle(1);
   hists.data_hist->Draw("E1X0");
@@ -1212,7 +1376,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   
   TCanvas canvas_bDown((info.plotName+"canvas_bDown").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bDown.cd();
-  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  //  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
   hists.data_hist->SetMarkerStyle(1);
   hists.data_hist->Draw("E1X0");
   mc_stack_bDown.Draw("HISTSAME");
@@ -1227,7 +1391,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear_noRatio.root").c_str());
   canvas_bDown.Clear();
   canvas_bDown.SetLogy();
-  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  //  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
   hists.data_hist->SetMinimum(info.yMin);
   hists.data_hist->Draw("E1X0");
   mc_stack_bDown.Draw("HISTSAME");
@@ -1268,7 +1432,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   gPad->SetGridy();
  
   canvas_bDownLin.cd(1);
-  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  //  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
   hists.data_hist->GetYaxis()->CenterTitle(1);
   hists.data_hist->GetYaxis()->SetTitleSize( 0.055 );
   hists.data_hist->GetYaxis()->SetTitleOffset( 1.3 );
@@ -1329,7 +1493,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   ratio->Draw("E1X0");
 
   canvas_bDownLog.cd(1);
-  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  //  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
   hists.data_hist->SetMinimum(info.yMin);
   hists.data_hist->Draw("E1X0");
   mc_stack_bDown.Draw("HISTSAME");
@@ -1364,7 +1528,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   gPad->SetGridy();
  
   canvas_bUpLin.cd(1);
-  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  //  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
   hists.data_hist->GetYaxis()->CenterTitle(1);
   hists.data_hist->GetYaxis()->SetTitleSize( 0.055 );
   hists.data_hist->GetYaxis()->SetTitleOffset( 1.3 );
@@ -1411,7 +1575,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 
   canvas_bUpLog.cd(1);
 
-  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  //  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
   hists.data_hist->SetMinimum(info.yMin);
   hists.data_hist->Draw("E1X0");
   mc_stack_bUp.Draw("HISTSAME");
@@ -1424,6 +1588,12 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bUpLog.SaveAs((info.plotName+"_bUp_Log.root").c_str());
 
   return;
+}
+
+void MakeATrackCutPlot(informationTrackCuts info, flavorHists1D hists, double scale){
+  information1d info1d = get1DInfoFromTrackCut(info);
+  
+  MakeAFlavorPlot(info1d, hists, scale);
 }
 
 void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
@@ -2358,6 +2528,16 @@ void MakeAHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector,
   return;
 }
 
+
+void MakeATrackCutHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, informationTrackCuts info, flavorHists1D hists)
+{
+  dataSelector->AddTrackSelector(true,  hists.data_hist, hists.mc_b_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
+  mcSelector->  AddTrackSelector(false, hists.data_hist, hists.mc_b_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
+
+  return;
+}
+
+
 void MakeACutCompHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, informationCutComp info, cutCompHists hists)
 {
   stringstream binaryBinningStream;
@@ -2563,6 +2743,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   list< pair< information2d , flavorHists2D > > reweightedPlots;
   list< pair< information2d , flavorHists2D > > reweightedTrackPlots;
   list< pair< informationCutComp , cutCompHists > > cutCompPlots;
+  list< pair< informationTrackCuts , flavorHists1D > > trackCutPlots;
 
   //  TString normalizationText = "";
   //  if(finalNorm<=0) normalizationText = "MC normalized to Data";
@@ -2581,7 +2762,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     if(line.find("plot_type")==string::npos) continue;
     size_t typePosition = line.find("=");
     string plotType = line.substr(typePosition+1);
-    if(plotType.find("jetPlots1D")!=string::npos){
+    if(  plotType.find("jetPlots1D")!=string::npos ){
       information1d thisPlot = param1d(&plotFiles,defaultInformation1d);
       if(doPlot == "" || doPlot.find(thisPlot.plotName)!=string::npos){
 	flavorHists1D theseHists;
@@ -2612,6 +2793,41 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	jetPlots1D.push_back(pair<information1d,flavorHists1D>(thisPlot,theseHists));
       }
     }
+
+  if(  plotType.find("trackCutPlot")!=string::npos){
+      informationTrackCuts thisPlot = paramTrackCuts(&plotFiles);
+      information1d thisPlot1d = get1DInfoFromTrackCut(thisPlot);
+      if(doPlot == "" || doPlot.find(thisPlot.plotName)!=string::npos){
+	flavorHists1D theseHists;
+	theseHists.data_hist = new TH1D((thisPlot.plotName+"_data_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.mc_all_hist = new TH1D((thisPlot.plotName+"_mc_all_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.mc_b_hist = new TH1D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.mc_c_hist = new TH1D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.mc_light_hist = new TH1D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.mc_none_hist = new TH1D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.data_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_all_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.data_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.data_hist->Sumw2();
+	theseHists.mc_all_hist->Sumw2();
+	theseHists.mc_b_hist->Sumw2();
+	theseHists.mc_c_hist->Sumw2();
+	theseHists.mc_light_hist->Sumw2();
+	theseHists.mc_none_hist->Sumw2();
+	trackCutPlots.push_back(pair<informationTrackCuts,flavorHists1D>(thisPlot,theseHists));
+      }
+    }
+
+
     if(plotType.find("cutCompPlots")!=string::npos){
       informationCutComp thisPlot = paramCutComp(&plotFiles,defaultInformationCutComp);
       if(doPlot == "" || doPlot.find(thisPlot.plotName)!=string::npos){
@@ -2905,6 +3121,10 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     {
       MakeAHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
     }
+  for(list< pair< informationTrackCuts , flavorHists1D > >::iterator iPlot = trackCutPlots.begin(); iPlot != trackCutPlots.end(); iPlot++)
+    {
+      MakeATrackCutHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
   for(list< pair<informationCutComp , cutCompHists> >::iterator iPlot = cutCompPlots.begin(); iPlot != cutCompPlots.end(); iPlot++)
     {
       MakeACutCompHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
@@ -2978,6 +3198,16 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
       iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
       MakeAFlavorPlot(iPlot->first,iPlot->second,finalNorm);
     }
+
+  for(list< pair< informationTrackCuts , flavorHists1D > >::iterator iPlot = trackCutPlots.begin(); iPlot != trackCutPlots.end(); iPlot++)
+    {
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
+      MakeATrackCutPlot(iPlot->first,iPlot->second,finalNorm);
+    }
+
   for(list< pair<informationCutComp , cutCompHists> >::iterator iPlot = cutCompPlots.begin(); iPlot != cutCompPlots.end(); iPlot++)
     {
       MakeACutCompPlot(iPlot->first,iPlot->second,finalNorm);
@@ -3032,4 +3262,29 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     }
 
   return;
+}
+
+
+information1d get1DInfoFromTrackCut(informationTrackCuts info){
+
+  information1d info1d;
+  info1d.plotName                 = info.plotName                ;
+  info1d.plotTitle		  = info.plotTitle               ;
+  info1d.label			  = info.label                   ;
+  info1d.aliasx			  = info.aliasx                  ;
+  info1d.xTitle			  = info.xTitle                  ;
+  info1d.cut			  = info.cut                     ;
+  info1d.xlow			  = info.xlow                    ;
+  info1d.xup			  = info.xup                     ;
+  info1d.nbinsx			  = info.nbinsx                  ;
+  info1d.yTitle			  = info.yTitle                  ;
+  info1d.yMin			  = info.yMin                    ;
+  info1d.ratioMin		  = info.ratioMin                ;
+  info1d.ratioMax		  = info.ratioMax                ;
+  info1d.ratioRebin		  = info.ratioRebin              ;
+  info1d.displayOverUnderflowBin  = info.displayOverUnderflowBin ;
+  info1d.displayNoInfo		  = info.displayNoInfo           ;
+  info1d.legendPosition           = info.legendPosition          ;
+
+  return info1d;
 }
