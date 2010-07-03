@@ -84,7 +84,7 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
         ), 
         cms.PSet(
             bTagSimpleSVAnalysisBlock,
-            label = cms.InputTag("standardSimpleSecondaryVertexCaloBJetTags")
+            label = cms.InputTag("standardSimpleSecondaryVertexHighEffCaloBJetTags")
         ), 
         cms.PSet(
             bTagSimpleSVAnalysisBlock,
@@ -176,7 +176,7 @@ process.bTagAnalysisHarvest.tagConfig = cms.VPSet(
         ), 
         cms.PSet(
             bTagSimpleSVAnalysisBlock,
-            label = cms.InputTag("standardSimpleSecondaryVertexPFBJetTags")
+            label = cms.InputTag("standardSimpleSecondaryVertexHighEffPFBJetTags")
         ), 
         cms.PSet(
             bTagSimpleSVAnalysisBlock,
