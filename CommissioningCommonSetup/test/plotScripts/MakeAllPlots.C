@@ -49,6 +49,31 @@ struct information1d{
 
 information1d get1DInfoFromTrackCut(informationTrackCuts info);
 
+void cmsPrel(double intLumi) {
+
+  TLatex *latex = new TLatex();
+  latex->SetNDC();
+  latex->SetTextSize(0.045);
+  latex->SetTextFont(42); //22
+
+  latex->SetTextAlign(13);
+  latex->DrawLatex(0.22, 0.96, Form("CMS Preliminary 2010,     #sqrt{s} = 7 TeV,  L = %.2g nb^{   -1}",intLumi));
+
+}
+
+// For profile and noRatio plots
+void cmsProfPrel(double intLumi) {
+
+  TLatex *latex = new TLatex();
+  latex->SetNDC();
+  latex->SetTextSize(0.035);
+  latex->SetTextFont(42); //22
+
+  latex->SetTextAlign(13);
+  latex->DrawLatex(0.22, 0.95, Form("CMS Preliminary 2010,   #sqrt{s} = 7 TeV,  L = %.2g nb^{-1}",intLumi));
+
+}
+
 void setTDRStyle() {
 
   TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-DR");
@@ -1247,6 +1272,8 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
       
     }
 }
+
+
 void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 {
   if(scale==0)
@@ -1299,11 +1326,8 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   mc_stack_bDown.Add(hists.mc_light_hist);
   if(info.displayNoInfo == true) mc_stack_bDown.Add(hists.mc_none_hist);
   
-  //Make Canvas
-
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
-
   
   TH1D* ratio = (TH1D*)hists.data_hist->Clone((info.plotName+"ratio").c_str());
   TH1D* ratioMC = (TH1D*)hists.mc_all_hist->Clone((info.plotName+"ratioMC").c_str());
@@ -1319,11 +1343,10 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 
   TLegend *legend;
   if(info.legendPosition == true)
-    legend = new TLegend(0.725,0.65, 0.925, 0.85);  
+    legend = new TLegend(0.685, 0.575, 0.985, 0.875); // "top right"
   else
-    legend = new TLegend(0.195,0.65, 0.350, 0.85);//By default legend is on the left side of the canvas
+    legend = new TLegend(0.195, 0.575, 0.495, 0.875); //By default legend is on the "top left" side of the canvas
   legend->AddEntry(drawHelper,"Data","LPE");
-  //  dataEntry->SetMarkerStyle(20);
   legend->AddEntry(hists.mc_light_hist,"Sim.(light)","F");
   legend->AddEntry(hists.mc_c_hist,"Sim.(charm)","F");
   legend->AddEntry(hists.mc_b_hist,"Sim.(bottom)","F");
@@ -1332,28 +1355,24 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend->SetBorderSize(0);
   legend->SetFillColor(kWhite);
   legend->SetMargin(0.12);
-  legend->SetTextSize(0.035);
+  legend->SetTextSize(0.05);
 
-  //legend.SetFillStyle(1);
+  //store the default value of y-maximum
+  double ymaxdef = hists.data_hist->GetMaximum();
+  hists.data_hist->GetYaxis()->CenterTitle(1);
 
+  //Make Canvas
   TCanvas canvas_bUp((info.plotName+"canvas_bUp").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bUp.cd();
 
-  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),ymaxdef) * 1.4);
   hists.data_hist->Draw("E1X0");
   mc_stack_bUp.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
 
   //include the official CMS label
-  TPaveText *pt = new TPaveText(0.25,0.945,0.98,0.995,"brNDC");   
-  pt->SetBorderSize(0);   
-  pt->SetFillStyle(0);  
-  pt->SetTextAlign(13);   
-  pt->SetTextFont(42);   
-  pt->SetTextSize(0.04);   
-  TText *text = pt->AddText("CMS Preliminary 2010, #sqrt{s} = 7 TeV, L = 15 nb^{-1}");   
-  pt->Draw();
+  cmsProfPrel(15.);
 
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear_noRatio.pdf").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Linear_noRatio.png").c_str());
@@ -1361,14 +1380,14 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   canvas_bUp.Clear();
   canvas_bUp.SetLogy();
 
-  //  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),ymaxdef) * 6.0);
   hists.data_hist->SetMinimum(info.yMin);
   hists.data_hist->SetMarkerStyle(1);
   hists.data_hist->Draw("E1X0");
   mc_stack_bUp.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
-  pt->Draw();
+  cmsProfPrel(15.);
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log_noRatio.pdf").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log_noRatio.png").c_str());
   canvas_bUp.SaveAs((info.plotName+"_bUp_Log_noRatio.root").c_str());
@@ -1376,7 +1395,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   
   TCanvas canvas_bDown((info.plotName+"canvas_bDown").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bDown.cd();
-  //  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
+  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),ymaxdef) * 1.4);
   hists.data_hist->SetMarkerStyle(1);
   hists.data_hist->Draw("E1X0");
   mc_stack_bDown.Draw("HISTSAME");
@@ -1384,33 +1403,55 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   legend->Draw();
 
   //include the official CMS label
-  pt->Draw();
+  cmsProfPrel(15.);
 
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear_noRatio.pdf").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear_noRatio.png").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Linear_noRatio.root").c_str());
   canvas_bDown.Clear();
   canvas_bDown.SetLogy();
-  //  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),ymaxdef) * 6.0);
   hists.data_hist->SetMinimum(info.yMin);
   hists.data_hist->Draw("E1X0");
   mc_stack_bDown.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
-  pt->Draw();
+  cmsProfPrel(15.);
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log_noRatio.pdf").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log_noRatio.png").c_str());
   canvas_bDown.SaveAs((info.plotName+"_bDown_Log_noRatio.root").c_str());
 
   TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_ratio.cd();
-  ratio->SetYTitle("Data/MC ratio");
+  ratio->SetYTitle("Data/Sim ratio");
   ratio->Draw("E1X0");
-  pt->Draw();
+  cmsPrel(15.);
   canvas_ratio.SaveAs((info.plotName+"_ratio.pdf").c_str());
   canvas_ratio.SaveAs((info.plotName+"_ratio.png").c_str());
   canvas_ratio.SaveAs((info.plotName+"_ratio.root").c_str());
   
+  ////////////////////////////////////////////////////
+  // Set the titles, range etc here before drawing
+  hists.data_hist->GetYaxis()->CenterTitle(1);
+  hists.data_hist->GetYaxis()->SetTitleSize( 0.055 );
+  hists.data_hist->GetYaxis()->SetTitleOffset( 1.3 );
+
+  //set the Y-axis range for the ratio
+  ratio->GetYaxis()->SetRangeUser(info.ratioMin,info.ratioMax);
+  ratio->GetYaxis()->CenterTitle(1);
+  ratio->GetYaxis()->SetTitleSize( 0.16 );
+  ratio->GetYaxis()->SetTitleOffset( 0.425 );
+  ratio->GetYaxis()->SetLabelSize( 0.16 );
+  ratio->GetYaxis()->SetNdivisions( 505 );
+
+  ratio->GetXaxis()->SetTitleSize( 0.16 );
+  ratio->GetXaxis()->SetLabelSize( 0.16 );
+  ratio->GetXaxis()->SetTitleOffset( 1 );
+  ratio->GetXaxis()->SetLabelOffset( 0.006 );
+  ratio->GetXaxis()->SetNdivisions( 510 );
+  ratio->GetXaxis()->SetTickLength( ratio->GetXaxis()->GetTickLength() * 3.0 );
+  ratio->SetYTitle("Data/Sim");
+
   //Draw the plot and ratio on the same canvas
   TCanvas canvas_bDownLin((info.plotName+"canvas_bDownLin").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bDownLin.cd();
@@ -1432,36 +1473,16 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   gPad->SetGridy();
  
   canvas_bDownLin.cd(1);
-  //  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
-  hists.data_hist->GetYaxis()->CenterTitle(1);
-  hists.data_hist->GetYaxis()->SetTitleSize( 0.055 );
-  hists.data_hist->GetYaxis()->SetTitleOffset( 1.3 );
+  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),ymaxdef) * 1.4);
   hists.data_hist->SetMinimum(0);
   hists.data_hist->Draw("E1X0");
   mc_stack_bDown.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
-  pt->Draw();
+  cmsPrel(15.);
   gPad->Update();
 
   canvas_bDownLin.cd(2);
-  //set the Y-axis range for the ratio
-  ratio->GetYaxis()->SetRangeUser(info.ratioMin,info.ratioMax);
-
-  ratio->GetYaxis()->CenterTitle(1);
-  ratio->GetYaxis()->SetTitleSize( 0.13 );
-  ratio->GetYaxis()->SetTitleOffset( 0.525 );
-  ratio->GetYaxis()->SetLabelSize( 0.13 );
-  ratio->GetYaxis()->SetNdivisions( 505 );
-
-  ratio->GetXaxis()->SetTitleSize( 0.13 );
-  ratio->GetXaxis()->SetLabelSize( 0.13 );
-  ratio->GetXaxis()->SetTitleOffset( 1 );
-  ratio->GetXaxis()->SetLabelOffset( 0.006 );
-  ratio->GetXaxis()->SetNdivisions( 510 );
-  ratio->GetXaxis()->SetTickLength( ratio->GetXaxis()->GetTickLength() * 3.0 );
-
-  ratio->SetYTitle("Data/MC");
   ratio->Draw("E1X0");
   gPad->Update();
 
@@ -1493,13 +1514,13 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   ratio->Draw("E1X0");
 
   canvas_bDownLog.cd(1);
-  //  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),ymaxdef) * 6.0);
   hists.data_hist->SetMinimum(info.yMin);
   hists.data_hist->Draw("E1X0");
   mc_stack_bDown.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
-  pt->Draw();
+  cmsPrel(15.);
 
   canvas_bDownLog.SaveAs((info.plotName+"_bDown_Log.pdf").c_str());
   canvas_bDownLog.SaveAs((info.plotName+"_bDown_Log.png").c_str());
@@ -1507,7 +1528,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 
 
   ////////////////////////////////////////
- //Draw the plot and ratio on the same canvas
+  //Draw the plot and ratio on the same canvas
   TCanvas canvas_bUpLin((info.plotName+"canvas_bUpLin").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_bUpLin.cd();
   canvas_bUpLin.Clear();
@@ -1528,21 +1549,16 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
   gPad->SetGridy();
  
   canvas_bUpLin.cd(1);
-  //  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 1.2);
-  hists.data_hist->GetYaxis()->CenterTitle(1);
-  hists.data_hist->GetYaxis()->SetTitleSize( 0.055 );
-  hists.data_hist->GetYaxis()->SetTitleOffset( 1.3 );
+  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),ymaxdef) * 1.4);
   hists.data_hist->SetMinimum(0);
   hists.data_hist->Draw("E1X0");
   mc_stack_bUp.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
-  pt->Draw();
+  cmsPrel(15.);
   gPad->Update();
 
   canvas_bUpLin.cd(2);
-  //set the Y-axis range for the ratio
- 
   ratio->Draw("E1X0");
   gPad->Update();
 
@@ -1575,13 +1591,13 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale)
 
   canvas_bUpLog.cd(1);
 
-  //  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),hists.data_hist->GetMaximum()) * 4.0);
+  hists.data_hist->SetMaximum(max(mc_stack_bUp.GetMaximum(),ymaxdef) * 6.0);
   hists.data_hist->SetMinimum(info.yMin);
   hists.data_hist->Draw("E1X0");
   mc_stack_bUp.Draw("HISTSAME");
   drawHelper->Draw("PSAME");
   legend->Draw();
-  pt->Draw();
+  cmsPrel(15.);
 
   canvas_bUpLog.SaveAs((info.plotName+"_bUp_Log.pdf").c_str());
   canvas_bUpLog.SaveAs((info.plotName+"_bUp_Log.png").c_str());
@@ -1738,6 +1754,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   hists.mc_all_hist->SetLineColor(kBlack);
   hists.mc_all_hist->SetLineWidth(3);
   hists.mc_all_hist->SetFillStyle(0);
+
   if(info.displayNoInfo == true) mc_stack.Add(hists.mc_none_hist);
   mc_stack.Add(hists.mc_light_hist);
   mc_stack.Add(hists.mc_c_hist);
@@ -1747,18 +1764,15 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   hists.data_hist->SetLineColor(kBlack);
   hists.data_hist->SetFillStyle(0);
 
-  //Make Canvas
-
   TH1D* drawHelper = (TH1D*)hists.data_hist->Clone((info.plotName+"draw_helper").c_str());
   drawHelper->SetMarkerStyle(20);
 
   TLegend *legend;
   if(info.legendPosition == true)
-    legend = new TLegend(0.725,0.15, 0.925, 0.35);
+    legend = new TLegend(0.725,0.15, 0.925, 0.35); //"bottom right"
   else
-    legend = new TLegend(0.225,0.6, 0.425, 0.85); //By default legend is on the left side of the canvas
+    legend = new TLegend(0.225,0.6, 0.425, 0.85); //By default legend is on the "top left" side of the canvas
   legend->AddEntry(drawHelper,"Data","LPE");
-  //  dataEntry->SetMarkerStyle(20);
   legend->AddEntry(hists.mc_all_hist,"Sim.(total)","L");
   legend->AddEntry(hists.mc_light_hist,"Sim.(light)","L");
   legend->AddEntry(hists.mc_c_hist,"Sim.(charm)","L");
@@ -1776,16 +1790,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists)
   hists.data_hist->Draw("E1X0SAME");
   legend->Draw();
 
-
-  TPaveText *pt = new TPaveText(0.2,0.945,0.98,0.995,"brNDC");   
-  pt->SetBorderSize(0);   
-  pt->SetFillStyle(0);  
-  pt->SetTextAlign(13);   
-  pt->SetTextFont(42);   
-  pt->SetTextSize(0.035);   
-  TText *text = pt->AddText("CMS Preliminary 2010, #sqrt{s} = 7 TeV, L= 15 nb^{-1}");   
-  pt->Draw();
-
+  cmsProfPrel(15.);
 
   canvas.SaveAs((info.plotName+".pdf").c_str());
   canvas.SaveAs((info.plotName+".png").c_str());
