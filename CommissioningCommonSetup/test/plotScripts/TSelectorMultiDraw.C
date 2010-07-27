@@ -38,14 +38,10 @@ void TSelectorMultiDraw::Begin(TTree * tree)
    // The tree argument is deprecated (on PROOF 0 is passed).
 
    TString option = GetOption();
-   for(list<TSelectorDraw*>::iterator iSelector = fSelectors.begin(); iSelector!=fSelectors.end(); iSelector++)
-     {
-       (*iSelector)->Begin(tree);
-     }
-   for(list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
-     {
-       (*iSelector)->Begin(tree);
-     }
+ 
+   for(int i=0; i<nSelectors; i++)        fArrSelectors[i]->Begin(tree);  
+   for(int j=0; j<nTrackSelectors; j++)  fArrTrackSelectors[j]->Begin(tree);
+
 }
 
 void TSelectorMultiDraw::SlaveBegin(TTree * tree)
@@ -77,15 +73,22 @@ Bool_t TSelectorMultiDraw::Process(Long64_t entry)
    // Use fStatus to set the return value of TTree::Process().
    //
    // The return value is currently not used.
-   for(list<TSelectorDraw*>::iterator iSelector = fSelectors.begin(); iSelector!=fSelectors.end(); iSelector++)
-     {
-       if((*iSelector)->ProcessCut(entry)) (*iSelector)->ProcessFill(entry);
-     }
-   for(list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
-     {
-         (*iSelector)->Process(entry);
-     }
 
+
+//    for(list<TSelectorDraw*>::iterator iSelector = fSelectors.begin(); iSelector!=fSelectors.end(); iSelector++)
+//      {
+//        if((*iSelector)->ProcessCut(entry)) (*iSelector)->ProcessFill(entry);
+//      }
+//    for(list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
+//      {
+//          (*iSelector)->Process(entry);
+//      }
+
+
+  for(int i=0; i<nSelectors; i++)       if( fArrSelectors[i]->ProcessCut(entry) )  fArrSelectors[i]->ProcessFill(entry);
+  for(int j=0; j<nTrackSelectors; j++)  fArrTrackSelectors[j]->Process(entry);
+
+   
    return kTRUE;
 }
 
@@ -101,14 +104,10 @@ void TSelectorMultiDraw::Terminate()
    // The Terminate() function is the last function to be called during
    // a query. It always runs on the client, it can be used to present
    // the results graphically or save the results to file.
-   for(list<TSelectorDraw*>::iterator iSelector = fSelectors.begin(); iSelector!=fSelectors.end(); iSelector++)
-     {
-       (*iSelector)->Terminate();
-     }
-   for(list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
-   {
-       (*iSelector)->Terminate();
-     }
+  
+   for(int i=0; i<nSelectors; i++)        fArrSelectors[i]->Terminate();  
+   for(int j=0; j<nTrackSelectors; j++)  fArrTrackSelectors[j]->Terminate();
+  
 }
 
 void TSelectorMultiDraw::LoadVariables(string varexp, string selection)
@@ -119,10 +118,37 @@ void TSelectorMultiDraw::LoadVariables(string varexp, string selection)
   input->Add(new TNamed("selection",selection.c_str()));
   thisSelector->SetInputList(input);
   fSelectors.push_back(thisSelector);
+
+  //  mySelector = thisSelector;
 }
 
 void TSelectorMultiDraw::AddTrackSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationTrackCuts info){
   TrackSelector *trackSel = new TrackSelector();
   trackSel->SetUp(isData, dataHist, mcHistb, mcHistc, mcHistl, mcHistn, info);
   fTrackSelectors.push_back(trackSel);
+}
+
+
+void TSelectorMultiDraw::SetupArrays(){
+
+  nSelectors = fSelectors.size();
+  nTrackSelectors = fTrackSelectors.size();
+
+  fArrSelectors = new TSelectorDraw*[nSelectors];
+  fArrTrackSelectors = new TrackSelector*[nTrackSelectors];
+
+
+  int iSelCounter = 0;
+  for(list<TSelectorDraw*>::iterator iSelector = fSelectors.begin(); iSelector!=fSelectors.end(); iSelector++)
+    {
+      fArrSelectors[iSelCounter] = *iSelector;
+      iSelCounter++;
+    }
+
+  int iTrackSelCounter = 0;
+  for(list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
+    {
+      fArrTrackSelectors[iTrackSelCounter] = *iSelector;
+      iTrackSelCounter++;
+    }
 }

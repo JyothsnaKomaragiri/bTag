@@ -2773,7 +2773,7 @@ void MakeACutHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelect
 }
 
 void
-MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double finalNorm=-1, string rootFile="plots.root" , string doPlot="")
+MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double finalNorm=-1, string rootFile="plots.root" , string doPlot="", int firstPlot=0, int lastPlot=0)
 {
 
   TFile* theFile = TFile::Open(rootFile.c_str(),"RECREATE");
@@ -2857,6 +2857,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   //  if(finalNorm<=0) normalizationText = "MC normalized to Data";
   //  else normalizationText = "normalized to Luminosity";
 
+  int plotCounter=0;
   while (! plotFiles.eof()) {
     string line;
     getline (plotFiles,line);
@@ -2868,6 +2869,13 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     if (line.find("defaultPtHat")!=string::npos) defaultInformationPtHat = paramPtHat(&plotFiles,defaultInformationPtHat);
     if (line.find("defaultTriggerComp")!=string::npos) defaultInformationCutComp = paramCutComp(&plotFiles,defaultInformationCutComp);
     if(line.find("plot_type")==string::npos) continue;
+    
+    // found plot type increase plot counter
+    plotCounter++;
+    // check if plot is in the range of plots to be plotted
+    if(firstPlot <=0 && lastPlot <=0) {}// no plot selection continue as usual
+    else if( plotCounter < firstPlot || plotCounter > lastPlot ) continue; // skip plot if it is outside of range 
+
     size_t typePosition = line.find("=");
     string plotType = line.substr(typePosition+1);
     if(  plotType.find("jetPlots1D")!=string::npos ){
@@ -3306,6 +3314,13 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
       MakeAJetTrackQualityHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
     }
 
+
+
+  // setup selector arrays after everything is created
+  mcSelector->SetupArrays();
+  dataSelector->SetupArrays();
+  
+
   for(list<pair<string,double> >::iterator iFile = mcList.begin(); iFile != mcList.end(); iFile++)
     {  
       std::cout<<"opening file " << iFile->first << std::endl;
@@ -3318,6 +3333,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
       thisFile->Close("r");
       //delete thisFile;
     }
+
 
   for(list<pair<string,double> >::iterator iFile = dataList.begin(); iFile != dataList.end(); iFile++)
     {

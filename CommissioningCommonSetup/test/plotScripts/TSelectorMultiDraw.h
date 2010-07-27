@@ -23,7 +23,15 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    std::list<TSelectorDraw*> fSelectors; //list of TSelectorDraws
    std::list<TrackSelector*> fTrackSelectors; //list of TrackSelectors
-    // Declaration of leaf types
+
+   // need them as arrays as well, to get faster access:
+   TSelectorDraw** fArrSelectors;
+   TrackSelector** fArrTrackSelectors;
+
+   int nSelectors;
+   int nTrackSelectors;
+
+   // Declaration of leaf types
 
    // List of branches
 
@@ -37,15 +45,11 @@ public :
    virtual Bool_t  Process(Long64_t entry);
    virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; }
    virtual void    SetOption(const char *option) {
-     for(std::list<TSelectorDraw*>::iterator iSelector = fSelectors.begin(); iSelector!=fSelectors.end(); iSelector++)
-       {
-	 (*iSelector)->SetOption(option);
-       }
-     for(std::list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
-       {
-	 (*iSelector)->SetOption(option);
-       }
+     for(int i=0; i<nSelectors; i++)        fArrSelectors[i]->SetOption(option);  
+     for(int j=0; j<nTrackSelectors; j++)  fArrTrackSelectors[j]->SetOption(option);
    }
+
+   virtual void SetupArrays();
    virtual void    SetObject(TObject *obj) { fObject = obj; }
    virtual void    SetInputList(TList *input) { fInput = input; }
    virtual TList  *GetOutputList() const { return fOutput; }
@@ -75,14 +79,9 @@ void TSelectorMultiDraw::Init(TTree *tree)
    if (!tree) return;
    fChain = tree;
    fChain->SetMakeClass(1);
-   for(list<TSelectorDraw*>::iterator iSelector = fSelectors.begin(); iSelector!=fSelectors.end(); iSelector++)
-     {
-       (*iSelector)->Init(tree);
-     }
-   for(list<TrackSelector*>::iterator iSelector = fTrackSelectors.begin(); iSelector!=fTrackSelectors.end(); iSelector++)
-     {
-       (*iSelector)->Init(tree);
-     }
+
+   for(int i=0; i<nSelectors; i++)        fArrSelectors[i]->Init(tree);  
+   for(int j=0; j<nTrackSelectors; j++)  fArrTrackSelectors[j]->Init(tree);
 }
 
 Bool_t TSelectorMultiDraw::Notify()
