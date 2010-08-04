@@ -31,7 +31,7 @@ process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #Global tag for 3_6_1
-process.GlobalTag.globaltag = 'GR_R_36X_V10A::All'
+process.GlobalTag.globaltag = 'GR_R_36X_V12A::All'
 
 process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
@@ -548,6 +548,7 @@ process.standardCaloBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParamet
 process.standardCaloBTagNtuple.ElectronTagInfos = cms.InputTag( "standardSoftElectronCaloTagInfos" )
 process.standardCaloBTagNtuple.MuonTagInfos = cms.InputTag( "standardSoftMuonCaloTagInfos" )
 process.standardCaloBTagNtuple.Label = cms.string("standardCalo")
+process.standardCaloBTagNtuple.filename = cms.string("standardCaloNtuple.root")
 process.standardCaloBTagNtuple.bTagConfig = cms.VPSet(
     cms.PSet(
     alias = cms.string("standardTrackCountingHighEffCaloBJetTags"),
@@ -619,6 +620,7 @@ process.standardPFBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParameter
 process.standardPFBTagNtuple.ElectronTagInfos = cms.InputTag( "standardSoftElectronPFTagInfos" )
 process.standardPFBTagNtuple.MuonTagInfos = cms.InputTag( "standardSoftMuonPFTagInfos" )
 process.standardPFBTagNtuple.Label = cms.string("standardPF")
+process.standardPFBTagNtuple.filename = cms.string("standardPFNtuple.root")
 process.standardPFBTagNtuple.bTagConfig = cms.VPSet(
     cms.PSet(
     alias = cms.string("standardTrackCountingHighEffPFBJetTags"),
@@ -685,17 +687,19 @@ process.bTagNtuples = cms.Sequence(
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(-1)
 )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-   '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FEA3BECA-7569-DF11-86FA-002354EF3BD2.root',
-        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE6FE723-7369-DF11-AF74-0026189438ED.root',
-        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE4EF777-7669-DF11-8546-0018F3D09636.root',
-        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE243325-7669-DF11-8CA4-0018F3D09636.root',
-        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE18F74E-7669-DF11-943A-0026189438A5.root',
-        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FCC4F3A4-7469-DF11-9882-002618943977.root' 
+
+  
+#   '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FEA3BECA-7569-DF11-86FA-002354EF3BD2.root',
+#        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE6FE723-7369-DF11-AF74-0026189438ED.root',
+#        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE4EF777-7669-DF11-8546-0018F3D09636.root',
+#        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE243325-7669-DF11-8CA4-0018F3D09636.root',
+#        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE18F74E-7669-DF11-943A-0026189438A5.root',
+#        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FCC4F3A4-7469-DF11-9882-002618943977.root' 
   )
 )
 
@@ -710,8 +714,7 @@ process.EDM = cms.OutputModule("PoolOutputModule",
                        "keep *_softPFElectrons_*_*",
                        "keep recoGsfTracks_electronGsfTracks_*_*",
                        "keep *_TriggerResults_*_*",
-                       "keep *_offlinePrimaryVertices_*_*",
-                       "keep *_*BTagNtuple_*_*"
+                       "keep *_offlinePrimaryVertices_*_*"
     ),
     fileName = cms.untracked.string('BTagCommissioning2010_April20_7TeV_Data_PromptReco_v8.root'),
 #    SelectEvents = cms.untracked.PSet(

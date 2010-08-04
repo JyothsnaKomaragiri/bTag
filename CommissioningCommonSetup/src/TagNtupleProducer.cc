@@ -1,21 +1,3 @@
-// -*- C++ -*-
-//
-// Package:    TagNtupleProducer
-// Class:      TagNtupleProducer
-// 
-/**\class TagNtupleProducer TagNtupleProducer.cc bTagAnalysis/TagNtupleProducer/src/TagNtupleProducer.cc
-
- Description: Creates a simple ntuple that stores b-tagging information
-
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  Lucas Olen Winstrom,6 R-029,+41227678914,
-//         Created:  Tue Mar 23 13:40:46 CET 2010
-// $Id: TagNtupleProducer.cc,v 1.19 2010/06/09 09:27:26 alschmid Exp $
-//
-//
 
 
 // system include files
@@ -26,9 +8,10 @@
 #include <cmath>
 #include <sstream>
 
+
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/ESHandle.h"
@@ -82,18 +65,23 @@
 #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
 #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
 #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
-//
-// class declaration
-//
 
-class TagNtupleProducer : public edm::EDProducer {
+#include <TTree.h>
+#include <TFile.h>
+
+// maximum array size (the arrays are stored with variable size in the root tree)
+const unsigned int MAXJETS = 40;
+const unsigned int MAXTRACKS = 200;
+
+
+class TagNtupleProducer : public edm::EDAnalyzer {
    public:
       explicit TagNtupleProducer(const edm::ParameterSet&);
       ~TagNtupleProducer();
 
-   private:
+
       virtual void beginJob() ;
-      virtual void produce(edm::Event&, const edm::EventSetup&);
+      virtual void analyze(const edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
 
       void getSharedHitsInfo(unsigned int layer, const reco::TrackRefVector & tracks, int &nSharedHits, int &nTotalHits);
@@ -101,10 +89,7 @@ class TagNtupleProducer : public edm::EDProducer {
       // ----------member data ---------------------------
 
       bool getMCTruth_;
-      bool get_SV_tag_infos_;
-      bool get_IP_tag_infos_;
-      bool get_SE_tag_infos_;
-      bool get_SM_tag_infos_;
+ 
       edm::InputTag jet_src_;
       edm::InputTag SVComputer_;
   edm::InputTag triggerTag_;
@@ -113,12 +98,197 @@ class TagNtupleProducer : public edm::EDProducer {
       edm::InputTag primaryVertexProducer_;
       edm::InputTag SV_tag_infos_;
       edm::InputTag IP_tag_infos_;
-      unsigned int IP_n_saved_tracks_;
+   
       edm::InputTag electron_tag_infos_;
       edm::InputTag muon_tag_infos_;
       std::vector< edm::ParameterSet > bTag_Config_;
       std::string label_;
-  
+
+
+
+  // data formats
+  TTree *tree;
+  TFile *file;
+
+  bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U;
+
+  unsigned int eventNumber ;
+  unsigned int runNumber ;
+  unsigned int lumiBlockNumber ;
+
+  unsigned int numberOfPrimaryVertices ;
+
+  float pthat;
+
+  //Basic Jet Information
+  int nJets;
+
+  math::XYZTLorentzVector jetP4[MAXJETS];               
+  float jetPt[MAXJETS];                                 
+  float jetEta[MAXJETS];                                
+  float jetPhi[MAXJETS];                                
+  float jetEMFraction[MAXJETS];        
+  float jetChargedEmEnergyFraction[MAXJETS];
+  float jetNeutralEmEnergyFraction[MAXJETS];
+  float jetChargedHadronEnergyFraction[MAXJETS];
+  float jetNeutralHadronEnergyFraction[MAXJETS];
+  float jetChargedMultiplicity[MAXJETS];
+  float jetMass[MAXJETS];                               
+  int jetnConstituents[MAXJETS];  
+  int jetnTracks[MAXJETS];                           
+//  int jetnElectrons[MAXJETS];                              
+//  int jetnMuons[MAXJETS];                                  
+  math::XYZVector jetVertex[MAXJETS];                   
+  float jetVertexChi2[MAXJETS];               
+  float jetVertexChi2Ndof[MAXJETS];           
+  float jetVertexNormalizedChi2[MAXJETS];    
+
+  //Track Information
+  int nTracks;
+
+  int trackJetIndex[MAXTRACKS];
+  bool trackSelected[MAXTRACKS];
+  math::XYZVector track3Momentum[MAXTRACKS];
+  float trackTransverseMomentum[MAXTRACKS];
+  float trackEta[MAXTRACKS];
+  float trackPhi[MAXTRACKS];
+  float trackMomentum[MAXTRACKS];
+  int trackNHits[MAXTRACKS];
+  int trackNPixelHits[MAXTRACKS];
+  float trackChi2[MAXTRACKS];
+  float trackNormChi2[MAXTRACKS];
+  int trackQuality[MAXTRACKS];
+  float trackLongitudinalImpactParameter[MAXTRACKS];
+  float trackIP[MAXTRACKS];
+  float trackDecayLength[MAXTRACKS];
+  float trackDistJetAxis[MAXTRACKS];
+  float trackDeltaR[MAXTRACKS];
+  float trackIP3d[MAXTRACKS];
+  float trackIP2d[MAXTRACKS];
+  float trackIP3dError[MAXTRACKS];
+  float trackIP2dError[MAXTRACKS];
+  int trackHasSharedPix1[MAXTRACKS];
+  int trackHasSharedPix2[MAXTRACKS];
+  int trackHasSharedPix3[MAXTRACKS];
+  int trackHasSharedPixAll[MAXTRACKS];
+
+  //MC Truth Information
+  int MCTrueFlavor[MAXJETS];                          
+ 				       
+  //secondaryVertexTagInfos:			       
+  math::XYZVector SecondaryVertex[MAXJETS];             
+  float SV3dDistance[MAXJETS];                          
+  float SV3dDistanceError[MAXJETS];                     
+  float SV2dDistance[MAXJETS];                          
+  float SV2dDistanceError[MAXJETS];                     
+  float SVChi2[MAXJETS];                
+ float SVIPFirstAboveCharm[MAXJETS];                                
+  float SVDegreesOfFreedom[MAXJETS];                    
+  float SVNormChi2[MAXJETS];                            
+  int SVnSelectedTracks[MAXJETS];                               
+  float SVMass[MAXJETS];                                
+  float SVEnergyRatio[MAXJETS];                                
+  int SVnVertices[MAXJETS];                             
+  int   SVnVertexTracks[MAXJETS];         
+  int   SVnVertexTracksAll[MAXJETS];         
+  int   SVnFirstVertexTracks[MAXJETS];         
+  int   SVnFirstVertexTracksAll[MAXJETS];         
+  float SVjetDeltaR[MAXJETS];
+  float SVvtxSumVtxDirDeltaR[MAXJETS];
+  float SVvtxSumJetDeltaR[MAXJETS];
+               
+  //impactParameterTagInfos
+  int IPnSelectedTracks[MAXJETS];                       
+  math::XYZVector IPghostTrackP3[MAXJETS];      
+  float IPghostTrackPt[MAXJETS];                        
+  float IPghostTrackPtRel[MAXJETS];                        
+  float IPghostTrackEta[MAXJETS];                       
+  float IPghostTrackPhi[MAXJETS];                       
+  float IPghostTrackDeltaR[MAXJETS];        
+  int   IPPix1SharedHits[MAXJETS];
+  int   IPPix1TotalHits[MAXJETS];
+  int   IPPix2SharedHits[MAXJETS];
+  int   IPPix2TotalHits[MAXJETS];
+  int   IPPix3SharedHits[MAXJETS];
+  int   IPPix3TotalHits[MAXJETS];
+  int   IPPixAllSharedHits[MAXJETS];
+  int   IPPixAllTotalHits[MAXJETS];
+
+  std::vector< int* > IP3dTrackQuality;    
+  std::vector< int* > IP3dHasSharedPix1;
+  std::vector< int* > IP3dHasSharedPix2;
+  std::vector< int* > IP3dHasSharedPix3;
+  std::vector< int* > IP3dHasSharedPixAll;
+  std::vector< float* > IP3d;
+  std::vector< float* > IP3dError;
+  std::vector< float* > IP3dProbability;
+  std::vector< float* > IP3dTrackPtRel;
+  std::vector< float* > IP3dDistJetAxis;
+  std::vector< float* > IP3dDecayLength;
+  std::vector< float* > IP3dDeltaR;
+  std::vector< float* > IP3dMomentum;
+  std::vector< float* > IP3dTransverseMomentum;
+  std::vector< float* > IP3dEta;
+  std::vector< float* > IP3dPhi;
+  std::vector< int* >   IP3dNHits;
+  std::vector< int* >   IP3dNPixelHits;
+  std::vector< float* > IP3dNormChi2;
+  std::vector< int* >   IP2dTrackQuality;    
+  std::vector< float* > IP2d;
+  std::vector< float* > IP2dError;
+  std::vector< float* > IP2dProbability;
+  std::vector< float* > IP2dTrackPtRel;
+
+  //softElectronTagInfos
+  int nElectrons[MAXJETS];                            
+  float electronPt[MAXJETS];   			       
+  float electronEta[MAXJETS];  			       
+  float electronPhi[MAXJETS];  			       
+  int electronNHits[MAXJETS];   		     
+  int electronNExpectedOuterHits[MAXJETS];   		       
+  int electronNPixelHits[MAXJETS];   		       
+  float electronNChi2[MAXJETS];			       
+  float electronPtRel[MAXJETS];   		       
+  float electronSip2d[MAXJETS];   		       
+  float electronIp2d[MAXJETS];   		       
+  float electronIpe2d[MAXJETS];   		       
+  float electronSip3d[MAXJETS];
+  float electronIp3d[MAXJETS];
+  float electronIpe3d[MAXJETS];   		          		          		       
+  float electronP0Par[MAXJETS];   		       
+  float electronDeltaR[MAXJETS];  		       
+  float electronEtaRel[MAXJETS];  		       
+  float electronRatio[MAXJETS];   		     
+  int electronTrackQuality[MAXJETS];   		       
+  float electronRatioRel[MAXJETS];                      
+						       
+  //softMuonTagInfos	
+  int nMuons[MAXJETS];                                
+  float muonPt[MAXJETS];   			       
+  float muonEta[MAXJETS];  			       
+  float muonPhi[MAXJETS];  			       
+  int muonNHits[MAXJETS];   	
+  int muonNExpectedOuterHits[MAXJETS];   			       
+  int muonNPixelHits[MAXJETS];   			       
+  float muonNChi2[MAXJETS];	         	       
+  float muonPtRel[MAXJETS];   
+  float muonSip2d[MAXJETS];   		       
+  float muonIp2d[MAXJETS];   		       
+  float muonIpe2d[MAXJETS];   		       
+  float muonSip3d[MAXJETS];
+  float muonIp3d[MAXJETS];
+  float muonIpe3d[MAXJETS];   	
+  float muonP0Par[MAXJETS];   			       
+  float muonDeltaR[MAXJETS];  			       
+  float muonEtaRel[MAXJETS];  			       
+  float muonRatio[MAXJETS];   			    
+  int muonTrackQuality[MAXJETS];   			       
+  float muonRatioRel[MAXJETS];                          
+
+
+
+  std::map< std::string, float* > bTagArrays;
+
 };
 
 //
@@ -150,10 +320,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
 {
   string alias;
   getMCTruth_     = iConfig.getParameter<bool>( "getMCTruth" );
-  get_SV_tag_infos_= iConfig.getParameter<bool>( "getSVTagInfo" );
-  get_IP_tag_infos_= iConfig.getParameter<bool>( "getIPTagInfo" );
-  get_SE_tag_infos_= iConfig.getParameter<bool>( "getSETagInfo" );
-  get_SM_tag_infos_= iConfig.getParameter<bool>( "getSMTagInfo" );
+
   jet_src_        = iConfig.getParameter<edm::InputTag>( "jetSrc" );
   SVComputer_     = iConfig.getParameter<edm::InputTag>( "svComputer");
    triggerTag_ = iConfig.getParameter<edm::InputTag>("TriggerTag");
@@ -162,232 +329,268 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   primaryVertexProducer_   = iConfig.getParameter<InputTag>("primaryVertex"); 
   SV_tag_infos_   = iConfig.getParameter<edm::InputTag>( "SVTagInfos" );
   IP_tag_infos_   = iConfig.getParameter<edm::InputTag>( "IPTagInfos" );
-  IP_n_saved_tracks_ = iConfig.getParameter<unsigned int>( "IPnSavedTracks" );
+
   electron_tag_infos_ = iConfig.getParameter<edm::InputTag>( "ElectronTagInfos" );
   muon_tag_infos_ = iConfig.getParameter<edm::InputTag>( "MuonTagInfos" );
   label_ = iConfig.getParameter<string>( "Label" );
-  
-  // Trigger info
-  produces<bool>( alias = label_ + "triggerHLTL1Jet6U"  ).setBranchAlias( alias );
-  produces<bool>( alias = label_ + "triggerHLTL1Jet10U"  ).setBranchAlias( alias );
-  produces<bool>( alias = label_ + "triggerHLTJet15U"  ).setBranchAlias( alias );
 
-  produces<unsigned int> ( alias = label_ + "eventNumber"  ).setBranchAlias( alias );
-  produces<unsigned int> ( alias = label_ + "runNumber"  ).setBranchAlias( alias );
-  produces<unsigned int> ( alias = label_ + "lumiBlockNumber"  ).setBranchAlias( alias );
+  std::string filename = iConfig.getParameter<string>( "filename" );
 
-  produces<unsigned int> ( alias = label_ + "numberOfPrimaryVertices"  ).setBranchAlias( alias );
-
-   //Basic Jet Information
-  produces<vector<math::XYZTLorentzVector> >( alias = label_ + "jetP4"                  ).setBranchAlias( alias );
-  produces<vector<float> >( alias = label_ + "jetPt"                                    ).setBranchAlias( alias );
-  produces<vector<float> >( alias = label_ + "jetEta"                                   ).setBranchAlias( alias );
-  produces<vector<float> >( alias = label_ + "jetPhi"                                   ).setBranchAlias( alias );
-  produces<vector<float> >( alias = label_ + "jetEMFraction"                            ).setBranchAlias( alias );
-  produces<vector<float> >( alias = label_ + "jetChargedEmEnergyFraction"               ).setBranchAlias( alias );
-  produces<vector<float> >( alias = label_ + "jetNeutralEmEnergyFraction"               ).setBranchAlias( alias );
-  produces<vector<float> >( alias = label_ + "jetChargedHadronEnergyFraction"           ).setBranchAlias( alias );
-  produces<vector<float> >( alias = label_ + "jetNeutralHadronEnergyFraction"           ).setBranchAlias( alias );
-  produces<vector<float> >( alias = label_ + "jetChargedMultiplicity"                   ).setBranchAlias( alias );
-  produces<vector<float> >( alias = label_ + "jetMass"                                  ).setBranchAlias( alias );
-  produces<vector<int> >( alias = label_ + "jetnConstituents"                           ).setBranchAlias( alias ); 
-  produces<vector<int> >( alias = label_ + "jetnTracks"                                 ).setBranchAlias( alias );  
-  produces<vector<math::XYZVector> >(alias = label_ + "jetVertex"                       ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "jetVertexChi2"                             ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "jetVertexChi2Ndof"                         ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "jetVertexNormalizedChi2"                   ).setBranchAlias( alias );
-
-  //Track Information
-  produces<vector<int> >  (alias = label_ + "trackJetIndex"                   ).setBranchAlias( alias );
-  produces<vector<bool> >  (alias = label_ + "trackSelected"                  ).setBranchAlias( alias );
-  produces<vector<math::XYZVector> >( alias = label_ + "track3Momentum"                ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackTransverseMomentum"                 ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackEta"                 ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackPhi"                 ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackMomentum"                   ).setBranchAlias( alias );
-  produces<vector<int> >(alias = label_ + "trackNHits"                   ).setBranchAlias( alias );
-  produces<vector<int> >(alias = label_ + "trackNPixelHits"                   ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackChi2"                   ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackNormChi2"                   ).setBranchAlias( alias );
-  produces<vector<int> >(alias = label_ + "trackQuality"                   ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackLongitudinalImpactParameter"          ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackDecayLength"          ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackDistJetAxis"          ).setBranchAlias( alias ) ;
-  produces<vector<float> >(alias = label_ + "trackDeltaR"          ).setBranchAlias( alias ) ;
-  produces<vector<float> >(alias = label_ + "trackIP3d" ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackIP2d" ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackIP3dError" ).setBranchAlias( alias );
-  produces<vector<float> >(alias = label_ + "trackIP2dError" ).setBranchAlias( alias );
-  produces<vector<int> >(alias = label_ + "trackHasSharedPix1" ).setBranchAlias( alias );
-  produces<vector<int> >(alias = label_ + "trackHasSharedPix2" ).setBranchAlias( alias );
-  produces<vector<int> >(alias = label_ + "trackHasSharedPix3" ).setBranchAlias( alias );
-  produces<vector<int> >(alias = label_ + "trackHasSharedPixAll" ).setBranchAlias( alias );
-
-  if(getMCTruth_)
-    {
-      //MC Truth Information
-      produces<vector<float> >( alias = label_ + "MCTrueFlavor"                             ).setBranchAlias( alias ); 
-      // the pthat information
-      produces<float>( alias = label_ + "pthat"  ).setBranchAlias( alias );
-    }
-
-  if(get_SV_tag_infos_)
-    {
-      //secondaryVertexTagInfos:					               
-      produces<vector<math::XYZVector> >( alias = label_ + "SecondaryVertex"                ).setBranchAlias( alias );  
-      produces<vector<float> >( alias = label_ + "SV3dDistance"                             ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = label_ + "SV3dDistanceError"                        ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = label_ + "SV2dDistance"                             ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = label_ + "SV2dDistanceError"                        ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = label_ + "SVChi2"                                   ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = label_ + "SVDegreesOfFreedom"                       ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = label_ + "SVNormChi2"                               ).setBranchAlias( alias );   
-     produces<vector<float> >( alias = label_ + "SVIPFirstAboveCharm"                               ).setBranchAlias( alias );   
-      produces<vector<int> >( alias = label_ + "SVnSelectedTracks"                                  ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = label_ + "SVMass"                                   ).setBranchAlias( alias );   
-      produces<vector<float> >( alias = label_ + "SVEnergyRatio"                                   ).setBranchAlias( alias );   
-      produces<vector<int> >( alias = label_ + "SVnVertices"                                ).setBranchAlias( alias );   
-      produces<vector<int> >( alias = label_ + "SVnVertexTracks"                            ).setBranchAlias( alias ); 
-      produces<vector<int> >( alias = label_ + "SVnVertexTracksAll"                         ).setBranchAlias( alias ); 
-      produces<vector<int> >( alias = label_ + "SVnFirstVertexTracks"                            ).setBranchAlias( alias ); 
-      produces<vector<int> >( alias = label_ + "SVnFirstVertexTracksAll"                         ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = label_ + "SVjetDeltaR"                            ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = label_ + "SVvtxSumJetDeltaR"                            ).setBranchAlias( alias ); 
-      produces<vector<float> >( alias = label_ + "SVvtxSumVtxDirDeltaR"                            ).setBranchAlias( alias ); 
-    
-    } 
-  if(get_IP_tag_infos_)
-    {
-      //impactParameterTagInfos
-      produces<vector<int> >( alias = label_ + "IPnSelectedTracks"                          ).setBranchAlias( alias );  
-      produces<vector<math::XYZVector> >( alias = label_ + "IPghostTrackP3"         ).setBranchAlias( alias );
-      produces<vector<float> >( alias = label_ + "IPghostTrackPt"                           ).setBranchAlias( alias );
-      produces<vector<float> >( alias = label_ + "IPghostTrackPtRel"                        ).setBranchAlias( alias );
-      produces<vector<float> >( alias = label_ + "IPghostTrackEta"                          ).setBranchAlias( alias );
-      produces<vector<float> >( alias = label_ + "IPghostTrackPhi"                          ).setBranchAlias( alias );
-      produces<vector<float> >( alias = label_ + "IPghostTrackDeltaR"                       ).setBranchAlias( alias );
-      produces<vector<int> >( alias = label_ + "IPPix1SharedHits"                       ).setBranchAlias( alias );
-      produces<vector<int> >( alias = label_ + "IPPix1TotalHits"                       ).setBranchAlias( alias );
-      produces<vector<int> >( alias = label_ + "IPPix2SharedHits"                       ).setBranchAlias( alias );
-      produces<vector<int> >( alias = label_ + "IPPix2TotalHits"                       ).setBranchAlias( alias );
-      produces<vector<int> >( alias = label_ + "IPPix3SharedHits"                       ).setBranchAlias( alias );
-      produces<vector<int> >( alias = label_ + "IPPix3TotalHits"                       ).setBranchAlias( alias );
-      produces<vector<int> >( alias = label_ + "IPPixAllSharedHits"                       ).setBranchAlias( alias );
-      produces<vector<int> >( alias = label_ + "IPPixAllTotalHits"                       ).setBranchAlias( alias );
-
-
-      for(unsigned int iTrack = 0; iTrack < IP_n_saved_tracks_; iTrack++)
-	{
-	  stringstream trackNum;
-	  trackNum << (iTrack+1);
-	  alias = label_ + "IP3dTrackQuality"+trackNum.str();
-	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3d"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dHasSharedPix1"+trackNum.str();
-	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dHasSharedPix2"+trackNum.str();
-	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dHasSharedPix3"+trackNum.str();
-	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dHasSharedPixAll"+trackNum.str();
-	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
-
-	  alias = label_ + "IP3dError"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dProbability"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dTrackPtRel"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dDistJetAxis"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dDecayLength"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dDeltaR"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dMomentum"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dTransverseMomentum"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dEta"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dPhi"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dNHits"+trackNum.str();
-	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dNPixelHits"+trackNum.str();
-	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP3dNormChi2"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP2dTrackQuality"+trackNum.str();
-	  produces<vector<int> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP2d"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP2dError"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP2dProbability"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	  alias = label_ + "IP2dTrackPtRel"+trackNum.str();
-	  produces<vector<float> >( alias                    ).setBranchAlias( alias );
-	}
-    }
-  if(get_SE_tag_infos_)
-    {
-      //softElectronTagInfos
-      produces<vector<int> >(alias = label_ + "nElectrons"                                ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronPt"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronEta"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronPhi"  			       ).setBranchAlias( alias );
-      produces<vector<int> >(alias = label_ + "electronNPixelHits"   			       ).setBranchAlias( alias );
-      produces<vector<int> >(alias = label_ + "electronNHits"   			       ).setBranchAlias( alias );
-      produces<vector<int> >(alias = label_ + "electronNExpectedOuterHits"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronNChi2"			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronPtRel"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronSip2d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronIp2d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronIpe2d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronSip3d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronIp3d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronIpe3d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronP0Par"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronDeltaR"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronEtaRel"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronRatio"   			       ).setBranchAlias( alias );
-      produces<vector<int> >(alias = label_ + "electronTrackQuality" 			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "electronRatioRel"                          ).setBranchAlias( alias );
-    }
-  if(get_SM_tag_infos_)
-    {
-      //softMuonTagInfos	
-      produces<vector<int> >(alias = label_ + "nMuons"                                    ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonPt"   			               ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonEta"  			               ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonPhi"  			               ).setBranchAlias( alias );
-      produces<vector<int> >(alias = label_ + "muonNHits"   			       ).setBranchAlias( alias );
-      produces<vector<int> >(alias = label_ + "muonNExpectedOuterHits"   			       ).setBranchAlias( alias );
-      produces<vector<int> >(alias = label_ + "muonNPixelHits"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonNChi2"	         		       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonPtRel"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonSip2d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonIp2d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonIpe2d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonSip3d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonIp3d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonIpe3d"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonP0Par"   			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonDeltaR"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonEtaRel"  			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonRatio"   			       ).setBranchAlias( alias );
-      produces<vector<int> >(alias = label_ + "muonTrackQuality" 			       ).setBranchAlias( alias );
-      produces<vector<float> >(alias = label_ + "muonRatioRel"                              ).setBranchAlias( alias );
-    }
   //b tagger outputs configured in python file
   bTag_Config_ = iConfig.getParameter< vector<edm::ParameterSet> >("bTagConfig");
+
+  file = new TFile (filename.c_str(), "RECREATE" );
+  // create tree structure
+  tree = new TTree("t","t");
+
+
+
   for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
     {
-      alias = label_+ ibTag->getParameter<string>("alias");
-      produces<vector<float> >( alias ).setBranchAlias( alias ); 
+      bTagArrays[ibTag->getParameter<string>("alias")] = new float[MAXJETS];
     }
+
+  for(int i=0; i<4; i++){
+    IP3dTrackQuality.push_back( new int[MAXJETS]);    
+    IP3dHasSharedPix1.push_back(  new int[MAXJETS]);
+    IP3dHasSharedPix2.push_back( new int[MAXJETS]);
+    IP3dHasSharedPix3.push_back( new int[MAXJETS]);
+    IP3dHasSharedPixAll.push_back( new int[MAXJETS]);
+    IP3d.push_back( new float[MAXJETS]);
+    IP3dError.push_back( new float[MAXJETS]);
+    IP3dProbability.push_back( new float[MAXJETS]);
+    IP3dTrackPtRel.push_back( new float[MAXJETS]);
+    IP3dDistJetAxis.push_back( new float[MAXJETS]);
+    IP3dDecayLength.push_back(new float[MAXJETS] );
+    IP3dDeltaR.push_back( new float[MAXJETS]);
+    IP3dMomentum.push_back( new float[MAXJETS]);
+    IP3dTransverseMomentum.push_back( new float[MAXJETS]);
+    IP3dEta.push_back( new float[MAXJETS]);
+    IP3dPhi.push_back( new float[MAXJETS]);
+    IP3dNHits.push_back( new int[MAXJETS]);
+    IP3dNPixelHits.push_back( new int[MAXJETS]);
+    IP3dNormChi2.push_back( new float[MAXJETS]);
+    IP2dTrackQuality.push_back( new int[MAXJETS]);    
+    IP2d.push_back( new float[MAXJETS]);
+    IP2dError.push_back( new float[MAXJETS]);
+    IP2dProbability.push_back( new float[MAXJETS]);
+    IP2dTrackPtRel.push_back( new float[MAXJETS]);
+  }
+
+
+  tree->Branch(  "triggerHLTL1Jet6U", &triggerHLTL1Jet6U, "triggerHLTL1Jet6U/O"); 
+  tree->Branch(  "triggerHLTL1Jet10U", &triggerHLTL1Jet10U, "triggerHLTL1Jet10U/O"); 
+  tree->Branch(  "triggerHLTJet15U",  &triggerHLTJet15U, "triggerHLTJet15U/O");
+
+  tree->Branch(  "eventNumber"             , &eventNumber             , "eventNumber/i"            );
+  tree->Branch(  "runNumber"		    , &runNumber               , "runNumber/i"   	    );
+  tree->Branch(  "lumiBlockNumber" 	    , &lumiBlockNumber         , "lumiBlockNumber/i" 	    );
+  tree->Branch(  "numberOfPrimaryVertices" , &numberOfPrimaryVertices , "numberOfPrimaryVertices/i"); 
+
+  tree->Branch(  "pthat" , &pthat, "pthat/F");
+
+  //Basic Jet Information
+  //  math::XYZTLorentzVector jetP4[nJets];    
+  tree->Branch(  "nJets", &nJets, "nJets/I");
+           
+  tree->Branch(  "jetPt", jetPt , "jetPt[nJets]/F");                                 
+  tree->Branch(  "jetEta", jetEta, "jetEta[nJets]/F");                                
+  tree->Branch(  "jetPhi", jetPhi, "jetPhi[nJets]/F");                                
+  tree->Branch(  "jetEMFraction", jetEMFraction, "jetEMFraction[nJets]/F");        
+  tree->Branch(  "jetChargedEmEnergyFraction", jetChargedEmEnergyFraction, "jetChargedEmEnergyFraction[nJets]/F");
+  tree->Branch(  "jetNeutralEmEnergyFraction",  jetNeutralEmEnergyFraction, "jetNeutralEmEnergyFraction[nJets]/F");
+  tree->Branch(  "jetChargedHadronEnergyFraction", jetChargedHadronEnergyFraction, "jetChargedHadronEnergyFraction[nJets]/F");
+  tree->Branch(  "jetNeutralHadronEnergyFraction", jetNeutralHadronEnergyFraction, "jetNeutralHadronEnergyFraction[nJets]/F");
+  tree->Branch(  "jetChargedMultiplicity", jetChargedMultiplicity , "jetChargedMultiplicity[nJets]/F");
+  tree->Branch(  "jetMass", jetMass , "jetMass[nJets]/F");                               
+  tree->Branch(  "jetnConstituents", jetnConstituents ,"jetnConstituents[nJets]/I");  
+  tree->Branch(  "jetnTracks", jetnTracks, "jetnTracks[nJets]/I");                           
+//   tree->Branch(  "jetnElectrons", jetnElectrons   [nJets];                              
+//   tree->Branch(  "jetnMuons", jetnMuons   [nJets];                                  
+//   math::XYZVector "jetVertex", jetVertex , "jetVertex[nJets]/F");                   
+  tree->Branch(  "jetVertexChi2", jetVertexChi2 , "jetVertexChi2[nJets]/F");               
+  tree->Branch(  "jetVertexChi2Ndof", jetVertexChi2Ndof , "jetVertexChi2Ndof[nJets]/F");           
+  tree->Branch(  "jetVertexNormalizedChi2", jetVertexNormalizedChi2 , "jetVertexNormalizedChi2[nJets]/F");    
+
+  //Track Information
+  tree->Branch(  "nTracks", &nTracks, "nTracks/I");
+
+  tree->Branch(  "trackJetIndex", trackJetIndex, "trackJetIndex[nTracks]/I");
+  tree->Branch( "trackSelected", trackSelected, "trackSelected[nTracks]/O") ;
+  //				 math::XYZVector "track3Momentum", track3Momentum,   [nTracks];
+  tree->Branch(  "trackTransverseMomentum", trackTransverseMomentum,  "trackTransverseMomentum[nTracks]/F");
+  tree->Branch(  "trackEta", trackEta, "trackEta[nTracks]/F");
+  tree->Branch(  "trackPhi", trackPhi, "trackPhi[nTracks]/F");
+  tree->Branch(  "trackMomentum",  trackMomentum, "trackMomentum[nTracks]/F");
+  tree->Branch(  "trackNHits", trackNHits, "trackNHits[nTracks]/I");
+  tree->Branch(  "trackNPixelHits",  trackNPixelHits, "trackNPixelHits[nTracks]/I");
+  tree->Branch(  "trackChi2",  trackChi2, "trackChi2[nTracks]/F");
+  tree->Branch(  "trackNormChi2", trackNormChi2, "trackNormChi2[nTracks]/F");
+  tree->Branch(  "trackQuality",  trackQuality, "trackQuality[nTracks]/I");
+  tree->Branch(  "trackLongitudinalImpactParameter",  trackLongitudinalImpactParameter, "trackLongitudinalImpactParameter[nTracks]/F");
+  tree->Branch(  "trackIP", trackIP, "trackIP[nTracks]/F");
+  tree->Branch(  "trackDecayLength", trackDecayLength, "trackDecayLength[nTracks]/F");
+  tree->Branch(  "trackDistJetAxis",  trackDistJetAxis, "trackDistJetAxis[nTracks]/F");
+  tree->Branch(  "trackDeltaR", trackDeltaR, "trackDeltaR[nTracks]/F");
+  tree->Branch(  "trackIP3d", trackIP3d, "trackIP3d[nTracks]/F");
+  tree->Branch(  "trackIP2d",  trackIP2d, "trackIP2d[nTracks]/F");
+  tree->Branch(  "trackIP3dError",  trackIP3dError, "trackIP3dError[nTracks]/F");
+  tree->Branch(  "trackIP2dError",  trackIP2dError, "trackIP2dError[nTracks]/F");
+  tree->Branch(  "trackHasSharedPix1",  trackHasSharedPix1, "trackHasSharedPix1[nTracks]/I");
+  tree->Branch(  "trackHasSharedPix2",  trackHasSharedPix2, "trackHasSharedPix2[nTracks]/I");
+  tree->Branch(  "trackHasSharedPix3",  trackHasSharedPix3, "trackHasSharedPix3[nTracks]/I");
+  tree->Branch(  "trackHasSharedPixAll",  trackHasSharedPixAll, "trackHasSharedPixAll[nTracks]/I");
+
+  //MC Truth Information
+  tree->Branch(  "MCTrueFlavor", MCTrueFlavor, "MCTrueFlavor[nJets]/I");                          
+ 				       
+  //secondaryVertexTagInfos:			       
+		  //  math::XYZVector "SecondaryVertex",    [nJets];             
+  tree->Branch(  "SV3dDistance", SV3dDistance, "SV3dDistance[nJets]/F");                          
+  tree->Branch(  "SV3dDistanceError",  SV3dDistanceError, "SV3dDistanceError[nJets]/F");                     
+  tree->Branch(  "SV2dDistance", SV2dDistance, "SV2dDistance[nJets]/F");                          
+  tree->Branch(  "SV2dDistanceError",  SV2dDistanceError, "SV2dDistanceError[nJets]/F");                     
+  tree->Branch(  "SVChi2",  SVChi2, "SVChi2[nJets]/F");                
+  tree->Branch(  "SVIPFirstAboveCharm",  SVIPFirstAboveCharm, "SVIPFirstAboveCharm[nJets]/F");                                
+  tree->Branch(  "SVDegreesOfFreedom",  SVDegreesOfFreedom, "SVDegreesOfFreedom[nJets]/F");                    
+  tree->Branch(  "SVNormChi2", SVNormChi2, "SVNormChi2[nJets]/F");                            
+  tree->Branch(  "SVnSelectedTracks",  SVnSelectedTracks, "SVnSelectedTracks[nJets]/I");                               
+  tree->Branch(  "SVMass",  SVMass, "SVMass[nJets]/F");                                
+  tree->Branch(  "SVEnergyRatio",  SVEnergyRatio, "SVEnergyRatio[nJets]/F");                                
+  tree->Branch(  "SVnVertices",  SVnVertices, "SVnVertices[nJets]/I");                             
+  tree->Branch(  "SVnVertexTracks", SVnVertexTracks, "SVnVertexTracks[nJets]/I");         
+  tree->Branch(  "SVnVertexTracksAll",  SVnVertexTracksAll, "SVnVertexTracksAll[nJets]/I");         
+  tree->Branch(  "SVnFirstVertexTracks", SVnFirstVertexTracks, "SVnFirstVertexTracks[nJets]/I");         
+  tree->Branch(  "SVnFirstVertexTracksAll",  SVnFirstVertexTracksAll, "SVnFirstVertexTracksAll[nJets]/I");         
+  tree->Branch(  "SVjetDeltaR",  SVjetDeltaR, "SVjetDeltaR[nJets]/F");
+  tree->Branch(  "SVvtxSumVtxDirDeltaR", SVvtxSumVtxDirDeltaR, "SVvtxSumVtxDirDeltaR[nJets]/F");
+  tree->Branch(  "SVvtxSumJetDeltaR",  SVvtxSumJetDeltaR, "SVvtxSumJetDeltaR[nJets]/F");
+               
+  //impactParameterTagInfos
+  tree->Branch(  "IPnSelectedTracks",  IPnSelectedTracks, "IPnSelectedTracks[nJets]/I");                       
+		  //  math::XYZVector "IPghostTrackP3",    [nJets];      
+  tree->Branch(  "IPghostTrackPt",  IPghostTrackPt, "IPghostTrackPt[nJets]/F");                        
+  tree->Branch(  "IPghostTrackPtRel", IPghostTrackPtRel, "IPghostTrackPtRel[nJets]/F");                        
+  tree->Branch(  "IPghostTrackEta",  IPghostTrackEta, "IPghostTrackEta[nJets]/F");                       
+  tree->Branch(  "IPghostTrackPhi",  IPghostTrackPhi, "IPghostTrackPhi[nJets]/F");                       
+  tree->Branch(  "IPghostTrackDeltaR", IPghostTrackDeltaR, "IPghostTrackDeltaR[nJets]/F");        
+  tree->Branch(  "IPPix1SharedHits",  IPPix1SharedHits, "IPPix1SharedHits[nJets]/I");
+  tree->Branch(  "IPPix1TotalHits",  IPPix1TotalHits, "IPPix1TotalHits[nJets]/I");
+  tree->Branch(  "IPPix2SharedHits", IPPix2SharedHits, "IPPix2SharedHits[nJets]/I");
+  tree->Branch(  "IPPix2TotalHits", IPPix2TotalHits, "IPPix2TotalHits[nJets]/I");
+  tree->Branch(  "IPPix3SharedHits",  IPPix3SharedHits, "IPPix3SharedHits[nJets]/I");
+  tree->Branch(  "IPPix3TotalHits", IPPix3TotalHits, "IPPix3TotalHits[nJets]/I");
+  tree->Branch(  "IPPixAllSharedHits", IPPixAllSharedHits, "IPPixAllSharedHits[nJets]/I");
+  tree->Branch(  "IPPixAllTotalHits", IPPixAllTotalHits, "IPPixAllTotalHits[nJets]/I");
+
+  for(int i=0; i<4; i++){
+    TString name = "IP3dTrackQuality"; name += (i+1);
+    tree->Branch( name, IP3dTrackQuality[i], name + "[nJets]/I");
+    name = "IP3dHasSharedPix1"; name += (i+1);
+    tree->Branch( name, IP3dHasSharedPix1[i], name + "[nJets]/I");
+    name = "IP3dHasSharedPix2"; name += (i+1);
+    tree->Branch( name, IP3dHasSharedPix2[i], name + "[nJets]/I");
+    name = "IP3dHasSharedPix3"; name += (i+1);
+    tree->Branch( name, IP3dHasSharedPix3[i], name + "[nJets]/I");
+    name = "IP3dHasSharedPixAll"; name += (i+1);
+    tree->Branch( name, IP3dHasSharedPixAll[i], name + "[nJets]/I");
+    name = "IP3d"; name += (i+1);
+    tree->Branch( name, IP3d[i], name + "[nJets]/F");
+    name = "IP3dError"; name += (i+1);
+    tree->Branch( name, IP3dError[i], name + "[nJets]/F");
+    name = "IP3dProbability"; name += (i+1);
+    tree->Branch( name, IP3dProbability[i], name + "[nJets]/F");
+    name = "IP3dTrackPtRel"; name += (i+1);
+    tree->Branch( name, IP3dTrackPtRel[i], name + "[nJets]/F");
+    name = "IP3dDistJetAxis"; name += (i+1);
+    tree->Branch( name, IP3dDistJetAxis[i], name + "[nJets]/F");
+    name = "IP3dDecayLength"; name += (i+1);
+    tree->Branch( name, IP3dDecayLength[i], name + "[nJets]/F");
+    name = "IP3dDeltaR"; name += (i+1);
+    tree->Branch( name, IP3dDeltaR[i], name + "[nJets]/F");
+    name = "IP3dMomentum"; name += (i+1);
+    tree->Branch( name, IP3dMomentum[i], name + "[nJets]/F");
+    name = "IP3dTransverseMomentum"; name += (i+1);
+    tree->Branch( name, IP3dTransverseMomentum[i], name + "[nJets]/F");
+    name = "IP3dEta"; name += (i+1);
+    tree->Branch( name, IP3dEta[i], name + "[nJets]/F");
+    name = "IP3dPhi"; name += (i+1);
+    tree->Branch( name, IP3dPhi[i], name + "[nJets]/F");
+    name = "IP3dNHits"; name += (i+1);
+    tree->Branch( name, IP3dNHits[i], name + "[nJets]/I");
+    name = "IP3dNPixelHits"; name += (i+1);
+    tree->Branch( name, IP3dNPixelHits[i], name + "[nJets]/I");
+    name = "IP3dNormChi2"; name += (i+1);
+    tree->Branch( name, IP3dNormChi2[i], name + "[nJets]/F");
+    name = "IP2dTrackQuality"; name += (i+1);
+    tree->Branch( name, IP2dTrackQuality[i], name + "[nJets]/I");
+    name = "IP2d"; name += (i+1);
+    tree->Branch( name, IP2d[i], name + "[nJets]/F");
+    name = "IP2dError"; name += (i+1);
+    tree->Branch( name, IP2dError[i], name + "[nJets]/F");
+    name = "IP2dProbability"; name += (i+1);
+    tree->Branch( name, IP2dProbability[i], name + "[nJets]/F");
+    name = "IP2dTrackPtRel"; name += (i+1);
+    tree->Branch( name, IP2dTrackPtRel[i], name + "[nJets]/F");
+
+  }
+
+  //softElectronTagInfos
+  tree->Branch(  "nElectrons",  nElectrons, "nElectrons[nJets]/I");                            
+  tree->Branch(  "electronPt",  electronPt, "electronPt[nJets]/F");   			       
+  tree->Branch(  "electronEta", electronEta, "electronEta[nJets]/F");  			       
+  tree->Branch(  "electronPhi",  electronPhi, "electronPhi[nJets]/F");  			       
+  tree->Branch(  "electronNHits", electronNHits, "electronNHits[nJets]/I");   		     
+  tree->Branch(  "electronNExpectedOuterHits", electronNExpectedOuterHits, "electronNExpectedOuterHits[nJets]/I");   		       
+  tree->Branch(  "electronNPixelHits",  electronNPixelHits, "electronNPixelHits[nJets]/I");   		       
+  tree->Branch(  "electronNChi2", electronNChi2, "electronNChi2[nJets]/F");			       
+  tree->Branch(  "electronPtRel", electronPtRel, "electronPtRel[nJets]/F");   		       
+  tree->Branch(  "electronSip2d", electronSip2d, "electronSip2d[nJets]/F");   		       
+  tree->Branch(  "electronIp2d", electronIp2d, "electronIp2d[nJets]/F");   		       
+  tree->Branch(  "electronIpe2d", electronIpe2d, "electronIpe2d[nJets]/F");   		       
+  tree->Branch(  "electronSip3d", electronSip3d, "electronSip3d[nJets]/F");
+  tree->Branch(  "electronIp3d", electronIp3d, "electronIp3d[nJets]/F");
+  tree->Branch(  "electronIpe3d", electronIpe3d, "electronIpe3d[nJets]/F");   		          		          		       
+  tree->Branch(  "electronP0Par", electronP0Par, "electronP0Par[nJets]/F");   		       
+   tree->Branch(  "electronDeltaR", electronDeltaR, "electronDeltaR[nJets]/F");  		       
+   tree->Branch(  "electronEtaRel", electronEtaRel, "electronEtaRel[nJets]/F");  		       
+   tree->Branch(  "electronRatio", electronRatio, "electronRatio[nJets]/F");   		     
+   tree->Branch(  "electronTrackQuality", electronTrackQuality, "electronTrackQuality[nJets]/I");   		       
+   tree->Branch(  "electronRatioRel", electronRatioRel, "electronRatioRel[nJets]/F");                      
+						       
+  //softMuonTagInfos	
+   tree->Branch(  "nMuons", nMuons, "nMuons[nJets]/I");                                
+   tree->Branch(  "muonPt", muonPt, "muonPt[nJets]/F");   			       
+   tree->Branch(  "muonEta", muonEta, "muonEta[nJets]/F");  			       
+   tree->Branch(  "muonPhi", muonPhi, "muonPhi[nJets]/F");  			       
+   tree->Branch(  "muonNHits", muonNHits, "muonNHits[nJets]/I");   	
+   tree->Branch(  "muonNExpectedOuterHits", muonNExpectedOuterHits, "muonNExpectedOuterHits[nJets]/I");   			       
+   tree->Branch(  "muonNPixelHits", muonNPixelHits, "muonNPixelHits[nJets]/I");   			       
+   tree->Branch(  "muonNChi2", muonNChi2, "muonNChi2[nJets]/F");	         	       
+   tree->Branch(  "muonPtRel", muonPtRel, "muonPtRel[nJets]/F");   
+   tree->Branch(  "muonSip2d", muonSip2d, "muonSip2d[nJets]/F");   		       
+   tree->Branch(  "muonIp2d", muonIp2d, "muonIp2d[nJets]/F");   		       
+   tree->Branch(  "muonIpe2d", muonIpe2d, "muonIpe2d[nJets]/F");   		       
+   tree->Branch(  "muonSip3d", muonSip3d, "muonSip3d[nJets]/F");
+   tree->Branch(  "muonIp3d", muonIp3d, "muonIp3d[nJets]/F");
+   tree->Branch(  "muonIpe3d", muonIpe3d, "muonIpe3d[nJets]/F");   	
+   tree->Branch(  "muonP0Par", muonP0Par, "muonP0Par[nJets]/F");   			       
+   tree->Branch(  "muonDeltaR", muonDeltaR, "muonDeltaR[nJets]/F");  			       
+   tree->Branch(  "muonEtaRel", muonEtaRel, "muonEtaRel[nJets]/F");  			       
+   tree->Branch(  "muonRatio", muonRatio, "muonRatio[nJets]/F");   			    
+   tree->Branch(  "muonTrackQuality", muonTrackQuality, "muonTrackQuality[nJets]/I");   			       
+   tree->Branch(  "muonRatioRel", muonRatioRel, "muonRatioRel[nJets]/F");                          
+
+
+
+   for(map< string, float* >::iterator it = bTagArrays.begin(); it!= bTagArrays.end(); it++){
+     TString name = it->first;
+     TString nameExt = name;
+     nameExt += "[nJets]/F";
+     tree->Branch(  name, it->second, nameExt ); 
+   }
+
+
 
 }
 
@@ -404,14 +607,13 @@ TagNtupleProducer::~TagNtupleProducer()
 
 // ------------ method called to produce the data  ------------
 void
-TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
   using namespace std;
   using namespace reco;
   
   //Get The Various collections defined in the configuration file
-  bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U;
   triggerHLTL1Jet6U= triggerHLTL1Jet10U= triggerHLTJet15U = 0;
 
   edm::Handle<edm::TriggerResults>  hltresults;
@@ -435,9 +637,13 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     exit(1);
   }
 
-  unsigned int eventNumber = iEvent.eventAuxiliary().event();
-  unsigned int runNumber = iEvent.eventAuxiliary().run();
-  unsigned int lumiBlockNumber = iEvent.eventAuxiliary().luminosityBlock();
+  // do NOT save event, if no trigger has fired
+  if( triggerHLTL1Jet6U != 1 && triggerHLTL1Jet10U !=1 && triggerHLTJet15U != 1 ) return;
+
+
+  eventNumber = iEvent.eventAuxiliary().event();
+  runNumber = iEvent.eventAuxiliary().run();
+  lumiBlockNumber = iEvent.eventAuxiliary().luminosityBlock();
 
    Handle< View<Jet> > jets;
   iEvent.getByLabel(jet_src_,jets);
@@ -448,7 +654,7 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   Handle<reco::VertexCollection> primaryVertex;
   iEvent.getByLabel(primaryVertexProducer_, primaryVertex);
 
-  unsigned int numberOfPrimaryVertices = primaryVertex->size();
+  numberOfPrimaryVertices = primaryVertex->size();
 
   edm::ESHandle<TransientTrackBuilder> builder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
@@ -458,55 +664,51 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   typedef map<JetRef, const SoftLeptonTagInfo*, JetRefCompare> slTagInfoMap;
   slTagInfoMap softElectronTagInfo;
   edm::Handle< View < reco::SoftLeptonTagInfo > > SoftElectronTagInfoVector;
-  if(get_SE_tag_infos_)
-    {
+ 
       iEvent.getByLabel(electron_tag_infos_,SoftElectronTagInfoVector);
       for(View< reco::SoftLeptonTagInfo >::const_iterator iTagInfo = SoftElectronTagInfoVector->begin(); iTagInfo != SoftElectronTagInfoVector->end(); iTagInfo++) 
 	{
 	  softElectronTagInfo[iTagInfo->jet()] = &*iTagInfo;
 	}
-    }
+    
 
   slTagInfoMap softMuonTagInfo;
   edm::Handle< View < reco::SoftLeptonTagInfo > > SoftMuonTagInfoVector;
-  if(get_SM_tag_infos_)
-    {
+ 
       iEvent.getByLabel(muon_tag_infos_,SoftMuonTagInfoVector);
       for(View< reco::SoftLeptonTagInfo >::const_iterator iTagInfo = SoftMuonTagInfoVector->begin(); iTagInfo != SoftMuonTagInfoVector->end(); iTagInfo++) 
 	{
 	  softMuonTagInfo[iTagInfo->jet()] = &*iTagInfo;
 	}
-    }
+    
 
   typedef map< JetRef, const SecondaryVertexTagInfo*, JetRefCompare > svTagInfoMap;
   svTagInfoMap svTagInfo;
   edm::Handle< View < reco::SecondaryVertexTagInfo > > svTagInfoVector;
-  if(get_SV_tag_infos_)
-    {
+
       iEvent.getByLabel(SV_tag_infos_,svTagInfoVector);
       for(View< reco::SecondaryVertexTagInfo >::const_iterator iTagInfo = svTagInfoVector->begin(); iTagInfo != svTagInfoVector->end(); iTagInfo++) 
 	{
 	  svTagInfo[iTagInfo->jet()] = &*iTagInfo;
 	}
-    }
+    
   typedef map<JetRef, const TrackIPTagInfo*, JetRefCompare> ipTagInfoMap;
   ipTagInfoMap ipTagInfo;
   edm::Handle< View < reco::TrackIPTagInfo > > ipTagInfoVector;
-  if(get_IP_tag_infos_)
-    {
+
       iEvent.getByLabel(IP_tag_infos_,ipTagInfoVector);  
       for(View< reco::TrackIPTagInfo >::const_iterator iTagInfo = ipTagInfoVector->begin(); iTagInfo != ipTagInfoVector->end(); iTagInfo++) 
 	{
 	  ipTagInfo[iTagInfo->jet()] = &*iTagInfo;
 	}
-    }
+    
   //Get the MC Truth Matching (if requested) and define a map from RefToBase<Jet> to the flavor; if MC Truth not requested, fill with -1
 
   typedef map<JetRef, int, JetRefCompare> FlavorMap;
   FlavorMap flavor;
 
   edm::Handle<JetFlavourMatchingCollection> jetMC;
-  float pthat;
+
   if(getMCTruth_)
     {
       iEvent.getByLabel(jet_MC_src_, jetMC);      
@@ -561,223 +763,54 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
   computer->passEventSetup(iSetup);
   
-  
-
-  //Defining Data Storage:
-  
-  //Basic Jet Information
-  vector<math::XYZTLorentzVector> jetP4;               
-  vector<float> jetPt;                                 
-  vector<float> jetEta;                                
-  vector<float> jetPhi;                                
-  vector<float> jetEMFraction;        
-  vector<float> jetChargedEmEnergyFraction;
-  vector<float> jetNeutralEmEnergyFraction;
-  vector<float> jetChargedHadronEnergyFraction;
-  vector<float> jetNeutralHadronEnergyFraction;
-  vector<float> jetChargedMultiplicity;
-  vector<float> jetMass;                               
-  vector<int> jetnConstituents;  
-  vector<int> jetnTracks;                           
-//  vector<int> jetnElectrons;                              
-//  vector<int> jetnMuons;                                  
-  vector<math::XYZVector> jetVertex;                   
-  vector<float> jetVertexChi2;               
-  vector<float> jetVertexChi2Ndof;           
-  vector<float> jetVertexNormalizedChi2;    
-
-  //Track Information
-
-  vector<int> trackJetIndex;
-  vector<bool> trackSelected;
-  vector<math::XYZVector> track3Momentum;
-  vector<float> trackTransverseMomentum;
-  vector<float> trackEta;
-  vector<float> trackPhi;
-  vector<float> trackMomentum;
-  vector<int> trackNHits;
-  vector<int> trackNPixelHits;
-  vector<float> trackChi2;
-  vector<float> trackNormChi2;
-  vector<int> trackQuality;
-  vector<float> trackLongitudinalImpactParameter;
-  vector<float> trackIP;
-  vector<float> trackDecayLength;
-  vector<float> trackDistJetAxis;
-  vector<float> trackDeltaR;
-  vector<float> trackIP3d;
-  vector<float> trackIP2d;
-  vector<float> trackIP3dError;
-  vector<float> trackIP2dError;
-  vector<int> trackHasSharedPix1;
-  vector<int> trackHasSharedPix2;
-  vector<int> trackHasSharedPix3;
-  vector<int> trackHasSharedPixAll;
-
-  //MC Truth Information
-  vector<float> MCTrueFlavor;                          
- 				       
-  //secondaryVertexTagInfos:			       
-  vector<math::XYZVector> SecondaryVertex;             
-  vector<float> SV3dDistance;                          
-  vector<float> SV3dDistanceError;                     
-  vector<float> SV2dDistance;                          
-  vector<float> SV2dDistanceError;                     
-  vector<float> SVChi2;                
- vector<float> SVIPFirstAboveCharm;                                
-  vector<float> SVDegreesOfFreedom;                    
-  vector<float> SVNormChi2;                            
-  vector<int> SVnSelectedTracks;                               
-  vector<float> SVMass;                                
-  vector<float> SVEnergyRatio;                                
-  vector<int> SVnVertices;                             
-  vector<int>   SVnVertexTracks;         
-  vector<int>   SVnVertexTracksAll;         
-  vector<int>   SVnFirstVertexTracks;         
-  vector<int>   SVnFirstVertexTracksAll;         
-  vector<float> SVjetDeltaR;
-  vector<float> SVvtxSumVtxDirDeltaR;
-  vector<float> SVvtxSumJetDeltaR;
-               
-  //impactParameterTagInfos
-  vector<int> IPnSelectedTracks;                       
-  vector<math::XYZVector> IPghostTrackP3;      
-  vector<float> IPghostTrackPt;                        
-  vector<float> IPghostTrackPtRel;                        
-  vector<float> IPghostTrackEta;                       
-  vector<float> IPghostTrackPhi;                       
-  vector<float> IPghostTrackDeltaR;        
-  vector<int>   IPPix1SharedHits;
-  vector<int>   IPPix1TotalHits;
-  vector<int>   IPPix2SharedHits;
-  vector<int>   IPPix2TotalHits;
-  vector<int>   IPPix3SharedHits;
-  vector<int>   IPPix3TotalHits;
-  vector<int>   IPPixAllSharedHits;
-  vector<int>   IPPixAllTotalHits;
-
-  vector< vector<int> > IP3dTrackQuality(IP_n_saved_tracks_);    
-  vector< vector<int> > IP3dHasSharedPix1(IP_n_saved_tracks_);
-  vector< vector<int> > IP3dHasSharedPix2(IP_n_saved_tracks_);
-  vector< vector<int> > IP3dHasSharedPix3(IP_n_saved_tracks_);
-  vector< vector<int> > IP3dHasSharedPixAll(IP_n_saved_tracks_);
-  vector< vector<float> > IP3d(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dError(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dProbability(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dTrackPtRel(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dDistJetAxis(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dDecayLength(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dDeltaR(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dMomentum(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dTransverseMomentum(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dEta(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dPhi(IP_n_saved_tracks_);
-  vector< vector<int> >   IP3dNHits(IP_n_saved_tracks_);
-  vector< vector<int> >   IP3dNPixelHits(IP_n_saved_tracks_);
-  vector< vector<float> > IP3dNormChi2(IP_n_saved_tracks_);
-  vector< vector<int> >   IP2dTrackQuality(IP_n_saved_tracks_);    
-  vector< vector<float> > IP2d(IP_n_saved_tracks_);
-  vector< vector<float> > IP2dError(IP_n_saved_tracks_);
-  vector< vector<float> > IP2dProbability(IP_n_saved_tracks_);
-  vector< vector<float> > IP2dTrackPtRel(IP_n_saved_tracks_);
-
-  //softElectronTagInfos
-  vector<int> nElectrons;                            
-  vector<float> electronPt;   			       
-  vector<float> electronEta;  			       
-  vector<float> electronPhi;  			       
-  vector<int> electronNHits;   		     
-  vector<int> electronNExpectedOuterHits;   		       
-  vector<int> electronNPixelHits;   		       
-  vector<float> electronNChi2;			       
-  vector<float> electronPtRel;   		       
-  vector<float> electronSip2d;   		       
-  vector<float> electronIp2d;   		       
-  vector<float> electronIpe2d;   		       
-  vector<float> electronSip3d;
-  vector<float> electronIp3d;
-  vector<float> electronIpe3d;   		          		          		       
-  vector<float> electronP0Par;   		       
-  vector<float> electronDeltaR;  		       
-  vector<float> electronEtaRel;  		       
-  vector<float> electronRatio;   		     
-  vector<int> electronTrackQuality;   		       
-  vector<float> electronRatioRel;                      
-						       
-  //softMuonTagInfos	
-  vector<int> nMuons;                                
-  vector<float> muonPt;   			       
-  vector<float> muonEta;  			       
-  vector<float> muonPhi;  			       
-  vector<int> muonNHits;   	
-  vector<int> muonNExpectedOuterHits;   			       
-  vector<int> muonNPixelHits;   			       
-  vector<float> muonNChi2;	         	       
-  vector<float> muonPtRel;   
-  vector<float> muonSip2d;   		       
-  vector<float> muonIp2d;   		       
-  vector<float> muonIpe2d;   		       
-  vector<float> muonSip3d;
-  vector<float> muonIp3d;
-  vector<float> muonIpe3d;   	
-  vector<float> muonP0Par;   			       
-  vector<float> muonDeltaR;  			       
-  vector<float> muonEtaRel;  			       
-  vector<float> muonRatio;   			    
-  vector<int> muonTrackQuality;   			       
-  vector<float> muonRatioRel;                          
-
-  map< string, vector< float > > bTagVectors;
-  for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
-    {
-      vector<float> vect;
-      bTagVectors[ibTag->getParameter<string>("alias")] = vect;
-    }
-
+  int iTotalTracksCounter = 0;
+  nJets = jets->size();
   //Begin Loop over Jets and record the various information
-  for (unsigned int iJet = 0; iJet<jets->size(); iJet++)
+  for (int iJet = 0; iJet<nJets; iJet++)
     {
+      if(iJet >= (int)MAXJETS) return;
+
       JetRef thisJetRef = RefToBase<Jet>(jets, iJet);
  
       //Basic Jet Information
-      jetP4.push_back(thisJetRef->p4());               
-      jetPt.push_back(thisJetRef->p4().Pt());                              
-      jetEta.push_back(thisJetRef->p4().Eta());
-      jetPhi.push_back(thisJetRef->p4().Phi());
+      jetP4[iJet] = (thisJetRef->p4());               
+      jetPt[iJet] = thisJetRef->p4().Pt();                              
+      jetEta[iJet] = (thisJetRef->p4().Eta());
+      jetPhi[iJet] = (thisJetRef->p4().Phi());
       //Store some Calo Jet Information:
       if(const CaloJet* caloJet = dynamic_cast<const CaloJet*>(&(*(thisJetRef.get()) )))
 	{
-	  jetEMFraction.push_back(caloJet->emEnergyFraction());
+	  jetEMFraction[iJet] = (caloJet->emEnergyFraction());
 	}
       else
 	{
-	  jetEMFraction.push_back(-1.0);
+	  jetEMFraction[iJet] = (-1.0);
 	}
       //Store some Particle Flow Jet Information
       if(const PFJet* pfJet = dynamic_cast<const PFJet*>(&(*(thisJetRef.get()) )))
 	{
-	  jetChargedEmEnergyFraction.push_back(pfJet->chargedEmEnergyFraction());
-	  jetNeutralEmEnergyFraction.push_back(pfJet->neutralEmEnergyFraction());
-	  jetChargedHadronEnergyFraction.push_back(pfJet->chargedHadronEnergyFraction());
-	  jetNeutralHadronEnergyFraction.push_back(pfJet->neutralHadronEnergyFraction());
-	  jetChargedMultiplicity.push_back(pfJet->chargedMultiplicity());
+	  jetChargedEmEnergyFraction[iJet] = (pfJet->chargedEmEnergyFraction());
+	  jetNeutralEmEnergyFraction[iJet] = (pfJet->neutralEmEnergyFraction());
+	  jetChargedHadronEnergyFraction[iJet] = (pfJet->chargedHadronEnergyFraction());
+	  jetNeutralHadronEnergyFraction[iJet] = (pfJet->neutralHadronEnergyFraction());
+	  jetChargedMultiplicity[iJet] = (pfJet->chargedMultiplicity());
 	}
       else
 	{
-	  jetChargedEmEnergyFraction.push_back(-1.0);
-	  jetNeutralEmEnergyFraction.push_back(-1.0);
-	  jetChargedHadronEnergyFraction.push_back(-1.0);
-	  jetNeutralHadronEnergyFraction.push_back(-1.0);
-	  jetChargedMultiplicity.push_back(-1.0);
+	  jetChargedEmEnergyFraction[iJet] = (-1.0);
+	  jetNeutralEmEnergyFraction[iJet] = (-1.0);
+	  jetChargedHadronEnergyFraction[iJet] = (-1.0);
+	  jetNeutralHadronEnergyFraction[iJet] = (-1.0);
+	  jetChargedMultiplicity[iJet] = (-1.0);
 	}
-      jetMass.push_back(thisJetRef->p4().M());
-      jetnConstituents.push_back(thisJetRef->nConstituents());
-      jetnTracks.push_back((*jetTracks)[thisJetRef].size());
+      jetMass[iJet] = (thisJetRef->p4().M());
+      jetnConstituents[iJet] = (thisJetRef->nConstituents());
+      jetnTracks[iJet] = ((*jetTracks)[thisJetRef].size());
 
-      jetVertex.push_back(math::XYZVector(thisJetRef->vx(),thisJetRef->vy(),thisJetRef->vz()));
-      jetVertexChi2.push_back(thisJetRef->vertexChi2());
-      jetVertexChi2Ndof.push_back(thisJetRef->vertexNdof());
-      jetVertexNormalizedChi2.push_back(thisJetRef->vertexNormalizedChi2());
+      jetVertex[iJet] = (math::XYZVector(thisJetRef->vx(),thisJetRef->vy(),thisJetRef->vz()));
+      jetVertexChi2[iJet] = (thisJetRef->vertexChi2());
+      jetVertexChi2Ndof[iJet] = (thisJetRef->vertexNdof());
+      jetVertexNormalizedChi2[iJet] = (thisJetRef->vertexNormalizedChi2());
 
       //Track Information
 
@@ -808,47 +841,47 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       size_t counter=0;
       for(track_iterator iTrack = (*jetTracks)[thisJetRef].begin(); iTrack != (*jetTracks)[thisJetRef].end(); iTrack++)
 	{ 
-	  trackJetIndex.push_back(iJet);
+	  if(iTotalTracksCounter >= (int)MAXTRACKS) return;
+
+	  trackJetIndex[iTotalTracksCounter] = iJet;
 	  bool isSelected = false;
-	  if(get_IP_tag_infos_)
+	  for(track_iterator jTrack = ipTagInfo[thisJetRef]->selectedTracks().begin(); jTrack != ipTagInfo[thisJetRef]->selectedTracks().end(); jTrack++)
 	    {
-	      for(track_iterator jTrack = ipTagInfo[thisJetRef]->selectedTracks().begin(); jTrack != ipTagInfo[thisJetRef]->selectedTracks().end(); jTrack++)
-		{
-		  if((*iTrack)==(*jTrack)) {
-		    isSelected = true;
-		    break;
-		  }
-		}
+	      if((*iTrack)==(*jTrack)) {
+		isSelected = true;
+		break;
+	      }
 	    }
+	
 	  if(isSelected) nSelectedTracks++;
 
-	  trackSelected.push_back(isSelected);
-	  track3Momentum.push_back(math::XYZVector((*iTrack)->px(),(*iTrack)->py(),(*iTrack)->pz()));
-	  trackTransverseMomentum.push_back((*iTrack)->pt());
-	  trackEta.push_back((*iTrack)->eta());
-	  trackPhi.push_back((*iTrack)->phi());
-	  trackMomentum.push_back((*iTrack)->p());
-	  trackNHits.push_back((*iTrack)->hitPattern().numberOfValidHits());
-	  trackNPixelHits.push_back((*iTrack)->hitPattern().numberOfValidPixelHits());
-	  trackChi2.push_back((*iTrack)->chi2());
-	  trackNormChi2.push_back((*iTrack)->normalizedChi2());
-	  //trackQuality.push_back((*iTrack)->qualityMask());
+	  trackSelected[iTotalTracksCounter] = (isSelected);
+	  track3Momentum[iTotalTracksCounter] = (math::XYZVector((*iTrack)->px(),(*iTrack)->py(),(*iTrack)->pz()));
+	  trackTransverseMomentum[iTotalTracksCounter] = ((*iTrack)->pt());
+	  trackEta[iTotalTracksCounter] = ((*iTrack)->eta());
+	  trackPhi[iTotalTracksCounter] = ((*iTrack)->phi());
+	  trackMomentum[iTotalTracksCounter] = ((*iTrack)->p());
+	  trackNHits[iTotalTracksCounter] = ((*iTrack)->hitPattern().numberOfValidHits());
+	  trackNPixelHits[iTotalTracksCounter] = ((*iTrack)->hitPattern().numberOfValidPixelHits());
+	  trackChi2[iTotalTracksCounter] = ((*iTrack)->chi2());
+	  trackNormChi2[iTotalTracksCounter] = ((*iTrack)->normalizedChi2());
+	  //trackQuality[iTotalTracksCounter] = ((*iTrack)->qualityMask());
 	  //cout << (*iTrack)->qualityMask() << endl;
 	  for(int i = 2; i>-2; i--){
 	    if((*iTrack)->quality(reco::TrackBase::TrackQuality(i))){
-	      trackQuality.push_back(i);
+	      trackQuality[iTotalTracksCounter] = (i);
 	      break;
 	    }
 	  }
-	  trackLongitudinalImpactParameter.push_back((*iTrack)->dz(pv->position()));
+	  trackLongitudinalImpactParameter[iTotalTracksCounter] = ((*iTrack)->dz(pv->position()));
   	  TransientTrack transientTrack = builder->build(*iTrack);
   	  GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
   	  Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
   	  Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
-  	  trackIP3d.push_back(ip3d.value());
-  	  trackIP2d.push_back(ip2d.value());
-  	  trackIP3dError.push_back(ip3d.error());
-  	  trackIP2dError.push_back(ip2d.error());
+  	  trackIP3d[iTotalTracksCounter] = (ip3d.value());
+  	  trackIP2d[iTotalTracksCounter] = (ip2d.value());
+  	  trackIP3dError[iTotalTracksCounter] = (ip3d.error());
+  	  trackIP2dError[iTotalTracksCounter] = (ip2d.error());
 	  double decayLength=-1;
 	  TrajectoryStateOnSurface closest =
 	    IPTools::closestApproachToJet(transientTrack.impactPointState(),
@@ -860,136 +893,136 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  else{
 	    decayLength = -1;
 	  }
-	  trackDecayLength.push_back(decayLength);
+	  trackDecayLength[iTotalTracksCounter] = (decayLength);
 
 	  double distJetAxis =  IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value();
-	  trackDistJetAxis.push_back( distJetAxis );
-	  trackDeltaR.push_back( ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),(*iTrack)->momentum()) );
+	  trackDistJetAxis[iTotalTracksCounter] = ( distJetAxis );
+	  trackDeltaR[iTotalTracksCounter] = ( ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),(*iTrack)->momentum()) );
 	  int tsharedP1, tsharedP2, tsharedP3;
-	  trackHasSharedPix1.push_back( tsharedP1 = hasSharedHit(1, counter, (*jetTracks)[thisJetRef]));
-	  trackHasSharedPix2.push_back( tsharedP2 = hasSharedHit(2, counter, (*jetTracks)[thisJetRef]));
-	  trackHasSharedPix3.push_back( tsharedP3 = hasSharedHit(3, counter, (*jetTracks)[thisJetRef]));
-	  trackHasSharedPixAll.push_back( tsharedP1 || tsharedP2 || tsharedP3 );
+	  trackHasSharedPix1[iTotalTracksCounter] = ( tsharedP1 = hasSharedHit(1, counter, (*jetTracks)[thisJetRef]));
+	  trackHasSharedPix2[iTotalTracksCounter] = ( tsharedP2 = hasSharedHit(2, counter, (*jetTracks)[thisJetRef]));
+	  trackHasSharedPix3[iTotalTracksCounter] = ( tsharedP3 = hasSharedHit(3, counter, (*jetTracks)[thisJetRef]));
+	  trackHasSharedPixAll[iTotalTracksCounter] = ( tsharedP1 || tsharedP2 || tsharedP3 );
 	  
 	  if(isSelected && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixTracks++;   //cut is hardcoded for now
 
 	  counter++;
+	  iTotalTracksCounter++;
 	}       
 
+
       //MC Truth Information
-      MCTrueFlavor.push_back(flavor[thisJetRef]);                          
+      MCTrueFlavor[iJet] = (flavor[thisJetRef]);                          
       //secondaryVertexTagInfos:
-      if(get_SV_tag_infos_)
+      
+      SVnSelectedTracks[iJet] = (svTagInfo[thisJetRef]->nSelectedTracks());  
+      bool hasVertex = svTagInfo[thisJetRef]->nVertices() > 0;
+      if(hasVertex)
 	{
-	  SVnSelectedTracks.push_back(svTagInfo[thisJetRef]->nSelectedTracks());  
-	  bool hasVertex = svTagInfo[thisJetRef]->nVertices() > 0;
-	  if(hasVertex)
-	    {
-	      // Compute tagging variables
-	      std::vector<const reco::BaseTagInfo*>  baseTagInfos;
-	      baseTagInfos.push_back( &(*ipTagInfo[thisJetRef]) ); 
-	      baseTagInfos.push_back( &(*svTagInfo[thisJetRef]) );
-	      JetTagComputer::TagInfoHelper helper(baseTagInfos);
-	      TaggingVariableList vars = computer->taggingVariables(helper);
-	      math::XYZVector thisVertex(svTagInfo[thisJetRef]->secondaryVertex(0).x(),svTagInfo[thisJetRef]->secondaryVertex(0).y(),svTagInfo[thisJetRef]->secondaryVertex(0).z());
-	      
-	      edm::RefToBase<Jet> jet = ipTagInfo[thisJetRef]->jet();
-	      math::XYZVector jetDir = jet->momentum().Unit();
+	  // Compute tagging variables
+	  std::vector<const reco::BaseTagInfo*>  baseTagInfos;
+	  baseTagInfos.push_back( &(*ipTagInfo[thisJetRef]) ); 
+	  baseTagInfos.push_back( &(*svTagInfo[thisJetRef]) );
+	  JetTagComputer::TagInfoHelper helper(baseTagInfos);
+	  TaggingVariableList vars = computer->taggingVariables(helper);
+	  math::XYZVector thisVertex(svTagInfo[thisJetRef]->secondaryVertex(0).x(),svTagInfo[thisJetRef]->secondaryVertex(0).y(),svTagInfo[thisJetRef]->secondaryVertex(0).z());
+	  
+	  edm::RefToBase<Jet> jet = ipTagInfo[thisJetRef]->jet();
+	  math::XYZVector jetDir = jet->momentum().Unit();
+	  
+	  SVnVertices[iJet] = (svTagInfo[thisJetRef]->nVertices());
+	  SecondaryVertex[iJet] = (thisVertex);
+	  SV3dDistance[iJet] = (svTagInfo[thisJetRef]->flightDistance(0).value());                          
+	  SV3dDistanceError[iJet] = (svTagInfo[thisJetRef]->flightDistance(0).error());                     
+	  SV2dDistance[iJet] = (svTagInfo[thisJetRef]->flightDistance(0, true).value());                          
+	  SV2dDistanceError[iJet] = (svTagInfo[thisJetRef]->flightDistance(0, true).error());                     
+	  SVChi2[iJet] = (svTagInfo[thisJetRef]->secondaryVertex(0).chi2());                                
+	  SVDegreesOfFreedom[iJet] = (svTagInfo[thisJetRef]->secondaryVertex(0).ndof());                    
+	  SVNormChi2[iJet] = (svTagInfo[thisJetRef]->secondaryVertex(0).normalizedChi2());
+	  SVnFirstVertexTracksAll[iJet] = (svTagInfo[thisJetRef]->secondaryVertex(0).tracksSize());
+	  SVnFirstVertexTracks[iJet] = ( svTagInfo[thisJetRef]->nVertexTracks(0)  );
+	  SVnVertexTracks[iJet] = ( svTagInfo[thisJetRef]->nVertexTracks()  );
+	  int nVertexTrackSize = 0;
+	  for(unsigned int i=0; i< svTagInfo[thisJetRef]->nVertices(); i++) nVertexTrackSize+= svTagInfo[thisJetRef]->secondaryVertex(i).tracksSize();
+	  SVnVertexTracksAll[iJet] = ( nVertexTrackSize );
+	  if(vars.checkTag(reco::btau::vertexMass)) SVMass[iJet] = ( vars.get( reco::btau::vertexMass));
+	  else  SVMass[iJet] = ( -9999 );
+	  if(vars.checkTag(reco::btau::vertexEnergyRatio)) SVEnergyRatio[iJet] = ( vars.get(reco::btau::vertexEnergyRatio) );
+	  else SVEnergyRatio[iJet] = ( -9999 );
+	  
+	  if(vars.checkTag(reco::btau::vertexJetDeltaR)) SVjetDeltaR[iJet] = (  vars.get( reco::btau::vertexJetDeltaR) );
+	  else SVjetDeltaR[iJet] = ( -9999 );
 
-	      SVnVertices.push_back(svTagInfo[thisJetRef]->nVertices());
-	      SecondaryVertex.push_back(thisVertex);
-	      SV3dDistance.push_back(svTagInfo[thisJetRef]->flightDistance(0).value());                          
-	      SV3dDistanceError.push_back(svTagInfo[thisJetRef]->flightDistance(0).error());                     
-	      SV2dDistance.push_back(svTagInfo[thisJetRef]->flightDistance(0, true).value());                          
-	      SV2dDistanceError.push_back(svTagInfo[thisJetRef]->flightDistance(0, true).error());                     
-	      SVChi2.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).chi2());                                
-	      SVDegreesOfFreedom.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).ndof());                    
-	      SVNormChi2.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).normalizedChi2());
-  	      SVnFirstVertexTracksAll.push_back(svTagInfo[thisJetRef]->secondaryVertex(0).tracksSize());
-	      SVnFirstVertexTracks.push_back( svTagInfo[thisJetRef]->nVertexTracks(0)  );
-	      SVnVertexTracks.push_back( svTagInfo[thisJetRef]->nVertexTracks()  );
-	      int nVertexTrackSize = 0;
-	      for(unsigned int i=0; i< svTagInfo[thisJetRef]->nVertices(); i++) nVertexTrackSize+= svTagInfo[thisJetRef]->secondaryVertex(i).tracksSize();
-  	      SVnVertexTracksAll.push_back( nVertexTrackSize );
-	      if(vars.checkTag(reco::btau::vertexMass)) SVMass.push_back( vars.get( reco::btau::vertexMass));
-	      else  SVMass.push_back( -9999 );
-	      if(vars.checkTag(reco::btau::vertexEnergyRatio)) SVEnergyRatio.push_back( vars.get(reco::btau::vertexEnergyRatio) );
-	      else SVEnergyRatio.push_back( -9999 );
-	     
-	      if(vars.checkTag(reco::btau::vertexJetDeltaR)) SVjetDeltaR.push_back(  vars.get( reco::btau::vertexJetDeltaR) );
-	      else SVjetDeltaR.push_back( -9999 );
-
-	      if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) SVIPFirstAboveCharm.push_back(  vars.get( reco::btau::trackSip3dSigAboveCharm ));
-	      else SVIPFirstAboveCharm.push_back(  -9999 );
-
-	      TrackKinematics vertexKinematics;
-	      const Vertex &vertex = svTagInfo[thisJetRef]->secondaryVertex(0);
-	      bool hasRefittedTracks = vertex.hasRefittedTracks();
-	      TrackRefVector tracks = svTagInfo[thisJetRef]->vertexTracks(0);
-	      for(TrackRefVector::const_iterator track = tracks.begin();
-		  track != tracks.end(); track++) {
-		double w = svTagInfo[thisJetRef]->trackWeight(0, *track);
-		if (w < 0.5)
-		  continue;
-		if (hasRefittedTracks) {
+	  if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) SVIPFirstAboveCharm[iJet] = (  vars.get( reco::btau::trackSip3dSigAboveCharm ));
+	  else SVIPFirstAboveCharm[iJet] = (  -9999 );
+	  
+	  TrackKinematics vertexKinematics;
+	  const Vertex &vertex = svTagInfo[thisJetRef]->secondaryVertex(0);
+	  bool hasRefittedTracks = vertex.hasRefittedTracks();
+	  TrackRefVector tracks = svTagInfo[thisJetRef]->vertexTracks(0);
+	  for(TrackRefVector::const_iterator track = tracks.begin();
+	      track != tracks.end(); track++) {
+	    double w = svTagInfo[thisJetRef]->trackWeight(0, *track);
+	    if (w < 0.5)
+	      continue;
+	    if (hasRefittedTracks) {
 		  Track actualTrack = vertex.refittedTrack(*track);
 		  vertexKinematics.add(actualTrack, w);
 		  
-		} else {
-		  vertexKinematics.add(**track, w);
-		}
-	      }
-	      bool useTrackWeights = true;
-	      math::XYZTLorentzVector vertexSum = useTrackWeights
-		? vertexKinematics.weightedVectorSum()
+	    } else {
+	      vertexKinematics.add(**track, w);
+	    }
+	  }
+	  bool useTrackWeights = true;
+	  math::XYZTLorentzVector vertexSum = useTrackWeights
+	    ? vertexKinematics.weightedVectorSum()
 		: vertexKinematics.vectorSum();
-
-	      math::XYZTLorentzVector flightDir( svTagInfo[thisJetRef]->flightDirection(0).x(), svTagInfo[thisJetRef]->flightDirection(0).y(), svTagInfo[thisJetRef]->flightDirection(0).z(), 0  );
-	      SVvtxSumJetDeltaR.push_back( Geom::deltaR(vertexSum, jetDir) );
-	      SVvtxSumVtxDirDeltaR.push_back( Geom::deltaR( flightDir, vertexSum ) );
-	
-
-	    }
-	  else
-	    {
-	      SVnVertices.push_back(0);
-	      SecondaryVertex.push_back(math::XYZVector(0,0,0));             
-	      SV3dDistance.push_back(-1);                          
-	      SV3dDistanceError.push_back(-1);                     
-	      SV2dDistance.push_back(-1);                          
-	      SV2dDistanceError.push_back(-1);                     
-	      SVChi2.push_back(-1);                                
-	      SVDegreesOfFreedom.push_back(-1);                    
-	      SVNormChi2.push_back(-1);                                                           
-	      SVnVertexTracks.push_back(-1);
-	      SVnVertexTracksAll.push_back(-1);
-	      SVnFirstVertexTracksAll.push_back(-1);
-	      SVnFirstVertexTracks.push_back(-1);
-	      SVMass.push_back(-1);
-	      SVEnergyRatio.push_back(-1);
-	      SVjetDeltaR.push_back(-1);
-	     
-	      SVIPFirstAboveCharm.push_back(  -9999 );
-	      SVvtxSumVtxDirDeltaR.push_back( -9999 );
-	      SVvtxSumJetDeltaR.push_back ( -9999 );
-	    }
+	  
+	  math::XYZTLorentzVector flightDir( svTagInfo[thisJetRef]->flightDirection(0).x(), svTagInfo[thisJetRef]->flightDirection(0).y(), svTagInfo[thisJetRef]->flightDirection(0).z(), 0  );
+	  SVvtxSumJetDeltaR[iJet] = ( Geom::deltaR(vertexSum, jetDir) );
+	  SVvtxSumVtxDirDeltaR[iJet] = ( Geom::deltaR( flightDir, vertexSum ) );
+	  
+	  
 	}
-
-      //impactParameterTagInfos
-      if(get_IP_tag_infos_)
+      else
 	{
+	  SVnVertices[iJet] = (0);
+	  SecondaryVertex[iJet] = (math::XYZVector(0,0,0));             
+	  SV3dDistance[iJet] = (-1);                          
+	  SV3dDistanceError[iJet] = (-1);                     
+	  SV2dDistance[iJet] = (-1);                          
+	  SV2dDistanceError[iJet] = (-1);                     
+	  SVChi2[iJet] = (-1);                                
+	  SVDegreesOfFreedom[iJet] = (-1);                    
+	  SVNormChi2[iJet] = (-1);                                                           
+	  SVnVertexTracks[iJet] = (-1);
+	  SVnVertexTracksAll[iJet] = (-1);
+	  SVnFirstVertexTracksAll[iJet] = (-1);
+	  SVnFirstVertexTracks[iJet] = (-1);
+	  SVMass[iJet] = (-1);
+	  SVEnergyRatio[iJet] = (-1);
+	  SVjetDeltaR[iJet] = (-1);
+	  
+	  SVIPFirstAboveCharm[iJet] = (  -9999 );
+	  SVvtxSumVtxDirDeltaR[iJet] = ( -9999 );
+	  SVvtxSumJetDeltaR[iJet] =  ( -9999 );
+	}
+      
+      
+      //impactParameterTagInfos
+   
 	  const GlobalVector jetAxis = ipTagInfo[thisJetRef]->axis();
 	  const math::XYZVector axis( jetAxis.x(), jetAxis.y(), jetAxis.z());
 	  const math::XYZVector ghostTrack(ipTagInfo[thisJetRef]->ghostTrack()->px(),ipTagInfo[thisJetRef]->ghostTrack()->py(),ipTagInfo[thisJetRef]->ghostTrack()->pz());
 
 	  //	  IPnSelectedTracks.push_back(ipTagInfo[thisJetRef]->selectedTracks().size());                       
-	  IPnSelectedTracks.push_back( nSelectedAndDecayLengthAndJetAsixTracks );                       
-	  IPghostTrackP3.push_back(ghostTrack);
-	  IPghostTrackPt.push_back(ipTagInfo[thisJetRef]->ghostTrack()->pt());                        
-	  IPghostTrackPtRel.push_back(Perp(ghostTrack,axis));
-	  IPghostTrackEta.push_back(ipTagInfo[thisJetRef]->ghostTrack()->eta());                       
-	  IPghostTrackPhi.push_back(ipTagInfo[thisJetRef]->ghostTrack()->phi());                       
-	  IPghostTrackDeltaR.push_back(deltaR(thisJetRef->eta(), thisJetRef->phi(), ipTagInfo[thisJetRef]->ghostTrack()->eta(), ipTagInfo[thisJetRef]->ghostTrack()->phi()));                    
+	  IPnSelectedTracks[iJet] = ( nSelectedAndDecayLengthAndJetAsixTracks );                       
+	  IPghostTrackP3[iJet] = (ghostTrack);
+	  IPghostTrackPt[iJet] = (ipTagInfo[thisJetRef]->ghostTrack()->pt());                        
+	  IPghostTrackPtRel[iJet] = (Perp(ghostTrack,axis));
+	  IPghostTrackEta[iJet] = (ipTagInfo[thisJetRef]->ghostTrack()->eta());                       
+	  IPghostTrackPhi[iJet] = (ipTagInfo[thisJetRef]->ghostTrack()->phi());                       
+	  IPghostTrackDeltaR[iJet] = (deltaR(thisJetRef->eta(), thisJetRef->phi(), ipTagInfo[thisJetRef]->ghostTrack()->eta(), ipTagInfo[thisJetRef]->ghostTrack()->phi()));                    
 
 	  int nPix1Shared, nPix1Total;
 	  int nPix2Shared, nPix2Total;
@@ -998,124 +1031,123 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  getSharedHitsInfo(2, ipTagInfo[thisJetRef]->selectedTracks(), nPix2Shared, nPix2Total);
 	  getSharedHitsInfo(3, ipTagInfo[thisJetRef]->selectedTracks(), nPix3Shared, nPix3Total);
 
-	  IPPix1TotalHits.push_back(nPix1Total); IPPix1SharedHits.push_back(nPix1Shared);
-	  IPPix2TotalHits.push_back(nPix2Total); IPPix2SharedHits.push_back(nPix2Shared);
-	  IPPix3TotalHits.push_back(nPix3Total); IPPix3SharedHits.push_back(nPix3Shared);
-	  IPPixAllTotalHits.push_back(nPix1Total + nPix2Total + nPix3Total); IPPixAllSharedHits.push_back(nPix1Shared + nPix2Shared + nPix3Shared);
+	  IPPix1TotalHits[iJet] = (nPix1Total); IPPix1SharedHits[iJet] = (nPix1Shared);
+	  IPPix2TotalHits[iJet] = (nPix2Total); IPPix2SharedHits[iJet] = (nPix2Shared);
+	  IPPix3TotalHits[iJet] = (nPix3Total); IPPix3SharedHits[iJet] = (nPix3Shared);
+	  IPPixAllTotalHits[iJet] = (nPix1Total + nPix2Total + nPix3Total); IPPixAllSharedHits[iJet] = (nPix1Shared + nPix2Shared + nPix3Shared);
 
-	  for(unsigned int iTrack = 0; iTrack < IP_n_saved_tracks_; iTrack++)
+	  for(unsigned int iTrack = 0; iTrack < 4; iTrack++)
 	    {
 	      if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
 		{
 		  size_t location3D = ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig)[iTrack];
 		  for(int i = 2; i>-2; i--){
 		    if(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->quality(reco::TrackBase::TrackQuality(i))){
-		      IP3dTrackQuality[iTrack].push_back(i);
+		      IP3dTrackQuality[iTrack][iJet] = (i);
 		      break;
 		    }
 		  }
 		  int sharedP1, sharedP2, sharedP3;
-		  IP3dHasSharedPix1[iTrack].push_back(sharedP1=hasSharedHit(1, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
-		  IP3dHasSharedPix2[iTrack].push_back(sharedP2=hasSharedHit(2, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
-		  IP3dHasSharedPix3[iTrack].push_back(sharedP3=hasSharedHit(3, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
-		  IP3dHasSharedPixAll[iTrack].push_back( sharedP1 || sharedP2 || sharedP3  );
+		  IP3dHasSharedPix1[iTrack][iJet] = (sharedP1=hasSharedHit(1, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
+		  IP3dHasSharedPix2[iTrack][iJet] = (sharedP2=hasSharedHit(2, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
+		  IP3dHasSharedPix3[iTrack][iJet] = (sharedP3=hasSharedHit(3, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
+		  IP3dHasSharedPixAll[iTrack][iJet] = ( sharedP1 || sharedP2 || sharedP3  );
 
-		  IP3d[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.value());
-		  IP3dError[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.error());
-		  IP3dProbability[iTrack].push_back(ipTagInfo[thisJetRef]->probabilities(0)[location3D]);
+		  IP3d[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.value());
+		  IP3dError[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.error());
+		  IP3dProbability[iTrack][iJet] = (ipTagInfo[thisJetRef]->probabilities(0)[location3D]);
 		  const math::XYZVector thisTrack(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->px(),
 						  ipTagInfo[thisJetRef]->selectedTracks()[location3D]->py(),
 						  ipTagInfo[thisJetRef]->selectedTracks()[location3D]->pz());
-		  IP3dTrackPtRel[iTrack].push_back( Perp(thisTrack,axis ) );
-		  IP3dDistJetAxis[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location3D].distanceToJetAxis.value());
-	       	  IP3dDecayLength[iTrack].push_back( (ipTagInfo[thisJetRef]->impactParameterData()[location3D].closestToJetAxis 
+		  IP3dTrackPtRel[iTrack][iJet] = ( Perp(thisTrack,axis ) );
+		  IP3dDistJetAxis[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location3D].distanceToJetAxis.value());
+	       	  IP3dDecayLength[iTrack][iJet] = ( (ipTagInfo[thisJetRef]->impactParameterData()[location3D].closestToJetAxis 
 						      -  RecoVertex::convertPos(pv->position())).mag() );
-		  IP3dDeltaR[iTrack].push_back(  ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),ipTagInfo[thisJetRef]->selectedTracks()[location3D]->momentum()) );
-		  IP3dMomentum[iTrack].push_back(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->p() );
-		  IP3dTransverseMomentum[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->pt() );
-		  IP3dEta[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->eta() );
-		  IP3dPhi[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->phi() );
-		  IP3dNHits[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->hitPattern().numberOfValidHits() ); 
-		  IP3dNPixelHits[iTrack].push_back( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->hitPattern().numberOfValidPixelHits() ); 
-		  IP3dNormChi2[iTrack].push_back(  ipTagInfo[thisJetRef]->selectedTracks()[location3D]->normalizedChi2() );
+		  IP3dDeltaR[iTrack][iJet] = (  ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),ipTagInfo[thisJetRef]->selectedTracks()[location3D]->momentum()) );
+		  IP3dMomentum[iTrack][iJet] = (ipTagInfo[thisJetRef]->selectedTracks()[location3D]->p() );
+		  IP3dTransverseMomentum[iTrack][iJet] = ( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->pt() );
+		  IP3dEta[iTrack][iJet] = ( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->eta() );
+		  IP3dPhi[iTrack][iJet] = ( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->phi() );
+		  IP3dNHits[iTrack][iJet] = ( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->hitPattern().numberOfValidHits() ); 
+		  IP3dNPixelHits[iTrack][iJet] = ( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->hitPattern().numberOfValidPixelHits() ); 
+		  IP3dNormChi2[iTrack][iJet] = (  ipTagInfo[thisJetRef]->selectedTracks()[location3D]->normalizedChi2() );
 		}
 	      else
 		{
-                  IP3dHasSharedPix1[iTrack].push_back(-1);
-		  IP3dHasSharedPix2[iTrack].push_back(-1);
-		  IP3dHasSharedPix3[iTrack].push_back(-1);
-		  IP3dHasSharedPixAll[iTrack].push_back(-1);
+                  IP3dHasSharedPix1[iTrack][iJet] = (-1);
+		  IP3dHasSharedPix2[iTrack][iJet] = (-1);
+		  IP3dHasSharedPix3[iTrack][iJet] = (-1);
+		  IP3dHasSharedPixAll[iTrack][iJet] = (-1);
 
-		  IP3dTrackQuality[iTrack].push_back(-100);
-		  IP3d[iTrack].push_back(-100.0);
-		  IP3dError[iTrack].push_back(-1.0);
-		  IP3dProbability[iTrack].push_back(-1.0);
-		  IP3dTrackPtRel[iTrack].push_back(-1.0);
-		  IP3dDistJetAxis[iTrack].push_back(-100);
-		  IP3dDecayLength[iTrack].push_back(-100);
-		  IP3dDeltaR[iTrack].push_back(-100);
-		  IP3dMomentum[iTrack].push_back(-100);
-		  IP3dTransverseMomentum[iTrack].push_back(-100);
-		  IP3dEta[iTrack].push_back(-100);
-		  IP3dPhi[iTrack].push_back(-100);
-		  IP3dNHits[iTrack].push_back( -100);
-		  IP3dNPixelHits[iTrack].push_back(-100);
-		  IP3dNormChi2[iTrack].push_back( -100 );
+		  IP3dTrackQuality[iTrack][iJet] = (-100);
+		  IP3d[iTrack][iJet] = (-100.0);
+		  IP3dError[iTrack][iJet] = (-1.0);
+		  IP3dProbability[iTrack][iJet] = (-1.0);
+		  IP3dTrackPtRel[iTrack][iJet] = (-1.0);
+		  IP3dDistJetAxis[iTrack][iJet] = (-100);
+		  IP3dDecayLength[iTrack][iJet] = (-100);
+		  IP3dDeltaR[iTrack][iJet] = (-100);
+		  IP3dMomentum[iTrack][iJet] = (-100);
+		  IP3dTransverseMomentum[iTrack][iJet] = (-100);
+		  IP3dEta[iTrack][iJet] = (-100);
+		  IP3dPhi[iTrack][iJet] = (-100);
+		  IP3dNHits[iTrack][iJet] = ( -100);
+		  IP3dNPixelHits[iTrack][iJet] = (-100);
+		  IP3dNormChi2[iTrack][iJet] = ( -100 );
 		}
 	      if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
 		{
 		  size_t location2D = ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP2DSig)[iTrack];
 		  for(int i = 2; i>-2; i--){
 		    if(ipTagInfo[thisJetRef]->selectedTracks()[location2D]->quality(reco::TrackBase::TrackQuality(i))){
-		      IP2dTrackQuality[iTrack].push_back(i);
+		      IP2dTrackQuality[iTrack][iJet] = (i);
 		      break;
 		    }
 		  }
-		  IP2d[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location2D].ip2d.value());
-		  IP2dError[iTrack].push_back(ipTagInfo[thisJetRef]->impactParameterData()[location2D].ip2d.error());
-		  IP2dProbability[iTrack].push_back(ipTagInfo[thisJetRef]->probabilities(1)[location2D]);
+		  IP2d[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location2D].ip2d.value());
+		  IP2dError[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location2D].ip2d.error());
+		  IP2dProbability[iTrack][iJet] = (ipTagInfo[thisJetRef]->probabilities(1)[location2D]);
 		  const math::XYZVector thisTrack(ipTagInfo[thisJetRef]->selectedTracks()[location2D]->px(),
 						  ipTagInfo[thisJetRef]->selectedTracks()[location2D]->py(),
 						  ipTagInfo[thisJetRef]->selectedTracks()[location2D]->pz());
-		  IP2dTrackPtRel[iTrack].push_back( Perp(thisTrack,axis ) );
+		  IP2dTrackPtRel[iTrack][iJet] = ( Perp(thisTrack,axis ) );
 
 		}
 	      else
 		{
-		  IP2dTrackQuality[iTrack].push_back(-100);
-		  IP2d[iTrack].push_back(-100.0);
-		  IP2dError[iTrack].push_back(-1.0);
-		  IP2dProbability[iTrack].push_back(-1.0);
-		  IP2dTrackPtRel[iTrack].push_back(-1.0);
+		  IP2dTrackQuality[iTrack][iJet] = (-100);
+		  IP2d[iTrack][iJet] = (-100.0);
+		  IP2dError[iTrack][iJet] = (-1.0);
+		  IP2dProbability[iTrack][iJet] = (-1.0);
+		  IP2dTrackPtRel[iTrack][iJet] = (-1.0);
 		}
 	    } 
-	}
+      
 
       //softElectronTagInfos
-      if(get_SE_tag_infos_)
-	{
+  
 	  bool hasLeptons = softElectronTagInfo[thisJetRef]->leptons() > 0;
 	  if(hasLeptons)
 	    {
-	      nElectrons.push_back(softElectronTagInfo[thisJetRef]->leptons());
+	      nElectrons[iJet] = (softElectronTagInfo[thisJetRef]->leptons());
 	      unsigned int maxPtElectron = 0;
 	      for(unsigned int iElectron = 0; iElectron < softElectronTagInfo[thisJetRef]->leptons(); iElectron++)
 		{
 		  if(softElectronTagInfo[thisJetRef]->lepton(iElectron)->pt() > softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->pt() )
 		    maxPtElectron = iElectron;
 		}
-	      electronPt.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->pt());   			       
-	      electronEta.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->eta());  			       
-	      electronPhi.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->phi());  			       
-	      electronNHits.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->hitPattern().numberOfValidHits() );   
-	      electronNExpectedOuterHits.push_back( softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->trackerExpectedHitsOuter().numberOfHits() );   
-	      electronNPixelHits.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->hitPattern().numberOfValidPixelHits() );   
-	      electronNChi2.push_back(softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->normalizedChi2());			       
-	      electronPtRel.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ptRel);   
+	      electronPt[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->pt());   			       
+	      electronEta[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->eta());  			       
+	      electronPhi[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->phi());  			       
+	      electronNHits[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->hitPattern().numberOfValidHits() );   
+	      electronNExpectedOuterHits[iJet] = ( softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->trackerExpectedHitsOuter().numberOfHits() );   
+	      electronNPixelHits[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->hitPattern().numberOfValidPixelHits() );   
+	      electronNChi2[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->normalizedChi2());			       
+	      electronPtRel[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ptRel);   
 	      
 	      for(int i = 2; i>-2; i--){
 		if( (*softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)).quality(reco::TrackBase::TrackQuality(i))){
-		  electronTrackQuality.push_back(i);
+		  electronTrackQuality[iJet] = (i);
 		  break;
 		}
 	      }
@@ -1125,71 +1157,70 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
 	      Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
 		       
-	      electronSip2d.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).sip2d);   
-	      electronIp2d.push_back( ip2d.value() );   
-	      electronIpe2d.push_back( ip2d.error() );   		       
+	      electronSip2d[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).sip2d);   
+	      electronIp2d[iJet] = ( ip2d.value() );   
+	      electronIpe2d[iJet] = ( ip2d.error() );   		       
    
 
-	      electronSip3d.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).sip3d);   
-	      electronIp3d.push_back( ip3d.value() );   
-	      electronIpe3d.push_back( ip3d.error() );   
+	      electronSip3d[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).sip3d);   
+	      electronIp3d[iJet] = ( ip3d.value() );   
+	      electronIpe3d[iJet] = ( ip3d.error() );   
 	   
 
-	      electronP0Par.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).p0Par);   		       
-	      electronDeltaR.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).deltaR);  		       
-	      electronEtaRel.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).etaRel);  		       
-	      electronRatio.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ratio);   		       
-	      electronRatioRel.push_back(softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ratioRel);                      
+	      electronP0Par[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).p0Par);   		       
+	      electronDeltaR[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).deltaR);  		       
+	      electronEtaRel[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).etaRel);  		       
+	      electronRatio[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ratio);   		       
+	      electronRatioRel[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ratioRel);                      
 	    }
 	  else{
-	    nElectrons.push_back( 0 );
-	    electronPt.push_back(-9999 );   			       
-	    electronEta.push_back(-9999);  			       
-	    electronPhi.push_back(-9999);  			       
-	    electronNHits.push_back(-9999 );   
-	    electronNExpectedOuterHits.push_back( -9999 );
-	    electronNPixelHits.push_back(-9999 );   
-	    electronNChi2.push_back(-9999);			       
-	    electronPtRel.push_back(-9999);   
-	    electronTrackQuality.push_back(-9999 );
-	    electronSip2d.push_back(-9999);   
-	    electronIp2d.push_back(-9999 );   
-	    electronIpe2d.push_back( -9999 );   		       
-	    electronSip3d.push_back(-9999);   
-	    electronIp3d.push_back(-9999 );   
-	    electronIpe3d.push_back( -9999 );   
-	    electronP0Par.push_back(-9999);   		       
-	    electronDeltaR.push_back(-9999);  		       
-	    electronEtaRel.push_back(-9999);  		       
-	    electronRatio.push_back(-9999);   		       
-	    electronRatioRel.push_back(-9999);  
+	    nElectrons[iJet] = ( 0 );
+	    electronPt[iJet] = (-9999 );   			       
+	    electronEta[iJet] = (-9999);  			       
+	    electronPhi[iJet] = (-9999);  			       
+	    electronNHits[iJet] = (-9999 );   
+	    electronNExpectedOuterHits[iJet] = ( -9999 );
+	    electronNPixelHits[iJet] = (-9999 );   
+	    electronNChi2[iJet] = (-9999);			       
+	    electronPtRel[iJet] = (-9999);   
+	    electronTrackQuality[iJet] = (-9999 );
+	    electronSip2d[iJet] = (-9999);   
+	    electronIp2d[iJet] = (-9999 );   
+	    electronIpe2d[iJet] = ( -9999 );   		       
+	    electronSip3d[iJet] = (-9999);   
+	    electronIp3d[iJet] = (-9999 );   
+	    electronIpe3d[iJet] = ( -9999 );   
+	    electronP0Par[iJet] = (-9999);   		       
+	    electronDeltaR[iJet] = (-9999);  		       
+	    electronEtaRel[iJet] = (-9999);  		       
+	    electronRatio[iJet] = (-9999);   		       
+	    electronRatioRel[iJet] = (-9999);  
 	  }
-	}
+      
       //softMuonTagInfos
-      if(get_SM_tag_infos_)
-	{
-	  bool hasLeptons = softMuonTagInfo[thisJetRef]->leptons() > 0;
+   
+	 hasLeptons = softMuonTagInfo[thisJetRef]->leptons() > 0;
 	  if(hasLeptons)
 	    {
-	      nMuons.push_back(softMuonTagInfo[thisJetRef]->leptons());
+	      nMuons[iJet] = (softMuonTagInfo[thisJetRef]->leptons());
 	      unsigned int maxPtMuon = 0;
 	      for(unsigned int iMuon = 0; iMuon < softMuonTagInfo[thisJetRef]->leptons(); iMuon++)
 		{
 		  if(softMuonTagInfo[thisJetRef]->lepton(iMuon)->pt() > softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->pt() )
 		    maxPtMuon = iMuon;
 		}
-	      muonPt.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->pt());   			       
-	      muonEta.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->eta());  			       
-	      muonPhi.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->phi());  			       
-	      muonNHits.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->hitPattern().numberOfValidHits() );   
-	      muonNExpectedOuterHits.push_back( softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->trackerExpectedHitsOuter().numberOfHits() );   
-	      muonNPixelHits.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->hitPattern().numberOfValidPixelHits() );     		       
-	      muonNChi2.push_back(softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->normalizedChi2());			       
-	      muonPtRel.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ptRel); 
+	      muonPt[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->pt());   			       
+	      muonEta[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->eta());  			       
+	      muonPhi[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->phi());  			       
+	      muonNHits[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->hitPattern().numberOfValidHits() );   
+	      muonNExpectedOuterHits[iJet] = ( softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->trackerExpectedHitsOuter().numberOfHits() );   
+	      muonNPixelHits[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->hitPattern().numberOfValidPixelHits() );     		       
+	      muonNChi2[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->normalizedChi2());			       
+	      muonPtRel[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ptRel); 
 
 	      for(int i = 2; i>-2; i--){
 		if( (*softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)).quality(reco::TrackBase::TrackQuality(i))){
-		  muonTrackQuality.push_back(i);
+		  muonTrackQuality[iJet] = (i);
 		  break;
 		}
 	      }
@@ -1198,278 +1229,57 @@ TagNtupleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
 	      Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;  	
 	       
-	      muonSip2d.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).sip2d);   		
-	      muonIp2d.push_back( ip2d.value() );   
-	      muonIpe2d.push_back( ip2d.error() );   	
+	      muonSip2d[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).sip2d);   		
+	      muonIp2d[iJet] = ( ip2d.value() );   
+	      muonIpe2d[iJet] = ( ip2d.error() );   	
        
-	      muonSip3d.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).sip3d);   	
-	      muonIp3d.push_back( ip3d.value() );   
-	      muonIpe3d.push_back( ip3d.error() );   
+	      muonSip3d[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).sip3d);   	
+	      muonIp3d[iJet] = ( ip3d.value() );   
+	      muonIpe3d[iJet] = ( ip3d.error() );   
 	       
-	      muonP0Par.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).p0Par);   		       
-	      muonDeltaR.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).deltaR);  		       
-	      muonEtaRel.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).etaRel);  		       
-	      muonRatio.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ratio);   		       
-	      muonRatioRel.push_back(softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ratioRel);                      
+	      muonP0Par[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).p0Par);   		       
+	      muonDeltaR[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).deltaR);  		       
+	      muonEtaRel[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).etaRel);  		       
+	      muonRatio[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ratio);   		       
+	      muonRatioRel[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ratioRel);                      
 	    }
 	  else{
-	    nMuons.push_back( 0 );
-	    muonPt.push_back(-9999 );   			       
-	    muonEta.push_back(-9999);  			       
-	    muonPhi.push_back(-9999);  			       
-	    muonNHits.push_back(-9999 );
-	    muonNExpectedOuterHits.push_back(-9999 );
-	    muonNPixelHits.push_back(-9999 );   
-	    muonNChi2.push_back(-9999);			       
-	    muonPtRel.push_back(-9999);   
-	    muonTrackQuality.push_back(-9999 );
-	    muonSip2d.push_back(-9999);   
-	    muonIp2d.push_back(-9999 );   
-	    muonIpe2d.push_back( -9999 );   		       
-	    muonSip3d.push_back(-9999);   
-	    muonIp3d.push_back(-9999 );   
-	    muonIpe3d.push_back( -9999 );   
-	    muonP0Par.push_back(-9999);   		       
-	    muonDeltaR.push_back(-9999);  		       
-	    muonEtaRel.push_back(-9999);  		       
-	    muonRatio.push_back(-9999);   		       
-	    muonRatioRel.push_back(-9999);  
+	    nMuons[iJet] = ( 0 );
+	    muonPt[iJet] = (-9999 );   			       
+	    muonEta[iJet] = (-9999);  			       
+	    muonPhi[iJet] = (-9999);  			       
+	    muonNHits[iJet] = (-9999 );
+	    muonNExpectedOuterHits[iJet] = (-9999 );
+	    muonNPixelHits[iJet] = (-9999 );   
+	    muonNChi2[iJet] = (-9999);			       
+	    muonPtRel[iJet] = (-9999);   
+	    muonTrackQuality[iJet] = (-9999 );
+	    muonSip2d[iJet] = (-9999);   
+	    muonIp2d[iJet] = (-9999 );   
+	    muonIpe2d[iJet] = ( -9999 );   		       
+	    muonSip3d[iJet] = (-9999);   
+	    muonIp3d[iJet] = (-9999 );   
+	    muonIpe3d[iJet] = ( -9999 );   
+	    muonP0Par[iJet] = (-9999);   		       
+	    muonDeltaR[iJet] = (-9999);  		       
+	    muonEtaRel[iJet] = (-9999);  		       
+	    muonRatio[iJet] = (-9999);   		       
+	    muonRatioRel[iJet] = (-9999);  
 	  }
-	}
+       
 
       
       for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
 	{
-	  bTagVectors[ibTag->getParameter<string>("alias")].push_back((bTags[ibTag->getParameter<string>("alias")])[thisJetRef]);
+	  bTagArrays[ibTag->getParameter<string>("alias")][iJet] = ((bTags[ibTag->getParameter<string>("alias")])[thisJetRef]);
 	}
-    }
+    } // end loop over jets
   
-  
-  //Putting Information into the Event
+  nTracks = iTotalTracksCounter;
 
-  iEvent.put(auto_ptr< bool >        ( new bool(triggerHLTL1Jet6U) ),       label_+"triggerHLTL1Jet6U");
-  iEvent.put(auto_ptr< bool >        ( new bool(triggerHLTL1Jet10U) ),      label_+"triggerHLTL1Jet10U");
-  iEvent.put(auto_ptr< bool >        ( new bool(triggerHLTJet15U) ),        label_+"triggerHLTJet15U");
+  // fill the tree
+  tree->Fill();  
 
-  iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(eventNumber) ),        label_+"eventNumber");
-  iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(runNumber) ),        label_+"runNumber");
-  iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(lumiBlockNumber) ),        label_+"lumiBlockNumber");
-
-  iEvent.put(auto_ptr< unsigned int >        ( new unsigned int(numberOfPrimaryVertices) ),        label_+"numberOfPrimaryVertices");
-
-  //Basic Jet Information
-  iEvent.put(auto_ptr< vector< math::XYZTLorentzVector> >(new vector< math::XYZTLorentzVector>(jetP4)),label_+"jetP4");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetPt)),label_+"jetPt");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetEta)),label_+"jetEta");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetPhi)),label_+"jetPhi");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetEMFraction)),label_+"jetEMFraction");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetChargedEmEnergyFraction)),label_+"jetChargedEmEnergyFraction");    
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetNeutralEmEnergyFraction)),label_+"jetNeutralEmEnergyFraction");    
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetChargedHadronEnergyFraction)),label_+"jetChargedHadronEnergyFraction");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetNeutralHadronEnergyFraction)),label_+"jetNeutralHadronEnergyFraction");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetChargedMultiplicity)),label_+"jetChargedMultiplicity");        
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetMass)),label_+"jetMass");
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(jetnConstituents)),label_+"jetnConstituents");
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(jetnTracks)),label_+"jetnTracks");
-  iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(jetVertex)),label_+"jetVertex");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexChi2)),label_+"jetVertexChi2");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexChi2Ndof)),label_+"jetVertexChi2Ndof");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(jetVertexNormalizedChi2)),label_+"jetVertexNormalizedChi2");
-
-  //Track Information
-
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackJetIndex)), label_ + "trackJetIndex" );
-  iEvent.put(auto_ptr< vector<bool> >(new vector<bool>(trackSelected)), label_ + "trackSelected" );
-  iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(track3Momentum)),label_ + "track3Momentum");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackTransverseMomentum)),label_ + "trackTransverseMomentum" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackEta)),label_ + "trackEta" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackPhi)),label_ + "trackPhi" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackMomentum)),label_ + "trackMomentum");
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackNHits)),label_ + "trackNHits");
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackNPixelHits)),label_ + "trackNPixelHits");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackChi2)),label_ + "trackChi2");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackNormChi2)),label_ + "trackNormChi2");
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackQuality)),label_ + "trackQuality" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackLongitudinalImpactParameter)),label_ + "trackLongitudinalImpactParameter");
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDecayLength)),label_ + "trackDecayLength" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDistJetAxis)),label_ + "trackDistJetAxis" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackDeltaR)),label_ + "trackDeltaR" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP3d)),label_ + "trackIP3d" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP2d)),label_ + "trackIP2d" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP3dError)),label_ + "trackIP3dError" );
-  iEvent.put(auto_ptr< vector<float> >(new vector<float>(trackIP2dError)),label_ + "trackIP2dError" );
-
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackHasSharedPix1)),label_ + "trackHasSharedPix1" );
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackHasSharedPix2)),label_ + "trackHasSharedPix2" );
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackHasSharedPix3)),label_ + "trackHasSharedPix3" );
-  iEvent.put(auto_ptr< vector<int> >(new vector<int>(trackHasSharedPixAll)),label_ + "trackHasSharedPixAll" );
-  //MC Truth Information
-  if(getMCTruth_)
-    {
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(MCTrueFlavor)),label_+"MCTrueFlavor");
-      iEvent.put(auto_ptr< float >        ( new float(pthat) ),             label_+"pthat");
-    }
-			               
-  //secondaryVertexTagInfos:					               
-  if(get_SV_tag_infos_)
-    {
-      iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(SecondaryVertex)),label_+"SecondaryVertex");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV3dDistance)),label_+"SV3dDistance");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV3dDistanceError)),label_+"SV3dDistanceError");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV2dDistance)),label_+"SV2dDistance");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SV2dDistanceError)),label_+"SV2dDistanceError");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVChi2)),label_+"SVChi2");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVDegreesOfFreedom)),label_+"SVDegreesOfFreedom");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVNormChi2)),label_+"SVNormChi2");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVIPFirstAboveCharm)),label_+"SVIPFirstAboveCharm");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnSelectedTracks)),label_+"SVnSelectedTracks");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVMass)),label_+"SVMass");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVEnergyRatio)),label_+"SVEnergyRatio");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertices)),label_+"SVnVertices");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertexTracks)),label_+"SVnVertexTracks");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnFirstVertexTracksAll)),label_+"SVnFirstVertexTracksAll");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnFirstVertexTracks)),label_+"SVnFirstVertexTracks");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(SVnVertexTracksAll)),label_+"SVnVertexTracksAll");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVjetDeltaR)),label_+"SVjetDeltaR");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVvtxSumJetDeltaR)),label_+"SVvtxSumJetDeltaR");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(SVvtxSumVtxDirDeltaR)),label_+"SVvtxSumVtxDirDeltaR");
-   
-    }          
-  //impactParameterTagInfos
-  if(get_IP_tag_infos_)
-    {
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPnSelectedTracks)),label_+"IPnSelectedTracks");
-      iEvent.put(auto_ptr< vector<math::XYZVector> >(new vector<math::XYZVector>(IPghostTrackP3)),label_+"IPghostTrackP3");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackPt)),label_+"IPghostTrackPt");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackPtRel)),label_+"IPghostTrackPtRel");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackEta)),label_+"IPghostTrackEta");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackPhi)),label_+"IPghostTrackPhi");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(IPghostTrackDeltaR)),label_+"IPghostTrackDeltaR");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix1SharedHits)),label_+"IPPix1SharedHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix1TotalHits)),label_+"IPPix1TotalHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix2SharedHits)),label_+"IPPix2SharedHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix2TotalHits)),label_+"IPPix2TotalHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix3SharedHits)),label_+"IPPix3SharedHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPix3TotalHits)),label_+"IPPix3TotalHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPixAllSharedHits)),label_+"IPPixAllSharedHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(IPPixAllTotalHits)),label_+"IPPixAllTotalHits");
-
-      for(unsigned int iTrack = 0; iTrack < IP_n_saved_tracks_; iTrack++)
-	{
-	  string alias;
-	  stringstream trackNum;
-	  trackNum << (iTrack+1);
-	  alias = label_ + "IP3dTrackQuality"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dTrackQuality[iTrack])),alias);
-	  alias = label_ + "IP3d"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3d[iTrack])),alias);
-	  alias = label_ + "IP3dHasSharedPix1"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dHasSharedPix1[iTrack])),alias);
-	  alias = label_ + "IP3dHasSharedPix2"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dHasSharedPix2[iTrack])),alias);
-	  alias = label_ + "IP3dHasSharedPix3"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dHasSharedPix3[iTrack])),alias);
-	  alias = label_ + "IP3dHasSharedPixAll"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dHasSharedPixAll[iTrack])),alias);
-
-
-	  alias = label_ + "IP3dError"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dError[iTrack])),alias);
-	  alias = label_ + "IP3dProbability"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dProbability[iTrack])),alias);
-	  alias = label_ + "IP3dTrackPtRel"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dTrackPtRel[iTrack])),alias);
-	  alias = label_ + "IP3dDecayLength"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dDecayLength[iTrack])),alias);
-	  alias = label_ + "IP3dDistJetAxis"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dDistJetAxis[iTrack])),alias);
-	  alias = label_ + "IP3dDeltaR"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dDeltaR[iTrack])),alias);
-	  alias = label_ + "IP3dNHits"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dNHits[iTrack])),alias);
-	  alias = label_ + "IP3dNPixelHits"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP3dNPixelHits[iTrack])),alias);
-	  alias = label_ + "IP3dNormChi2"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dNormChi2[iTrack])),alias);
-	  alias = label_ + "IP3dMomentum"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dMomentum[iTrack])),alias);
-	  alias = label_ + "IP3dTransverseMomentum"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dTransverseMomentum[iTrack])),alias);
-	  alias = label_ + "IP3dEta"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dEta[iTrack])),alias);
-	  alias = label_ + "IP3dPhi"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP3dPhi[iTrack])),alias);
-	  alias = label_ + "IP2dTrackQuality"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<int> >(new vector<int>(IP2dTrackQuality[iTrack])),alias);
-	  alias = label_ + "IP2d"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP2d[iTrack])),alias);
-	  alias = label_ + "IP2dError"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP2dError[iTrack])),alias);
-	  alias = label_ + "IP2dProbability"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP2dProbability[iTrack])),alias);
-	  alias = label_ + "IP2dTrackPtRel"+trackNum.str();
-	  iEvent.put(auto_ptr< vector<float> >(new vector<float>(IP2dTrackPtRel[iTrack])),alias);
-	}
-    }
- 
-  //softElectronTagInfos
-  if(get_SE_tag_infos_)
-    {
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(nElectrons)),label_+"nElectrons");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPt)),label_+"electronPt");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronEta)),label_+"electronEta");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPhi)),label_+"electronPhi");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(electronNHits)),label_+"electronNHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(electronNExpectedOuterHits)),label_+"electronNExpectedOuterHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(electronNPixelHits)),label_+"electronNPixelHits");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronNChi2)),label_+"electronNChi2");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronPtRel)),label_+"electronPtRel");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronSip2d)),label_+"electronSip2d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronIp2d)),label_+"electronIp2d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronIpe2d)),label_+"electronIpe2d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronSip3d)),label_+"electronSip3d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronIp3d)),label_+"electronIp3d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronIpe3d)),label_+"electronIpe3d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronP0Par)),label_+"electronP0Par");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronDeltaR)),label_+"electronDeltaR");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronEtaRel)),label_+"electronEtaRel");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronRatio)),label_+"electronRatio");
-     iEvent.put(auto_ptr< vector<int> >(new vector<int>(electronTrackQuality)),label_+"electronTrackQuality");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(electronRatioRel)),label_+"electronRatioRel");
-    }
-							               
-  //softMuonTagInfos	
-  if(get_SM_tag_infos_)
-    {
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(nMuons)),label_+"nMuons");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPt)),label_+"muonPt");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonEta)),label_+"muonEta");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPhi)),label_+"muonPhi");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(muonNHits)),label_+"muonNHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(muonNExpectedOuterHits)),label_+"muonNExpectedOuterHits");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(muonNPixelHits)),label_+"muonNPixelHits");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonNChi2)),label_+"muonNChi2");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonPtRel)),label_+"muonPtRel");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonSip2d)),label_+"muonSip2d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonIp2d)),label_+"muonIp2d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonIpe2d)),label_+"muonIpe2d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonSip3d)),label_+"muonSip3d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonIp3d)),label_+"muonIp3d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonIpe3d)),label_+"muonIpe3d");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonP0Par)),label_+"muonP0Par");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonDeltaR)),label_+"muonDeltaR");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonEtaRel)),label_+"muonEtaRel");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonRatio)),label_+"muonRatio");
-      iEvent.put(auto_ptr< vector<int> >(new vector<int>(muonTrackQuality)),label_+"muonTrackQuality");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(muonRatioRel)),label_+"muonRatioRel");
-    }
-
-  //b tagger outputs configured in python file
-  for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
-    {
-      string alias = label_+ibTag->getParameter<string>("alias");
-      iEvent.put(auto_ptr< vector<float> >(new vector<float>(bTagVectors[ibTag->getParameter<string>("alias")])),alias);
-    }  
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -1481,6 +1291,9 @@ TagNtupleProducer::beginJob()
 // ------------ method called once each job just after ending the event loop  ------------
 void 
 TagNtupleProducer::endJob() {
+
+  file ->Write();
+  file->Close();
 }
 
 

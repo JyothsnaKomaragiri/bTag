@@ -31,7 +31,7 @@ process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #Global tag for 3_6_1
-process.GlobalTag.globaltag = 'GR_R_36X_V10A::All'
+process.GlobalTag.globaltag = 'GR_R_36X_V12A::All'
 
 process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
@@ -612,6 +612,7 @@ process.standardCaloBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParamet
 process.standardCaloBTagNtuple.ElectronTagInfos = cms.InputTag( "standardSoftElectronCaloTagInfos" )
 process.standardCaloBTagNtuple.MuonTagInfos = cms.InputTag( "standardSoftMuonCaloTagInfos" )
 process.standardCaloBTagNtuple.Label = cms.string("standardCalo")
+process.standardCaloBTagNtuple.filename = cms.string("standardCaloNtuple.root")
 process.standardCaloBTagNtuple.bTagConfig = cms.VPSet(
     cms.PSet(
     alias = cms.string("standardTrackCountingHighEffCaloBJetTags"),
@@ -683,6 +684,7 @@ process.standardPFBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParameter
 process.standardPFBTagNtuple.ElectronTagInfos = cms.InputTag( "standardSoftElectronPFTagInfos" )
 process.standardPFBTagNtuple.MuonTagInfos = cms.InputTag( "standardSoftMuonPFTagInfos" )
 process.standardPFBTagNtuple.Label = cms.string("standardPF")
+process.standardPFBTagNtuple.filename = cms.string("standardPFNtuple.root")
 process.standardPFBTagNtuple.bTagConfig = cms.VPSet(
     cms.PSet(
     alias = cms.string("standardTrackCountingHighEffPFBJetTags"),
@@ -915,8 +917,7 @@ process.EDM = cms.OutputModule("PoolOutputModule",
                        "keep *_softPFElectrons_*_*",
                        "keep recoGsfTracks_electronGsfTracks_*_*",
                        "keep *_TriggerResults_*_*",
-                       "keep *_offlinePrimaryVertices_*_*",
-                       "keep *_*BTagNtuple_*_*"
+                       "keep *_offlinePrimaryVertices_*_*"
     ),
     fileName = cms.untracked.string('BTagCommissioning2010_April20_7TeV_Data_PromptReco_v8.root'),
 #    SelectEvents = cms.untracked.PSet(
