@@ -69,48 +69,52 @@ Bool_t TrackSelector::Process(Long64_t entry)
    // Use fStatus to set the return value of TTree::Process().
    //
    // The return value is currently not used.
-  b_floats_standardPFBTagNtuple_standardPFjetPt_validation_obj->GetEntry(entry);
-  b_floats_standardPFBTagNtuple_standardPFjetEta_validation_obj->GetEntry(entry);
-  b_ints_standardPFBTagNtuple_standardPFtrackNHits_validation_obj->GetEntry(entry);
-  b_bool_standardPFBTagNtuple_standardPFtriggerHLTJet15U_validation_obj->GetEntry(entry);  
-  b_ints_standardPFBTagNtuple_standardPFtrackJetIndex_validation_obj->GetEntry(entry);
-  b_ints_standardPFBTagNtuple_standardPFtrackNPixelHits_validation_obj->GetEntry(entry);
-  b_ints_standardPFBTagNtuple_standardPFtrackNHits_validation_obj->GetEntry(entry);
-  b_floats_standardPFBTagNtuple_standardPFtrackNormChi2_validation_obj->GetEntry(entry);
-  b_floats_standardPFBTagNtuple_standardPFtrackTransverseMomentum_validation_obj->GetEntry(entry);
-  b_floats_standardPFBTagNtuple_standardPFtrackDistJetAxis_validation_obj->GetEntry(entry);
-  b_floats_standardPFBTagNtuple_standardPFtrackDecayLength_validation_obj->GetEntry(entry);
-  b_floats_standardPFBTagNtuple_standardPFtrackIP2d_validation_obj->GetEntry(entry);
-  b_floats_standardPFBTagNtuple_standardPFtrackLongitudinalImpactParameter_validation_obj->GetEntry(entry);
 
-  if(!isData) b_floats_standardPFBTagNtuple_standardPFMCTrueFlavor_validation_obj->GetEntry(entry);
 
-  unsigned int sizeOfJets =    floats_standardPFBTagNtuple_standardPFjetPt_validation_obj.size();
-  unsigned int sizeOfTracks =  ints_standardPFBTagNtuple_standardPFtrackNHits_validation_obj.size();
+  b_nJets -> GetEntry(entry);
+  b_nTracks->GetEntry(entry);
+  b_jetPt->GetEntry(entry);
+  b_jetEta->GetEntry(entry);
+  b_trackNHits->GetEntry(entry);
+  b_triggerHLTJet15U->GetEntry(entry);  
+  b_trackJetIndex->GetEntry(entry);
+  b_trackNPixelHits->GetEntry(entry);
+  b_trackNHits->GetEntry(entry);
+  b_trackNormChi2->GetEntry(entry);
+  b_trackTransverseMomentum->GetEntry(entry);
+  b_trackDistJetAxis->GetEntry(entry);
+  b_trackDecayLength->GetEntry(entry);
+  b_trackIP2d->GetEntry(entry);
+  b_trackLongitudinalImpactParameter->GetEntry(entry);
+
+  if(!isData) b_MCTrueFlavor->GetEntry(entry);
+
+  unsigned int sizeOfJets =    nJets;
+  unsigned int sizeOfTracks =  nTracks;
  
 
   // only fill histograms if cuts are fulfilled
   
-  if(bool_standardPFBTagNtuple_standardPFtriggerHLTJet15U_validation_obj != info.standardPFtriggerHLTJet15U) return kTRUE;
+  if(triggerHLTJet15U != info.standardPFtriggerHLTJet15U) return kTRUE;
 
   /// ITERATE OVER ALL JETS
   for(unsigned int i=0 ;i<sizeOfJets; i++){
   
-    if(floats_standardPFBTagNtuple_standardPFjetPt_validation_obj[i] < info.jetPtCut) continue;
-    if(fabs(floats_standardPFBTagNtuple_standardPFjetEta_validation_obj[i]) > info.jetEtaCut) continue;
+    if(jetPt[i] < info.jetPtCut) continue;
+    if(fabs(jetEta[i]) > info.jetEtaCut) continue;
 
     unsigned int NtrackspassingCuts = 0;
     // now iterate over tracks of this jet and check cuts
     for(unsigned int j=0 ;j<sizeOfTracks; j++){
-      if(ints_standardPFBTagNtuple_standardPFtrackJetIndex_validation_obj[j]   != i)           continue;
-      if(ints_standardPFBTagNtuple_standardPFtrackNPixelHits_validation_obj[j] <  info.nPixHitsCut) continue;
-      if(ints_standardPFBTagNtuple_standardPFtrackNHits_validation_obj[j]      <  info.nHitsCut)    continue;
-      if(floats_standardPFBTagNtuple_standardPFtrackNormChi2_validation_obj[j]     >  info.Chi2Cut)    continue;
-      if(floats_standardPFBTagNtuple_standardPFtrackTransverseMomentum_validation_obj[j] < info.trackPtCut) continue; 
-      if(fabs(floats_standardPFBTagNtuple_standardPFtrackDistJetAxis_validation_obj[j]) > info.distJetAxisCut) continue;
-      if(floats_standardPFBTagNtuple_standardPFtrackDecayLength_validation_obj[j] > info.decayLengthCut) continue; 
-      if(fabs(floats_standardPFBTagNtuple_standardPFtrackIP2d_validation_obj[j]) > info.IP2dCut) continue;
-      if(fabs(floats_standardPFBTagNtuple_standardPFtrackLongitudinalImpactParameter_validation_obj[j]) > info.longIPCut ) continue;
+      if(trackJetIndex[j]   != i)           continue;
+      if(trackNPixelHits[j] <  info.nPixHitsCut) continue;
+      if(trackNHits[j]      <  info.nHitsCut)    continue;
+      if(trackNormChi2[j]     >  info.Chi2Cut)    continue;
+      if(trackTransverseMomentum[j] < info.trackPtCut) continue; 
+      if(fabs(trackDistJetAxis[j]) > info.distJetAxisCut) continue;
+      if(trackDecayLength[j] > info.decayLengthCut) continue; 
+      if(fabs(trackIP2d[j]) > info.IP2dCut) continue;
+      if(fabs(trackLongitudinalImpactParameter[j]) > info.longIPCut ) continue;
       // passed all cuts, now count the track
       NtrackspassingCuts++;
     }
@@ -118,18 +122,17 @@ Bool_t TrackSelector::Process(Long64_t entry)
     // fill number of tracks in histograms depending on jet flavour etc...
     if( isData ) dataHist->Fill(NtrackspassingCuts, fChain->GetWeight());
     else{
-      if( abs(floats_standardPFBTagNtuple_standardPFMCTrueFlavor_validation_obj[i]) == 5) mcHistb->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
-      else if( abs(floats_standardPFBTagNtuple_standardPFMCTrueFlavor_validation_obj[i]) == 4) mcHistc->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
-      else if( abs(floats_standardPFBTagNtuple_standardPFMCTrueFlavor_validation_obj[i]) == 3
-	  || abs(floats_standardPFBTagNtuple_standardPFMCTrueFlavor_validation_obj[i]) == 2
-	  || abs(floats_standardPFBTagNtuple_standardPFMCTrueFlavor_validation_obj[i]) == 1
-	  || abs(floats_standardPFBTagNtuple_standardPFMCTrueFlavor_validation_obj[i]) == 21 ) mcHistl->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
+      if( abs(MCTrueFlavor[i]) == 5) mcHistb->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
+      else if( abs(MCTrueFlavor[i]) == 4) mcHistc->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
+      else if( abs(MCTrueFlavor[i]) == 3
+	  || abs(MCTrueFlavor[i]) == 2
+	  || abs(MCTrueFlavor[i]) == 1
+	  || abs(MCTrueFlavor[i]) == 21 ) mcHistl->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
       else mcHistn->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
     }// is not data
 
   } // END ITERATION OVER ALL JETS
   
-
 
    return kTRUE;
 }

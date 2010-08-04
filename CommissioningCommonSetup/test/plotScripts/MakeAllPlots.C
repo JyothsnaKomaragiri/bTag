@@ -14,9 +14,10 @@
 #include "TDirectory.h"
 #include "TPaveText.h"
 
-#include <cmath>
+//#include <cmath>
+#include <math.h>
 #include <string>
-#include <string.h>
+//#include <string.h>
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -1216,7 +1217,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
     double data_error = dataCorrelations->GetBinError(i+1,i+1);
     double data_calc_ratio = data_content/integral_data;
     double data_calc_error = 0;
-    if(data_content!=integral_data) data_calc_error = sqrt(abs(((1.-2.*data_calc_ratio)*data_error*data_error+data_calc_ratio*data_calc_ratio*integral_data_error*integral_data_error)/(integral_data*integral_data)));
+    if(data_content!=integral_data) data_calc_error = sqrt(fabs(((1.-2.*data_calc_ratio)*data_error*data_error+data_calc_ratio*data_calc_ratio*integral_data_error*integral_data_error)/(integral_data*integral_data)));
     dataEfficiencies->SetBinContent(i+1,data_calc_ratio);
     dataEfficiencies->SetBinError(i+1, data_calc_error);
     
@@ -1224,7 +1225,7 @@ void MakeACutCompPlot(informationCutComp info, cutCompHists hists, double scale)
     double mc_error = mcCorrelations->GetBinError(i+1,i+1);
     double mc_calc_ratio = mc_content/integral_mc;
     double mc_calc_error = 0;
-    if(mc_content!=integral_mc) mc_calc_error = sqrt(abs(((1.-2.*data_calc_ratio)*data_error*data_error+data_calc_ratio*data_calc_ratio*integral_data_error*integral_data_error)/(integral_data*integral_data)));
+    if(mc_content!=integral_mc) mc_calc_error = sqrt(fabs(((1.-2.*data_calc_ratio)*data_error*data_error+data_calc_ratio*data_calc_ratio*integral_data_error*integral_data_error)/(integral_data*integral_data)));
     mcEfficiencies->SetBinContent(i+1,mc_calc_ratio);
     mcEfficiencies->SetBinError(i+1,mc_calc_error);
   }
@@ -3325,7 +3326,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     {  
       std::cout<<"opening file " << iFile->first << std::endl;
       TFile* thisFile = TFile::Open((iFile->first).c_str());
-      TTree* thisTree = (TTree*)thisFile->Get("Events");
+      TTree* thisTree = (TTree*)thisFile->Get("t");
       thisTree->SetWeight(iFile->second);
       Long64_t nentries = thisTree->GetEntries();
       gDirectory->cd((rootFile+":/").c_str());
@@ -3339,7 +3340,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     {
       std::cout<<"opening file " << iFile->first << std::endl;
       TFile* thisFile = TFile::Open((iFile->first).c_str());
-      TTree* thisTree = (TTree*)thisFile->Get("Events");
+      TTree* thisTree = (TTree*)thisFile->Get("t");
       thisTree->SetWeight(iFile->second);
       Long64_t nentries = thisTree->GetEntries();
       gDirectory->cd((rootFile+":/").c_str());
