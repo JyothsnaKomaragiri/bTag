@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 caloJetIDFilter = cms.EDFilter("CaloJetIDFilter",
   JetIDTag = cms.InputTag("ak5JetID"),
   CaloJetsTag = cms.InputTag("ak5CaloJets"),
+  filter = cms.bool(True),
   PtCuts = cms.vdouble(10.0, 1e6),
   EtaCuts = cms.vdouble(-2.5, 2.5),
   fHPDCuts = cms.vdouble(-1e6, 0.98),

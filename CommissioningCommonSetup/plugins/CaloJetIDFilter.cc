@@ -13,7 +13,7 @@
 //
 // Original Author:  Jason Keller
 //         Created:  Thu Apr 25 23:23:27 CDT 2020
-// $Id: CaloJetIDFilter.cc,v 1.1 2010/04/16 18:04:43 kellerjd Exp $
+// $Id: CaloJetIDFilter.cc,v 1.2 2010/04/16 18:07:16 kellerjd Exp $
 //
 //
 
@@ -50,6 +50,7 @@ class CaloJetIDFilter : public edm::EDFilter {
       // ----------member data ---------------------------
       edm::InputTag jetIDTag_;
       edm::InputTag caloJetTag_;
+      bool filter_;
 
       std::vector<double> pTCuts_;
       std::vector<double> etaCuts_;
@@ -87,6 +88,7 @@ class CaloJetIDFilter : public edm::EDFilter {
 CaloJetIDFilter::CaloJetIDFilter(const edm::ParameterSet& iConfig) :
   jetIDTag_(iConfig.getParameter<edm::InputTag>("JetIDTag")),
   caloJetTag_(iConfig.getParameter<edm::InputTag>("CaloJetsTag")),
+  filter_(iConfig.getParameter<bool>("filter")),
   pTCuts_(iConfig.getParameter<std::vector<double> >("PtCuts")),
   etaCuts_(iConfig.getParameter<std::vector<double> >("EtaCuts")),
   fHPDCuts_(iConfig.getParameter<std::vector<double> >("fHPDCuts")),
@@ -169,7 +171,7 @@ CaloJetIDFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   bool jetsEmpty = goodJets->empty();
   iEvent.put(goodJets);
-  return !jetsEmpty;
+  return !filter_ || !jetsEmpty;
 }
 
 // ------------ method called once each job just before starting event loop  ------------
