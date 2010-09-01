@@ -111,6 +111,7 @@ class TagNtupleProducer : public edm::EDAnalyzer {
   TFile *file;
 
   bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U;
+  bool triggerHLTJet30U, triggerHLTJet50U, triggerHLTJet70U, triggerHLTJet100U ;
 
   unsigned int eventNumber ;
   unsigned int runNumber ;
@@ -381,6 +382,10 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "triggerHLTL1Jet6U", &triggerHLTL1Jet6U, "triggerHLTL1Jet6U/O"); 
   tree->Branch(  "triggerHLTL1Jet10U", &triggerHLTL1Jet10U, "triggerHLTL1Jet10U/O"); 
   tree->Branch(  "triggerHLTJet15U",  &triggerHLTJet15U, "triggerHLTJet15U/O");
+  tree->Branch(  "triggerHLTJet30U",  &triggerHLTJet15U, "triggerHLTJet30U/O");
+  tree->Branch(  "triggerHLTJet50U",  &triggerHLTJet15U, "triggerHLTJet50U/O");
+  tree->Branch(  "triggerHLTJet70U",  &triggerHLTJet15U, "triggerHLTJet70U/O");
+  tree->Branch(  "triggerHLTJet100U",  &triggerHLTJet15U, "triggerHLTJet100U/O");
 
   tree->Branch(  "eventNumber"             , &eventNumber             , "eventNumber/i"            );
   tree->Branch(  "runNumber"		    , &runNumber               , "runNumber/i"   	    );
@@ -615,6 +620,7 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   
   //Get The Various collections defined in the configuration file
   triggerHLTL1Jet6U= triggerHLTL1Jet10U= triggerHLTJet15U = 0;
+  triggerHLTJet30U = triggerHLTJet50U = triggerHLTJet70U= triggerHLTJet100U = 0;
 
   edm::Handle<edm::TriggerResults>  hltresults;
   iEvent.getByLabel(triggerTag_, hltresults);
@@ -630,7 +636,11 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     string trigName=triggerNames_.triggerName(itrig);
     if (trigName=="HLT_L1Jet6U")  {bFoundTrig = 1; triggerHLTL1Jet6U  = hltresults->accept(itrig) ;}
     if (trigName=="HLT_L1Jet10U") triggerHLTL1Jet10U = hltresults->accept(itrig) ; 
-    if (trigName=="HLT_Jet15U")   triggerHLTJet15U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet15U")   {bFoundTrig = 1; triggerHLTJet15U   = hltresults->accept(itrig) ;}
+    if (trigName=="HLT_Jet30U")   triggerHLTJet30U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet50U")   triggerHLTJet50U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet70U")   triggerHLTJet70U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet100U")   triggerHLTJet100U   = hltresults->accept(itrig) ;
   }  
   if(bFoundTrig==0){
     std::cout<<"  ERROR: trigger name not found in event" << std::endl;
@@ -638,7 +648,8 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   }
 
   // do NOT save event, if no trigger has fired
-  if( triggerHLTL1Jet6U != 1 && triggerHLTL1Jet10U !=1 && triggerHLTJet15U != 1 ) return;
+  if( triggerHLTL1Jet6U != 1 && triggerHLTL1Jet10U !=1 && triggerHLTJet15U != 1 && triggerHLTJet30U != 1 && 
+      triggerHLTJet50U != 1 && triggerHLTJet70U != 1 && triggerHLTJet100U != 1 ) return;
 
 
   eventNumber = iEvent.eventAuxiliary().event();
