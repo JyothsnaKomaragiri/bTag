@@ -4,6 +4,7 @@
 <use name=DataFormats/Math>
 <use name=DataFormats/TrackReco>
 <use name=DataFormats/VertexReco>
+<use name=DataFormats/MuonReco>
 <use name=TrackingTools/IPTools>
 <use name=TrackingTools/TransientTrack>
 <use name=TrackingTools/Records>
