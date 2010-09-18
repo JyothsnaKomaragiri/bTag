@@ -36,6 +36,10 @@
 #include "DataFormats/JetReco/interface/JetTracksAssociation.h"
 #include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
 
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonTrackLinks.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+
 #include "DataFormats/Math/interface/deltaR.h"
 #include "Math/GenVector/VectorUtil.h"
 #include "DataFormats/GeometryVector/interface/VectorUtil.h"
@@ -265,26 +269,148 @@ class TagNtupleProducer : public edm::EDAnalyzer {
 						       
   //softMuonTagInfos	
   int nMuons[MAXJETS];                                
-  float muonPt[MAXJETS];   			       
-  float muonEta[MAXJETS];  			       
-  float muonPhi[MAXJETS];  			       
-  int muonNHits[MAXJETS];   	
-  int muonNExpectedOuterHits[MAXJETS];   			       
-  int muonNPixelHits[MAXJETS];   			       
-  float muonNChi2[MAXJETS];	         	       
-  float muonPtRel[MAXJETS];   
-  float muonSip2d[MAXJETS];   		       
-  float muonIp2d[MAXJETS];   		       
-  float muonIpe2d[MAXJETS];   		       
-  float muonSip3d[MAXJETS];
-  float muonIp3d[MAXJETS];
-  float muonIpe3d[MAXJETS];   	
-  float muonP0Par[MAXJETS];   			       
-  float muonDeltaR[MAXJETS];  			       
-  float muonEtaRel[MAXJETS];  			       
-  float muonRatio[MAXJETS];   			    
-  int muonTrackQuality[MAXJETS];   			       
-  float muonRatioRel[MAXJETS];                          
+
+  bool  muon1IsGlobal[MAXJETS];
+  bool  muon1IsTracker[MAXJETS];
+  bool  muon1IsStandalone[MAXJETS];
+  float muon1Pt[MAXJETS];   			       
+  float muon1Eta[MAXJETS];  			       
+  float muon1Phi[MAXJETS];  	
+  int   muon1NumberOfMatches[MAXJETS];
+  int   muon1GlobalMuonHits[MAXJETS];
+  int   muon1InnerValidHits[MAXJETS];
+  int   muon1NExpectedOuterHits[MAXJETS];   			       
+  int   muon1NPixelHits[MAXJETS];
+  float muon1InnerNChi2[MAXJETS];
+  float muon1GlobalNChi2[MAXJETS];
+  float muon1VzPVDist[MAXJETS];
+  float muon1PtRel[MAXJETS];   
+  float muon1Sip2d[MAXJETS];   		       
+  float muon1Ip2d[MAXJETS];   		       
+  float muon1Ipe2d[MAXJETS];   		       
+  float muon1Sip3d[MAXJETS];
+  float muon1Ip3d[MAXJETS];
+  float muon1Ipe3d[MAXJETS];   	
+  float muon1P0Par[MAXJETS];   			       
+  float muon1DeltaR[MAXJETS];  			       
+  float muon1EtaRel[MAXJETS];  			       
+  float muon1Ratio[MAXJETS];   			    
+  int   muon1TrackQuality[MAXJETS];   			       
+  float muon1RatioRel[MAXJETS];                          
+
+  bool  muon2IsGlobal[MAXJETS];
+  bool  muon2IsTracker[MAXJETS];
+  bool  muon2IsStandalone[MAXJETS];
+  float muon2Pt[MAXJETS];   			       
+  float muon2Eta[MAXJETS];  			       
+  float muon2Phi[MAXJETS];  	
+  int   muon2NumberOfMatches[MAXJETS];
+  int   muon2GlobalMuonHits[MAXJETS];
+  int   muon2InnerValidHits[MAXJETS];
+  int   muon2NExpectedOuterHits[MAXJETS];   			       
+  int   muon2NPixelHits[MAXJETS];
+  float muon2InnerNChi2[MAXJETS];
+  float muon2GlobalNChi2[MAXJETS];
+  float muon2VzPVDist[MAXJETS];
+  float muon2PtRel[MAXJETS];   
+  float muon2Sip2d[MAXJETS];   		       
+  float muon2Ip2d[MAXJETS];   		       
+  float muon2Ipe2d[MAXJETS];   		       
+  float muon2Sip3d[MAXJETS];
+  float muon2Ip3d[MAXJETS];
+  float muon2Ipe3d[MAXJETS];   	
+  float muon2P0Par[MAXJETS];   			       
+  float muon2DeltaR[MAXJETS];  			       
+  float muon2EtaRel[MAXJETS];  			       
+  float muon2Ratio[MAXJETS];   			    
+  int   muon2TrackQuality[MAXJETS];   			       
+  float muon2RatioRel[MAXJETS];                          
+
+  bool  muon3IsGlobal[MAXJETS];
+  bool  muon3IsTracker[MAXJETS];
+  bool  muon3IsStandalone[MAXJETS];
+  float muon3Pt[MAXJETS];   			       
+  float muon3Eta[MAXJETS];  			       
+  float muon3Phi[MAXJETS];  	
+  int   muon3NumberOfMatches[MAXJETS];
+  int   muon3GlobalMuonHits[MAXJETS];
+  int   muon3InnerValidHits[MAXJETS];
+  int   muon3NExpectedOuterHits[MAXJETS];   			       
+  int   muon3NPixelHits[MAXJETS];
+  float muon3InnerNChi2[MAXJETS];
+  float muon3GlobalNChi2[MAXJETS];
+  float muon3VzPVDist[MAXJETS];
+  float muon3PtRel[MAXJETS];   
+  float muon3Sip2d[MAXJETS];   		       
+  float muon3Ip2d[MAXJETS];   		       
+  float muon3Ipe2d[MAXJETS];   		       
+  float muon3Sip3d[MAXJETS];
+  float muon3Ip3d[MAXJETS];
+  float muon3Ipe3d[MAXJETS];   	
+  float muon3P0Par[MAXJETS];   			       
+  float muon3DeltaR[MAXJETS];  			       
+  float muon3EtaRel[MAXJETS];  			       
+  float muon3Ratio[MAXJETS];   			    
+  int   muon3TrackQuality[MAXJETS];   			       
+  float muon3RatioRel[MAXJETS];                          
+
+  bool  muon4IsGlobal[MAXJETS];
+  bool  muon4IsTracker[MAXJETS];
+  bool  muon4IsStandalone[MAXJETS];
+  float muon4Pt[MAXJETS];   			       
+  float muon4Eta[MAXJETS];  			       
+  float muon4Phi[MAXJETS];  	
+  int   muon4NumberOfMatches[MAXJETS];
+  int   muon4GlobalMuonHits[MAXJETS];
+  int   muon4InnerValidHits[MAXJETS];
+  int   muon4NExpectedOuterHits[MAXJETS];   			       
+  int   muon4NPixelHits[MAXJETS];
+  float muon4InnerNChi2[MAXJETS];
+  float muon4GlobalNChi2[MAXJETS];
+  float muon4VzPVDist[MAXJETS];
+  float muon4PtRel[MAXJETS];   
+  float muon4Sip2d[MAXJETS];   		       
+  float muon4Ip2d[MAXJETS];   		       
+  float muon4Ipe2d[MAXJETS];   		       
+  float muon4Sip3d[MAXJETS];
+  float muon4Ip3d[MAXJETS];
+  float muon4Ipe3d[MAXJETS];   	
+  float muon4P0Par[MAXJETS];   			       
+  float muon4DeltaR[MAXJETS];  			       
+  float muon4EtaRel[MAXJETS];  			       
+  float muon4Ratio[MAXJETS];   			    
+  int   muon4TrackQuality[MAXJETS];   			       
+  float muon4RatioRel[MAXJETS];                          
+
+
+
+  std::vector< bool* > muonIsGlobal;
+  std::vector< bool* >  muonIsTracker;
+  std::vector<bool*>  muonIsStandalone;
+  std::vector<float*> muonPt;   			       
+  std::vector<float*> muonEta;  			       
+  std::vector<float*> muonPhi;  	
+  std::vector<int*>   muonNumberOfMatches;
+  std::vector<int*>   muonGlobalMuonHits;
+  std::vector<int*>   muonInnerValidHits;
+  std::vector<int*>   muonNExpectedOuterHits;   			       
+  std::vector<int*>   muonNPixelHits;
+  std::vector<float*> muonInnerNChi2;
+  std::vector<float*> muonGlobalNChi2;
+  std::vector<float*> muonVzPVDist;
+  std::vector<float*> muonPtRel;   
+  std::vector<float*> muonSip2d;   		       
+  std::vector<float*> muonIp2d;   		       
+  std::vector<float*> muonIpe2d;   		       
+  std::vector<float*> muonSip3d;
+  std::vector<float*> muonIp3d;
+  std::vector<float*> muonIpe3d;   	
+  std::vector<float*> muonP0Par;   			       
+  std::vector<float*> muonDeltaR;  			       
+  std::vector<float*> muonEtaRel;  			       
+  std::vector<float*> muonRatio;   			    
+  std::vector<int*>   muonTrackQuality;   			       
+  std::vector<float*> muonRatioRel; 
 
 
 
@@ -377,6 +503,66 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
     IP2dProbability.push_back( new float[MAXJETS]);
     IP2dTrackPtRel.push_back( new float[MAXJETS]);
   }
+
+  muonIsGlobal.push_back(muon1IsGlobal); 
+  muonIsGlobal.push_back(muon2IsGlobal);
+  
+  muonIsTracker           .push_back(muon1IsTracker          ); muonIsTracker           .push_back(muon2IsTracker          ); 
+  muonIsStandalone        .push_back(muon1IsStandalone       ); muonIsStandalone        .push_back(muon2IsStandalone       ); 
+  muonPt                  .push_back(muon1Pt                 ); muonPt                  .push_back(muon2Pt                 );       
+  muonEta                 .push_back(muon1Eta                ); muonEta                 .push_back(muon2Eta                );       
+  muonPhi                 .push_back(muon1Phi                ); muonPhi                 .push_back(muon2Phi                ); 
+  muonNumberOfMatches     .push_back(muon1NumberOfMatches    ); muonNumberOfMatches     .push_back(muon2NumberOfMatches    ); 
+  muonGlobalMuonHits      .push_back(muon1GlobalMuonHits     ); muonGlobalMuonHits      .push_back(muon2GlobalMuonHits     ); 
+  muonInnerValidHits      .push_back(muon1InnerValidHits     ); muonInnerValidHits      .push_back(muon2InnerValidHits     ); 
+  muonNExpectedOuterHits  .push_back(muon1NExpectedOuterHits ); muonNExpectedOuterHits  .push_back(muon2NExpectedOuterHits ); 
+  muonNPixelHits          .push_back(muon1NPixelHits         ); muonNPixelHits          .push_back(muon2NPixelHits         ); 
+  muonInnerNChi2          .push_back(muon1InnerNChi2         ); muonInnerNChi2          .push_back(muon2InnerNChi2         ); 
+  muonGlobalNChi2         .push_back(muon1GlobalNChi2        ); muonGlobalNChi2         .push_back(muon2GlobalNChi2        ); 
+  muonVzPVDist            .push_back(muon1VzPVDist           ); muonVzPVDist            .push_back(muon2VzPVDist           ); 
+  muonPtRel               .push_back(muon1PtRel              ); muonPtRel               .push_back(muon2PtRel              ); 
+  muonSip2d               .push_back(muon1Sip2d              ); muonSip2d               .push_back(muon2Sip2d              ); 
+  muonIp2d                .push_back(muon1Ip2d               ); muonIp2d                .push_back(muon2Ip2d               ); 
+  muonIpe2d               .push_back(muon1Ipe2d              ); muonIpe2d               .push_back(muon2Ipe2d              ); 
+  muonSip3d               .push_back(muon1Sip3d              ); muonSip3d               .push_back(muon2Sip3d              ); 
+  muonIp3d                .push_back(muon1Ip3d               ); muonIp3d                .push_back(muon2Ip3d               ); 
+  muonIpe3d               .push_back(muon1Ipe3d              ); muonIpe3d               .push_back(muon2Ipe3d              ); 
+  muonP0Par               .push_back(muon1P0Par              ); muonP0Par               .push_back(muon2P0Par              );       
+  muonDeltaR              .push_back(muon1DeltaR             ); muonDeltaR              .push_back(muon2DeltaR             );       
+  muonEtaRel              .push_back(muon1EtaRel             ); muonEtaRel              .push_back(muon2EtaRel             );       
+  muonRatio               .push_back(muon1Ratio              ); muonRatio               .push_back(muon2Ratio              );       
+  muonTrackQuality        .push_back(muon1TrackQuality       ); muonTrackQuality        .push_back(muon2TrackQuality       );       
+  muonRatioRel            .push_back(muon1RatioRel           ); muonRatioRel            .push_back(muon2RatioRel           ); 
+  
+  muonIsGlobal            .push_back(muon3IsGlobal           ); muonIsGlobal            .push_back(muon4IsGlobal           ); 
+  muonIsTracker           .push_back(muon3IsTracker          ); muonIsTracker           .push_back(muon4IsTracker          ); 
+  muonIsStandalone        .push_back(muon3IsStandalone       ); muonIsStandalone        .push_back(muon4IsStandalone       ); 
+  muonPt                  .push_back(muon3Pt                 ); muonPt                  .push_back(muon4Pt                 );       
+  muonEta                 .push_back(muon3Eta                ); muonEta                 .push_back(muon4Eta                );       
+  muonPhi                 .push_back(muon3Phi                ); muonPhi                 .push_back(muon4Phi                ); 
+  muonNumberOfMatches     .push_back(muon3NumberOfMatches    ); muonNumberOfMatches     .push_back(muon4NumberOfMatches    ); 
+  muonGlobalMuonHits      .push_back(muon3GlobalMuonHits     ); muonGlobalMuonHits      .push_back(muon4GlobalMuonHits     ); 
+  muonInnerValidHits      .push_back(muon3InnerValidHits     ); muonInnerValidHits      .push_back(muon4InnerValidHits     ); 
+  muonNExpectedOuterHits  .push_back(muon3NExpectedOuterHits ); muonNExpectedOuterHits  .push_back(muon4NExpectedOuterHits ); 
+  muonNPixelHits          .push_back(muon3NPixelHits         ); muonNPixelHits          .push_back(muon4NPixelHits         ); 
+  muonInnerNChi2          .push_back(muon3InnerNChi2         ); muonInnerNChi2          .push_back(muon4InnerNChi2         ); 
+  muonGlobalNChi2         .push_back(muon3GlobalNChi2        ); muonGlobalNChi2         .push_back(muon4GlobalNChi2        ); 
+  muonVzPVDist            .push_back(muon3VzPVDist           ); muonVzPVDist            .push_back(muon4VzPVDist           ); 
+  muonPtRel               .push_back(muon3PtRel              ); muonPtRel               .push_back(muon4PtRel              ); 
+  muonSip2d               .push_back(muon3Sip2d              ); muonSip2d               .push_back(muon4Sip2d              ); 
+  muonIp2d                .push_back(muon3Ip2d               ); muonIp2d                .push_back(muon4Ip2d               ); 
+  muonIpe2d               .push_back(muon3Ipe2d              ); muonIpe2d               .push_back(muon4Ipe2d              ); 
+  muonSip3d               .push_back(muon3Sip3d              ); muonSip3d               .push_back(muon4Sip3d              ); 
+  muonIp3d                .push_back(muon3Ip3d               ); muonIp3d                .push_back(muon4Ip3d               ); 
+  muonIpe3d               .push_back(muon3Ipe3d              ); muonIpe3d               .push_back(muon4Ipe3d              ); 
+  muonP0Par               .push_back(muon3P0Par              ); muonP0Par               .push_back(muon4P0Par              );       
+  muonDeltaR              .push_back(muon3DeltaR             ); muonDeltaR              .push_back(muon4DeltaR             );       
+  muonEtaRel              .push_back(muon3EtaRel             ); muonEtaRel              .push_back(muon4EtaRel             );       
+  muonRatio               .push_back(muon3Ratio              ); muonRatio               .push_back(muon4Ratio              );       
+  muonTrackQuality        .push_back(muon3TrackQuality       ); muonTrackQuality        .push_back(muon4TrackQuality       );       
+  muonRatioRel            .push_back(muon3RatioRel           ); muonRatioRel            .push_back(muon4RatioRel           ); 
+
+
 
 
   tree->Branch(  "triggerHLTL1Jet6U", &triggerHLTL1Jet6U, "triggerHLTL1Jet6U/O"); 
@@ -565,26 +751,121 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
 						       
   //softMuonTagInfos	
    tree->Branch(  "nMuons", nMuons, "nMuons[nJets]/I");                                
-   tree->Branch(  "muonPt", muonPt, "muonPt[nJets]/F");   			       
-   tree->Branch(  "muonEta", muonEta, "muonEta[nJets]/F");  			       
-   tree->Branch(  "muonPhi", muonPhi, "muonPhi[nJets]/F");  			       
-   tree->Branch(  "muonNHits", muonNHits, "muonNHits[nJets]/I");   	
-   tree->Branch(  "muonNExpectedOuterHits", muonNExpectedOuterHits, "muonNExpectedOuterHits[nJets]/I");   			       
-   tree->Branch(  "muonNPixelHits", muonNPixelHits, "muonNPixelHits[nJets]/I");   			       
-   tree->Branch(  "muonNChi2", muonNChi2, "muonNChi2[nJets]/F");	         	       
-   tree->Branch(  "muonPtRel", muonPtRel, "muonPtRel[nJets]/F");   
-   tree->Branch(  "muonSip2d", muonSip2d, "muonSip2d[nJets]/F");   		       
-   tree->Branch(  "muonIp2d", muonIp2d, "muonIp2d[nJets]/F");   		       
-   tree->Branch(  "muonIpe2d", muonIpe2d, "muonIpe2d[nJets]/F");   		       
-   tree->Branch(  "muonSip3d", muonSip3d, "muonSip3d[nJets]/F");
-   tree->Branch(  "muonIp3d", muonIp3d, "muonIp3d[nJets]/F");
-   tree->Branch(  "muonIpe3d", muonIpe3d, "muonIpe3d[nJets]/F");   	
-   tree->Branch(  "muonP0Par", muonP0Par, "muonP0Par[nJets]/F");   			       
-   tree->Branch(  "muonDeltaR", muonDeltaR, "muonDeltaR[nJets]/F");  			       
-   tree->Branch(  "muonEtaRel", muonEtaRel, "muonEtaRel[nJets]/F");  			       
-   tree->Branch(  "muonRatio", muonRatio, "muonRatio[nJets]/F");   			    
-   tree->Branch(  "muonTrackQuality", muonTrackQuality, "muonTrackQuality[nJets]/I");   			       
-   tree->Branch(  "muonRatioRel", muonRatioRel, "muonRatioRel[nJets]/F");                          
+
+ tree->Branch(  "muon1IsGlobal",            muon1IsGlobal,            "muon1IsGlobal[nJets]/O");            
+ tree->Branch(  "muon1IsTracker", 	   muon1IsTracker,           "muon1IsTracker[nJets]/O");           
+ tree->Branch(  "muon1IsStandalone", 	   muon1IsStandalone,        "muon1IsStandalone[nJets]/O");        
+ tree->Branch(  "muon1Pt",    		   muon1Pt,                  "muon1Pt[nJets]/F");                     	       
+ tree->Branch(  "muon1Eta",   		   muon1Eta,                 "muon1Eta[nJets]/F");                    	       
+ tree->Branch(  "muon1Phi",   		   muon1Phi,                 "muon1Phi[nJets]/F");                 
+ tree->Branch(  "muon1NumberOfMatches", 	   muon1NumberOfMatches,     "muon1NumberOfMatches[nJets]/I");     
+ tree->Branch(  "muon1GlobalMuonHits", 	   muon1GlobalMuonHits,      "muon1GlobalMuonHits[nJets]/I");      
+ tree->Branch(  "muon1InnerValidHits", 	   muon1InnerValidHits,      "muon1InnerValidHits[nJets]/I");      
+ tree->Branch(  "muon1NExpectedOuterHits",  muon1NExpectedOuterHits,  "muon1NExpectedOuterHits[nJets]/I");    			       
+ tree->Branch(  "muon1NPixelHits", 	   muon1NPixelHits,          "muon1NPixelHits[nJets]/I");          
+ tree->Branch(  "muon1InnerNChi2", 	   muon1InnerNChi2,          "muon1InnerNChi2[nJets]/F");          
+ tree->Branch(  "muon1GlobalNChi2", 	   muon1GlobalNChi2,         "muon1GlobalNChi2[nJets]/F");         
+ tree->Branch(  "muon1VzPVDist", 	   muon1VzPVDist,            "muon1VzPVDist[nJets]/F");            
+ tree->Branch(  "muon1PtRel",    	   muon1PtRel,               "muon1PtRel[nJets]/F");               
+ tree->Branch(  "muon1Sip2d",    	   muon1Sip2d,               "muon1Sip2d[nJets]/F");                  	       
+ tree->Branch(  "muon1Ip2d",    		   muon1Ip2d,                "muon1Ip2d[nJets]/F");                    
+ tree->Branch(  "muon1Ipe2d",    	   muon1Ipe2d,               "muon1Ipe2d[nJets]/F");                  	       
+ tree->Branch(  "muon1Sip3d", 		   muon1Sip3d,               "muon1Sip3d[nJets]/F");               
+ tree->Branch(  "muon1Ip3d", 		   muon1Ip3d,                "muon1Ip3d[nJets]/F");                
+ tree->Branch(  "muon1Ipe3d",    	   muon1Ipe3d,               "muon1Ipe3d[nJets]/F");               
+ tree->Branch(  "muon1P0Par",    	   muon1P0Par,               "muon1P0Par[nJets]/F");                  		       
+ tree->Branch(  "muon1DeltaR",   	   muon1DeltaR,              "muon1DeltaR[nJets]/F");                 		       
+ tree->Branch(  "muon1EtaRel",   	   muon1EtaRel,              "muon1EtaRel[nJets]/F");                 		       
+ tree->Branch(  "muon1Ratio",    	   muon1Ratio,               "muon1Ratio[nJets]/F");                  		    
+ tree->Branch(  "muon1TrackQuality",    	   muon1TrackQuality,        "muon1TrackQuality[nJets]/I");           		       
+ tree->Branch(  "muon1RatioRel",            muon1RatioRel,            "muon1RatioRel[nJets]/F");                           
+
+
+ tree->Branch(  "muon2IsGlobal",            muon2IsGlobal,            "muon2IsGlobal[nJets]/O");            
+ tree->Branch(  "muon2IsTracker", 	   muon2IsTracker,           "muon2IsTracker[nJets]/O");           
+ tree->Branch(  "muon2IsStandalone", 	   muon2IsStandalone,        "muon2IsStandalone[nJets]/O");        
+ tree->Branch(  "muon2Pt",    		   muon2Pt,                  "muon2Pt[nJets]/F");                     	       
+ tree->Branch(  "muon2Eta",   		   muon2Eta,                 "muon2Eta[nJets]/F");                    	       
+ tree->Branch(  "muon2Phi",   		   muon2Phi,                 "muon2Phi[nJets]/F");                 
+ tree->Branch(  "muon2NumberOfMatches", 	   muon2NumberOfMatches,     "muon2NumberOfMatches[nJets]/I");     
+ tree->Branch(  "muon2GlobalMuonHits", 	   muon2GlobalMuonHits,      "muon2GlobalMuonHits[nJets]/I");      
+ tree->Branch(  "muon2InnerValidHits", 	   muon2InnerValidHits,      "muon2InnerValidHits[nJets]/I");      
+ tree->Branch(  "muon2NExpectedOuterHits",  muon2NExpectedOuterHits,  "muon2NExpectedOuterHits[nJets]/I");    			       
+ tree->Branch(  "muon2NPixelHits", 	   muon2NPixelHits,          "muon2NPixelHits[nJets]/I");          
+ tree->Branch(  "muon2InnerNChi2", 	   muon2InnerNChi2,          "muon2InnerNChi2[nJets]/F");          
+ tree->Branch(  "muon2GlobalNChi2", 	   muon2GlobalNChi2,         "muon2GlobalNChi2[nJets]/F");         
+ tree->Branch(  "muon2VzPVDist", 	   muon2VzPVDist,            "muon2VzPVDist[nJets]/F");            
+ tree->Branch(  "muon2PtRel",    	   muon2PtRel,               "muon2PtRel[nJets]/F");               
+ tree->Branch(  "muon2Sip2d",    	   muon2Sip2d,               "muon2Sip2d[nJets]/F");                  	       
+ tree->Branch(  "muon2Ip2d",    		   muon2Ip2d,                "muon2Ip2d[nJets]/F");                    
+ tree->Branch(  "muon2Ipe2d",    	   muon2Ipe2d,               "muon2Ipe2d[nJets]/F");                  	       
+ tree->Branch(  "muon2Sip3d", 		   muon2Sip3d,               "muon2Sip3d[nJets]/F");               
+ tree->Branch(  "muon2Ip3d", 		   muon2Ip3d,                "muon2Ip3d[nJets]/F");                
+ tree->Branch(  "muon2Ipe3d",    	   muon2Ipe3d,               "muon2Ipe3d[nJets]/F");               
+ tree->Branch(  "muon2P0Par",    	   muon2P0Par,               "muon2P0Par[nJets]/F");                  		       
+ tree->Branch(  "muon2DeltaR",   	   muon2DeltaR,              "muon2DeltaR[nJets]/F");                 		       
+ tree->Branch(  "muon2EtaRel",   	   muon2EtaRel,              "muon2EtaRel[nJets]/F");                 		       
+ tree->Branch(  "muon2Ratio",    	   muon2Ratio,               "muon2Ratio[nJets]/F");                  		    
+ tree->Branch(  "muon2TrackQuality",    	   muon2TrackQuality,        "muon2TrackQuality[nJets]/I");           		       
+ tree->Branch(  "muon2RatioRel",            muon2RatioRel,            "muon2RatioRel[nJets]/F");                           
+
+
+ tree->Branch(  "muon3IsGlobal",            muon3IsGlobal,            "muon3IsGlobal[nJets]/O");            
+ tree->Branch(  "muon3IsTracker", 	   muon3IsTracker,           "muon3IsTracker[nJets]/O");           
+ tree->Branch(  "muon3IsStandalone", 	   muon3IsStandalone,        "muon3IsStandalone[nJets]/O");        
+ tree->Branch(  "muon3Pt",    		   muon3Pt,                  "muon3Pt[nJets]/F");                     	       
+ tree->Branch(  "muon3Eta",   		   muon3Eta,                 "muon3Eta[nJets]/F");                    	       
+ tree->Branch(  "muon3Phi",   		   muon3Phi,                 "muon3Phi[nJets]/F");                 
+ tree->Branch(  "muon3NumberOfMatches", 	   muon3NumberOfMatches,     "muon3NumberOfMatches[nJets]/I");     
+ tree->Branch(  "muon3GlobalMuonHits", 	   muon3GlobalMuonHits,      "muon3GlobalMuonHits[nJets]/I");      
+ tree->Branch(  "muon3InnerValidHits", 	   muon3InnerValidHits,      "muon3InnerValidHits[nJets]/I");      
+ tree->Branch(  "muon3NExpectedOuterHits",  muon3NExpectedOuterHits,  "muon3NExpectedOuterHits[nJets]/I");    			       
+ tree->Branch(  "muon3NPixelHits", 	   muon3NPixelHits,          "muon3NPixelHits[nJets]/I");          
+ tree->Branch(  "muon3InnerNChi2", 	   muon3InnerNChi2,          "muon3InnerNChi2[nJets]/F");          
+ tree->Branch(  "muon3GlobalNChi2", 	   muon3GlobalNChi2,         "muon3GlobalNChi2[nJets]/F");         
+ tree->Branch(  "muon3VzPVDist", 	   muon3VzPVDist,            "muon3VzPVDist[nJets]/F");            
+ tree->Branch(  "muon3PtRel",    	   muon3PtRel,               "muon3PtRel[nJets]/F");               
+ tree->Branch(  "muon3Sip2d",    	   muon3Sip2d,               "muon3Sip2d[nJets]/F");                  	       
+ tree->Branch(  "muon3Ip2d",    		   muon3Ip2d,                "muon3Ip2d[nJets]/F");                    
+ tree->Branch(  "muon3Ipe2d",    	   muon3Ipe2d,               "muon3Ipe2d[nJets]/F");                  	       
+ tree->Branch(  "muon3Sip3d", 		   muon3Sip3d,               "muon3Sip3d[nJets]/F");               
+ tree->Branch(  "muon3Ip3d", 		   muon3Ip3d,                "muon3Ip3d[nJets]/F");                
+ tree->Branch(  "muon3Ipe3d",    	   muon3Ipe3d,               "muon3Ipe3d[nJets]/F");               
+ tree->Branch(  "muon3P0Par",    	   muon3P0Par,               "muon3P0Par[nJets]/F");                  		       
+ tree->Branch(  "muon3DeltaR",   	   muon3DeltaR,              "muon3DeltaR[nJets]/F");                 		       
+ tree->Branch(  "muon3EtaRel",   	   muon3EtaRel,              "muon3EtaRel[nJets]/F");                 		       
+ tree->Branch(  "muon3Ratio",    	   muon3Ratio,               "muon3Ratio[nJets]/F");                  		    
+ tree->Branch(  "muon3TrackQuality",    	   muon3TrackQuality,        "muon3TrackQuality[nJets]/I");           		       
+ tree->Branch(  "muon3RatioRel",            muon3RatioRel,            "muon3RatioRel[nJets]/F");                           
+
+
+ tree->Branch(  "muon4IsGlobal",            muon4IsGlobal,            "muon4IsGlobal[nJets]/O");            
+ tree->Branch(  "muon4IsTracker", 	   muon4IsTracker,           "muon4IsTracker[nJets]/O");           
+ tree->Branch(  "muon4IsStandalone", 	   muon4IsStandalone,        "muon4IsStandalone[nJets]/O");        
+ tree->Branch(  "muon4Pt",    		   muon4Pt,                  "muon4Pt[nJets]/F");                     	       
+ tree->Branch(  "muon4Eta",   		   muon4Eta,                 "muon4Eta[nJets]/F");                    	       
+ tree->Branch(  "muon4Phi",   		   muon4Phi,                 "muon4Phi[nJets]/F");                 
+ tree->Branch(  "muon4NumberOfMatches", 	   muon4NumberOfMatches,     "muon4NumberOfMatches[nJets]/I");     
+ tree->Branch(  "muon4GlobalMuonHits", 	   muon4GlobalMuonHits,      "muon4GlobalMuonHits[nJets]/I");      
+ tree->Branch(  "muon4InnerValidHits", 	   muon4InnerValidHits,      "muon4InnerValidHits[nJets]/I");      
+ tree->Branch(  "muon4NExpectedOuterHits",  muon4NExpectedOuterHits,  "muon4NExpectedOuterHits[nJets]/I");    			       
+ tree->Branch(  "muon4NPixelHits", 	   muon4NPixelHits,          "muon4NPixelHits[nJets]/I");          
+ tree->Branch(  "muon4InnerNChi2", 	   muon4InnerNChi2,          "muon4InnerNChi2[nJets]/F");          
+ tree->Branch(  "muon4GlobalNChi2", 	   muon4GlobalNChi2,         "muon4GlobalNChi2[nJets]/F");         
+ tree->Branch(  "muon4VzPVDist", 	   muon4VzPVDist,            "muon4VzPVDist[nJets]/F");            
+ tree->Branch(  "muon4PtRel",    	   muon4PtRel,               "muon4PtRel[nJets]/F");               
+ tree->Branch(  "muon4Sip2d",    	   muon4Sip2d,               "muon4Sip2d[nJets]/F");                  	       
+ tree->Branch(  "muon4Ip2d",    		   muon4Ip2d,                "muon4Ip2d[nJets]/F");                    
+ tree->Branch(  "muon4Ipe2d",    	   muon4Ipe2d,               "muon4Ipe2d[nJets]/F");                  	       
+ tree->Branch(  "muon4Sip3d", 		   muon4Sip3d,               "muon4Sip3d[nJets]/F");               
+ tree->Branch(  "muon4Ip3d", 		   muon4Ip3d,                "muon4Ip3d[nJets]/F");                
+ tree->Branch(  "muon4Ipe3d",    	   muon4Ipe3d,               "muon4Ipe3d[nJets]/F");               
+ tree->Branch(  "muon4P0Par",    	   muon4P0Par,               "muon4P0Par[nJets]/F");                  		       
+ tree->Branch(  "muon4DeltaR",   	   muon4DeltaR,              "muon4DeltaR[nJets]/F");                 		       
+ tree->Branch(  "muon4EtaRel",   	   muon4EtaRel,              "muon4EtaRel[nJets]/F");                 		       
+ tree->Branch(  "muon4Ratio",    	   muon4Ratio,               "muon4Ratio[nJets]/F");                  		    
+ tree->Branch(  "muon4TrackQuality",    	   muon4TrackQuality,        "muon4TrackQuality[nJets]/I");           		       
+ tree->Branch(  "muon4RatioRel",            muon4RatioRel,            "muon4RatioRel[nJets]/F");                           
 
 
 
@@ -1208,82 +1489,139 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	    electronRatioRel[iJet] = (-9999);  
 	  }
       
-      //softMuonTagInfos
-   
-	 hasLeptons = softMuonTagInfo[thisJetRef]->leptons() > 0;
+	  //softMuonTagInfos
+	  for(unsigned int i=0; i<4; i++){
+	    muonIsGlobal[i][iJet] = 0;             
+	    muonIsTracker[i][iJet] = 0;            
+	    muonIsStandalone[i][iJet] = 0;         
+	    muonPt[i][iJet] = -999;                        
+	    muonEta[i][iJet] = -999;                       
+	    muonPhi[i][iJet] = -999;                  
+	    muonNumberOfMatches[i][iJet] = -999;      
+	    muonGlobalMuonHits[i][iJet] = -999;       
+	    muonInnerValidHits[i][iJet] = -999;       
+	    muonNExpectedOuterHits[i][iJet] = -999;   
+	    muonNPixelHits[i][iJet] = -999;           
+	    muonInnerNChi2[i][iJet] = -999;           
+	    muonGlobalNChi2[i][iJet] = -999;          
+	    muonVzPVDist[i][iJet] = -999;             
+	    muonPtRel[i][iJet] = -999;                
+	    muonSip2d[i][iJet] = -999;                
+	    muonIp2d[i][iJet] = -999;                 
+	    muonIpe2d[i][iJet] = -999;                
+	    muonSip3d[i][iJet] = -999;                
+	    muonIp3d[i][iJet] = -999;                 
+	    muonIpe3d[i][iJet] = -999;                
+	    muonP0Par[i][iJet] = -999;                     
+	    muonDeltaR[i][iJet] = -999;                    
+	    muonEtaRel[i][iJet] = -999;                    
+	    muonRatio[i][iJet] = -999;                     
+	    muonTrackQuality[i][iJet] = -999;              
+	    muonRatioRel[i][iJet] = -999;             
+
+	  }
+
+
+	  hasLeptons = softMuonTagInfo[thisJetRef]->leptons() > 0;
 	  if(hasLeptons)
 	    {
 	      nMuons[iJet] = (softMuonTagInfo[thisJetRef]->leptons());
-	      unsigned int maxPtMuon = 0;
+	      
+	      edm::Handle<reco::MuonCollection> allmuons;
+	      iEvent.getByLabel("muons",allmuons);
+	      // loop over all muons in tag info and match them to muon collection 
+	      // create sorted map of muons
+	      std::map<double, const Muon*> muMap;
+	      std::map<const Muon*, unsigned int> tagInfoMap;
+              unsigned int maxPtMuon = 0;
 	      for(unsigned int iMuon = 0; iMuon < softMuonTagInfo[thisJetRef]->leptons(); iMuon++)
 		{
 		  if(softMuonTagInfo[thisJetRef]->lepton(iMuon)->pt() > softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->pt() )
 		    maxPtMuon = iMuon;
-		}
-	      muonPt[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->pt());   			       
-	      muonEta[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->eta());  			       
-	      muonPhi[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->phi());  			       
-	      muonNHits[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->hitPattern().numberOfValidHits() );   
-	      muonNExpectedOuterHits[iJet] = ( softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->trackerExpectedHitsOuter().numberOfHits() );   
-	      muonNPixelHits[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->hitPattern().numberOfValidPixelHits() );     		       
-	      muonNChi2[iJet] = (softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->normalizedChi2());			       
-	      muonPtRel[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ptRel); 
 
-	      for(int i = 2; i>-2; i--){
-		if( (*softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)).quality(reco::TrackBase::TrackQuality(i))){
-		  muonTrackQuality[iJet] = (i);
-		  break;
+		  //loop on muon collection
+		  //count
+		  unsigned int iMuCounter = 0;
+		  for(size_t i=0; i < allmuons->size(); ++i){
+		    const Muon & mu = (*allmuons)[i];
+		    TrackRef globTrack = mu.globalTrack();
+		    TrackRef softLepTrackRef =  (softMuonTagInfo[thisJetRef]->lepton(iMuon)).castTo<TrackRef>();
+		    if( globTrack == softLepTrackRef ){
+		      iMuCounter++;
+		      muMap[mu.globalTrack()->pt()] = &mu ;
+		      tagInfoMap[&mu] = iMuon;
+		    }
+		    
+		  }
+		  if(iMuCounter != 1){
+		    std::cout<<"iMuCounter != 1" << std::endl;
+		    exit(1);
+		  }
 		}
+
+	      if( muMap.size() != softMuonTagInfo[thisJetRef]->leptons()){
+		std::cout<<"softMuonTagInfo[thisJetRef]->leptons()"<< std::endl;
+		exit(1);
 	      }
-	      TransientTrack transientTrack = builder->build( *softMuonTagInfo[thisJetRef]->lepton(maxPtMuon) );
-	      GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
-	      Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
-	      Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;  	
-	       
-	      muonSip2d[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).sip2d);   		
-	      muonIp2d[iJet] = ( ip2d.value() );   
-	      muonIpe2d[iJet] = ( ip2d.error() );   	
-       
-	      muonSip3d[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).sip3d);   	
-	      muonIp3d[iJet] = ( ip3d.value() );   
-	      muonIpe3d[iJet] = ( ip3d.error() );   
-	       
-	      muonP0Par[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).p0Par);   		       
-	      muonDeltaR[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).deltaR);  		       
-	      muonEtaRel[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).etaRel);  		       
-	      muonRatio[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ratio);   		       
-	      muonRatioRel[iJet] = (softMuonTagInfo[thisJetRef]->properties(maxPtMuon).ratioRel);                      
+
+	      // now loop over mu map and fill info
+	      int iMuMapCounter = 0;
+	      for(std::map<double, const Muon*>::reverse_iterator it= muMap.rbegin(); it != muMap.rend(); it++){
+		std::cout<<iMuMapCounter << " muon pt = " << it->first << std::endl;
+		const Muon * mu =  it->second;
+		muonIsGlobal[iMuMapCounter][iJet] =           mu->isGlobalMuon();                
+		muonIsTracker[iMuMapCounter][iJet] =                          mu->isTrackerMuon();
+		muonIsStandalone[iMuMapCounter][iJet] =                       mu->isStandAloneMuon();
+		muonPt[iMuMapCounter][iJet] = softMuonTagInfo[thisJetRef]->lepton(tagInfoMap[mu])->pt(); 
+		muonEta[iMuMapCounter][iJet] = softMuonTagInfo[thisJetRef]->lepton(tagInfoMap[mu])->eta(); 
+		muonPhi[iMuMapCounter][iJet] = softMuonTagInfo[thisJetRef]->lepton(tagInfoMap[mu])->phi(); 
+		muonNumberOfMatches[iMuMapCounter][iJet] =  mu->numberOfMatches();
+		muonGlobalMuonHits[iMuMapCounter][iJet] = mu->globalTrack()->hitPattern().numberOfValidMuonHits();
+		muonInnerValidHits[iMuMapCounter][iJet] = mu->innerTrack()->numberOfValidHits();        
+		muonNExpectedOuterHits[iMuMapCounter][iJet] = mu->innerTrack()->trackerExpectedHitsOuter().numberOfHits();
+		muonNPixelHits[iMuMapCounter][iJet] = mu->innerTrack()->hitPattern().numberOfValidPixelHits();
+		muonInnerNChi2[iMuMapCounter][iJet] = mu->innerTrack()->normalizedChi2();    
+		muonGlobalNChi2[iMuMapCounter][iJet] = mu->globalTrack()->normalizedChi2();
+		muonVzPVDist[iMuMapCounter][iJet] = mu->vz() - pv->z();
+		muonPtRel[iMuMapCounter][iJet] = softMuonTagInfo[thisJetRef]->properties(tagInfoMap[mu]).ptRel;
+
+		TransientTrack transientTrack = builder->build( *softMuonTagInfo[thisJetRef]->lepton(tagInfoMap[mu]) );
+		GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
+		Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
+		Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;  	
+		
+		
+		muonSip2d[iMuMapCounter][iJet] = softMuonTagInfo[thisJetRef]->properties(tagInfoMap[mu]).sip2d;
+		muonIp2d[iMuMapCounter][iJet] = ip2d.value();
+		muonIpe2d[iMuMapCounter][iJet] = ip2d.error();   
+		muonSip3d[iMuMapCounter][iJet] = softMuonTagInfo[thisJetRef]->properties(tagInfoMap[mu]).sip3d;
+		muonIp3d[iMuMapCounter][iJet] = ip3d.value();
+		muonIpe3d[iMuMapCounter][iJet] = ip3d.error();   
+		muonP0Par[iMuMapCounter][iJet] =        (softMuonTagInfo[thisJetRef]->properties(tagInfoMap[mu]).p0Par);
+		muonDeltaR[iMuMapCounter][iJet] =       (softMuonTagInfo[thisJetRef]->properties(tagInfoMap[mu]).deltaR); 
+		muonEtaRel[iMuMapCounter][iJet] =       (softMuonTagInfo[thisJetRef]->properties(tagInfoMap[mu]).etaRel); 
+		muonRatio[iMuMapCounter][iJet] =        (softMuonTagInfo[thisJetRef]->properties(tagInfoMap[mu]).ratio);
+		muonRatioRel[iMuMapCounter][iJet] =  (softMuonTagInfo[thisJetRef]->properties(tagInfoMap[mu]).ratioRel);  
+		
+		
+		for(int i = 2; i>-2; i--){
+		  if( (*softMuonTagInfo[thisJetRef]->lepton(tagInfoMap[mu])).quality(reco::TrackBase::TrackQuality(i))){
+		    muonTrackQuality[iMuMapCounter][iJet] = (i);
+		    break;
+		  }
+		}
+		iMuMapCounter++;
+		if(iMuMapCounter>=4) break;
+	      }
 	    }
-	  else{
-	    nMuons[iJet] = ( 0 );
-	    muonPt[iJet] = (-9999 );   			       
-	    muonEta[iJet] = (-9999);  			       
-	    muonPhi[iJet] = (-9999);  			       
-	    muonNHits[iJet] = (-9999 );
-	    muonNExpectedOuterHits[iJet] = (-9999 );
-	    muonNPixelHits[iJet] = (-9999 );   
-	    muonNChi2[iJet] = (-9999);			       
-	    muonPtRel[iJet] = (-9999);   
-	    muonTrackQuality[iJet] = (-9999 );
-	    muonSip2d[iJet] = (-9999);   
-	    muonIp2d[iJet] = (-9999 );   
-	    muonIpe2d[iJet] = ( -9999 );   		       
-	    muonSip3d[iJet] = (-9999);   
-	    muonIp3d[iJet] = (-9999 );   
-	    muonIpe3d[iJet] = ( -9999 );   
-	    muonP0Par[iJet] = (-9999);   		       
-	    muonDeltaR[iJet] = (-9999);  		       
-	    muonEtaRel[iJet] = (-9999);  		       
-	    muonRatio[iJet] = (-9999);   		       
-	    muonRatioRel[iJet] = (-9999);  
-	  }
+
        
 
       
-      for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
-	{
-	  bTagArrays[ibTag->getParameter<string>("alias")][iJet] = ((bTags[ibTag->getParameter<string>("alias")])[thisJetRef]);
-	}
+	  for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
+	    {
+	      bTagArrays[ibTag->getParameter<string>("alias")][iJet] = ((bTags[ibTag->getParameter<string>("alias")])[thisJetRef]);
+	    }
     } // end loop over jets
   
   nTracks = iTotalTracksCounter;
