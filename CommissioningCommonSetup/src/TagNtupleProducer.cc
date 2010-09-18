@@ -1530,23 +1530,20 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      edm::Handle<reco::MuonCollection> allmuons;
 	      iEvent.getByLabel("muons",allmuons);
 	      // loop over all muons in tag info and match them to muon collection 
-	      // create sorted map of muons
+	      // create pt sorted map of muons
 	      std::map<double, const Muon*> muMap;
 	      std::map<const Muon*, unsigned int> tagInfoMap;
-              unsigned int maxPtMuon = 0;
+
 	      for(unsigned int iMuon = 0; iMuon < softMuonTagInfo[thisJetRef]->leptons(); iMuon++)
 		{
-		  if(softMuonTagInfo[thisJetRef]->lepton(iMuon)->pt() > softMuonTagInfo[thisJetRef]->lepton(maxPtMuon)->pt() )
-		    maxPtMuon = iMuon;
-
 		  //loop on muon collection
-		  //count
+		  //count muons
 		  unsigned int iMuCounter = 0;
 		  for(size_t i=0; i < allmuons->size(); ++i){
 		    const Muon & mu = (*allmuons)[i];
 		    TrackRef globTrack = mu.globalTrack();
 		    TrackRef softLepTrackRef =  (softMuonTagInfo[thisJetRef]->lepton(iMuon)).castTo<TrackRef>();
-		    if( globTrack == softLepTrackRef ){
+		    if( globTrack == softLepTrackRef ){   // found a matched muon
 		      iMuCounter++;
 		      muMap[mu.globalTrack()->pt()] = &mu ;
 		      tagInfoMap[&mu] = iMuon;
@@ -1554,21 +1551,22 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 		    
 		  }
 		  if(iMuCounter != 1){
-		    std::cout<<"iMuCounter != 1" << std::endl;
+		    std::cout<<"ERROR: iMuCounter != 1 this should never happen" << std::endl;
 		    exit(1);
 		  }
 		}
 
 	      if( muMap.size() != softMuonTagInfo[thisJetRef]->leptons()){
-		std::cout<<"softMuonTagInfo[thisJetRef]->leptons()"<< std::endl;
+		std::cout<<"ERROR: softMuonTagInfo[thisJetRef]->leptons():  this should never happen"<< std::endl;
 		exit(1);
 	      }
 
 	      // now loop over mu map and fill info
 	      int iMuMapCounter = 0;
 	      for(std::map<double, const Muon*>::reverse_iterator it= muMap.rbegin(); it != muMap.rend(); it++){
-		std::cout<<iMuMapCounter << " muon pt = " << it->first << std::endl;
+
 		const Muon * mu =  it->second;
+
 		muonIsGlobal[iMuMapCounter][iJet] =           mu->isGlobalMuon();                
 		muonIsTracker[iMuMapCounter][iJet] =                          mu->isTrackerMuon();
 		muonIsStandalone[iMuMapCounter][iJet] =                       mu->isStandAloneMuon();
