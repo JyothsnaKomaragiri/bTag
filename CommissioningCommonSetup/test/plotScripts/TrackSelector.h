@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Aug  4 12:39:27 2010 by ROOT version 5.22/00d
+// Tue Oct 12 12:20:57 2010 by ROOT version 5.22/00d
 // from TTree t/t
-// found on file: standardPFNtuple_MC.root
+// found on file: /storage/5/jyothsna/btag_18Sep_QCDPt80/standardPFNtuple_1_2_pIs.root
 //////////////////////////////////////////////////////////
 
 #ifndef TrackSelector_h
@@ -34,6 +34,10 @@ public :
    Bool_t          triggerHLTL1Jet6U;
    Bool_t          triggerHLTL1Jet10U;
    Bool_t          triggerHLTJet15U;
+   Bool_t          triggerHLTJet30U;
+   Bool_t          triggerHLTJet50U;
+   Bool_t          triggerHLTJet70U;
+   Bool_t          triggerHLTJet100U;
    UInt_t          eventNumber;
    UInt_t          runNumber;
    UInt_t          lumiBlockNumber;
@@ -232,26 +236,114 @@ public :
    Int_t           electronTrackQuality[40];   //[nJets]
    Float_t         electronRatioRel[40];   //[nJets]
    Int_t           nMuons[40];   //[nJets]
-   Float_t         muonPt[40];   //[nJets]
-   Float_t         muonEta[40];   //[nJets]
-   Float_t         muonPhi[40];   //[nJets]
-   Int_t           muonNHits[40];   //[nJets]
-   Int_t           muonNExpectedOuterHits[40];   //[nJets]
-   Int_t           muonNPixelHits[40];   //[nJets]
-   Float_t         muonNChi2[40];   //[nJets]
-   Float_t         muonPtRel[40];   //[nJets]
-   Float_t         muonSip2d[40];   //[nJets]
-   Float_t         muonIp2d[40];   //[nJets]
-   Float_t         muonIpe2d[40];   //[nJets]
-   Float_t         muonSip3d[40];   //[nJets]
-   Float_t         muonIp3d[40];   //[nJets]
-   Float_t         muonIpe3d[40];   //[nJets]
-   Float_t         muonP0Par[40];   //[nJets]
-   Float_t         muonDeltaR[40];   //[nJets]
-   Float_t         muonEtaRel[40];   //[nJets]
-   Float_t         muonRatio[40];   //[nJets]
-   Int_t           muonTrackQuality[40];   //[nJets]
-   Float_t         muonRatioRel[40];   //[nJets]
+   Bool_t          muon1IsGlobal[40];   //[nJets]
+   Bool_t          muon1IsTracker[40];   //[nJets]
+   Bool_t          muon1IsStandalone[40];   //[nJets]
+   Float_t         muon1Pt[40];   //[nJets]
+   Float_t         muon1Eta[40];   //[nJets]
+   Float_t         muon1Phi[40];   //[nJets]
+   Int_t           muon1NumberOfMatches[40];   //[nJets]
+   Int_t           muon1GlobalMuonHits[40];   //[nJets]
+   Int_t           muon1InnerValidHits[40];   //[nJets]
+   Int_t           muon1NExpectedOuterHits[40];   //[nJets]
+   Int_t           muon1NPixelHits[40];   //[nJets]
+   Float_t         muon1InnerNChi2[40];   //[nJets]
+   Float_t         muon1GlobalNChi2[40];   //[nJets]
+   Float_t         muon1VzPVDist[40];   //[nJets]
+   Float_t         muon1PtRel[40];   //[nJets]
+   Float_t         muon1Sip2d[40];   //[nJets]
+   Float_t         muon1Ip2d[40];   //[nJets]
+   Float_t         muon1Ipe2d[40];   //[nJets]
+   Float_t         muon1Sip3d[40];   //[nJets]
+   Float_t         muon1Ip3d[40];   //[nJets]
+   Float_t         muon1Ipe3d[40];   //[nJets]
+   Float_t         muon1P0Par[40];   //[nJets]
+   Float_t         muon1DeltaR[40];   //[nJets]
+   Float_t         muon1EtaRel[40];   //[nJets]
+   Float_t         muon1Ratio[40];   //[nJets]
+   Int_t           muon1TrackQuality[40];   //[nJets]
+   Float_t         muon1RatioRel[40];   //[nJets]
+   Bool_t          muon2IsGlobal[40];   //[nJets]
+   Bool_t          muon2IsTracker[40];   //[nJets]
+   Bool_t          muon2IsStandalone[40];   //[nJets]
+   Float_t         muon2Pt[40];   //[nJets]
+   Float_t         muon2Eta[40];   //[nJets]
+   Float_t         muon2Phi[40];   //[nJets]
+   Int_t           muon2NumberOfMatches[40];   //[nJets]
+   Int_t           muon2GlobalMuonHits[40];   //[nJets]
+   Int_t           muon2InnerValidHits[40];   //[nJets]
+   Int_t           muon2NExpectedOuterHits[40];   //[nJets]
+   Int_t           muon2NPixelHits[40];   //[nJets]
+   Float_t         muon2InnerNChi2[40];   //[nJets]
+   Float_t         muon2GlobalNChi2[40];   //[nJets]
+   Float_t         muon2VzPVDist[40];   //[nJets]
+   Float_t         muon2PtRel[40];   //[nJets]
+   Float_t         muon2Sip2d[40];   //[nJets]
+   Float_t         muon2Ip2d[40];   //[nJets]
+   Float_t         muon2Ipe2d[40];   //[nJets]
+   Float_t         muon2Sip3d[40];   //[nJets]
+   Float_t         muon2Ip3d[40];   //[nJets]
+   Float_t         muon2Ipe3d[40];   //[nJets]
+   Float_t         muon2P0Par[40];   //[nJets]
+   Float_t         muon2DeltaR[40];   //[nJets]
+   Float_t         muon2EtaRel[40];   //[nJets]
+   Float_t         muon2Ratio[40];   //[nJets]
+   Int_t           muon2TrackQuality[40];   //[nJets]
+   Float_t         muon2RatioRel[40];   //[nJets]
+   Bool_t          muon3IsGlobal[40];   //[nJets]
+   Bool_t          muon3IsTracker[40];   //[nJets]
+   Bool_t          muon3IsStandalone[40];   //[nJets]
+   Float_t         muon3Pt[40];   //[nJets]
+   Float_t         muon3Eta[40];   //[nJets]
+   Float_t         muon3Phi[40];   //[nJets]
+   Int_t           muon3NumberOfMatches[40];   //[nJets]
+   Int_t           muon3GlobalMuonHits[40];   //[nJets]
+   Int_t           muon3InnerValidHits[40];   //[nJets]
+   Int_t           muon3NExpectedOuterHits[40];   //[nJets]
+   Int_t           muon3NPixelHits[40];   //[nJets]
+   Float_t         muon3InnerNChi2[40];   //[nJets]
+   Float_t         muon3GlobalNChi2[40];   //[nJets]
+   Float_t         muon3VzPVDist[40];   //[nJets]
+   Float_t         muon3PtRel[40];   //[nJets]
+   Float_t         muon3Sip2d[40];   //[nJets]
+   Float_t         muon3Ip2d[40];   //[nJets]
+   Float_t         muon3Ipe2d[40];   //[nJets]
+   Float_t         muon3Sip3d[40];   //[nJets]
+   Float_t         muon3Ip3d[40];   //[nJets]
+   Float_t         muon3Ipe3d[40];   //[nJets]
+   Float_t         muon3P0Par[40];   //[nJets]
+   Float_t         muon3DeltaR[40];   //[nJets]
+   Float_t         muon3EtaRel[40];   //[nJets]
+   Float_t         muon3Ratio[40];   //[nJets]
+   Int_t           muon3TrackQuality[40];   //[nJets]
+   Float_t         muon3RatioRel[40];   //[nJets]
+   Bool_t          muon4IsGlobal[40];   //[nJets]
+   Bool_t          muon4IsTracker[40];   //[nJets]
+   Bool_t          muon4IsStandalone[40];   //[nJets]
+   Float_t         muon4Pt[40];   //[nJets]
+   Float_t         muon4Eta[40];   //[nJets]
+   Float_t         muon4Phi[40];   //[nJets]
+   Int_t           muon4NumberOfMatches[40];   //[nJets]
+   Int_t           muon4GlobalMuonHits[40];   //[nJets]
+   Int_t           muon4InnerValidHits[40];   //[nJets]
+   Int_t           muon4NExpectedOuterHits[40];   //[nJets]
+   Int_t           muon4NPixelHits[40];   //[nJets]
+   Float_t         muon4InnerNChi2[40];   //[nJets]
+   Float_t         muon4GlobalNChi2[40];   //[nJets]
+   Float_t         muon4VzPVDist[40];   //[nJets]
+   Float_t         muon4PtRel[40];   //[nJets]
+   Float_t         muon4Sip2d[40];   //[nJets]
+   Float_t         muon4Ip2d[40];   //[nJets]
+   Float_t         muon4Ipe2d[40];   //[nJets]
+   Float_t         muon4Sip3d[40];   //[nJets]
+   Float_t         muon4Ip3d[40];   //[nJets]
+   Float_t         muon4Ipe3d[40];   //[nJets]
+   Float_t         muon4P0Par[40];   //[nJets]
+   Float_t         muon4DeltaR[40];   //[nJets]
+   Float_t         muon4EtaRel[40];   //[nJets]
+   Float_t         muon4Ratio[40];   //[nJets]
+   Int_t           muon4TrackQuality[40];   //[nJets]
+   Float_t         muon4RatioRel[40];   //[nJets]
    Float_t         standardCombinedSecondaryVertexMVAPFBJetTags[40];   //[nJets]
    Float_t         standardCombinedSecondaryVertexPFBJetTags[40];   //[nJets]
    Float_t         standardGhostTrackPFBJetTags[40];   //[nJets]
@@ -271,6 +363,10 @@ public :
    TBranch        *b_triggerHLTL1Jet6U;   //!
    TBranch        *b_triggerHLTL1Jet10U;   //!
    TBranch        *b_triggerHLTJet15U;   //!
+   TBranch        *b_triggerHLTJet30U;   //!
+   TBranch        *b_triggerHLTJet50U;   //!
+   TBranch        *b_triggerHLTJet70U;   //!
+   TBranch        *b_triggerHLTJet100U;   //!
    TBranch        *b_eventNumber;   //!
    TBranch        *b_runNumber;   //!
    TBranch        *b_lumiBlockNumber;   //!
@@ -469,26 +565,114 @@ public :
    TBranch        *b_electronTrackQuality;   //!
    TBranch        *b_electronRatioRel;   //!
    TBranch        *b_nMuons;   //!
-   TBranch        *b_muonPt;   //!
-   TBranch        *b_muonEta;   //!
-   TBranch        *b_muonPhi;   //!
-   TBranch        *b_muonNHits;   //!
-   TBranch        *b_muonNExpectedOuterHits;   //!
-   TBranch        *b_muonNPixelHits;   //!
-   TBranch        *b_muonNChi2;   //!
-   TBranch        *b_muonPtRel;   //!
-   TBranch        *b_muonSip2d;   //!
-   TBranch        *b_muonIp2d;   //!
-   TBranch        *b_muonIpe2d;   //!
-   TBranch        *b_muonSip3d;   //!
-   TBranch        *b_muonIp3d;   //!
-   TBranch        *b_muonIpe3d;   //!
-   TBranch        *b_muonP0Par;   //!
-   TBranch        *b_muonDeltaR;   //!
-   TBranch        *b_muonEtaRel;   //!
-   TBranch        *b_muonRatio;   //!
-   TBranch        *b_muonTrackQuality;   //!
-   TBranch        *b_muonRatioRel;   //!
+   TBranch        *b_muon1IsGlobal;   //!
+   TBranch        *b_muon1IsTracker;   //!
+   TBranch        *b_muon1IsStandalone;   //!
+   TBranch        *b_muon1Pt;   //!
+   TBranch        *b_muon1Eta;   //!
+   TBranch        *b_muon1Phi;   //!
+   TBranch        *b_muon1NumberOfMatches;   //!
+   TBranch        *b_muon1GlobalMuonHits;   //!
+   TBranch        *b_muon1InnerValidHits;   //!
+   TBranch        *b_muon1NExpectedOuterHits;   //!
+   TBranch        *b_muon1NPixelHits;   //!
+   TBranch        *b_muon1InnerNChi2;   //!
+   TBranch        *b_muon1GlobalNChi2;   //!
+   TBranch        *b_muon1VzPVDist;   //!
+   TBranch        *b_muon1PtRel;   //!
+   TBranch        *b_muon1Sip2d;   //!
+   TBranch        *b_muon1Ip2d;   //!
+   TBranch        *b_muon1Ipe2d;   //!
+   TBranch        *b_muon1Sip3d;   //!
+   TBranch        *b_muon1Ip3d;   //!
+   TBranch        *b_muon1Ipe3d;   //!
+   TBranch        *b_muon1P0Par;   //!
+   TBranch        *b_muon1DeltaR;   //!
+   TBranch        *b_muon1EtaRel;   //!
+   TBranch        *b_muon1Ratio;   //!
+   TBranch        *b_muon1TrackQuality;   //!
+   TBranch        *b_muon1RatioRel;   //!
+   TBranch        *b_muon2IsGlobal;   //!
+   TBranch        *b_muon2IsTracker;   //!
+   TBranch        *b_muon2IsStandalone;   //!
+   TBranch        *b_muon2Pt;   //!
+   TBranch        *b_muon2Eta;   //!
+   TBranch        *b_muon2Phi;   //!
+   TBranch        *b_muon2NumberOfMatches;   //!
+   TBranch        *b_muon2GlobalMuonHits;   //!
+   TBranch        *b_muon2InnerValidHits;   //!
+   TBranch        *b_muon2NExpectedOuterHits;   //!
+   TBranch        *b_muon2NPixelHits;   //!
+   TBranch        *b_muon2InnerNChi2;   //!
+   TBranch        *b_muon2GlobalNChi2;   //!
+   TBranch        *b_muon2VzPVDist;   //!
+   TBranch        *b_muon2PtRel;   //!
+   TBranch        *b_muon2Sip2d;   //!
+   TBranch        *b_muon2Ip2d;   //!
+   TBranch        *b_muon2Ipe2d;   //!
+   TBranch        *b_muon2Sip3d;   //!
+   TBranch        *b_muon2Ip3d;   //!
+   TBranch        *b_muon2Ipe3d;   //!
+   TBranch        *b_muon2P0Par;   //!
+   TBranch        *b_muon2DeltaR;   //!
+   TBranch        *b_muon2EtaRel;   //!
+   TBranch        *b_muon2Ratio;   //!
+   TBranch        *b_muon2TrackQuality;   //!
+   TBranch        *b_muon2RatioRel;   //!
+   TBranch        *b_muon3IsGlobal;   //!
+   TBranch        *b_muon3IsTracker;   //!
+   TBranch        *b_muon3IsStandalone;   //!
+   TBranch        *b_muon3Pt;   //!
+   TBranch        *b_muon3Eta;   //!
+   TBranch        *b_muon3Phi;   //!
+   TBranch        *b_muon3NumberOfMatches;   //!
+   TBranch        *b_muon3GlobalMuonHits;   //!
+   TBranch        *b_muon3InnerValidHits;   //!
+   TBranch        *b_muon3NExpectedOuterHits;   //!
+   TBranch        *b_muon3NPixelHits;   //!
+   TBranch        *b_muon3InnerNChi2;   //!
+   TBranch        *b_muon3GlobalNChi2;   //!
+   TBranch        *b_muon3VzPVDist;   //!
+   TBranch        *b_muon3PtRel;   //!
+   TBranch        *b_muon3Sip2d;   //!
+   TBranch        *b_muon3Ip2d;   //!
+   TBranch        *b_muon3Ipe2d;   //!
+   TBranch        *b_muon3Sip3d;   //!
+   TBranch        *b_muon3Ip3d;   //!
+   TBranch        *b_muon3Ipe3d;   //!
+   TBranch        *b_muon3P0Par;   //!
+   TBranch        *b_muon3DeltaR;   //!
+   TBranch        *b_muon3EtaRel;   //!
+   TBranch        *b_muon3Ratio;   //!
+   TBranch        *b_muon3TrackQuality;   //!
+   TBranch        *b_muon3RatioRel;   //!
+   TBranch        *b_muon4IsGlobal;   //!
+   TBranch        *b_muon4IsTracker;   //!
+   TBranch        *b_muon4IsStandalone;   //!
+   TBranch        *b_muon4Pt;   //!
+   TBranch        *b_muon4Eta;   //!
+   TBranch        *b_muon4Phi;   //!
+   TBranch        *b_muon4NumberOfMatches;   //!
+   TBranch        *b_muon4GlobalMuonHits;   //!
+   TBranch        *b_muon4InnerValidHits;   //!
+   TBranch        *b_muon4NExpectedOuterHits;   //!
+   TBranch        *b_muon4NPixelHits;   //!
+   TBranch        *b_muon4InnerNChi2;   //!
+   TBranch        *b_muon4GlobalNChi2;   //!
+   TBranch        *b_muon4VzPVDist;   //!
+   TBranch        *b_muon4PtRel;   //!
+   TBranch        *b_muon4Sip2d;   //!
+   TBranch        *b_muon4Ip2d;   //!
+   TBranch        *b_muon4Ipe2d;   //!
+   TBranch        *b_muon4Sip3d;   //!
+   TBranch        *b_muon4Ip3d;   //!
+   TBranch        *b_muon4Ipe3d;   //!
+   TBranch        *b_muon4P0Par;   //!
+   TBranch        *b_muon4DeltaR;   //!
+   TBranch        *b_muon4EtaRel;   //!
+   TBranch        *b_muon4Ratio;   //!
+   TBranch        *b_muon4TrackQuality;   //!
+   TBranch        *b_muon4RatioRel;   //!
    TBranch        *b_standardCombinedSecondaryVertexMVAPFBJetTags;   //!
    TBranch        *b_standardCombinedSecondaryVertexPFBJetTags;   //!
    TBranch        *b_standardGhostTrackPFBJetTags;   //!
@@ -554,6 +738,10 @@ void TrackSelector::Init(TTree *tree)
    fChain->SetBranchAddress("triggerHLTL1Jet6U", &triggerHLTL1Jet6U, &b_triggerHLTL1Jet6U);
    fChain->SetBranchAddress("triggerHLTL1Jet10U", &triggerHLTL1Jet10U, &b_triggerHLTL1Jet10U);
    fChain->SetBranchAddress("triggerHLTJet15U", &triggerHLTJet15U, &b_triggerHLTJet15U);
+   fChain->SetBranchAddress("triggerHLTJet30U", &triggerHLTJet30U, &b_triggerHLTJet30U);
+   fChain->SetBranchAddress("triggerHLTJet50U", &triggerHLTJet50U, &b_triggerHLTJet50U);
+   fChain->SetBranchAddress("triggerHLTJet70U", &triggerHLTJet70U, &b_triggerHLTJet70U);
+   fChain->SetBranchAddress("triggerHLTJet100U", &triggerHLTJet100U, &b_triggerHLTJet100U);
    fChain->SetBranchAddress("eventNumber", &eventNumber, &b_eventNumber);
    fChain->SetBranchAddress("runNumber", &runNumber, &b_runNumber);
    fChain->SetBranchAddress("lumiBlockNumber", &lumiBlockNumber, &b_lumiBlockNumber);
@@ -752,26 +940,114 @@ void TrackSelector::Init(TTree *tree)
    fChain->SetBranchAddress("electronTrackQuality", electronTrackQuality, &b_electronTrackQuality);
    fChain->SetBranchAddress("electronRatioRel", electronRatioRel, &b_electronRatioRel);
    fChain->SetBranchAddress("nMuons", nMuons, &b_nMuons);
-   fChain->SetBranchAddress("muonPt", muonPt, &b_muonPt);
-   fChain->SetBranchAddress("muonEta", muonEta, &b_muonEta);
-   fChain->SetBranchAddress("muonPhi", muonPhi, &b_muonPhi);
-   fChain->SetBranchAddress("muonNHits", muonNHits, &b_muonNHits);
-   fChain->SetBranchAddress("muonNExpectedOuterHits", muonNExpectedOuterHits, &b_muonNExpectedOuterHits);
-   fChain->SetBranchAddress("muonNPixelHits", muonNPixelHits, &b_muonNPixelHits);
-   fChain->SetBranchAddress("muonNChi2", muonNChi2, &b_muonNChi2);
-   fChain->SetBranchAddress("muonPtRel", muonPtRel, &b_muonPtRel);
-   fChain->SetBranchAddress("muonSip2d", muonSip2d, &b_muonSip2d);
-   fChain->SetBranchAddress("muonIp2d", muonIp2d, &b_muonIp2d);
-   fChain->SetBranchAddress("muonIpe2d", muonIpe2d, &b_muonIpe2d);
-   fChain->SetBranchAddress("muonSip3d", muonSip3d, &b_muonSip3d);
-   fChain->SetBranchAddress("muonIp3d", muonIp3d, &b_muonIp3d);
-   fChain->SetBranchAddress("muonIpe3d", muonIpe3d, &b_muonIpe3d);
-   fChain->SetBranchAddress("muonP0Par", muonP0Par, &b_muonP0Par);
-   fChain->SetBranchAddress("muonDeltaR", muonDeltaR, &b_muonDeltaR);
-   fChain->SetBranchAddress("muonEtaRel", muonEtaRel, &b_muonEtaRel);
-   fChain->SetBranchAddress("muonRatio", muonRatio, &b_muonRatio);
-   fChain->SetBranchAddress("muonTrackQuality", muonTrackQuality, &b_muonTrackQuality);
-   fChain->SetBranchAddress("muonRatioRel", muonRatioRel, &b_muonRatioRel);
+   fChain->SetBranchAddress("muon1IsGlobal", muon1IsGlobal, &b_muon1IsGlobal);
+   fChain->SetBranchAddress("muon1IsTracker", muon1IsTracker, &b_muon1IsTracker);
+   fChain->SetBranchAddress("muon1IsStandalone", muon1IsStandalone, &b_muon1IsStandalone);
+   fChain->SetBranchAddress("muon1Pt", muon1Pt, &b_muon1Pt);
+   fChain->SetBranchAddress("muon1Eta", muon1Eta, &b_muon1Eta);
+   fChain->SetBranchAddress("muon1Phi", muon1Phi, &b_muon1Phi);
+   fChain->SetBranchAddress("muon1NumberOfMatches", muon1NumberOfMatches, &b_muon1NumberOfMatches);
+   fChain->SetBranchAddress("muon1GlobalMuonHits", muon1GlobalMuonHits, &b_muon1GlobalMuonHits);
+   fChain->SetBranchAddress("muon1InnerValidHits", muon1InnerValidHits, &b_muon1InnerValidHits);
+   fChain->SetBranchAddress("muon1NExpectedOuterHits", muon1NExpectedOuterHits, &b_muon1NExpectedOuterHits);
+   fChain->SetBranchAddress("muon1NPixelHits", muon1NPixelHits, &b_muon1NPixelHits);
+   fChain->SetBranchAddress("muon1InnerNChi2", muon1InnerNChi2, &b_muon1InnerNChi2);
+   fChain->SetBranchAddress("muon1GlobalNChi2", muon1GlobalNChi2, &b_muon1GlobalNChi2);
+   fChain->SetBranchAddress("muon1VzPVDist", muon1VzPVDist, &b_muon1VzPVDist);
+   fChain->SetBranchAddress("muon1PtRel", muon1PtRel, &b_muon1PtRel);
+   fChain->SetBranchAddress("muon1Sip2d", muon1Sip2d, &b_muon1Sip2d);
+   fChain->SetBranchAddress("muon1Ip2d", muon1Ip2d, &b_muon1Ip2d);
+   fChain->SetBranchAddress("muon1Ipe2d", muon1Ipe2d, &b_muon1Ipe2d);
+   fChain->SetBranchAddress("muon1Sip3d", muon1Sip3d, &b_muon1Sip3d);
+   fChain->SetBranchAddress("muon1Ip3d", muon1Ip3d, &b_muon1Ip3d);
+   fChain->SetBranchAddress("muon1Ipe3d", muon1Ipe3d, &b_muon1Ipe3d);
+   fChain->SetBranchAddress("muon1P0Par", muon1P0Par, &b_muon1P0Par);
+   fChain->SetBranchAddress("muon1DeltaR", muon1DeltaR, &b_muon1DeltaR);
+   fChain->SetBranchAddress("muon1EtaRel", muon1EtaRel, &b_muon1EtaRel);
+   fChain->SetBranchAddress("muon1Ratio", muon1Ratio, &b_muon1Ratio);
+   fChain->SetBranchAddress("muon1TrackQuality", muon1TrackQuality, &b_muon1TrackQuality);
+   fChain->SetBranchAddress("muon1RatioRel", muon1RatioRel, &b_muon1RatioRel);
+   fChain->SetBranchAddress("muon2IsGlobal", muon2IsGlobal, &b_muon2IsGlobal);
+   fChain->SetBranchAddress("muon2IsTracker", muon2IsTracker, &b_muon2IsTracker);
+   fChain->SetBranchAddress("muon2IsStandalone", muon2IsStandalone, &b_muon2IsStandalone);
+   fChain->SetBranchAddress("muon2Pt", muon2Pt, &b_muon2Pt);
+   fChain->SetBranchAddress("muon2Eta", muon2Eta, &b_muon2Eta);
+   fChain->SetBranchAddress("muon2Phi", muon2Phi, &b_muon2Phi);
+   fChain->SetBranchAddress("muon2NumberOfMatches", muon2NumberOfMatches, &b_muon2NumberOfMatches);
+   fChain->SetBranchAddress("muon2GlobalMuonHits", muon2GlobalMuonHits, &b_muon2GlobalMuonHits);
+   fChain->SetBranchAddress("muon2InnerValidHits", muon2InnerValidHits, &b_muon2InnerValidHits);
+   fChain->SetBranchAddress("muon2NExpectedOuterHits", muon2NExpectedOuterHits, &b_muon2NExpectedOuterHits);
+   fChain->SetBranchAddress("muon2NPixelHits", muon2NPixelHits, &b_muon2NPixelHits);
+   fChain->SetBranchAddress("muon2InnerNChi2", muon2InnerNChi2, &b_muon2InnerNChi2);
+   fChain->SetBranchAddress("muon2GlobalNChi2", muon2GlobalNChi2, &b_muon2GlobalNChi2);
+   fChain->SetBranchAddress("muon2VzPVDist", muon2VzPVDist, &b_muon2VzPVDist);
+   fChain->SetBranchAddress("muon2PtRel", muon2PtRel, &b_muon2PtRel);
+   fChain->SetBranchAddress("muon2Sip2d", muon2Sip2d, &b_muon2Sip2d);
+   fChain->SetBranchAddress("muon2Ip2d", muon2Ip2d, &b_muon2Ip2d);
+   fChain->SetBranchAddress("muon2Ipe2d", muon2Ipe2d, &b_muon2Ipe2d);
+   fChain->SetBranchAddress("muon2Sip3d", muon2Sip3d, &b_muon2Sip3d);
+   fChain->SetBranchAddress("muon2Ip3d", muon2Ip3d, &b_muon2Ip3d);
+   fChain->SetBranchAddress("muon2Ipe3d", muon2Ipe3d, &b_muon2Ipe3d);
+   fChain->SetBranchAddress("muon2P0Par", muon2P0Par, &b_muon2P0Par);
+   fChain->SetBranchAddress("muon2DeltaR", muon2DeltaR, &b_muon2DeltaR);
+   fChain->SetBranchAddress("muon2EtaRel", muon2EtaRel, &b_muon2EtaRel);
+   fChain->SetBranchAddress("muon2Ratio", muon2Ratio, &b_muon2Ratio);
+   fChain->SetBranchAddress("muon2TrackQuality", muon2TrackQuality, &b_muon2TrackQuality);
+   fChain->SetBranchAddress("muon2RatioRel", muon2RatioRel, &b_muon2RatioRel);
+   fChain->SetBranchAddress("muon3IsGlobal", muon3IsGlobal, &b_muon3IsGlobal);
+   fChain->SetBranchAddress("muon3IsTracker", muon3IsTracker, &b_muon3IsTracker);
+   fChain->SetBranchAddress("muon3IsStandalone", muon3IsStandalone, &b_muon3IsStandalone);
+   fChain->SetBranchAddress("muon3Pt", muon3Pt, &b_muon3Pt);
+   fChain->SetBranchAddress("muon3Eta", muon3Eta, &b_muon3Eta);
+   fChain->SetBranchAddress("muon3Phi", muon3Phi, &b_muon3Phi);
+   fChain->SetBranchAddress("muon3NumberOfMatches", muon3NumberOfMatches, &b_muon3NumberOfMatches);
+   fChain->SetBranchAddress("muon3GlobalMuonHits", muon3GlobalMuonHits, &b_muon3GlobalMuonHits);
+   fChain->SetBranchAddress("muon3InnerValidHits", muon3InnerValidHits, &b_muon3InnerValidHits);
+   fChain->SetBranchAddress("muon3NExpectedOuterHits", muon3NExpectedOuterHits, &b_muon3NExpectedOuterHits);
+   fChain->SetBranchAddress("muon3NPixelHits", muon3NPixelHits, &b_muon3NPixelHits);
+   fChain->SetBranchAddress("muon3InnerNChi2", muon3InnerNChi2, &b_muon3InnerNChi2);
+   fChain->SetBranchAddress("muon3GlobalNChi2", muon3GlobalNChi2, &b_muon3GlobalNChi2);
+   fChain->SetBranchAddress("muon3VzPVDist", muon3VzPVDist, &b_muon3VzPVDist);
+   fChain->SetBranchAddress("muon3PtRel", muon3PtRel, &b_muon3PtRel);
+   fChain->SetBranchAddress("muon3Sip2d", muon3Sip2d, &b_muon3Sip2d);
+   fChain->SetBranchAddress("muon3Ip2d", muon3Ip2d, &b_muon3Ip2d);
+   fChain->SetBranchAddress("muon3Ipe2d", muon3Ipe2d, &b_muon3Ipe2d);
+   fChain->SetBranchAddress("muon3Sip3d", muon3Sip3d, &b_muon3Sip3d);
+   fChain->SetBranchAddress("muon3Ip3d", muon3Ip3d, &b_muon3Ip3d);
+   fChain->SetBranchAddress("muon3Ipe3d", muon3Ipe3d, &b_muon3Ipe3d);
+   fChain->SetBranchAddress("muon3P0Par", muon3P0Par, &b_muon3P0Par);
+   fChain->SetBranchAddress("muon3DeltaR", muon3DeltaR, &b_muon3DeltaR);
+   fChain->SetBranchAddress("muon3EtaRel", muon3EtaRel, &b_muon3EtaRel);
+   fChain->SetBranchAddress("muon3Ratio", muon3Ratio, &b_muon3Ratio);
+   fChain->SetBranchAddress("muon3TrackQuality", muon3TrackQuality, &b_muon3TrackQuality);
+   fChain->SetBranchAddress("muon3RatioRel", muon3RatioRel, &b_muon3RatioRel);
+   fChain->SetBranchAddress("muon4IsGlobal", muon4IsGlobal, &b_muon4IsGlobal);
+   fChain->SetBranchAddress("muon4IsTracker", muon4IsTracker, &b_muon4IsTracker);
+   fChain->SetBranchAddress("muon4IsStandalone", muon4IsStandalone, &b_muon4IsStandalone);
+   fChain->SetBranchAddress("muon4Pt", muon4Pt, &b_muon4Pt);
+   fChain->SetBranchAddress("muon4Eta", muon4Eta, &b_muon4Eta);
+   fChain->SetBranchAddress("muon4Phi", muon4Phi, &b_muon4Phi);
+   fChain->SetBranchAddress("muon4NumberOfMatches", muon4NumberOfMatches, &b_muon4NumberOfMatches);
+   fChain->SetBranchAddress("muon4GlobalMuonHits", muon4GlobalMuonHits, &b_muon4GlobalMuonHits);
+   fChain->SetBranchAddress("muon4InnerValidHits", muon4InnerValidHits, &b_muon4InnerValidHits);
+   fChain->SetBranchAddress("muon4NExpectedOuterHits", muon4NExpectedOuterHits, &b_muon4NExpectedOuterHits);
+   fChain->SetBranchAddress("muon4NPixelHits", muon4NPixelHits, &b_muon4NPixelHits);
+   fChain->SetBranchAddress("muon4InnerNChi2", muon4InnerNChi2, &b_muon4InnerNChi2);
+   fChain->SetBranchAddress("muon4GlobalNChi2", muon4GlobalNChi2, &b_muon4GlobalNChi2);
+   fChain->SetBranchAddress("muon4VzPVDist", muon4VzPVDist, &b_muon4VzPVDist);
+   fChain->SetBranchAddress("muon4PtRel", muon4PtRel, &b_muon4PtRel);
+   fChain->SetBranchAddress("muon4Sip2d", muon4Sip2d, &b_muon4Sip2d);
+   fChain->SetBranchAddress("muon4Ip2d", muon4Ip2d, &b_muon4Ip2d);
+   fChain->SetBranchAddress("muon4Ipe2d", muon4Ipe2d, &b_muon4Ipe2d);
+   fChain->SetBranchAddress("muon4Sip3d", muon4Sip3d, &b_muon4Sip3d);
+   fChain->SetBranchAddress("muon4Ip3d", muon4Ip3d, &b_muon4Ip3d);
+   fChain->SetBranchAddress("muon4Ipe3d", muon4Ipe3d, &b_muon4Ipe3d);
+   fChain->SetBranchAddress("muon4P0Par", muon4P0Par, &b_muon4P0Par);
+   fChain->SetBranchAddress("muon4DeltaR", muon4DeltaR, &b_muon4DeltaR);
+   fChain->SetBranchAddress("muon4EtaRel", muon4EtaRel, &b_muon4EtaRel);
+   fChain->SetBranchAddress("muon4Ratio", muon4Ratio, &b_muon4Ratio);
+   fChain->SetBranchAddress("muon4TrackQuality", muon4TrackQuality, &b_muon4TrackQuality);
+   fChain->SetBranchAddress("muon4RatioRel", muon4RatioRel, &b_muon4RatioRel);
    fChain->SetBranchAddress("standardCombinedSecondaryVertexMVAPFBJetTags", standardCombinedSecondaryVertexMVAPFBJetTags, &b_standardCombinedSecondaryVertexMVAPFBJetTags);
    fChain->SetBranchAddress("standardCombinedSecondaryVertexPFBJetTags", standardCombinedSecondaryVertexPFBJetTags, &b_standardCombinedSecondaryVertexPFBJetTags);
    fChain->SetBranchAddress("standardGhostTrackPFBJetTags", standardGhostTrackPFBJetTags, &b_standardGhostTrackPFBJetTags);
