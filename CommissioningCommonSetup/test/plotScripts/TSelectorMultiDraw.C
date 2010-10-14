@@ -25,9 +25,11 @@
 
 #include "TSelectorMultiDraw.h"
 #include "TrackSelector.h"
+#include "MuonSelector.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include "informationTrackCuts.h"
+#include "informationMuonCuts.h"
 
 using namespace std;
 
@@ -40,7 +42,8 @@ void TSelectorMultiDraw::Begin(TTree * tree)
    TString option = GetOption();
  
    for(int i=0; i<nSelectors; i++)        fArrSelectors[i]->Begin(tree);  
-   for(int j=0; j<nTrackSelectors; j++)  fArrTrackSelectors[j]->Begin(tree);
+   for(int j=0; j<nTrackSelectors; j++)   fArrTrackSelectors[j]->Begin(tree);
+   for(int j=0; j<nMuonSelectors; j++)    fArrMuonSelectors[j]->Begin(tree);
 
 }
 
@@ -87,7 +90,7 @@ Bool_t TSelectorMultiDraw::Process(Long64_t entry)
 
   for(int i=0; i<nSelectors; i++)       if( fArrSelectors[i]->ProcessCut(entry) )  fArrSelectors[i]->ProcessFill(entry);
   for(int j=0; j<nTrackSelectors; j++)  fArrTrackSelectors[j]->Process(entry);
-
+  for(int j=0; j<nMuonSelectors; j++)   fArrMuonSelectors[j]->Process(entry);
    
    return kTRUE;
 }
@@ -106,7 +109,8 @@ void TSelectorMultiDraw::Terminate()
    // the results graphically or save the results to file.
   
    for(int i=0; i<nSelectors; i++)        fArrSelectors[i]->Terminate();  
-   for(int j=0; j<nTrackSelectors; j++)  fArrTrackSelectors[j]->Terminate();
+   for(int j=0; j<nTrackSelectors; j++)   fArrTrackSelectors[j]->Terminate();
+   for(int j=0; j<nMuonSelectors; j++)    fArrMuonSelectors[j]->Terminate();
   
 }
 
@@ -128,14 +132,21 @@ void TSelectorMultiDraw::AddTrackSelector(bool isData, TH1D*dataHist, TH1D* mcHi
   fTrackSelectors.push_back(trackSel);
 }
 
+void TSelectorMultiDraw::AddMuonSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationMuonCuts info){
+  MuonSelector *muSel = new MuonSelector();
+  muSel->SetUp(isData, dataHist, mcHistb, mcHistc, mcHistl, mcHistn, info);
+  fMuonSelectors.push_back(muSel);
+}
 
 void TSelectorMultiDraw::SetupArrays(){
 
-  nSelectors = fSelectors.size();
+  nSelectors      = fSelectors.size();
   nTrackSelectors = fTrackSelectors.size();
+  nMuonSelectors  = fMuonSelectors.size();
 
-  fArrSelectors = new TSelectorDraw*[nSelectors];
+  fArrSelectors      = new TSelectorDraw*[nSelectors];
   fArrTrackSelectors = new TrackSelector*[nTrackSelectors];
+  fArrMuonSelectors  = new MuonSelector*[nMuonSelectors];
 
 
   int iSelCounter = 0;
@@ -150,5 +161,12 @@ void TSelectorMultiDraw::SetupArrays(){
     {
       fArrTrackSelectors[iTrackSelCounter] = *iSelector;
       iTrackSelCounter++;
+    }
+
+  int iMuonSelCounter = 0;
+  for(list<MuonSelector*>::iterator iSelector = fMuonSelectors.begin(); iSelector!=fMuonSelectors.end(); iSelector++)
+    {
+      fArrMuonSelectors[iMuonSelCounter] = *iSelector;
+      iMuonSelCounter++;
     }
 }

@@ -26,6 +26,7 @@
 #include <utility>
 #include "TStyle.h"
 #include "informationTrackCuts.h"
+#include "informationMuonCuts.h"
 
 struct information1d{
   std::string plotName;
@@ -49,6 +50,7 @@ struct information1d{
 
 
 information1d get1DInfoFromTrackCut(informationTrackCuts info);
+information1d get1DInfoFromMuonCut(informationMuonCuts info);
 double IntegralAndError(TH1D*    , int, int, double &);
 
 void cmsPrel(double intLumi) {
@@ -534,6 +536,186 @@ informationTrackCuts paramTrackCuts(ifstream* plotFile)
       thisPlot.standardPFtriggerHLTJet15U = (bool)(atoi((line.substr(position+1)).c_str()));
     }
 
+  }
+  return thisPlot;
+}
+
+informationMuonCuts paramMuonCuts(ifstream* plotFile)
+{
+  informationMuonCuts thisPlot;
+  bool plotName = false;
+  bool plotTitle = false;
+  bool label = false;
+  bool aliasx = false;
+  bool xTitle = false;
+  bool cut = false;
+  bool xlow = false;
+  bool xup = false;
+  bool nbinsx = false;
+  bool yTitle = false;
+  bool yMin = false;
+  bool ratioMin = false;
+  bool ratioMax = false;
+  bool ratioRebin = false;
+  bool displayOverUnderflowBin = false;
+  bool bDisplayNoInfo = false;
+  bool blegendPosition = false;
+
+  bool bstandardPFtriggerHLTJet30U = false;
+  bool bjetPtCut = false;
+  bool bjetEtaCut = false;
+  bool bmuPtCut = false;
+  bool bmuEtaCut = false;
+  bool bmuIsGlobal = false;
+  bool bmuGlobalHits = false;
+  bool bmuNmatch = false;
+  bool bmuInnerHits = false;
+  bool bmuPixelHits = false;
+  bool bmuExpOuterHits = false;
+  bool bmuInnerChi2 = false;
+  bool bmuGlobalChi2 = false;
+  bool bmuVzPVDist = false;
+  bool bmuDR = false;
+
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition 
+	    && bstandardPFtriggerHLTJet30U && bjetPtCut && bjetEtaCut && bmuPtCut && bmuEtaCut && bmuIsGlobal && bmuGlobalHits && bmuNmatch && bmuInnerHits && bmuPixelHits && bmuExpOuterHits && bmuInnerChi2 && bmuGlobalChi2 && bmuVzPVDist && bmuDR) ) {
+    string line;
+    size_t position;
+    getline(*plotFile,line);
+    if (line.find("#")==0) continue;
+    if (line.find("end_plot")!=string::npos) return thisPlot;
+    if (line.find("end_default")!=string::npos) return thisPlot;
+    position = line.find("=");
+    if(line.find("plotName")<position){
+      plotName = true; 
+      thisPlot.plotName = line.substr(position+1);
+      //  thisPlot.plotName += "_TC";
+    }
+    if(line.find("plotTitle")<position){
+      plotTitle = true; 
+      thisPlot.plotTitle = line.substr(position+1);
+    }
+    if(line.find("label")<position){
+      label = true; 
+      thisPlot.label = line.substr(position+1);
+    }
+    if(line.find("aliasx")<position){
+      aliasx = true;
+      thisPlot.aliasx = line.substr(position+1);
+    }
+    if(line.find("xTitle")<position){
+      xTitle = true;
+      thisPlot.xTitle = line.substr(position+1);
+    }
+    if(line.find("cut")<position){
+      cut = true;
+      thisPlot.cut = line.substr(position+1);
+    }
+    if(line.find("xlow")<position){
+      xlow = true;
+      thisPlot.xlow = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("xup")<position){
+      xup = true;
+      thisPlot.xup = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("nbinsx")<position){
+      nbinsx = true;
+      thisPlot.nbinsx = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("yTitle")<position){
+      yTitle = true;
+      thisPlot.yTitle = line.substr(position+1);
+    }
+    if(line.find("yMin")<position){
+      yMin = true;
+      thisPlot.yMin = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("ratioMin")<position){
+      ratioMin = true;
+      thisPlot.ratioMin = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("ratioMax")<position){
+      ratioMax = true;
+      thisPlot.ratioMax = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("ratioRebin")<position){
+      ratioRebin = true;
+      thisPlot.ratioRebin = atof((line.substr(position+1)).c_str());
+    }
+   if(line.find("displayOverUnderflowBin")<position){
+      displayOverUnderflowBin = true;
+      thisPlot.displayOverUnderflowBin = (bool)atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("displayNoInfo")<position){
+      bDisplayNoInfo = true;
+      thisPlot.displayNoInfo = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
+    if(line.find("legendPosition")<position){
+      blegendPosition = true;
+      thisPlot.legendPosition = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
+
+    if(line.find("standardPFtriggerHLTJet30U")<position){
+      bstandardPFtriggerHLTJet30U = true;
+      thisPlot.standardPFtriggerHLTJet30U = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
+    if(line.find("jetPtCut")<position){
+      bjetPtCut = true;
+      thisPlot.jetPtCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("jetEtaCut")<position){
+      bjetEtaCut = true;
+      thisPlot.jetEtaCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonPtCut")<position){
+      bmuPtCut = true;
+      thisPlot.muonPtCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonEtaCut")<position){
+      bmuEtaCut = true;
+      thisPlot.muonEtaCut = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonIsGlobal")<position){
+      bmuIsGlobal = true;
+      thisPlot.muonIsGlobal = (bool)(atoi((line.substr(position+1)).c_str()));
+    }
+    if(line.find("muonGlobalMuonHits")<position){
+      bmuGlobalHits = true;
+      thisPlot.muonGlobalMuonHits = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonNumberOfMatches")<position){
+      bmuNmatch = true;
+      thisPlot.muonNumberOfMatches = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonInnerValidHits")<position){
+      bmuInnerHits = true;
+      thisPlot.muonInnerValidHits = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonNPixelHits")<position){
+      bmuPixelHits = true;
+      thisPlot.muonNPixelHits = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonNExpectedOuterHits")<position){
+      bmuExpOuterHits = true;
+      thisPlot.muonNExpectedOuterHits = atoi((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonInnerNChi2")<position){
+      bmuInnerChi2 = true;
+      thisPlot.muonInnerNChi2 = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonGlobalNChi2")<position){
+      bmuGlobalChi2 = true;
+      thisPlot.muonGlobalNChi2 = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonVzPVDist")<position){
+      bmuVzPVDist = true;
+      thisPlot.muonVzPVDist = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("muonDeltaR")<position){
+      bmuDR = true;
+      thisPlot.muonDeltaR = atof((line.substr(position+1)).c_str());
+    }
   }
   return thisPlot;
 }
@@ -1853,6 +2035,12 @@ void MakeATrackCutPlot(informationTrackCuts info, flavorHists1D hists, double sc
   MakeAFlavorPlot(info1d, hists, scale);
 }
 
+void MakeAMuonCutPlot(informationMuonCuts info, flavorHists1D hists, double scale){
+  information1d info1d = get1DInfoFromMuonCut(info);
+  
+  MakeAFlavorPlot(info1d, hists, scale);
+}
+
 void MakeAPtHatPlot(informationPtHat info, ptHatHists1D hists, double scale)
 {
   if(scale==0)
@@ -2723,6 +2911,14 @@ void MakeATrackCutHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataS
   return;
 }
 
+void MakeAMuonCutHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, informationMuonCuts info, flavorHists1D hists)
+{
+  dataSelector->AddMuonSelector(true,  hists.data_hist, hists.mc_b_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
+  mcSelector->  AddMuonSelector(false, hists.data_hist, hists.mc_b_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
+
+  return;
+}
+
 
 void MakeACutCompHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, informationCutComp info, cutCompHists hists)
 {
@@ -2931,6 +3127,7 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
   list< pair< information2d , flavorHists2D > > reweightedTrackPlots;
   list< pair< informationCutComp , cutCompHists > > cutCompPlots;
   list< pair< informationTrackCuts , flavorHists1D > > trackCutPlots;
+  list< pair< informationMuonCuts , flavorHists1D > > muonCutPlots;
 
   //  TString normalizationText = "";
   //  if(finalNorm<=0) normalizationText = "MC normalized to Data";
@@ -3019,6 +3216,39 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
 	theseHists.mc_light_hist->Sumw2();
 	theseHists.mc_none_hist->Sumw2();
 	trackCutPlots.push_back(pair<informationTrackCuts,flavorHists1D>(thisPlot,theseHists));
+      }
+    }
+
+  if(  plotType.find("muonCutPlot")!=string::npos){
+      informationMuonCuts thisPlot = paramMuonCuts(&plotFiles);
+      information1d thisPlot1d = get1DInfoFromMuonCut(thisPlot);
+      if(doPlot == "" || doPlot.find(thisPlot.plotName)!=string::npos){
+	flavorHists1D theseHists;
+	theseHists.data_hist = new TH1D((thisPlot.plotName+"_data_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.mc_all_hist = new TH1D((thisPlot.plotName+"_mc_all_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.mc_b_hist = new TH1D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.mc_c_hist = new TH1D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.mc_light_hist = new TH1D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.mc_none_hist = new TH1D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	theseHists.data_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_all_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	theseHists.data_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
+	theseHists.mc_all_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
+	theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	theseHists.data_hist->Sumw2();
+	theseHists.mc_all_hist->Sumw2();
+	theseHists.mc_b_hist->Sumw2();
+	theseHists.mc_c_hist->Sumw2();
+	theseHists.mc_light_hist->Sumw2();
+	theseHists.mc_none_hist->Sumw2();
+	muonCutPlots.push_back(pair<informationMuonCuts,flavorHists1D>(thisPlot,theseHists));
       }
     }
 
@@ -3352,6 +3582,10 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
     {
       MakeATrackCutHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
     }
+  for(list< pair< informationMuonCuts , flavorHists1D > >::iterator iPlot = muonCutPlots.begin(); iPlot != muonCutPlots.end(); iPlot++)
+    {
+      MakeAMuonCutHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
+    }
   for(list< pair<informationCutComp , cutCompHists> >::iterator iPlot = cutCompPlots.begin(); iPlot != cutCompPlots.end(); iPlot++)
     {
       MakeACutCompHist(mcSelector,dataSelector,iPlot->first,iPlot->second);
@@ -3447,6 +3681,15 @@ MakeAllPlots(string mcfilename, string datafilename, string plotfilename, double
       MakeATrackCutPlot(iPlot->first,iPlot->second,finalNorm);
     }
 
+  for(list< pair< informationMuonCuts , flavorHists1D > >::iterator iPlot = muonCutPlots.begin(); iPlot != muonCutPlots.end(); iPlot++)
+    {
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
+      iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
+      MakeAMuonCutPlot(iPlot->first,iPlot->second,finalNorm);
+    }
+
   for(list< pair<informationCutComp , cutCompHists> >::iterator iPlot = cutCompPlots.begin(); iPlot != cutCompPlots.end(); iPlot++)
     {
       MakeACutCompPlot(iPlot->first,iPlot->second,finalNorm);
@@ -3538,6 +3781,29 @@ information1d get1DInfoFromTrackCut(informationTrackCuts info){
   return info1d;
 }
 
+information1d get1DInfoFromMuonCut(informationMuonCuts info){
+
+  information1d info1d;
+  info1d.plotName                 = info.plotName                ;
+  info1d.plotTitle		  = info.plotTitle               ;
+  info1d.label			  = info.label                   ;
+  info1d.aliasx			  = info.aliasx                  ;
+  info1d.xTitle			  = info.xTitle                  ;
+  info1d.cut			  = info.cut                     ;
+  info1d.xlow			  = info.xlow                    ;
+  info1d.xup			  = info.xup                     ;
+  info1d.nbinsx			  = info.nbinsx                  ;
+  info1d.yTitle			  = info.yTitle                  ;
+  info1d.yMin			  = info.yMin                    ;
+  info1d.ratioMin		  = info.ratioMin                ;
+  info1d.ratioMax		  = info.ratioMax                ;
+  info1d.ratioRebin		  = info.ratioRebin              ;
+  info1d.displayOverUnderflowBin  = info.displayOverUnderflowBin ;
+  info1d.displayNoInfo		  = info.displayNoInfo           ;
+  info1d.legendPosition           = info.legendPosition          ;
+
+  return info1d;
+}
 
 double IntegralAndError(TH1D* h   , int i, int j, double &err){
   double integral = h->Integral( i, j);
