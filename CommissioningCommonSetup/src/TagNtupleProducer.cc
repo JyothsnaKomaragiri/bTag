@@ -115,7 +115,7 @@ public:
   TTree *tree;
   TFile *file;
   
-  bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U, triggerHLTBTagMuJet10U;
+  bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U, triggerHLTBTagMuJet10U, triggerHLTBTagIPJet50U;
   bool triggerHLTJet30U, triggerHLTJet50U, triggerHLTJet70U, triggerHLTJet100U ;
   
   unsigned int eventNumber ;
@@ -123,6 +123,11 @@ public:
   unsigned int lumiBlockNumber ;
 
   unsigned int numberOfPrimaryVertices ;
+  unsigned int numberOfTracksAtPV;
+  float PVx;
+  float PVy;
+  float PVz;
+  float PVNormalizedChi2;
 
   float pthat;
 
@@ -574,11 +579,17 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "triggerHLTJet70U",  &triggerHLTJet70U, "triggerHLTJet70U/O");
   tree->Branch(  "triggerHLTJet100U",  &triggerHLTJet100U, "triggerHLTJet100U/O");
   tree->Branch(  "triggerHLTBTagMuJet10U", &triggerHLTBTagMuJet10U, "triggerHLTBTagMuJet10U/O");
+  tree->Branch(  "triggerHLTBTagIPJet50U", &triggerHLTBTagIPJet50U, "triggerHLTBTagIPJet50U/O");
 
     tree->Branch(  "eventNumber"             , &eventNumber             , "eventNumber/i"            );
   tree->Branch(  "runNumber"		    , &runNumber               , "runNumber/i"   	    );
   tree->Branch(  "lumiBlockNumber" 	    , &lumiBlockNumber         , "lumiBlockNumber/i" 	    );
   tree->Branch(  "numberOfPrimaryVertices" , &numberOfPrimaryVertices , "numberOfPrimaryVertices/i"); 
+  tree->Branch(  "numberOfTracksAtPV" , &numberOfTracksAtPV , "numberOfTracksAtPV/i"); 
+  tree->Branch(  "PVx" , &PVx , "PVx/F"); 
+  tree->Branch(  "PVy" , &PVy , "PVy/F"); 
+  tree->Branch(  "PVz" , &PVz , "PVz/F"); 
+  tree->Branch(  "PVNormalizedChi2" , &PVNormalizedChi2 , "PVNormalizedChi2/F"); 
 
   tree->Branch(  "pthat" , &pthat, "pthat/F");
 
@@ -925,6 +936,7 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     if (trigName=="HLT_Jet70U")   triggerHLTJet70U   = hltresults->accept(itrig) ;
     if (trigName=="HLT_Jet100U")   triggerHLTJet100U   = hltresults->accept(itrig) ;
     if (trigName=="HLT_BTagMu_Jet10U") triggerHLTBTagMuJet10U = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagIP_Jet50U") triggerHLTBTagIPJet50U = hltresults->accept(itrig) ;
   }  
   if(bFoundTrig==0){
     std::cout<<"  ERROR: trigger name not found in event" << std::endl;
@@ -933,7 +945,8 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   // do NOT save event, if no trigger has fired
   if( triggerHLTL1Jet6U != 1 && triggerHLTL1Jet10U !=1 && triggerHLTJet15U != 1 && triggerHLTJet30U != 1 && 
-      triggerHLTJet50U != 1 && triggerHLTJet70U != 1 && triggerHLTJet100U != 1 && triggerHLTBTagMuJet10U != 1 ) return;
+      triggerHLTJet50U != 1 && triggerHLTJet70U != 1 && triggerHLTJet100U != 1 && triggerHLTBTagMuJet10U != 1 
+      && triggerHLTBTagIPJet50U != 1 ) return;
 
 
   eventNumber = iEvent.eventAuxiliary().event();
@@ -1126,9 +1139,15 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	Vertex::Point p(0, 0, 0);
 	dummy = Vertex(p, e, 0, 0, 0);
       }
-
       //End Stealing
       
+      // vertex properties
+      numberOfTracksAtPV = pv->nTracks();
+      PVx = pv->x();
+      PVy = pv->y();
+      PVz = pv->z();
+      PVNormalizedChi2 = pv->normalizedChi2();
+
       //some counters
       size_t nSelectedTracks=0;
       size_t nSelectedAndDecayLengthAndJetAsixTracks=0;
