@@ -704,7 +704,7 @@ public :
    virtual void    SlaveTerminate();
    virtual void    Terminate();
 
-   virtual void    SetUp(bool isData_, TH1D*dataHist_, TH1D* mcHistb_, TH1D* mcHistc_, TH1D* mcHistl_, TH1D* mcHistn_, informationMuonCuts info_){
+   virtual void    MuSetUp(bool isData_, TH1D*dataHist_, TH1D* mcHistb_, TH1D* mcHistc_, TH1D* mcHistl_, TH1D* mcHistn_, informationMuonCuts info_){
      isData = isData_;
      dataHist = dataHist_;
      mcHistb = mcHistb_;

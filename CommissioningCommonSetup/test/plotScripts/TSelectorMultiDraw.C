@@ -134,7 +134,7 @@ void TSelectorMultiDraw::AddTrackSelector(bool isData, TH1D*dataHist, TH1D* mcHi
 
 void TSelectorMultiDraw::AddMuonSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationMuonCuts info){
   MuonSelector *muSel = new MuonSelector();
-  muSel->SetUp(isData, dataHist, mcHistb, mcHistc, mcHistl, mcHistn, info);
+  muSel->MuSetUp(isData, dataHist, mcHistb, mcHistc, mcHistl, mcHistn, info);
   fMuonSelectors.push_back(muSel);
 }
 

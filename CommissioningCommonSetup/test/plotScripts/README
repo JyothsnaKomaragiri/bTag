@@ -3,21 +3,16 @@ run the plotting macro in the following way:
 remove existing libraries with 
 rm *.so
 
-start root and compile the library:
-.L TrackSelector.C++
-.L TSelectorMultiDraw.C++
-.L MakeAllPlots.C++
-
 then run the macro from the shell:
 
 for lumi normalization:
-root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", 1, "plots.root", "plotname", firstPlot, lastPlot)'
+root -l -q -b MakeAllPlotsLoader.C'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", 1, "plots.root", intLumi, dataVsmc, "plotname", firstPlot, lastPlot)'
 
 for area normalization WITHOUT overflow bins:
-root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", 0, "plots.root", "plotname", firstPlot, lastPlot)'
+root -l -q -b MakeAllPlotsLoader.C'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", 0, "plots.root", intLumi, dataVsmc, "plotname", firstPlot, lastPlot)'
 
 for area normalization WITH overflow bins:
-root -l -q -b MakeAllPlots.C+'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", -1, "plots.root", "plotname", firstPlot, lastPlot)'
+root -l -q -b MakeAllPlotsLoader.C'("filelistMC.cfg", "filelistData.cfg", "plot.cfg", -1, "plots.root", intLumi, dataVsmc, "plotname", firstPlot, lastPlot)'
 
 where filelistMC.cfg and filelistData.cfg are the list of files to read including their weight, separated by a comma.
 
@@ -29,6 +24,10 @@ Example list of files:
 
 
 "plots.root" is the output root file containing some histograms (optional)
+
+intLumi is the data integrated luminosity used in the header of the canvas
+
+Set dataVsmc to 1 to do Data vs MC comparisons and to 0 for Data vs Data comparisons.
 
 "plotname" is the name of the plot to be produced (optional). Use empty string "" to produce ALL plots defined in the plots.cfg (very slow), 
 or give additional two arguments firstPlot and lastPlot:
