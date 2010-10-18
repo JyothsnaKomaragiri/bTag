@@ -6,6 +6,7 @@
 class informationTrackCuts{
  public:
   bool triggerHLTJet15U;
+  bool triggerHLTJet30U;
   float jetPtCut;
   float jetEtaCut;
   unsigned int nHitsCut;
