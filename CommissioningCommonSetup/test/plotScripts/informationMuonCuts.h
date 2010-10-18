@@ -6,7 +6,7 @@
 class informationMuonCuts{
 
  public:
-  bool standardPFtriggerHLTJet30U;
+  bool triggerHLTJet30U;
   float jetPtCut;
   float jetEtaCut;
   float muonPtCut;
