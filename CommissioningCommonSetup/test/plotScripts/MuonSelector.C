@@ -130,17 +130,21 @@ Bool_t MuonSelector::Process(Long64_t entry)
 
   unsigned int sizeOfJets = nJets;
 
-  // only fill histograms if cuts are fulfilled
+   // only fill histograms if cuts are fulfilled
   
-  if(triggerHLTJet30U != info.standardPFtriggerHLTJet30U) return kTRUE;
+
+  if(triggerHLTJet30U != info.triggerHLTJet30U) return kTRUE;
   
+
   ////////////////////////////////////////////////////////////
   /// ITERATE OVER ALL JETS
   for(unsigned int i=0 ;i<sizeOfJets; i++){//loop over jets
     
+
     if(jetPt[i] < info.jetPtCut) continue;
     if(fabs(jetEta[i]) > info.jetEtaCut) continue;
     
+
     /*
       muon1Pt > 5.0 && TMath::Abs(muon1Eta) < 2.4 && muon1IsGlobal == 1 
       && muon1GlobalMuonHits > 0 && muon1NumberOfMatches > 1 
@@ -154,74 +158,61 @@ Bool_t MuonSelector::Process(Long64_t entry)
     ///////////////////////////////////////
     //Count separately for the muons ordered in pT, muon1,2,3 and 4
     //muon1
-    if(muon1Pt[i] < info.muonPtCut) continue;
-    if(fabs(muon1Eta[i]) > info.muonEtaCut) continue;
-    if(muon1IsGlobal[i] != info.muonIsGlobal) continue;
-    if(muon1GlobalMuonHits[i] <= info.muonGlobalMuonHits) continue;
-    if(muon1NumberOfMatches[i] <= info.muonNumberOfMatches) continue;
-    if(muon1InnerValidHits[i] <= info.muonInnerValidHits) continue;
-    if(muon1NPixelHits[i] <= info.muonNPixelHits) continue;
-    if(muon1NExpectedOuterHits[i] >= info.muonNExpectedOuterHits) continue;
-    if(muon1InnerNChi2[i] >= info.muonInnerNChi2) continue;
-    if(muon1GlobalNChi2[i] >= info.muonGlobalNChi2) continue;
-    if(muon1VzPVDist[i] >= info.muonVzPVDist) continue;
-    if(muon1DeltaR[i] >= info.muonDeltaR) continue;
+    if (  (muon1Pt[i] > info.muonPtCut) &&
+    (fabs(muon1Eta[i]) > info.muonEtaCut) &&
+    (muon1IsGlobal[i] == info.muonIsGlobal) &&
+    (muon1GlobalMuonHits[i] > info.muonGlobalMuonHits) &&
+    (muon1NumberOfMatches[i] > info.muonNumberOfMatches) &&
+    (muon1InnerValidHits[i] > info.muonInnerValidHits) &&
+    (muon1NPixelHits[i] > info.muonNPixelHits) &&
+    (muon1NExpectedOuterHits[i] < info.muonNExpectedOuterHits) &&
+    (muon1InnerNChi2[i] < info.muonInnerNChi2) &&
+    (muon1GlobalNChi2[i] < info.muonGlobalNChi2) &&
+      (fabs(muon1VzPVDist[i]) < info.muonVzPVDist) &&
+	  (muon1DeltaR[i] < info.muonDeltaR) ) Nmupassingcuts++;
     
-    //Count the no. of muons passing the muon ID cuts
-    Nmupassingcuts++;
+   if (  (muon2Pt[i] > info.muonPtCut) &&
+    (fabs(muon2Eta[i]) > info.muonEtaCut) &&
+    (muon2IsGlobal[i] == info.muonIsGlobal) &&
+    (muon2GlobalMuonHits[i] > info.muonGlobalMuonHits) &&
+    (muon2NumberOfMatches[i] > info.muonNumberOfMatches) &&
+    (muon2InnerValidHits[i] > info.muonInnerValidHits) &&
+    (muon2NPixelHits[i] > info.muonNPixelHits) &&
+    (muon2NExpectedOuterHits[i] < info.muonNExpectedOuterHits) &&
+    (muon2InnerNChi2[i] < info.muonInnerNChi2) &&
+    (muon2GlobalNChi2[i] < info.muonGlobalNChi2) &&
+      (fabs(muon2VzPVDist[i]) < info.muonVzPVDist) &&
+	  (muon2DeltaR[i] < info.muonDeltaR) ) Nmupassingcuts++; 
 
-    //muon2
-    if(muon2Pt[i] < info.muonPtCut) continue;
-    if(fabs(muon2Eta[i]) > info.muonEtaCut) continue;
-    if(muon2IsGlobal[i] != info.muonIsGlobal) continue;
-    if(muon2GlobalMuonHits[i] <= info.muonGlobalMuonHits) continue;
-    if(muon2NumberOfMatches[i] <= info.muonNumberOfMatches) continue;
-    if(muon2InnerValidHits[i] <= info.muonInnerValidHits) continue;
-    if(muon2NPixelHits[i] <= info.muonNPixelHits) continue;
-    if(muon2NExpectedOuterHits[i] >= info.muonNExpectedOuterHits) continue;
-    if(muon2InnerNChi2[i] >= info.muonInnerNChi2) continue;
-    if(muon2GlobalNChi2[i] >= info.muonGlobalNChi2) continue;
-    if(muon2VzPVDist[i] >= info.muonVzPVDist) continue;
-    if(muon2DeltaR[i] >= info.muonDeltaR) continue;
-    
-    //Count the no. of muons passing the muon ID cuts
-    Nmupassingcuts++;
-    
-    //muon3
-    if(muon3Pt[i] < info.muonPtCut) continue;
-    if(fabs(muon3Eta[i]) > info.muonEtaCut) continue;
-    if(muon3IsGlobal[i] != info.muonIsGlobal) continue;
-    if(muon3GlobalMuonHits[i] <= info.muonGlobalMuonHits) continue;
-    if(muon3NumberOfMatches[i] <= info.muonNumberOfMatches) continue;
-    if(muon3InnerValidHits[i] <= info.muonInnerValidHits) continue;
-    if(muon3NPixelHits[i] <= info.muonNPixelHits) continue;
-    if(muon3NExpectedOuterHits[i] >= info.muonNExpectedOuterHits) continue;
-    if(muon3InnerNChi2[i] >= info.muonInnerNChi2) continue;
-    if(muon3GlobalNChi2[i] >= info.muonGlobalNChi2) continue;
-    if(muon3VzPVDist[i] >= info.muonVzPVDist) continue;
-    if(muon3DeltaR[i] >= info.muonDeltaR) continue;
-    
-    //Count the no. of muons passing the muon ID cuts
-    Nmupassingcuts++;
-    
-    //muon4
-    if(muon4Pt[i] < info.muonPtCut) continue;
-    if(fabs(muon4Eta[i]) > info.muonEtaCut) continue;
-    if(muon4IsGlobal[i] != info.muonIsGlobal) continue;
-    if(muon4GlobalMuonHits[i] <= info.muonGlobalMuonHits) continue;
-    if(muon4NumberOfMatches[i] <= info.muonNumberOfMatches) continue;
-    if(muon4InnerValidHits[i] <= info.muonInnerValidHits) continue;
-    if(muon4NPixelHits[i] <= info.muonNPixelHits) continue;
-    if(muon4NExpectedOuterHits[i] >= info.muonNExpectedOuterHits) continue;
-    if(muon4InnerNChi2[i] >= info.muonInnerNChi2) continue;
-    if(muon4GlobalNChi2[i] >= info.muonGlobalNChi2) continue;
-    if(muon4VzPVDist[i] >= info.muonVzPVDist) continue;
-    if(muon4DeltaR[i] >= info.muonDeltaR) continue;
-    
-    //Count the no. of muons passing the muon ID cuts
-    Nmupassingcuts++;
+   if (  (muon3Pt[i] > info.muonPtCut) &&
+    (fabs(muon3Eta[i]) > info.muonEtaCut) &&
+    (muon3IsGlobal[i] == info.muonIsGlobal) &&
+    (muon3GlobalMuonHits[i] > info.muonGlobalMuonHits) &&
+    (muon3NumberOfMatches[i] > info.muonNumberOfMatches) &&
+    (muon3InnerValidHits[i] > info.muonInnerValidHits) &&
+    (muon3NPixelHits[i] > info.muonNPixelHits) &&
+    (muon3NExpectedOuterHits[i] < info.muonNExpectedOuterHits) &&
+    (muon3InnerNChi2[i] < info.muonInnerNChi2) &&
+    (muon3GlobalNChi2[i] < info.muonGlobalNChi2) &&
+      (fabs(muon3VzPVDist[i]) < info.muonVzPVDist) &&
+	  (muon3DeltaR[i] < info.muonDeltaR) ) Nmupassingcuts++;
+
+   if (  (muon4Pt[i] > info.muonPtCut) &&
+    (fabs(muon4Eta[i]) > info.muonEtaCut) &&
+    (muon4IsGlobal[i] == info.muonIsGlobal) &&
+    (muon4GlobalMuonHits[i] > info.muonGlobalMuonHits) &&
+    (muon4NumberOfMatches[i] > info.muonNumberOfMatches) &&
+    (muon4InnerValidHits[i] > info.muonInnerValidHits) &&
+    (muon4NPixelHits[i] > info.muonNPixelHits) &&
+    (muon4NExpectedOuterHits[i] < info.muonNExpectedOuterHits) &&
+    (muon4InnerNChi2[i] < info.muonInnerNChi2) &&
+    (muon4GlobalNChi2[i] < info.muonGlobalNChi2) &&
+      (fabs(muon4VzPVDist[i]) < info.muonVzPVDist) &&
+	  (muon4DeltaR[i] < info.muonDeltaR) ) Nmupassingcuts++;
+
     ///////////////////////////////////////
   
+ 
     // fill number of muons in histograms depending on jet flavour etc...
     if( isData ) dataHist->Fill(Nmupassingcuts, fChain->GetWeight());
     else{//MC

@@ -3,6 +3,14 @@ run the plotting macro in the following way:
 remove existing libraries with 
 rm *.so
 
+
+start root and compile the library:
+.L TrackSelector.C++
+.L MuonSelector.C++
+.L TSelectorMultiDraw.C++
+.L MakeAllPlots.C++
+
+
 then run the macro from the shell:
 
 for lumi normalization:

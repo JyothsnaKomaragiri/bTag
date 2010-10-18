@@ -5,7 +5,7 @@
 
 class informationTrackCuts{
  public:
-  bool standardPFtriggerHLTJet15U;
+  bool triggerHLTJet15U;
   float jetPtCut;
   float jetEtaCut;
   unsigned int nHitsCut;

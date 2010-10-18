@@ -77,6 +77,7 @@ Bool_t TrackSelector::Process(Long64_t entry)
   b_jetEta->GetEntry(entry);
   b_trackNHits->GetEntry(entry);
   b_triggerHLTJet15U->GetEntry(entry);  
+  b_triggerHLTJet30U->GetEntry(entry);  
   b_trackJetIndex->GetEntry(entry);
   b_trackNPixelHits->GetEntry(entry);
   b_trackNHits->GetEntry(entry);
@@ -95,7 +96,7 @@ Bool_t TrackSelector::Process(Long64_t entry)
 
   // only fill histograms if cuts are fulfilled
   
-  if(triggerHLTJet15U != info.standardPFtriggerHLTJet15U) return kTRUE;
+  if(triggerHLTJet30U != info.triggerHLTJet30U) return kTRUE;
 
   /// ITERATE OVER ALL JETS
   for(unsigned int i=0 ;i<sizeOfJets; i++){

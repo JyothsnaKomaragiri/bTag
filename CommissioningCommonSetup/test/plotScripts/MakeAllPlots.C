@@ -403,7 +403,7 @@ informationTrackCuts paramTrackCuts(ifstream* plotFile)
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  bool bstandardPFtriggerHLTJet15U = false;
+  bool triggerHLTJet30U = false;
   bool bjetPtCut = false;
   bool bjetEtaCut = false;
   bool bnHitsCut = false;
@@ -415,7 +415,7 @@ informationTrackCuts paramTrackCuts(ifstream* plotFile)
   bool bIP2dCut = false;
   bool blongIPCut = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition && bjetPtCut && bjetEtaCut && bnHitsCut && bnPixHitsCut && bChi2Cut && btrackPtCut && bdistJetAxisCut && bdecayLengthCut && bIP2dCut && blongIPCut && bstandardPFtriggerHLTJet15U)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition && bjetPtCut && bjetEtaCut && bnHitsCut && bnPixHitsCut && bChi2Cut && btrackPtCut && bdistJetAxisCut && bdecayLengthCut && bIP2dCut && blongIPCut && btriggerHLTJet30U)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -533,9 +533,9 @@ informationTrackCuts paramTrackCuts(ifstream* plotFile)
       blongIPCut = true;
       thisPlot.longIPCut = atof((line.substr(position+1)).c_str());
     }
-    if(line.find("standardPFtriggerHLTJet15U")<position){
-      bstandardPFtriggerHLTJet15U = true;
-      thisPlot.standardPFtriggerHLTJet15U = (bool)(atoi((line.substr(position+1)).c_str()));
+    if(line.find("triggerHLTJet30U")<position){
+      btriggerHLTJet30U = true;
+      thisPlot.triggerHLTJet30U = (bool)(atoi((line.substr(position+1)).c_str()));
     }
 
   }
@@ -563,7 +563,7 @@ informationMuonCuts paramMuonCuts(ifstream* plotFile)
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  bool bstandardPFtriggerHLTJet30U = false;
+  bool btriggerHLTJet30U = false;
   bool bjetPtCut = false;
   bool bjetEtaCut = false;
   bool bmuPtCut = false;
@@ -580,7 +580,7 @@ informationMuonCuts paramMuonCuts(ifstream* plotFile)
   bool bmuDR = false;
 
   while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition 
-	    && bstandardPFtriggerHLTJet30U && bjetPtCut && bjetEtaCut && bmuPtCut && bmuEtaCut && bmuIsGlobal && bmuGlobalHits && bmuNmatch && bmuInnerHits && bmuPixelHits && bmuExpOuterHits && bmuInnerChi2 && bmuGlobalChi2 && bmuVzPVDist && bmuDR) ) {
+	    && btriggerHLTJet30U && bjetPtCut && bjetEtaCut && bmuPtCut && bmuEtaCut && bmuIsGlobal && bmuGlobalHits && bmuNmatch && bmuInnerHits && bmuPixelHits && bmuExpOuterHits && bmuInnerChi2 && bmuGlobalChi2 && bmuVzPVDist && bmuDR) ) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -658,9 +658,9 @@ informationMuonCuts paramMuonCuts(ifstream* plotFile)
       thisPlot.legendPosition = (bool)(atoi((line.substr(position+1)).c_str()));
     }
 
-    if(line.find("standardPFtriggerHLTJet30U")<position){
-      bstandardPFtriggerHLTJet30U = true;
-      thisPlot.standardPFtriggerHLTJet30U = (bool)(atoi((line.substr(position+1)).c_str()));
+    if(line.find("triggerHLTJet30U")<position){
+      btriggerHLTJet30U = true;
+      thisPlot.triggerHLTJet30U = (bool)(atoi((line.substr(position+1)).c_str()));
     }
     if(line.find("jetPtCut")<position){
       bjetPtCut = true;
