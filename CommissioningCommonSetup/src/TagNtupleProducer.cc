@@ -1513,6 +1513,7 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       
       //softMuonTagInfos
       for(unsigned int i=0; i<4; i++){
+	nMuons[iJet] = 0;
 	muonIsGlobal[i][iJet] = 0;             
 	muonIsTracker[i][iJet] = 0;            
 	muonIsStandalone[i][iJet] = 0;         
