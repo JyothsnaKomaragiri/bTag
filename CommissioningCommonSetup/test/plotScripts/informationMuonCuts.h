@@ -12,11 +12,11 @@ class informationMuonCuts{
   float muonPtCut;
   float muonEtaCut;
   bool  muonIsGlobal;
-  unsigned int muonGlobalMuonHits;
-  unsigned int muonNumberOfMatches;
-  unsigned int muonInnerValidHits;
-  unsigned int muonNPixelHits;
-  unsigned int muonNExpectedOuterHits;   			       
+  int muonGlobalMuonHits;
+  int muonNumberOfMatches;
+  int muonInnerValidHits;
+  int muonNPixelHits;
+  int muonNExpectedOuterHits;   			       
   float muonInnerNChi2;
   float muonGlobalNChi2;
   float muonVzPVDist;
