@@ -231,13 +231,15 @@ struct informationCut{
 
 
 
-struct flavorHists1D{
+struct flavorHists1D {
   TH1D* data_hist;
   TH1D* mc_all_hist;
   TH1D* mc_b_hist;
   TH1D* mc_c_hist;
   TH1D* mc_light_hist;
   TH1D* mc_none_hist;
+  // constructor to avoid warning
+  flavorHists1D(){data_hist=0; mc_all_hist=0; mc_b_hist=0; mc_c_hist=0; mc_light_hist=0; mc_none_hist=0;};
 };
 
 struct cutCompHists{
@@ -275,6 +277,7 @@ struct flavorHists2D{
   TH2D* mc_c_hist;
   TH2D* mc_light_hist;
   TH2D* mc_none_hist;
+  flavorHists2D(){data_hist=0; mc_all_hist=0; mc_b_hist=0; mc_c_hist=0; mc_light_hist=0; mc_none_hist=0;};
 };
 
 using namespace std;
@@ -403,7 +406,7 @@ informationTrackCuts paramTrackCuts(ifstream* plotFile)
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  bool triggerHLTJet30U = false;
+  bool btriggerHLTJet30U = false;
   bool bjetPtCut = false;
   bool bjetEtaCut = false;
   bool bnHitsCut = false;

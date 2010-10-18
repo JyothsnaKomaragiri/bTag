@@ -158,8 +158,10 @@ Bool_t MuonSelector::Process(Long64_t entry)
     ///////////////////////////////////////
     //Count separately for the muons ordered in pT, muon1,2,3 and 4
     //muon1
+
+    
     if (  (muon1Pt[i] > info.muonPtCut) &&
-    (fabs(muon1Eta[i]) > info.muonEtaCut) &&
+    (fabs(muon1Eta[i]) < info.muonEtaCut) &&
     (muon1IsGlobal[i] == info.muonIsGlobal) &&
     (muon1GlobalMuonHits[i] > info.muonGlobalMuonHits) &&
     (muon1NumberOfMatches[i] > info.muonNumberOfMatches) &&
@@ -172,7 +174,7 @@ Bool_t MuonSelector::Process(Long64_t entry)
 	  (muon1DeltaR[i] < info.muonDeltaR) ) Nmupassingcuts++;
     
    if (  (muon2Pt[i] > info.muonPtCut) &&
-    (fabs(muon2Eta[i]) > info.muonEtaCut) &&
+    (fabs(muon2Eta[i]) < info.muonEtaCut) &&
     (muon2IsGlobal[i] == info.muonIsGlobal) &&
     (muon2GlobalMuonHits[i] > info.muonGlobalMuonHits) &&
     (muon2NumberOfMatches[i] > info.muonNumberOfMatches) &&
@@ -185,7 +187,7 @@ Bool_t MuonSelector::Process(Long64_t entry)
 	  (muon2DeltaR[i] < info.muonDeltaR) ) Nmupassingcuts++; 
 
    if (  (muon3Pt[i] > info.muonPtCut) &&
-    (fabs(muon3Eta[i]) > info.muonEtaCut) &&
+    (fabs(muon3Eta[i]) < info.muonEtaCut) &&
     (muon3IsGlobal[i] == info.muonIsGlobal) &&
     (muon3GlobalMuonHits[i] > info.muonGlobalMuonHits) &&
     (muon3NumberOfMatches[i] > info.muonNumberOfMatches) &&
@@ -198,7 +200,7 @@ Bool_t MuonSelector::Process(Long64_t entry)
 	  (muon3DeltaR[i] < info.muonDeltaR) ) Nmupassingcuts++;
 
    if (  (muon4Pt[i] > info.muonPtCut) &&
-    (fabs(muon4Eta[i]) > info.muonEtaCut) &&
+    (fabs(muon4Eta[i]) < info.muonEtaCut) &&
     (muon4IsGlobal[i] == info.muonIsGlobal) &&
     (muon4GlobalMuonHits[i] > info.muonGlobalMuonHits) &&
     (muon4NumberOfMatches[i] > info.muonNumberOfMatches) &&
@@ -212,7 +214,7 @@ Bool_t MuonSelector::Process(Long64_t entry)
 
     ///////////////////////////////////////
   
- 
+  
     // fill number of muons in histograms depending on jet flavour etc...
     if( isData ) dataHist->Fill(Nmupassingcuts, fChain->GetWeight());
     else{//MC
