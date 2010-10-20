@@ -42,6 +42,8 @@ struct information1d{
   double yMin;
   double ratioMin;
   double ratioMax;
+  double bScale;
+  double cScale;
   int ratioRebin;
   bool displayOverUnderflowBin;
   bool displayNoInfo;
@@ -199,6 +201,8 @@ struct information2d{
   std::string aliasy;
   std::string yTitle;
   std::string cut;
+  double bScale;
+  double cScale;
   double xlow;
   double xup;
   int nbinsx;
@@ -218,6 +222,8 @@ struct informationCut{
   std::string aliasy;
   std::string yTitle;
   std::string cut;
+  double bScale;
+  double cScale;
   std::string direction;
   double xlow;
   double xup;
@@ -291,6 +297,8 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
   bool aliasx = false;
   bool xTitle = false;
   bool cut = false;
+  bool bScale = false;
+  bool cScale = false;
   bool xlow = false;
   bool xup = false;
   bool nbinsx = false;
@@ -303,7 +311,7 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && bScale && cScale && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -334,6 +342,14 @@ information1d param1d(ifstream* plotFile, information1d defaultParams)
     if(line.find("cut")<position){
       cut = true;
       thisPlot.cut = line.substr(position+1);
+    }
+    if(line.find("bScale")<position){
+      bScale = true;
+      thisPlot.bScale = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("cScale")<position){
+      cScale = true;
+      thisPlot.cScale = atof((line.substr(position+1)).c_str());
     }
     if(line.find("xlow")<position){
       xlow = true;
@@ -394,6 +410,8 @@ informationTrackCuts paramTrackCuts(ifstream* plotFile)
   bool aliasx = false;
   bool xTitle = false;
   bool cut = false;
+  bool bScale = false;
+  bool cScale = false;
   bool xlow = false;
   bool xup = false;
   bool nbinsx = false;
@@ -418,7 +436,7 @@ informationTrackCuts paramTrackCuts(ifstream* plotFile)
   bool bIP2dCut = false;
   bool blongIPCut = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition && bjetPtCut && bjetEtaCut && bnHitsCut && bnPixHitsCut && bChi2Cut && btrackPtCut && bdistJetAxisCut && bdecayLengthCut && bIP2dCut && blongIPCut && btriggerHLTJet30U)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && bScale && cScale && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition && bjetPtCut && bjetEtaCut && bnHitsCut && bnPixHitsCut && bChi2Cut && btrackPtCut && bdistJetAxisCut && bdecayLengthCut && bIP2dCut && blongIPCut && btriggerHLTJet30U)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -450,6 +468,14 @@ informationTrackCuts paramTrackCuts(ifstream* plotFile)
     if(line.find("cut")<position){
       cut = true;
       thisPlot.cut = line.substr(position+1);
+    }
+    if(line.find("bScale")<position){
+      bScale = true;
+      thisPlot.bScale = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("cScale")<position){
+      cScale = true;
+      thisPlot.cScale = atof((line.substr(position+1)).c_str());
     }
     if(line.find("xlow")<position){
       xlow = true;
@@ -554,6 +580,8 @@ informationMuonCuts paramMuonCuts(ifstream* plotFile)
   bool aliasx = false;
   bool xTitle = false;
   bool cut = false;
+  bool bScale = false;
+  bool cScale = false;
   bool xlow = false;
   bool xup = false;
   bool nbinsx = false;
@@ -582,7 +610,7 @@ informationMuonCuts paramMuonCuts(ifstream* plotFile)
   bool bmuVzPVDist = false;
   bool bmuDR = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition 
+  while (! (plotName && plotTitle && label && aliasx && xTitle && cut && bScale && cScale && xlow && xup && nbinsx && yTitle && yMin && ratioMin && ratioMax && displayOverUnderflowBin && ratioRebin && bDisplayNoInfo && blegendPosition 
 	    && btriggerHLTJet30U && bjetPtCut && bjetEtaCut && bmuPtCut && bmuEtaCut && bmuIsGlobal && bmuGlobalHits && bmuNmatch && bmuInnerHits && bmuPixelHits && bmuExpOuterHits && bmuInnerChi2 && bmuGlobalChi2 && bmuVzPVDist && bmuDR) ) {
     string line;
     size_t position;
@@ -615,6 +643,14 @@ informationMuonCuts paramMuonCuts(ifstream* plotFile)
     if(line.find("cut")<position){
       cut = true;
       thisPlot.cut = line.substr(position+1);
+    }
+    if(line.find("bScale")<position){
+      bScale = true;
+      thisPlot.bScale = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("cScale")<position){
+      cScale = true;
+      thisPlot.cScale = atof((line.substr(position+1)).c_str());
     }
     if(line.find("xlow")<position){
       xlow = true;
@@ -1017,6 +1053,8 @@ information2d param2d(ifstream* plotFile, information2d defaultParams)
   bool aliasy = false;
   bool yTitle = false;
   bool cut = false;
+  bool bScale = false;
+  bool cScale = false;
   bool xlow = false;
   bool xup = false;
   bool nbinsx = false;
@@ -1026,7 +1064,7 @@ information2d param2d(ifstream* plotFile, information2d defaultParams)
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && xlow && xup && nbinsx && ylow && yup && nbinsy && bDisplayNoInfo && blegendPosition)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && bScale && cScale && xlow && xup && nbinsx && ylow && yup && nbinsy && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -1065,6 +1103,14 @@ information2d param2d(ifstream* plotFile, information2d defaultParams)
     if(line.find("cut")<position){
       cut = true;
       thisPlot.cut = line.substr(position+1);
+    }
+    if(line.find("bScale")<position){
+      bScale = true;
+      thisPlot.bScale = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("cScale")<position){
+      cScale = true;
+      thisPlot.cScale = atof((line.substr(position+1)).c_str());
     }
     if(line.find("xlow")<position){
       xlow = true;
@@ -1113,6 +1159,8 @@ informationCut paramCut(ifstream* plotFile, informationCut defaultParams)
   bool aliasy = false;
   bool yTitle = false;
   bool cut = false;
+  bool bScale  = false; 
+  bool cScale = false;
   bool direction = false;
   bool xlow = false;
   bool xup = false;
@@ -1123,7 +1171,7 @@ informationCut paramCut(ifstream* plotFile, informationCut defaultParams)
   bool bDisplayNoInfo = false;
   bool blegendPosition = false;
 
-  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && direction && xlow && xup && nbinsx && ylow && yup && nbinsy && bDisplayNoInfo && blegendPosition)) {
+  while (! (plotName && plotTitle && label && aliasx && xTitle && aliasy && yTitle && cut && bScale && cScale &&  direction && xlow && xup && nbinsx && ylow && yup && nbinsy && bDisplayNoInfo && blegendPosition)) {
     string line;
     size_t position;
     getline(*plotFile,line);
@@ -1162,6 +1210,14 @@ informationCut paramCut(ifstream* plotFile, informationCut defaultParams)
     if(line.find("cut")<position){
       cut = true;
       thisPlot.cut = line.substr(position+1);
+    }
+    if(line.find("bScale")<position){
+      bScale = true;
+      thisPlot.bScale = atof((line.substr(position+1)).c_str());
+    }
+    if(line.find("cScale")<position){
+      cScale = true;
+      thisPlot.cScale = atof((line.substr(position+1)).c_str());
     }
     if(line.find("direction")<position){
       direction = true;
@@ -3782,6 +3838,9 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
   for(list< pair< information1d , flavorHists1D > >::iterator iPlot = jetPlots1D.begin(); iPlot != jetPlots1D.end(); iPlot++)
     {
       if(dataVsmc) {//only for data vs mc comparison
+	// apply the flavor re scaling
+	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
@@ -3793,6 +3852,9 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
   for(list< pair< informationTrackCuts , flavorHists1D > >::iterator iPlot = trackCutPlots.begin(); iPlot != trackCutPlots.end(); iPlot++)
     {
       if(dataVsmc) {//only for data vs mc comparison      
+	// apply the flavor re scaling
+	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
@@ -3804,6 +3866,9 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
   for(list< pair< informationMuonCuts , flavorHists1D > >::iterator iPlot = muonCutPlots.begin(); iPlot != muonCutPlots.end(); iPlot++)
     {
       if(dataVsmc) {//only for data vs mc comparison
+	// apply the flavor re scaling
+	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
@@ -3823,6 +3888,9 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
   for(list< pair< information1d , flavorHists1D > >::iterator iPlot = trackPlots_flavorStack.begin(); iPlot != trackPlots_flavorStack.end(); iPlot++)
     {
       if(dataVsmc) {//only for data vs mc comparison
+	// apply the flavor re scaling
+	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
@@ -3837,6 +3905,9 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
   for(list< pair< information2d , flavorHists2D > >::iterator iPlot = jetPlots2D.begin(); iPlot != jetPlots2D.end(); iPlot++)
     {
       if(dataVsmc) {//only for data vs mc comparison
+	// apply the flavor re scaling
+	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
@@ -3870,6 +3941,9 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
   for(list< pair< information1d , flavorHists1D > >::iterator iPlot = effVsCutPlots.begin(); iPlot != effVsCutPlots.end(); iPlot++)
     {
       if(dataVsmc) {//only for data vs mc comparison
+	// apply the flavor re scaling
+	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
@@ -3896,6 +3970,8 @@ information1d get1DInfoFromTrackCut(informationTrackCuts info){
   info1d.aliasx			  = info.aliasx                  ;
   info1d.xTitle			  = info.xTitle                  ;
   info1d.cut			  = info.cut                     ;
+  info1d.bScale			  = info.bScale                     ;
+  info1d.cScale			  = info.cScale                     ;
   info1d.xlow			  = info.xlow                    ;
   info1d.xup			  = info.xup                     ;
   info1d.nbinsx			  = info.nbinsx                  ;
@@ -3920,6 +3996,8 @@ information1d get1DInfoFromMuonCut(informationMuonCuts info){
   info1d.aliasx			  = info.aliasx                  ;
   info1d.xTitle			  = info.xTitle                  ;
   info1d.cut			  = info.cut                     ;
+  info1d.bScale			  = info.bScale                     ;
+  info1d.cScale			  = info.cScale                     ;
   info1d.xlow			  = info.xlow                    ;
   info1d.xup			  = info.xup                     ;
   info1d.nbinsx			  = info.nbinsx                  ;

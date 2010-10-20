@@ -28,6 +28,8 @@ class informationMuonCuts{
   std::string aliasx;
   std::string xTitle;
   std::string cut;
+  double bScale;
+  double cScale;
   double xlow;
   double xup;
   int nbinsx;
