@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-bTagNtuple = cms.EDProducer('TagNtupleProducer',
+bTagNtuple = cms.EDAnalyzer('TagNtupleProducer',
                             getMCTruth = cms.bool(True),
                             jetSrc = cms.InputTag( "ak5CaloJets" ),
                             svComputer = cms.InputTag( "combinedSecondaryVertex" ),
