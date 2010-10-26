@@ -1,82 +1,28 @@
 import FWCore.ParameterSet.Config as cms
 
-import RecoBTag.SoftLepton.muonSelection
-from DQMOffline.RecoB.bTagCombinedSVVariables_cff import *
-#includes added because of block refactoring replacing simple includes by using statements
-from DQMOffline.RecoB.bTagTrackIPAnalysis_cff import *
-from DQMOffline.RecoB.bTagCombinedSVAnalysis_cff import *
-from DQMOffline.RecoB.bTagTrackCountingAnalysis_cff import *
-from DQMOffline.RecoB.bTagTrackProbabilityAnalysis_cff import *
-from DQMOffline.RecoB.bTagTrackBProbabilityAnalysis_cff import *
-from DQMOffline.RecoB.bTagGenericAnalysis_cff import *
-from DQMOffline.RecoB.bTagSimpleSVAnalysis_cff import *
-from DQMOffline.RecoB.bTagSoftLeptonAnalysis_cff import *
-from DQMOffline.RecoB.bTagSoftLeptonByPtAnalysis_cff import *
-from DQMOffline.RecoB.bTagSoftLeptonByIPAnalysis_cff import *
-
 process = cms.Process("validation")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-process.load("DQMServices.Components.DQMEnvironment_cfi")
 
 #keep the logging output to a nice level
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-
-process.load("DQMServices.Core.DQM_cfg")
 
 process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
-process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
+process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-#Global tag for 3_6_1
-process.GlobalTag.globaltag = 'GR_R_36X_V12A::All'
+#Global tag for 3_8_X data reprocessing
+process.GlobalTag.globaltag = 'GR_R_38X_V13A::All'
 
-process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
-from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
-#Good Bunch Crossings
-process.bptxAnd = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True), L1SeedsLogicalExpression = cms.string('0'))
-#BSCNOBEAMHALO
-process.bit40 = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True), L1SeedsLogicalExpression = cms.string('(40 OR 41) AND NOT (36 OR 37 OR 38 OR 39) AND NOT ((42 AND NOT 43) OR (43 AND NOT 42))'))
-
-#Physics-declared Bit
-from HLTrigger.HLTfilters.hltHighLevelDev_cfi import hltHighLevelDev
-process.physDecl = hltHighLevelDev.clone(HLTPaths = ['HLT_PhysicsDeclared'], HLTPathsPrescales = [1])
-
-#Select events based on the HLT triggers (HLT_L1Jet6U || HLT_L1Jet10U || HLT_Jet15U)
-# Use the instructions provided at:
-# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/HLTrigger/HLTfilters/python/hltHighLevel_cfi.py?hideattic=1&revision=1.5&view=markup
-import HLTrigger.HLTfilters.hltHighLevel_cfi
-process.singleJetHLTFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
-process.singleJetHLTFilter.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
-process.singleJetHLTFilter.HLTPaths = ["HLT_L1Jet6U", "HLT_L1Jet10U", "HLT_Jet15U"]
-process.singleJetHLTFilter.andOr = cms.bool(True) # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
-
-import HLTrigger.HLTfilters.hltHighLevel_cfi
-process.HLT_Jet15U = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
-process.HLT_Jet15U.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
-process.HLT_Jet15U.HLTPaths = ["HLT_Jet15U"]
-process.HLT_Jet15U.andOr = cms.bool(True) # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
-
+########### Event cleaning ###########
 #Require a good vertex
 process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
    src = cms.InputTag("offlinePrimaryVertices"),
    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"),
    filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
 )
-
-# JEC for both ak5PF and Calo jets
-process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-
-#Filter for PFJets
-process.PFJetsFilter = cms.EDFilter("PFJetSelector",
-  src = cms.InputTag("ak5PFJetsL2L3"),
-  cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 1.0 && neutralEmEnergyFraction < 1.0 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 1.0"),
-  filter = cms.bool(True)
-)
-
-
 
 #Filter for removing scraping events
 process.noscraping = cms.EDFilter("FilterOutScraping",
@@ -86,12 +32,69 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
                                 thresh = cms.untracked.double(0.25)
                                 )
 
+
+########### Trigger selection ###########
+# Select events based on the HLT triggers....singleJet and BTag triggers
+# Use the instructions provided at:
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/TriggerResultsFilter
+# This eases the trigger selection for different HLT menus and also takes care of wildcard and trigger versioning
+#######
+
+import HLTrigger.HLTfilters.triggerResultsFilter_cfi as hlt
+process.JetHLTFilter = hlt.triggerResultsFilter.clone(
+   triggerConditions = cms.vstring( 
+        "HLT_L1Jet6U", 
+        "HLT_L1Jet10U", 
+        "HLT_Jet15U", 
+        "HLT_Jet30U", 
+        "HLT_Jet50U",
+        "HLT_Jet70U",
+        "HLT_Jet100U",
+        "HLT_BTagIP_Jet50U",
+        "HLT_BTagMu_Jet10U",
+        "HLT_BTagMu_Jet20U",
+        "HLT_BTagMu_DiJet10U_v*",
+        "HLT_BTagMu_DiJet20U_v*",
+        "HLT_BTagMu_DiJet20U_Mu5_v*"
+        ),
+   hltResults = cms.InputTag("TriggerResults","","REDIGI38X"),
+   l1tResults = cms.InputTag( "" ),
+   throw = cms.bool( False) #set to false to deal with missing triggers while running over different trigger menus
+)
+
+########### Jet selection and JEC ###########
+# Apply "loose PF JetID" first
+process.PFJetsFilter = cms.EDFilter("PFJetSelector",
+  src = cms.InputTag("ak5PFJets"),
+  cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 1.0 && neutralEmEnergyFraction < 1.0 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 1.0"),
+  filter = cms.bool(True)
+)
+
+# Then apply the JEC
+#...........................................
+# JEC in 38X....switch off use of confDB
+process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+
+##------------------  PF JETS --------------
+process.ak5PFJetsJEC = process.ak5PFJetsL2L3.clone(
+    src = 'PFJetsFilter', 
+    correctors = ['ak5PFL2L3'])
+
+process.ak5PFL2Relative.useCondDB = False
+process.ak5PFL3Absolute.useCondDB = False
+process.ak5PFResidual.useCondDB = False
+
+#............................................
+
+
+########### Rerun b-tagging for PF Jets ###########
 process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 
 process.ak5PFJetTracksAssociatorAtVertex = cms.EDProducer("JetTracksAssociatorAtVertex",
    process.j2tParametersVX,
-   jets = cms.InputTag("PFJetsFilter")
+   jets = cms.InputTag("ak5PFJetsJEC")
 )
+
 
 process.standardImpactParameterPFTagInfos = process.impactParameterTagInfos.clone(
   jetTracks = "ak5PFJetTracksAssociatorAtVertex"
@@ -109,7 +112,6 @@ process.standardGhostTrackVertexPFTagInfos.vertexReco = process.ghostTrackVertex
 process.standardGhostTrackVertexPFTagInfos.vertexCuts.multiplicityMin = 1
 
 process.standardCombinedSecondaryVertexPF = process.combinedSecondaryVertex.clone()
-
 process.standardCombinedSecondaryVertex3TrkPF = process.combinedSecondaryVertex.clone()
 
 process.standardSecondaryVertexV0PFTagInfos = process.standardSecondaryVertexPFTagInfos.clone()
@@ -130,32 +132,26 @@ process.standardTrackCountingHighPurPFBJetTags = process.trackCountingHighPurBJe
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterPFTagInfos"))
 )
 
-
 process.standardJetProbabilityPFBJetTags = process.jetProbabilityBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterPFTagInfos")) 
 )
-
 
 process.standardJetBProbabilityPFBJetTags = process.jetBProbabilityBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterPFTagInfos")) 
 )
 
-
 process.standardSimpleSecondaryVertexHighEffPFBJetTags = process.simpleSecondaryVertexHighEffBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardSecondaryVertexPFTagInfos"))
 )
-
 
 process.standardSimpleSecondaryVertexHighPurPFBJetTags = process.simpleSecondaryVertexHighPurBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardSecondaryVertexPFTagInfos"))
 )
 
-
 process.standardGhostTrackPFBJetTags = process.ghostTrackBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterPFTagInfos"),
 	                         cms.InputTag("standardGhostTrackVertexPFTagInfos"))
 )
-
 
 process.standardCombinedSecondaryVertexPFBJetTags = process.combinedSecondaryVertexBJetTags.clone(
   jetTagComputer = cms.string('standardCombinedSecondaryVertexPF'),
@@ -163,174 +159,46 @@ process.standardCombinedSecondaryVertexPFBJetTags = process.combinedSecondaryVer
                            cms.InputTag("standardSecondaryVertexPFTagInfos"))
 )
 
-
 process.standardCombinedSecondaryVertexMVAPFBJetTags = process.combinedSecondaryVertexMVABJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardImpactParameterPFTagInfos"),
                            cms.InputTag("standardSecondaryVertexPFTagInfos"))
 )
 
-
 process.standardSoftMuonPFTagInfos = process.softMuonTagInfos.clone(
-  jets = "PFJetsFilter"
+  jets = "ak5PFJetsJEC"
 )
-
 
 process.standardSoftElectronPFTagInfos = process.softElectronTagInfos.clone(
-  jets = "PFJetsFilter"
+  jets = "ak5PFJetsJEC"
 )
-
 
 process.standardSoftMuonPFBJetTags = process.softMuonBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardSoftMuonPFTagInfos"))
 )
 
-
 process.standardSoftMuonByPtPFBJetTags = process.softMuonByPtBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardSoftMuonPFTagInfos"))
 )
-
 
 process.standardSoftMuonByIP3dPFBJetTags = process.softMuonByIP3dBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardSoftMuonPFTagInfos"))
 )
 
-
 process.standardSoftElectronByPtPFBJetTags = process.softElectronByPtBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardSoftElectronPFTagInfos"))
 )
-
 
 process.standardSoftElectronByIP3dPFBJetTags = process.softElectronByIP3dBJetTags.clone(
   tagInfos = cms.VInputTag(cms.InputTag("standardSoftElectronPFTagInfos"))
 )
 
-process.load("DQMOffline.RecoB.bTagAnalysisData_cfi")
-process.pfBTagAnalysis = process.bTagAnalysis.clone()
-process.pfBTagAnalysis.tagConfig = cms.VPSet(
-        cms.PSet(
-            bTagTrackIPAnalysisBlock,
-            type = cms.string('TrackIP'),
-            label = cms.InputTag("standardImpactParameterPFTagInfos")
-        ), 
-        cms.PSet(
-            bTagCombinedSVAnalysisBlock,
-            ipTagInfos = cms.InputTag("standardImpactParameterPFTagInfos"),
-            type = cms.string('GenericMVA'),
-            svTagInfos = cms.InputTag("standardSecondaryVertexPFTagInfos"),
-            label = cms.InputTag("standardCombinedSecondaryVertexPF")
-        ), 
-        cms.PSet(
-            bTagCombinedSVAnalysisBlock,
-            ipTagInfos = cms.InputTag("standardImpactParameterPFTagInfos"),
-            type = cms.string('GenericMVA'),
-            svTagInfos = cms.InputTag("standardSecondaryVertexV0PFTagInfos"),
-            label = cms.InputTag("standardCombinedSecondaryVertexV0PF")
-        ), 
-        cms.PSet(
-            bTagCombinedSVAnalysisBlock,
-            ipTagInfos = cms.InputTag("standardImpactParameterPFTagInfos"),
-            type = cms.string('GenericMVA'),
-            svTagInfos = cms.InputTag("standardSecondaryVertex3TrkPFTagInfos"),
-            label = cms.InputTag("standardCombinedSecondaryVertex3TrkPF")
-        ), 
-        cms.PSet(
-            bTagTrackCountingAnalysisBlock,
-            label = cms.InputTag("standardTrackCountingHighEffPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagTrackCountingAnalysisBlock,
-            label = cms.InputTag("standardTrackCountingHighPurPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagProbabilityAnalysisBlock,
-            label = cms.InputTag("standardJetProbabilityPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagBProbabilityAnalysisBlock,
-            label = cms.InputTag("standardJetBProbabilityPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagSimpleSVAnalysisBlock,
-            label = cms.InputTag("standardSimpleSecondaryVertexHighEffPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagSimpleSVAnalysisBlock,
-            label = cms.InputTag("standardSimpleSecondaryVertexHighPurPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagGenericAnalysisBlock,
-            label = cms.InputTag("standardGhostTrackPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagGenericAnalysisBlock,
-            label = cms.InputTag("standardCombinedSecondaryVertexPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagGenericAnalysisBlock,
-            label = cms.InputTag("standardCombinedSecondaryVertexMVAPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagSoftLeptonAnalysisBlock,
-            label = cms.InputTag("standardSoftMuonPFBJetTags")
-        ),
-        cms.PSet(
-            bTagSoftLeptonByIPAnalysisBlock,
-            label = cms.InputTag("standardSoftMuonByIP3dPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagSoftLeptonByPtAnalysisBlock,
-            label = cms.InputTag("standardSoftMuonByPtPFBJetTags")
-        ),
-        cms.PSet(
-            bTagSoftLeptonByIPAnalysisBlock,
-            label = cms.InputTag("standardSoftElectronByIP3dPFBJetTags")
-        ), 
-        cms.PSet(
-            bTagSoftLeptonByPtAnalysisBlock,
-            label = cms.InputTag("standardSoftElectronByPtPFBJetTags")
-        ),
-        cms.PSet(
-            bTagSoftLeptonAnalysisBlock,
-            type = cms.string("SoftLepton"),
-            label = cms.InputTag("standardSoftMuonPFTagInfos")
-        ),
-        cms.PSet(
-            bTagSoftLeptonAnalysisBlock,
-            type = cms.string("SoftLepton"),
-            label = cms.InputTag("standardSoftElectronPFTagInfos")
-        ) 
-)
-process.pfBTagAnalysis.tagConfig[2].parameters.categories[0].vertexMass.min = 0.3
-process.pfBTagAnalysis.tagConfig[2].parameters.categories[0].vertexMass.max = 0.8
-process.pfBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.min = 0.3
-process.pfBTagAnalysis.tagConfig[2].parameters.categories[1].vertexMass.max = 0.8
-process.pfBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.min = 0.3
-process.pfBTagAnalysis.tagConfig[2].parameters.categories[2].vertexMass.max = 0.8
-for i in range(4, 17):
-  for j in range(i + 1, 17):
-    process.pfBTagAnalysis.tagConfig.append(
-      cms.PSet(
-        type = cms.string("TagCorrelation"),
-        label1 = process.pfBTagAnalysis.tagConfig[i].label,
-        label2 = process.pfBTagAnalysis.tagConfig[j].label,
-        parameters = cms.PSet(
-          CreateProfile = cms.bool(True),
-          Discr1Start = process.pfBTagAnalysis.tagConfig[i].parameters.discriminatorStart,
-          Discr1End = process.pfBTagAnalysis.tagConfig[i].parameters.discriminatorEnd,
-          Discr2Start = process.pfBTagAnalysis.tagConfig[j].parameters.discriminatorStart,
-          Discr2End = process.pfBTagAnalysis.tagConfig[j].parameters.discriminatorEnd
-        )
-      )
-    )
-
+########### Dump contents into ntuple ###########
 process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 
-
 process.standardPFBTagNtuple = process.bTagNtuple.clone()
-process.standardPFBTagNtuple.getMCTruth = cms.bool(False)
-process.standardPFBTagNtuple.jetSrc = cms.InputTag( "PFJetsFilter" )
+process.standardPFBTagNtuple.jetSrc = cms.InputTag( "ak5PFJetsJEC" )
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
-process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::HLT")
+process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI38X")
 process.standardPFBTagNtuple.jetMCSrc = cms.InputTag( "" )
 process.standardPFBTagNtuple.jetTracks = cms.InputTag( "ak5PFJetTracksAssociatorAtVertex" )
 process.standardPFBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexPFTagInfos" )
@@ -365,12 +233,12 @@ process.standardPFBTagNtuple.bTagConfig = cms.VPSet(
     label = cms.InputTag("standardSimpleSecondaryVertexHighPurPFBJetTags")
     ), 
     cms.PSet(
-    alias = cms.string("standardGhostTrackPFBJetTags"),
-    label = cms.InputTag("standardGhostTrackPFBJetTags")
-    ), 
-    cms.PSet(
     alias = cms.string("standardCombinedSecondaryVertexPFBJetTags"),
     label = cms.InputTag("standardCombinedSecondaryVertexPFBJetTags")
+    ), 
+    cms.PSet(
+    alias = cms.string("standardGhostTrackPFBJetTags"),
+    label = cms.InputTag("standardGhostTrackPFBJetTags")
     ), 
     cms.PSet(
     alias = cms.string("standardCombinedSecondaryVertexMVAPFBJetTags"),
@@ -405,53 +273,14 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile1.root',
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile2.root',
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile3.root',
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile4.root',
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile5.root',
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile6.root',
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile7.root',
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile8.root',
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile9.root',
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile10.root',
-'file:/nfs/data6/alschmid/SVAnalysis/OnData/CMSSW_3_6_1_patch4/src/bTag/CommissioningCommonSetup/test/DataTestFile11.root'
-  
-#   '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FEA3BECA-7569-DF11-86FA-002354EF3BD2.root',
-#        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE6FE723-7369-DF11-AF74-0026189438ED.root',
-#        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE4EF777-7669-DF11-8546-0018F3D09636.root',
-#        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE243325-7669-DF11-8CA4-0018F3D09636.root',
-#        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FE18F74E-7669-DF11-943A-0026189438A5.root',
-#        '/store/data/Commissioning10/MinimumBias/RECO/May27thReReco_of_valskim_PreProduction_v2/0165/FCC4F3A4-7469-DF11-9882-002618943977.root' 
-  )
+  'file:/storage/5/jyothsna/QCD_Pt_80to120_TuneZ2_7TeV_pythia6_Fall10-START38_V12-v1/DE0CA996-41CB-DF11-A68D-0025B3E06378.root',
+  'file:/storage/5/jyothsna/QCD_Pt_80to120_TuneZ2_7TeV_pythia6_Fall10-START38_V12-v1/F4A9BA39-57CB-DF11-8D97-003048D46006.root'
+     )
 )
-
-process.EDM = cms.OutputModule("PoolOutputModule",
-    outputCommands = cms.untracked.vstring('drop *',
-                       "keep *_*_*_validation",
-                       "keep recoTracks_generalTracks_*_*",
-                       "keep recoTracks_globalMuons_*_*",
-                       "keep *_offlineBeamSpot_*_*",
-                       "keep *_gsfElectrons_*_*",
-                       "keep recoMuons_muons_*_*",
-                       "keep *_softPFElectrons_*_*",
-                       "keep recoGsfTracks_electronGsfTracks_*_*",
-                       "keep *_TriggerResults_*_*",
-                       "keep *_offlinePrimaryVertices_*_*"
-    ),
-    fileName = cms.untracked.string('BTagCommissioning2010_April20_7TeV_Data_PromptReco_v8.root'),
-#    SelectEvents = cms.untracked.PSet(
-#       SelectEvents = cms.vstring("plots")
-#    )
-)
-
-process.load("DQMServices.Components.MEtoEDMConverter_cfi")
-
 
 process.svTagInfos = cms.Sequence(
     process.standardSecondaryVertexPFTagInfos +
-    process.standardSecondaryVertexV0PFTagInfos +
+    process.standardSecondaryVertexV0PFTagInfos + 
     process.standardSecondaryVertex3TrkPFTagInfos +
     process.standardGhostTrackVertexPFTagInfos 
 )
@@ -474,8 +303,8 @@ process.svTaggers = cms.Sequence(
 process.slTagInfos = cms.Sequence(
     process.standardSoftMuonPFTagInfos +
     process.softElectronCands * (
-    process.standardSoftElectronPFTagInfos 
-    )
+    process.standardSoftElectronPFTagInfos
+    ) 
 )
 
 process.slTaggers = cms.Sequence(
@@ -488,14 +317,11 @@ process.slTaggers = cms.Sequence(
 
 
 process.plots = cms.Path(
-  process.bit40 +
-  process.bptxAnd +
-#  process.physDecl +
-  process.singleJetHLTFilter +
+  process.JetHLTFilter +
   process.noscraping +
   process.oneGoodVertexFilter +
-  process.ak5PFJetsL2L3 *
-  cms.ignore(process.PFJetsFilter) *
+  process.PFJetsFilter *
+  process.ak5PFJetsJEC *
   process.ak5PFJetTracksAssociatorAtVertex  *
   process.standardImpactParameterPFTagInfos  *
   process.svTagInfos *
@@ -503,13 +329,8 @@ process.plots = cms.Path(
   process.svTaggers *
   process.slTagInfos *
   process.slTaggers *
-  process.standardPFBTagNtuple *
-  process.HLT_Jet15U *
-  process.pfBTagAnalysis  * 
-  process.MEtoEDMConverter
+  process.standardPFBTagNtuple 
 )
-
-process.outpath = cms.EndPath(process.EDM)
 
 ## Added for getting the L1 and HLT summary report
 process.options = cms.untracked.PSet(
