@@ -1539,7 +1539,10 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists, double intLumi, i
     hists.mc_b_hist->SetFillStyle(0);
     hists.mc_all_hist->SetLineColor(kBlack);
   }
-  else  hists.mc_all_hist->SetLineColor(kRed);
+  else  {
+    hists.mc_all_hist->SetLineColor(kRed);
+    hists.mc_all_hist->SetMarkerColor(kRed);
+  }
   hists.mc_all_hist->SetLineWidth(3);
   hists.mc_all_hist->SetFillStyle(0);
 
@@ -1572,6 +1575,17 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists, double intLumi, i
   ratio->Divide(ratioMC);
   ratio->SetMarkerStyle(20);
 
+  TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),1024,1024);
+  canvas_ratio.cd();
+  if(dataVsmc)     ratio->SetYTitle("Data/Sim ratio");
+  else             ratio->SetYTitle("Data/Data ratio");
+  ratio->Draw("E1X0");
+  cmsPrel(intLumi);
+  canvas_ratio.SaveAs((info.plotName+"_ratio.pdf").c_str());
+  canvas_ratio.SaveAs((info.plotName+"_ratio.png").c_str());
+  canvas_ratio.SaveAs((info.plotName+"_ratio.root").c_str());
+
+  /////////////
   TLegend *legend;
   if(info.legendPosition == true)
     legend = new TLegend(0.725,0.15, 0.925, 0.35); //"bottom right"
@@ -1633,7 +1647,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists, double intLumi, i
   canvas.cd(1);
 
   if(dataVsmc)   mc_stack.Draw("HISTNOSTACK");
-  else           mc_stack.Draw("E1X0SAME");
+  else           mc_stack.Draw("E1X0");
   drawHelper->Draw("PSAME");
   hists.data_hist->Draw("E1X0SAME");
   legend->Draw();
@@ -1645,9 +1659,9 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists, double intLumi, i
   ratio->Draw("E1X0");
   gPad->Update();
 
-  canvas.SaveAs((info.plotName+".pdf").c_str());
-  canvas.SaveAs((info.plotName+".png").c_str());
-  canvas.SaveAs((info.plotName+".root").c_str());
+  canvas.SaveAs((info.plotName+"_Linear.pdf").c_str());
+  canvas.SaveAs((info.plotName+"_Linear.png").c_str());
+  canvas.SaveAs((info.plotName+"_Linear.root").c_str());
 
   canvas.Clear();
   canvas.Divide(1,2,0.01,0.0);
@@ -1675,7 +1689,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists, double intLumi, i
   //  hists.data_hist->SetMaximum(max(mc_stack_bDown.GetMaximum(),ymaxdef) * 6.0);
   //  hists.data_hist->SetMinimum(info.yMin);
   if(dataVsmc)   mc_stack.Draw("HISTNOSTACK");
-  else           mc_stack.Draw("E1X0SAME");
+  else           mc_stack.Draw("E1X0");
   drawHelper->Draw("PSAME");
   hists.data_hist->Draw("E1X0SAME");
   legend->Draw();
@@ -1807,6 +1821,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale, doub
     hists.mc_c_hist->SetFillColor(kGreen);
     hists.mc_b_hist->SetFillColor(kRed);
   }
+  hists.mc_all_hist->SetLineColor(kRed);
   hists.mc_all_hist->SetFillColor(kRed);
   hists.mc_all_hist->SetMarkerColor(kRed);
   
@@ -1951,7 +1966,8 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale, doub
 
   TCanvas canvas_ratio((info.plotName+"canvas_ratio").c_str(),info.plotTitle.c_str(),1024,1024);
   canvas_ratio.cd();
-  ratio->SetYTitle("Data/Sim ratio");
+  if(dataVsmc) ratio->SetYTitle("Data/Sim");
+  else         ratio->SetYTitle("Data/Data");
   ratio->Draw("E1X0");
   cmsPrel(intLumi);
   canvas_ratio.SaveAs((info.plotName+"_ratio.pdf").c_str());
@@ -1978,7 +1994,8 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale, doub
   ratio->GetXaxis()->SetLabelOffset( 0.006 );
   ratio->GetXaxis()->SetNdivisions( 510 );
   ratio->GetXaxis()->SetTickLength( ratio->GetXaxis()->GetTickLength() * 3.0 );
-  ratio->SetYTitle("Data/Sim");
+  if(dataVsmc) ratio->SetYTitle("Data/Sim");
+  else         ratio->SetYTitle("Data/Data");
 
   //Draw the plot and ratio on the same canvas
   TCanvas canvas_bDownLin((info.plotName+"canvas_bDownLin").c_str(),info.plotTitle.c_str(),1024,1024);
