@@ -1,5 +1,3 @@
-
-
 // system include files
 #include <memory>
 #include <vector>
@@ -109,15 +107,15 @@ public:
   std::vector< edm::ParameterSet > bTag_Config_;
   std::string label_;
   
-  
-
   // data formats
   TTree *tree;
   TFile *file;
   
-  bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U, triggerHLTBTagMuJet10U, triggerHLTBTagIPJet50U;
+  bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U;
   bool triggerHLTJet30U, triggerHLTJet50U, triggerHLTJet70U, triggerHLTJet100U ;
-  
+  bool triggerHLTBTagIPJet50U, triggerHLTBTagMuJet10U, triggerHLTBTagMuJet20U;
+  bool triggerHLTBTagMuDiJet10U, triggerHLTBTagMuDiJet20U, triggerHLTBTagMuDiJet20UMu5;
+
   unsigned int eventNumber ;
   unsigned int runNumber ;
   unsigned int lumiBlockNumber ;
@@ -578,10 +576,14 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "triggerHLTJet50U",  &triggerHLTJet50U, "triggerHLTJet50U/O");
   tree->Branch(  "triggerHLTJet70U",  &triggerHLTJet70U, "triggerHLTJet70U/O");
   tree->Branch(  "triggerHLTJet100U",  &triggerHLTJet100U, "triggerHLTJet100U/O");
-  tree->Branch(  "triggerHLTBTagMuJet10U", &triggerHLTBTagMuJet10U, "triggerHLTBTagMuJet10U/O");
   tree->Branch(  "triggerHLTBTagIPJet50U", &triggerHLTBTagIPJet50U, "triggerHLTBTagIPJet50U/O");
+  tree->Branch(  "triggerHLTBTagMuJet10U", &triggerHLTBTagMuJet10U, "triggerHLTBTagMuJet10U/O");
+  tree->Branch(  "triggerHLTBTagMuJet20U", &triggerHLTBTagMuJet20U, "triggerHLTBTagMuJet20U/O");
+  tree->Branch(  "triggerHLTBTagMuDiJet10U", &triggerHLTBTagMuDiJet10U, "triggerHLTBTagMuDiJet10U/O");
+  tree->Branch(  "triggerHLTBTagMuDiJet20U", &triggerHLTBTagMuDiJet20U, "triggerHLTBTagMuDiJet20U/O");
 
-    tree->Branch(  "eventNumber"             , &eventNumber             , "eventNumber/i"            );
+
+  tree->Branch(  "eventNumber"             , &eventNumber             , "eventNumber/i"            );
   tree->Branch(  "runNumber"		    , &runNumber               , "runNumber/i"   	    );
   tree->Branch(  "lumiBlockNumber" 	    , &lumiBlockNumber         , "lumiBlockNumber/i" 	    );
   tree->Branch(  "numberOfPrimaryVertices" , &numberOfPrimaryVertices , "numberOfPrimaryVertices/i"); 
@@ -904,23 +906,21 @@ TagNtupleProducer::~TagNtupleProducer()
 //
 
 // ------------ method called to produce the data  ------------
-void
-TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
   using namespace std;
   using namespace reco;
   
-  //Get The Various collections defined in the configuration file
   triggerHLTL1Jet6U= triggerHLTL1Jet10U= triggerHLTJet15U = 0;
   triggerHLTJet30U = triggerHLTJet50U = triggerHLTJet70U= triggerHLTJet100U = 0;
-  triggerHLTBTagMuJet10U = 0;
+  triggerHLTBTagIPJet50U = triggerHLTBTagMuJet10U = triggerHLTBTagMuJet20U = 0;
+  triggerHLTBTagMuDiJet10U = triggerHLTBTagMuDiJet20U = triggerHLTBTagMuDiJet20UMu5 = 0;
 
+  //Get The Various collections defined in the configuration file
   edm::Handle<edm::TriggerResults>  hltresults;
   iEvent.getByLabel(triggerTag_, hltresults);
   
-  //  edm::TriggerNames triggerNames_;
-  //  triggerNames_.init(* hltresults);
   const edm::TriggerNames & triggerNames_ = iEvent.triggerNames(*hltresults);  
 
   int ntrigs = hltresults->size();
@@ -928,26 +928,24 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   bool bFoundTrig=0;
   for (int itrig = 0; itrig != ntrigs; ++itrig){
     string trigName=triggerNames_.triggerName(itrig);
-    if (trigName=="HLT_L1Jet6U")  {bFoundTrig = 1; triggerHLTL1Jet6U  = hltresults->accept(itrig) ;}
-    if (trigName=="HLT_L1Jet10U") triggerHLTL1Jet10U = hltresults->accept(itrig) ; 
-    if (trigName=="HLT_Jet15U")   {bFoundTrig = 1; triggerHLTJet15U   = hltresults->accept(itrig) ;}
-    if (trigName=="HLT_Jet30U")   triggerHLTJet30U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet50U")   triggerHLTJet50U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet70U")   triggerHLTJet70U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet100U")   triggerHLTJet100U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_BTagMu_Jet10U") triggerHLTBTagMuJet10U = hltresults->accept(itrig) ;
-    if (trigName=="HLT_BTagIP_Jet50U") triggerHLTBTagIPJet50U = hltresults->accept(itrig) ;
+    if (trigName=="HLT_L1Jet6U")               {bFoundTrig = 1; triggerHLTL1Jet6U  = hltresults->accept(itrig) ;}
+    if (trigName=="HLT_L1Jet10U")              triggerHLTL1Jet10U = hltresults->accept(itrig) ; 
+    if (trigName=="HLT_Jet15U")                {bFoundTrig = 1; triggerHLTJet15U   = hltresults->accept(itrig) ;}
+    if (trigName=="HLT_Jet30U")                triggerHLTJet30U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet50U")                triggerHLTJet50U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet70U")                triggerHLTJet70U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet100U")               triggerHLTJet100U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagIP_Jet50U")         triggerHLTBTagIPJet50U = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagMu_Jet10U")         triggerHLTBTagMuJet10U = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagMu_Jet20U")         triggerHLTBTagMuJet20U = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagMu_DiJet10U")       triggerHLTBTagMuDiJet10U = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagMu_DiJet20U")       triggerHLTBTagMuDiJet20U = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagMu_DiJet20U_Mu5")   triggerHLTBTagMuDiJet20UMu5 = hltresults->accept(itrig) ;
   }  
   if(bFoundTrig==0){
     std::cout<<"  ERROR: trigger name not found in event" << std::endl;
     exit(1);
   }
-
-  // do NOT save event, if no trigger has fired
-  if( triggerHLTL1Jet6U != 1 && triggerHLTL1Jet10U !=1 && triggerHLTJet15U != 1 && triggerHLTJet30U != 1 && 
-      triggerHLTJet50U != 1 && triggerHLTJet70U != 1 && triggerHLTJet100U != 1 && triggerHLTBTagMuJet10U != 1 
-      && triggerHLTBTagIPJet50U != 1 ) return;
-
 
   eventNumber = iEvent.eventAuxiliary().event();
   runNumber = iEvent.eventAuxiliary().run();
@@ -1653,14 +1651,12 @@ TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-void 
-TagNtupleProducer::beginJob()
+void TagNtupleProducer::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void 
-TagNtupleProducer::endJob() {
+void TagNtupleProducer::endJob() {
 
   file ->Write();
   file->Close();
