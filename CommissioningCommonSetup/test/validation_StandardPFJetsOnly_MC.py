@@ -16,35 +16,13 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 #Global tag for 3_8_4
 process.GlobalTag.globaltag = 'START38_V12::All'
 
-process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
-from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
-#Good Bunch Crossings
-process.bptxAnd = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True), L1SeedsLogicalExpression = cms.string('0'))
-#BSCNOBEAMHALO
-process.bit40 = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True), L1SeedsLogicalExpression = cms.string('(40 OR 41) AND NOT (36 OR 37 OR 38 OR 39) AND NOT ((42 AND NOT 43) OR (43 AND NOT 42))'))
-
+########### Event cleaning ###########
 #Require a good vertex
 process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
    src = cms.InputTag("offlinePrimaryVertices"),
    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"),
    filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
 )
-
-#...........................................
-# JEC in 38X....switch off use of confDB
-process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
-process.ak5PFL2Relative.useCondDB = False
-process.ak5PFL3Absolute.useCondDB = False
-process.ak5PFResidual.useCondDB = False
-#............................................
-
-#Filter for PFJets
-process.PFJetsFilter = cms.EDFilter("PFJetSelector",
-  src = cms.InputTag("ak5PFJetsL2L3"),
-  cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 1.0 && neutralEmEnergyFraction < 1.0 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 1.0"),
-  filter = cms.bool(True)
-)
-
 
 #Filter for removing scraping events
 process.noscraping = cms.EDFilter("FilterOutScraping",
@@ -54,6 +32,61 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
                                 thresh = cms.untracked.double(0.25)
                                 )
 
+
+########### Trigger selection ###########
+# Select events based on the HLT triggers....singleJet and BTag triggers
+# Use the instructions provided at:
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/TriggerResultsFilter
+# This eases the trigger selection for different HLT menus and also takes care of wildcard and trigger versioning
+#######
+
+import HLTrigger.HLTfilters.triggerResultsFilter_cfi as hlt
+process.JetHLTFilter = hlt.triggerResultsFilter.clone(
+   triggerConditions = cms.vstring( 
+        "HLT_L1Jet6U", 
+        "HLT_L1Jet10U", 
+        "HLT_Jet15U", 
+        "HLT_Jet30U", 
+        "HLT_Jet50U",
+        "HLT_Jet70U",
+        "HLT_Jet100U",
+        "HLT_BTagIP_Jet50U",
+        "HLT_BTagMu_Jet10U",
+        "HLT_BTagMu_Jet20U",
+        "HLT_BTagMu_DiJet10U_v*",
+        "HLT_BTagMu_DiJet20U_v*",
+        "HLT_BTagMu_DiJet20U_Mu5_v*"
+        ),
+   hltResults = cms.InputTag("TriggerResults","","REDIGI38X"),
+   l1tResults = cms.InputTag( "" ),
+   throw = cms.bool( False) #set to false to deal with missing triggers while running over different trigger menus
+)
+
+########### Jet selection and JEC ###########
+# Apply "loose PF JetID" first
+process.PFJetsFilter = cms.EDFilter("PFJetSelector",
+  src = cms.InputTag("ak5PFJets"),
+  cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 1.0 && neutralEmEnergyFraction < 1.0 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 1.0"),
+  filter = cms.bool(True)
+)
+
+# Then apply the JEC
+#...........................................
+# JEC in 38X....switch off use of confDB
+process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+
+##------------------  PF JETS --------------
+process.ak5PFJetsJEC = process.ak5PFJetsL2L3.clone(
+    src = 'PFJetsFilter', 
+    correctors = ['ak5PFL2L3'])
+
+process.ak5PFL2Relative.useCondDB = False
+process.ak5PFL3Absolute.useCondDB = False
+process.ak5PFResidual.useCondDB = False
+
+#............................................
+
+
 #Filter to remove pthat>15 events in MinBias samples
 process.pthat_filter = cms.EDFilter("MCProcessFilter",
 	  MaxPthat = cms.untracked.vdouble(15.0),
@@ -62,11 +95,12 @@ process.pthat_filter = cms.EDFilter("MCProcessFilter",
 )
 
 
+########### Rerun b-tagging for PF Jets ###########
 process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 
 process.ak5PFJetTracksAssociatorAtVertex = cms.EDProducer("JetTracksAssociatorAtVertex",
    process.j2tParametersVX,
-   jets = cms.InputTag("PFJetsFilter")
+   jets = cms.InputTag("ak5PFJetsJEC")
 )
 
 
@@ -139,11 +173,11 @@ process.standardCombinedSecondaryVertexMVAPFBJetTags = process.combinedSecondary
 )
 
 process.standardSoftMuonPFTagInfos = process.softMuonTagInfos.clone(
-  jets = "PFJetsFilter"
+  jets = "ak5PFJetsJEC"
 )
 
 process.standardSoftElectronPFTagInfos = process.softElectronTagInfos.clone(
-  jets = "PFJetsFilter"
+  jets = "ak5PFJetsJEC"
 )
 
 process.standardSoftMuonPFBJetTags = process.softMuonBJetTags.clone(
@@ -166,10 +200,11 @@ process.standardSoftElectronByIP3dPFBJetTags = process.softElectronByIP3dBJetTag
   tagInfos = cms.VInputTag(cms.InputTag("standardSoftElectronPFTagInfos"))
 )
 
+########### MC truth flavour matching ###########
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 
 process.AK5PFbyRef = process.AK5byRef.clone(
-  jets = "PFJetsFilter"
+  jets = "ak5PFJetsJEC"
 )
 process.AK5PFbyValAlgo = process.AK5byValAlgo.clone(
   srcByReference = "AK5PFbyRef"
@@ -180,10 +215,11 @@ process.flavourSeq = cms.Sequence(
     process.AK5PFbyRef *
     process.AK5PFbyValAlgo )
 
+########### Dump contents into ntuple ###########
 process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 
 process.standardPFBTagNtuple = process.bTagNtuple.clone()
-process.standardPFBTagNtuple.jetSrc = cms.InputTag( "PFJetsFilter" )
+process.standardPFBTagNtuple.jetSrc = cms.InputTag( "ak5PFJetsJEC" )
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
 process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI38X")
 process.standardPFBTagNtuple.jetMCSrc = cms.InputTag( "AK5PFbyValAlgo" )
@@ -305,11 +341,11 @@ process.slTaggers = cms.Sequence(
 
 process.plots = cms.Path(
 #  process.pthat_filter+
-#  process.bit40 +
+  process.JetHLTFilter +
   process.noscraping +
   process.oneGoodVertexFilter +
-  process.ak5PFJetsL2L3 *
   process.PFJetsFilter *
+  process.ak5PFJetsJEC *
   process.ak5PFJetTracksAssociatorAtVertex  *
   process.standardImpactParameterPFTagInfos  *
   process.svTagInfos *
