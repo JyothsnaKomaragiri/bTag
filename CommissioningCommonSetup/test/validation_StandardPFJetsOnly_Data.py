@@ -57,7 +57,7 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
         "HLT_BTagMu_DiJet20U_v*",
         "HLT_BTagMu_DiJet20U_Mu5_v*"
         ),
-   hltResults = cms.InputTag("TriggerResults","","REDIGI38X"),
+   hltResults = cms.InputTag("TriggerResults","","HLT"),
    l1tResults = cms.InputTag( "" ),
    throw = cms.bool( False) #set to false to deal with missing triggers while running over different trigger menus
 )
@@ -198,8 +198,8 @@ process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 process.standardPFBTagNtuple = process.bTagNtuple.clone()
 process.standardPFBTagNtuple.jetSrc = cms.InputTag( "ak5PFJetsJEC" )
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
-process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI38X")
-process.standardPFBTagNtuple.jetMCSrc = cms.InputTag( "" )
+process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::HLT")
+process.standardPFBTagNtuple.getMCTruth = cms.bool(False)
 process.standardPFBTagNtuple.jetTracks = cms.InputTag( "ak5PFJetTracksAssociatorAtVertex" )
 process.standardPFBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexPFTagInfos" )
 process.standardPFBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParameterPFTagInfos" )
@@ -273,9 +273,11 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-  'file:/storage/5/jyothsna/QCD_Pt_80to120_TuneZ2_7TeV_pythia6_Fall10-START38_V12-v1/DE0CA996-41CB-DF11-A68D-0025B3E06378.root',
-  'file:/storage/5/jyothsna/QCD_Pt_80to120_TuneZ2_7TeV_pythia6_Fall10-START38_V12-v1/F4A9BA39-57CB-DF11-8D97-003048D46006.root'
-     )
+    '/store/data/Run2010A/JetMETTau/RECO/Sep17ReReco_v2/0054/FEFC3537-44C7-DF11-8EE1-002618943868.root',
+    '/store/data/Run2010A/JetMETTau/RECO/Sep17ReReco_v2/0054/FEE6BD22-41C7-DF11-8F0D-002618943919.root',
+    '/store/data/Run2010A/JetMETTau/RECO/Sep17ReReco_v2/0054/FCE4C15C-43C7-DF11-A97F-001A92810ADE.root',
+    '/store/data/Run2010A/JetMETTau/RECO/Sep17ReReco_v2/0054/FC88AC0E-44C7-DF11-982A-002354EF3BE4.root'
+    )
 )
 
 process.svTagInfos = cms.Sequence(
