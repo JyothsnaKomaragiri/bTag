@@ -73,7 +73,7 @@
 
 // maximum array size (the arrays are stored with variable size in the root tree)
 const unsigned int MAXJETS = 40;
-const unsigned int MAXTRACKS = 200;
+const unsigned int MAXTRACKS = 300;
 
 
 class TagNtupleProducer : public edm::EDAnalyzer {
@@ -180,6 +180,7 @@ public:
   int trackHasSharedPix2[MAXTRACKS];
   int trackHasSharedPix3[MAXTRACKS];
   int trackHasSharedPixAll[MAXTRACKS];
+  bool trackIsVertexTrack[MAXTRACKS];
 
   //MC Truth Information
   int MCTrueFlavor[MAXJETS];                          
@@ -205,6 +206,11 @@ public:
   float SVjetDeltaR[MAXJETS];
   float SVvtxSumVtxDirDeltaR[MAXJETS];
   float SVvtxSumJetDeltaR[MAXJETS];
+  float SVvtxPt[MAXJETS];
+  float SVvtxSumDirEta[MAXJETS];
+  float SVvtxSumDirPhi[MAXJETS];
+  float SVvtxDirEta[MAXJETS];
+  float SVvtxDirPhi[MAXJETS];
                
   //impactParameterTagInfos
   int IPnSelectedTracks[MAXJETS];                       
@@ -646,6 +652,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "trackHasSharedPix2",  trackHasSharedPix2, "trackHasSharedPix2[nTracks]/I");
   tree->Branch(  "trackHasSharedPix3",  trackHasSharedPix3, "trackHasSharedPix3[nTracks]/I");
   tree->Branch(  "trackHasSharedPixAll",  trackHasSharedPixAll, "trackHasSharedPixAll[nTracks]/I");
+  tree->Branch( "trackIsVertexTrack", trackIsVertexTrack, "trackIsVertexTrack[nTracks]/O") ;
 
   //MC Truth Information
   tree->Branch(  "MCTrueFlavor", MCTrueFlavor, "MCTrueFlavor[nJets]/I");                          
@@ -671,6 +678,12 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "SVjetDeltaR",  SVjetDeltaR, "SVjetDeltaR[nJets]/F");
   tree->Branch(  "SVvtxSumVtxDirDeltaR", SVvtxSumVtxDirDeltaR, "SVvtxSumVtxDirDeltaR[nJets]/F");
   tree->Branch(  "SVvtxSumJetDeltaR",  SVvtxSumJetDeltaR, "SVvtxSumJetDeltaR[nJets]/F");
+
+  tree->Branch(  "SVvtxPt",  SVvtxPt, "SVvtxPt[nJets]/F");
+  tree->Branch(  "SVvtxSumDirEta",  SVvtxSumDirEta, "SVvtxSumDirEta[nJets]/F");
+  tree->Branch(  "SVvtxSumDirPhi",  SVvtxSumDirPhi, "SVvtxSumDirPhi[nJets]/F");
+  tree->Branch(  "SVvtxDirEta",  SVvtxDirEta, "SVvtxDirEta[nJets]/F");
+  tree->Branch(  "SVvtxDirPhi",  SVvtxDirPhi, "SVvtxDirPhi[nJets]/F");
                
   //impactParameterTagInfos
   tree->Branch(  "IPnSelectedTracks",  IPnSelectedTracks, "IPnSelectedTracks[nJets]/I");                       
@@ -925,16 +938,16 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   int ntrigs = hltresults->size();
 
-  bool bFoundTrig=0;
+
   for (int itrig = 0; itrig != ntrigs; ++itrig){
     string trigName=triggerNames_.triggerName(itrig);
-    if (trigName=="HLT_L1Jet6U")               {bFoundTrig = 1; triggerHLTL1Jet6U  = hltresults->accept(itrig) ;}
+    if (trigName=="HLT_L1Jet6U")               triggerHLTL1Jet6U  = hltresults->accept(itrig) ;
     if (trigName=="HLT_L1Jet10U")              triggerHLTL1Jet10U = hltresults->accept(itrig) ; 
-    if (trigName=="HLT_Jet15U")                {bFoundTrig = 1; triggerHLTJet15U   = hltresults->accept(itrig) ;}
+    if (trigName=="HLT_Jet15U")                triggerHLTJet15U   = hltresults->accept(itrig) ;
     if (trigName=="HLT_Jet30U")                triggerHLTJet30U   = hltresults->accept(itrig) ;
     if (trigName=="HLT_Jet50U")                triggerHLTJet50U   = hltresults->accept(itrig) ;
     if (trigName=="HLT_Jet70U")                triggerHLTJet70U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet100U")               triggerHLTJet100U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet100U")               triggerHLTJet100U   = hltresults->accept(itrig) ; 
     if (trigName=="HLT_BTagIP_Jet50U")         triggerHLTBTagIPJet50U = hltresults->accept(itrig) ;
     if (trigName=="HLT_BTagMu_Jet10U")         triggerHLTBTagMuJet10U = hltresults->accept(itrig) ;
     if (trigName=="HLT_BTagMu_Jet20U")         triggerHLTBTagMuJet20U = hltresults->accept(itrig) ;
@@ -942,10 +955,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     if (trigName=="HLT_BTagMu_DiJet20U")       triggerHLTBTagMuDiJet20U = hltresults->accept(itrig) ;
     if (trigName=="HLT_BTagMu_DiJet20U_Mu5")   triggerHLTBTagMuDiJet20UMu5 = hltresults->accept(itrig) ;
   }  
-  if(bFoundTrig==0){
-    std::cout<<"  ERROR: trigger name not found in event" << std::endl;
-    exit(1);
-  }
+ 
 
   eventNumber = iEvent.eventAuxiliary().event();
   runNumber = iEvent.eventAuxiliary().run();
@@ -1151,6 +1161,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       size_t nSelectedAndDecayLengthAndJetAsixTracks=0;
 
       size_t counter=0;
+    
       for(track_iterator iTrack = (*jetTracks)[thisJetRef].begin(); iTrack != (*jetTracks)[thisJetRef].end(); iTrack++)
 	{ 
 	  if(iTotalTracksCounter >= (int)MAXTRACKS) return;
@@ -1166,6 +1177,26 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	    }
 	
 	  if(isSelected) nSelectedTracks++;
+
+
+	  // check if track is attached to a vertex
+	  trackIsVertexTrack[iTotalTracksCounter] = false;
+	  bool hasVertex = svTagInfo[thisJetRef]->nVertices() > 0;
+	  if(hasVertex)
+	    {
+	      const Vertex &sv = svTagInfo[thisJetRef]->secondaryVertex(0);
+	      for(Vertex::trackRef_iterator iter = sv.tracks_begin();
+		  iter != sv.tracks_end(); iter++) {
+		if (sv.trackWeight(*iter) < 0.5)
+		  continue;
+		
+		TrackRef vtxTrackRef =  (*iter).castTo<TrackRef>();
+
+		if( vtxTrackRef == (*iTrack) ){
+		  trackIsVertexTrack[iTotalTracksCounter] = true;
+		}
+	      }
+	    }
 
 	  trackSelected[iTotalTracksCounter] = (isSelected);
 	  track3Momentum[iTotalTracksCounter] = (math::XYZVector((*iTrack)->px(),(*iTrack)->py(),(*iTrack)->pz()));
@@ -1294,6 +1325,11 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  SVvtxSumJetDeltaR[iJet] = ( Geom::deltaR(vertexSum, jetDir) );
 	  SVvtxSumVtxDirDeltaR[iJet] = ( Geom::deltaR( flightDir, vertexSum ) );
 	  
+	  SVvtxPt[iJet] = vertex.p4().pt();
+	  SVvtxSumDirEta[iJet] = vertex.p4().eta();
+	  SVvtxSumDirPhi[iJet] = vertex.p4().phi();
+	  SVvtxDirEta[iJet] =  flightDir.eta();
+	  SVvtxDirPhi[iJet] =  flightDir.phi();
 	  
 	}
       else
@@ -1318,6 +1354,12 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  SVIPFirstAboveCharm[iJet] = (  -9999 );
 	  SVvtxSumVtxDirDeltaR[iJet] = ( -9999 );
 	  SVvtxSumJetDeltaR[iJet] =  ( -9999 );
+
+	  SVvtxPt[iJet] = (-1 );
+	  SVvtxSumDirEta[iJet] = (-9999 );
+	  SVvtxSumDirPhi[iJet] = (-9999 );
+	  SVvtxDirEta[iJet] = (-9999 );
+	  SVvtxDirPhi[iJet] = (-9999 );
 	}
       
       
