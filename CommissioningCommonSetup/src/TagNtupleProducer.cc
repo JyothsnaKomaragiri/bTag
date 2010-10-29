@@ -50,6 +50,7 @@
 #include "SimDataFormats/JetMatching/interface/JetFlavour.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
 
@@ -128,6 +129,7 @@ public:
   float PVNormalizedChi2;
 
   float pthat;
+  bool isGluonSplitting;
 
   //Basic Jet Information
   int nJets;
@@ -600,6 +602,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "PVNormalizedChi2" , &PVNormalizedChi2 , "PVNormalizedChi2/F"); 
 
   tree->Branch(  "pthat" , &pthat, "pthat/F");
+  tree->Branch(  "isGluonSplitting" , &isGluonSplitting, "isGluonSplitting/O");
 
   //Basic Jet Information
   //  math::XYZTLorentzVector jetP4[nJets];    
@@ -1054,6 +1057,27 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	}
       pthat = -2;
     }
+
+  // determine gluon splitting
+  isGluonSplitting = 0;
+  if(getMCTruth_) {
+    bool bFoundS3BQuark = false;
+    bool bFoundS2BQuark = false;
+    edm::Handle<GenParticleCollection> genParticles;
+    iEvent.getByLabel("genParticles" , genParticles );
+    for( size_t i = 0; i < genParticles->size(); ++ i ) {
+      const GenParticle & genCand = (*genParticles)[ i ];
+      int MC_particleID=abs(genCand.pdgId());
+      if(genCand.status() == 3 && MC_particleID ==5){
+	bFoundS3BQuark = true;
+      }
+      if(genCand.status() == 2 && MC_particleID ==5){
+	bFoundS2BQuark = true;
+      }
+    }
+    // if no status 3 b quark but status 2
+    if( (!bFoundS3BQuark) && bFoundS2BQuark  ) isGluonSplitting  = 1;
+  }
 
   //Get the btaggers that are defined in the configuration file
 
