@@ -23,6 +23,7 @@ public :
   // some objects
    TH1D* dataHist;
    TH1D* mcHistb;
+   TH1D* mcHistbglusplit;
    TH1D* mcHistc; 
    TH1D* mcHistl;
    TH1D* mcHistn;
@@ -38,6 +39,7 @@ public :
    Bool_t          triggerHLTJet50U;
    Bool_t          triggerHLTJet70U;
    Bool_t          triggerHLTJet100U;
+   Bool_t          isGluonSplitting;
    UInt_t          eventNumber;
    UInt_t          runNumber;
    UInt_t          lumiBlockNumber;
@@ -60,30 +62,30 @@ public :
    Float_t         jetVertexChi2Ndof[40];   //[nJets]
    Float_t         jetVertexNormalizedChi2[40];   //[nJets]
    Int_t           nTracks;
-   Int_t           trackJetIndex[200];   //[nTracks]
-   Bool_t          trackSelected[200];   //[nTracks]
-   Float_t         trackTransverseMomentum[200];   //[nTracks]
-   Float_t         trackEta[200];   //[nTracks]
-   Float_t         trackPhi[200];   //[nTracks]
-   Float_t         trackMomentum[200];   //[nTracks]
-   Int_t           trackNHits[200];   //[nTracks]
-   Int_t           trackNPixelHits[200];   //[nTracks]
-   Float_t         trackChi2[200];   //[nTracks]
-   Float_t         trackNormChi2[200];   //[nTracks]
-   Int_t           trackQuality[200];   //[nTracks]
-   Float_t         trackLongitudinalImpactParameter[200];   //[nTracks]
-   Float_t         trackIP[200];   //[nTracks]
-   Float_t         trackDecayLength[200];   //[nTracks]
-   Float_t         trackDistJetAxis[200];   //[nTracks]
-   Float_t         trackDeltaR[200];   //[nTracks]
-   Float_t         trackIP3d[200];   //[nTracks]
-   Float_t         trackIP2d[200];   //[nTracks]
-   Float_t         trackIP3dError[200];   //[nTracks]
-   Float_t         trackIP2dError[200];   //[nTracks]
-   Int_t           trackHasSharedPix1[200];   //[nTracks]
-   Int_t           trackHasSharedPix2[200];   //[nTracks]
-   Int_t           trackHasSharedPix3[200];   //[nTracks]
-   Int_t           trackHasSharedPixAll[200];   //[nTracks]
+   Int_t           trackJetIndex[300];   //[nTracks]
+   Bool_t          trackSelected[300];   //[nTracks]
+   Float_t         trackTransverseMomentum[300];   //[nTracks]
+   Float_t         trackEta[300];   //[nTracks]
+   Float_t         trackPhi[300];   //[nTracks]
+   Float_t         trackMomentum[300];   //[nTracks]
+   Int_t           trackNHits[300];   //[nTracks]
+   Int_t           trackNPixelHits[300];   //[nTracks]
+   Float_t         trackChi2[300];   //[nTracks]
+   Float_t         trackNormChi2[300];   //[nTracks]
+   Int_t           trackQuality[300];   //[nTracks]
+   Float_t         trackLongitudinalImpactParameter[300];   //[nTracks]
+   Float_t         trackIP[300];   //[nTracks]
+   Float_t         trackDecayLength[300];   //[nTracks]
+   Float_t         trackDistJetAxis[300];   //[nTracks]
+   Float_t         trackDeltaR[300];   //[nTracks]
+   Float_t         trackIP3d[300];   //[nTracks]
+   Float_t         trackIP2d[300];   //[nTracks]
+   Float_t         trackIP3dError[300];   //[nTracks]
+   Float_t         trackIP2dError[300];   //[nTracks]
+   Int_t           trackHasSharedPix1[300];   //[nTracks]
+   Int_t           trackHasSharedPix2[300];   //[nTracks]
+   Int_t           trackHasSharedPix3[300];   //[nTracks]
+   Int_t           trackHasSharedPixAll[300];   //[nTracks]
    Int_t           MCTrueFlavor[40];   //[nJets]
    Float_t         SV3dDistance[40];   //[nJets]
    Float_t         SV3dDistanceError[40];   //[nJets]
@@ -367,6 +369,7 @@ public :
    TBranch        *b_triggerHLTJet50U;   //!
    TBranch        *b_triggerHLTJet70U;   //!
    TBranch        *b_triggerHLTJet100U;   //!
+   TBranch        *b_isGluonSplitting;   //!
    TBranch        *b_eventNumber;   //!
    TBranch        *b_runNumber;   //!
    TBranch        *b_lumiBlockNumber;   //!
@@ -704,10 +707,11 @@ public :
    virtual void    SlaveTerminate();
    virtual void    Terminate();
 
-   virtual void    MuSetUp(bool isData_, TH1D*dataHist_, TH1D* mcHistb_, TH1D* mcHistc_, TH1D* mcHistl_, TH1D* mcHistn_, informationMuonCuts info_){
+   virtual void    MuSetUp(bool isData_, TH1D*dataHist_, TH1D* mcHistb_, TH1D* mcHistbglusplit_, TH1D* mcHistc_, TH1D* mcHistl_, TH1D* mcHistn_, informationMuonCuts info_){
      isData = isData_;
      dataHist = dataHist_;
      mcHistb = mcHistb_;
+     mcHistbglusplit = mcHistbglusplit_;
      mcHistc = mcHistc_;
      mcHistl = mcHistl_;
      mcHistn = mcHistn_;
@@ -742,6 +746,7 @@ void MuonSelector::Init(TTree *tree)
    fChain->SetBranchAddress("triggerHLTJet50U", &triggerHLTJet50U, &b_triggerHLTJet50U);
    fChain->SetBranchAddress("triggerHLTJet70U", &triggerHLTJet70U, &b_triggerHLTJet70U);
    fChain->SetBranchAddress("triggerHLTJet100U", &triggerHLTJet100U, &b_triggerHLTJet100U);
+   fChain->SetBranchAddress("isGluonSplitting", &isGluonSplitting, &b_isGluonSplitting);
    fChain->SetBranchAddress("eventNumber", &eventNumber, &b_eventNumber);
    fChain->SetBranchAddress("runNumber", &runNumber, &b_runNumber);
    fChain->SetBranchAddress("lumiBlockNumber", &lumiBlockNumber, &b_lumiBlockNumber);

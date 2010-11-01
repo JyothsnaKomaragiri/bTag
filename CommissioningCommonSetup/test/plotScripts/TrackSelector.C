@@ -70,7 +70,7 @@ Bool_t TrackSelector::Process(Long64_t entry)
    //
    // The return value is currently not used.
 
-
+  b_isGluonSplitting->GetEntry(entry);
   b_nJets -> GetEntry(entry);
   b_nTracks->GetEntry(entry);
   b_jetPt->GetEntry(entry);
@@ -123,7 +123,8 @@ Bool_t TrackSelector::Process(Long64_t entry)
     // fill number of tracks in histograms depending on jet flavour etc...
     if( isData ) dataHist->Fill(NtrackspassingCuts, fChain->GetWeight());
     else{
-      if( abs(MCTrueFlavor[i]) == 5) mcHistb->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
+      if( abs(MCTrueFlavor[i]) == 5 && isGluonSplitting==0) mcHistb->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
+      else if( abs(MCTrueFlavor[i]) == 5 && isGluonSplitting==1) mcHistbglusplit->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
       else if( abs(MCTrueFlavor[i]) == 4) mcHistc->Fill(NtrackspassingCuts,  fChain->GetWeight()); 
       else if( abs(MCTrueFlavor[i]) == 3
 	  || abs(MCTrueFlavor[i]) == 2

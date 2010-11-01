@@ -241,11 +241,12 @@ struct flavorHists1D {
   TH1D* data_hist;
   TH1D* mc_all_hist;
   TH1D* mc_b_hist;
+  TH1D* mc_bglusplit_hist;
   TH1D* mc_c_hist;
   TH1D* mc_light_hist;
   TH1D* mc_none_hist;
   // constructor to avoid warning
-  flavorHists1D(){data_hist=0; mc_all_hist=0; mc_b_hist=0; mc_c_hist=0; mc_light_hist=0; mc_none_hist=0;};
+  flavorHists1D(){data_hist=0; mc_all_hist=0; mc_b_hist=0; mc_bglusplit_hist=0; mc_c_hist=0; mc_light_hist=0; mc_none_hist=0;};
 };
 
 struct cutCompHists{
@@ -280,10 +281,11 @@ struct flavorHists2D{
   TH2D* data_hist;
   TH2D* mc_all_hist;
   TH2D* mc_b_hist;
+  TH2D* mc_bglusplit_hist;
   TH2D* mc_c_hist;
   TH2D* mc_light_hist;
   TH2D* mc_none_hist;
-  flavorHists2D(){data_hist=0; mc_all_hist=0; mc_b_hist=0; mc_c_hist=0; mc_light_hist=0; mc_none_hist=0;};
+  flavorHists2D(){data_hist=0; mc_all_hist=0; mc_b_hist=0; mc_bglusplit_hist=0; mc_c_hist=0; mc_light_hist=0; mc_none_hist=0;};
 };
 
 using namespace std;
@@ -1537,6 +1539,9 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists, double intLumi, i
     hists.mc_b_hist->SetLineColor(kRed);
     hists.mc_b_hist->SetLineWidth(3);
     hists.mc_b_hist->SetFillStyle(0);
+    hists.mc_bglusplit_hist->SetLineColor(kOrange);
+    hists.mc_bglusplit_hist->SetLineWidth(3);
+    hists.mc_bglusplit_hist->SetFillStyle(0);
     hists.mc_all_hist->SetLineColor(kBlack);
   }
   else  {
@@ -1551,6 +1556,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists, double intLumi, i
     mc_stack.Add(hists.mc_light_hist);
     mc_stack.Add(hists.mc_c_hist);
     mc_stack.Add(hists.mc_b_hist);
+    mc_stack.Add(hists.mc_bglusplit_hist);
     mc_stack.Add(hists.mc_all_hist);
   }
   else     mc_stack.Add(hists.mc_all_hist);
@@ -1597,6 +1603,7 @@ void MakeAProfilePlot(information1d info, flavorHists1D hists, double intLumi, i
     legend->AddEntry(hists.mc_light_hist,"Sim.(light)","L");
     legend->AddEntry(hists.mc_c_hist,"Sim.(charm)","L");
     legend->AddEntry(hists.mc_b_hist,"Sim.(bottom)","L");
+    legend->AddEntry(hists.mc_bglusplit_hist,"Sim.(b glusplit)","L");
     if(info.displayNoInfo == true) legend->AddEntry(hists.mc_none_hist,"Sim.(no info)","L");
   }
   else      legend->AddEntry(hists.mc_all_hist,"Data","LPE");
@@ -1733,16 +1740,19 @@ void MakeAEffVsCutPlot(information1d info, flavorHists1D hists, double scale, do
   if(dataVsmc) {//dataVsmc
     
     double mc_bIntegralError    ;
+    double mc_bglusplitIntegralError    ;
     double mc_cIntegralError    ;
     double mc_lightIntegralError;
     double mc_noneIntegralError ;
     
     double mc_bIntegral     = IntegralAndError(hists.mc_b_hist    , 0,info.nbinsx+1, mc_bIntegralError);
+    double mc_bglusplitIntegral     = IntegralAndError(hists.mc_bglusplit_hist    , 0,info.nbinsx+1, mc_bglusplitIntegralError);
     double mc_cIntegral     = IntegralAndError(hists.mc_c_hist    , 0,info.nbinsx+1, mc_cIntegralError);
     double mc_lightIntegral = IntegralAndError(hists.mc_light_hist, 0,info.nbinsx+1, mc_lightIntegralError);
     double mc_noneIntegral  = IntegralAndError(hists.mc_none_hist , 0,info.nbinsx+1,  mc_noneIntegralError);
     
     TH1D *mc_bEff     = (TH1D*)hists.mc_b_hist->Clone((info.plotName+"mc_bEff").c_str());
+    TH1D *mc_bglusplitEff     = (TH1D*)hists.mc_bglusplit_hist->Clone((info.plotName+"mc_bglusplitEff").c_str());
     TH1D *mc_cEff     = (TH1D*)hists.mc_c_hist->Clone((info.plotName+"mc_cEff").c_str());
     TH1D *mc_lightEff = (TH1D*)hists.mc_light_hist->Clone((info.plotName+"mc_lightEff").c_str());
     TH1D *mc_noneEff  = (TH1D*)hists.mc_none_hist->Clone((info.plotName+"mc_noneEff").c_str());
@@ -1750,17 +1760,21 @@ void MakeAEffVsCutPlot(information1d info, flavorHists1D hists, double scale, do
     for(int i=1; i<=info.nbinsx ; i++){
     
       double mc_bIntEffError    ;
+      double mc_bglusplitIntEffError    ;
       double mc_cIntEffError    ;
       double mc_lightIntEffError;
       double mc_noneIntEffError ;
       
       double mc_bIntEff     = IntegralAndError(mc_bEff    ,i,info.nbinsx+1, mc_bIntEffError);
+      double mc_bglusplitIntEff     = IntegralAndError(mc_bglusplitEff    ,i,info.nbinsx+1, mc_bglusplitIntEffError);
       double mc_cIntEff     = IntegralAndError(mc_cEff    ,i,info.nbinsx+1, mc_cIntEffError);
       double mc_lightIntEff = IntegralAndError(mc_lightEff,i,info.nbinsx+1, mc_lightIntEffError);
       double mc_noneIntEff  = IntegralAndError(mc_noneEff ,i,info.nbinsx+1,  mc_noneIntEffError);
       
       double mc_bEffError = sqrt( (mc_bIntEffError/mc_bIntegral)*(mc_bIntEffError/mc_bIntegral) 
 				  + (mc_bIntEff*mc_bIntegralError/(mc_bIntegral*mc_bIntegral))*(mc_bIntEff*mc_bIntegralError/(mc_bIntegral*mc_bIntegral))  );
+      double mc_bglusplitEffError = sqrt( (mc_bglusplitIntEffError/mc_bglusplitIntegral)*(mc_bglusplitIntEffError/mc_bglusplitIntegral) 
+				  + (mc_bglusplitIntEff*mc_bglusplitIntegralError/(mc_bglusplitIntegral*mc_bglusplitIntegral))*(mc_bglusplitIntEff*mc_bglusplitIntegralError/(mc_bglusplitIntegral*mc_bglusplitIntegral))  );
       
       double mc_cEffError = sqrt( (mc_cIntEffError/mc_cIntegral)*(mc_cIntEffError/mc_cIntegral) 
 				  + (mc_cIntEff*mc_cIntegralError/(mc_cIntegral*mc_cIntegral))*(mc_cIntEff*mc_cIntegralError/(mc_cIntegral*mc_cIntegral))  );
@@ -1773,6 +1787,8 @@ void MakeAEffVsCutPlot(information1d info, flavorHists1D hists, double scale, do
       
       hists.mc_b_hist->SetBinContent    (i, mc_bIntEff/mc_bIntegral);
       hists.mc_b_hist->SetBinError      (i, mc_bEffError);
+      hists.mc_bglusplit_hist->SetBinContent    (i, mc_bglusplitIntEff/mc_bglusplitIntegral);
+      hists.mc_bglusplit_hist->SetBinError      (i, mc_bglusplitEffError);
       hists.mc_c_hist->SetBinContent    (i, mc_cIntEff/mc_cIntegral);
       hists.mc_c_hist->SetBinError      (i, mc_cEffError);
       hists.mc_light_hist->SetBinContent    (i, mc_lightIntEff/mc_lightIntegral);
@@ -1786,6 +1802,7 @@ void MakeAEffVsCutPlot(information1d info, flavorHists1D hists, double scale, do
   hists.mc_all_hist  ->GetYaxis()->SetTitle("Efficiency");
   if(dataVsmc) {
      hists.mc_b_hist    ->GetYaxis()->SetTitle("Efficiency");
+     hists.mc_bglusplit_hist    ->GetYaxis()->SetTitle("Efficiency");
      hists.mc_c_hist    ->GetYaxis()->SetTitle("Efficiency");
      hists.mc_light_hist->GetYaxis()->SetTitle("Efficiency");
      hists.mc_none_hist ->GetYaxis()->SetTitle("Efficiency");
@@ -1812,6 +1829,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale, doub
   hists.mc_all_hist->Scale(scale);
   if(dataVsmc) {//only for data vs mc comparison
     hists.mc_b_hist->Scale(scale);
+    hists.mc_bglusplit_hist->Scale(scale);
     hists.mc_c_hist->Scale(scale);
     hists.mc_light_hist->Scale(scale);
     hists.mc_none_hist->Scale(scale);
@@ -1820,6 +1838,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale, doub
     hists.mc_light_hist->SetFillColor(kBlue);
     hists.mc_c_hist->SetFillColor(kGreen);
     hists.mc_b_hist->SetFillColor(kRed);
+    hists.mc_bglusplit_hist->SetFillColor(kOrange);
   }
   hists.mc_all_hist->SetLineColor(kRed);
   hists.mc_all_hist->SetFillColor(kRed);
@@ -1833,6 +1852,8 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale, doub
     if(dataVsmc) {//only for data vs mc comparison
       hists.mc_b_hist->SetBinContent(nBinX, hists.mc_b_hist->GetBinContent(nBinX) + hists.mc_b_hist->GetBinContent(nBinX+1));
       hists.mc_b_hist->SetBinContent(1, hists.mc_b_hist->GetBinContent(1) + hists.mc_b_hist->GetBinContent(0));
+      hists.mc_bglusplit_hist->SetBinContent(nBinX, hists.mc_bglusplit_hist->GetBinContent(nBinX) + hists.mc_bglusplit_hist->GetBinContent(nBinX+1));
+      hists.mc_bglusplit_hist->SetBinContent(1, hists.mc_bglusplit_hist->GetBinContent(1) + hists.mc_bglusplit_hist->GetBinContent(0));
       hists.mc_c_hist->SetBinContent(nBinX, hists.mc_c_hist->GetBinContent(nBinX) + hists.mc_c_hist->GetBinContent(nBinX+1));
       hists.mc_c_hist->SetBinContent(1, hists.mc_c_hist->GetBinContent(1) + hists.mc_c_hist->GetBinContent(0));
       hists.mc_light_hist->SetBinContent(nBinX, hists.mc_light_hist->GetBinContent(nBinX) + hists.mc_light_hist->GetBinContent(nBinX+1));
@@ -1849,6 +1870,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale, doub
     if(info.displayNoInfo == true) mc_stack_bUp.Add(hists.mc_none_hist);
     mc_stack_bUp.Add(hists.mc_light_hist);
     mc_stack_bUp.Add(hists.mc_c_hist);
+    mc_stack_bUp.Add(hists.mc_bglusplit_hist);
     mc_stack_bUp.Add(hists.mc_b_hist);
   }
   else     mc_stack_bUp.Add(hists.mc_all_hist);
@@ -1856,6 +1878,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale, doub
   THStack mc_stack_bDown((info.plotName+"_mc_stack_bDown").c_str(),info.plotTitle.c_str());
   if(dataVsmc) {//only for data vs mc comparison
     mc_stack_bDown.Add(hists.mc_b_hist);
+    mc_stack_bDown.Add(hists.mc_bglusplit_hist);
     mc_stack_bDown.Add(hists.mc_c_hist);
     mc_stack_bDown.Add(hists.mc_light_hist);
     if(info.displayNoInfo == true) mc_stack_bDown.Add(hists.mc_none_hist);
@@ -1886,6 +1909,7 @@ void MakeAFlavorPlot(information1d info, flavorHists1D hists, double scale, doub
   if(dataVsmc) {//only for data vs mc comparison
     legend->AddEntry(hists.mc_light_hist,"Sim.(light)","F");
     legend->AddEntry(hists.mc_c_hist,"Sim.(charm)","F");
+    legend->AddEntry(hists.mc_bglusplit_hist,"Sim.(b glusplit)","F");
     legend->AddEntry(hists.mc_b_hist,"Sim.(bottom)","F");
     if(info.displayNoInfo == true) legend->AddEntry(hists.mc_none_hist,"Sim.(no info)","F");
   }
@@ -2395,6 +2419,7 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale, double i
   hists.mc_all_hist->Scale(scale);
   if(dataVsmc) {
     hists.mc_b_hist->Scale(scale);
+    hists.mc_bglusplit_hist->Scale(scale);
     hists.mc_c_hist->Scale(scale);
     hists.mc_light_hist->Scale(scale);
     hists.mc_none_hist->Scale(scale);
@@ -2416,18 +2441,22 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale, double i
 
   if(dataVsmc) {
     TProfile* mc_b_prof_x = hists.mc_b_hist->ProfileX();
+    TProfile* mc_bglusplit_prof_x = hists.mc_bglusplit_hist->ProfileX();
     TProfile* mc_c_prof_x = hists.mc_c_hist->ProfileX();
     TProfile* mc_light_prof_x = hists.mc_light_hist->ProfileX();
     TProfile* mc_none_prof_x = hists.mc_none_hist->ProfileX();
+    mc_bglusplit_prof_x->SetTitle((info.plotTitle+" : "+" "+info.xTitle+" Profile").c_str());
     mc_b_prof_x->SetTitle((info.plotTitle+" : "+" "+info.xTitle+" Profile").c_str());
     mc_c_prof_x->SetTitle((info.plotTitle+" : "+" "+info.xTitle+" Profile").c_str());
     mc_light_prof_x->SetTitle((info.plotTitle+" : "+" "+info.xTitle+" Profile").c_str());
     mc_none_prof_x->SetTitle((info.plotTitle+" : "+" "+info.xTitle+" Profile").c_str());
     mc_b_prof_x->GetYaxis()->SetTitle(info.yTitle.c_str());
+    mc_bglusplit_prof_x->GetYaxis()->SetTitle(info.yTitle.c_str());
     mc_c_prof_x->GetYaxis()->SetTitle(info.yTitle.c_str());
     mc_light_prof_x->GetYaxis()->SetTitle(info.yTitle.c_str());
     mc_none_prof_x->GetYaxis()->SetTitle(info.yTitle.c_str());
     profiles.mc_b_hist = (TH1D*)mc_b_prof_x;
+    profiles.mc_bglusplit_hist = (TH1D*)mc_bglusplit_prof_x;
     profiles.mc_c_hist = (TH1D*)mc_c_prof_x;
     profiles.mc_light_hist = (TH1D*)mc_light_prof_x;
     profiles.mc_none_hist = (TH1D*)mc_none_prof_x;
@@ -2449,18 +2478,22 @@ void MakeA2DPlot(information2d info, flavorHists2D hists, double scale, double i
 
   if(dataVsmc) {
     TProfile* mc_b_prof_y = hists.mc_b_hist->ProfileY();
+    TProfile* mc_bglusplit_prof_y = hists.mc_bglusplit_hist->ProfileY();
     TProfile* mc_c_prof_y = hists.mc_c_hist->ProfileY();
     TProfile* mc_light_prof_y = hists.mc_light_hist->ProfileY();
     TProfile* mc_none_prof_y = hists.mc_none_hist->ProfileY();
     mc_b_prof_y->SetTitle((info.plotTitle+" : "+" "+info.yTitle+" Profile").c_str());
+    mc_bglusplit_prof_y->SetTitle((info.plotTitle+" : "+" "+info.yTitle+" Profile").c_str());
     mc_c_prof_y->SetTitle((info.plotTitle+" : "+" "+info.yTitle+" Profile").c_str());
     mc_light_prof_y->SetTitle((info.plotTitle+" : "+" "+info.yTitle+" Profile").c_str());
     mc_none_prof_y->SetTitle((info.plotTitle+" : "+" "+info.yTitle+" Profile").c_str());
     mc_b_prof_y->GetYaxis()->SetTitle(info.xTitle.c_str());
+    mc_bglusplit_prof_y->GetYaxis()->SetTitle(info.xTitle.c_str());
     mc_c_prof_y->GetYaxis()->SetTitle(info.xTitle.c_str());
     mc_light_prof_y->GetYaxis()->SetTitle(info.xTitle.c_str());
     mc_none_prof_y->GetYaxis()->SetTitle(info.xTitle.c_str());
     profiles.mc_b_hist = (TH1D*)mc_b_prof_y;
+    profiles.mc_bglusplit_hist = (TH1D*)mc_bglusplit_prof_y;
     profiles.mc_c_hist = (TH1D*)mc_c_prof_y;
     profiles.mc_light_hist = (TH1D*)mc_light_prof_y;
     profiles.mc_none_hist = (TH1D*)mc_none_prof_y;
@@ -2821,11 +2854,13 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale, double
 
   if(dataVsmc) {//dataVsmc comparison
     TH2D* mc_b_int = (TH2D*)hists.mc_all_hist->Clone((info.plotName+"_mc_b_int").c_str());
+    TH2D* mc_bglusplit_int = (TH2D*)hists.mc_all_hist->Clone((info.plotName+"_mc_bglusplit_int").c_str());
     TH2D* mc_c_int = (TH2D*)hists.mc_all_hist->Clone((info.plotName+"_mc_c_int").c_str());
     TH2D* mc_light_int = (TH2D*)hists.mc_all_hist->Clone((info.plotName+"_mc_light_int").c_str());
     TH2D* mc_none_int = (TH2D*)hists.mc_all_hist->Clone((info.plotName+"_mc_none_int").c_str());
     
     vector<double> error2_mc_b(info.nbinsy+2,0);
+    vector<double> error2_mc_bglusplit(info.nbinsy+2,0);
     vector<double> error2_mc_c(info.nbinsy+2,0);
     vector<double> error2_mc_light(info.nbinsy+2,0);
     vector<double> error2_mc_none(info.nbinsy+2,0);
@@ -2837,6 +2872,10 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale, double
 	    mc_b_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_b_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx+1,iYbin,iYbin));
 	    error2_data[iYbin]+=pow(hists.mc_b_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
 	    mc_b_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_data[iYbin]));
+
+	    mc_bglusplit_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_bglusplit_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx+1,iYbin,iYbin));
+	    error2_data[iYbin]+=pow(hists.mc_bglusplit_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
+	    mc_bglusplit_int->SetBinError(info.nbinsx+1-iXbin,iYbin,sqrt(error2_data[iYbin]));
 	    
 	    mc_c_int->SetBinContent(info.nbinsx+1-iXbin,iYbin,hists.mc_c_hist->Integral(info.nbinsx+1-iXbin,info.nbinsx+1,iYbin,iYbin));
 	    error2_data[iYbin]+=pow(hists.mc_c_hist->GetBinError(info.nbinsx+1-iXbin,iYbin),2);
@@ -2861,6 +2900,10 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale, double
 	    mc_b_int->SetBinContent(iXbin,iYbin,hists.mc_b_hist->Integral(0,iXbin,iYbin,iYbin));
 	    error2_data[iYbin]+=pow(hists.mc_b_hist->GetBinError(iXbin,iYbin),2);
 	    mc_b_int->SetBinError(iXbin,iYbin,sqrt(error2_data[iYbin]));
+
+	    mc_bglusplit_int->SetBinContent(iXbin,iYbin,hists.mc_bglusplit_hist->Integral(0,iXbin,iYbin,iYbin));
+	    error2_data[iYbin]+=pow(hists.mc_bglusplit_hist->GetBinError(iXbin,iYbin),2);
+	    mc_bglusplit_int->SetBinError(iXbin,iYbin,sqrt(error2_data[iYbin]));
 	    
 	    mc_c_int->SetBinContent(iXbin,iYbin,hists.mc_c_hist->Integral(0,iXbin,iYbin,iYbin));
 	    error2_data[iYbin]+=pow(hists.mc_c_hist->GetBinError(iXbin,iYbin),2);
@@ -2878,11 +2921,13 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale, double
       }
     
     mc_all_int->Add(mc_b_int);
+    mc_all_int->Add(mc_bglusplit_int);
     mc_all_int->Add(mc_c_int);
     mc_all_int->Add(mc_light_int);
     mc_all_int->Add(mc_none_int);
   
     hists.mc_all_hist->Add(hists.mc_b_hist);
+    hists.mc_all_hist->Add(hists.mc_bglusplit_hist);
     hists.mc_all_hist->Add(hists.mc_c_hist);
     hists.mc_all_hist->Add(hists.mc_light_hist);
     hists.mc_all_hist->Add(hists.mc_none_hist);
@@ -2893,24 +2938,29 @@ void MakeACutPlot(informationCut info, flavorHists2D hists, double scale, double
     if(scale==-1)  scale = hists.data_hist->Integral(0,info.nbinsx+1,0,info.nbinsy+1)/hists.mc_all_hist->Integral(0,info.nbinsx+1,0,info.nbinsy+1);
 
     mc_b_int->Scale(scale);
+    mc_bglusplit_int->Scale(scale);
     mc_c_int->Scale(scale);
     mc_light_int->Scale(scale);
     mc_none_int->Scale(scale);
 
 
     TProfile* mc_b_prof = mc_b_int->ProfileX();
+    TProfile* mc_bglusplit_prof = mc_bglusplit_int->ProfileX();
     TProfile* mc_c_prof = mc_c_int->ProfileX();
     TProfile* mc_light_prof = mc_light_int->ProfileX();
     TProfile* mc_none_prof = mc_none_int->ProfileX();
     mc_b_prof->SetTitle((info.plotTitle+" : "+" "+info.xTitle+" Profile").c_str());
+    mc_bglusplit_prof->SetTitle((info.plotTitle+" : "+" "+info.xTitle+" Profile").c_str());
     mc_c_prof->SetTitle((info.plotTitle+" : "+" "+info.xTitle+" Profile").c_str());
     mc_light_prof->SetTitle((info.plotTitle+" : "+" "+info.xTitle+" Profile").c_str());
     mc_none_prof->SetTitle((info.plotTitle+" : "+" "+info.xTitle+" Profile").c_str());
     mc_b_prof->GetYaxis()->SetTitle(info.yTitle.c_str());
+    mc_bglusplit_prof->GetYaxis()->SetTitle(info.yTitle.c_str());
     mc_c_prof->GetYaxis()->SetTitle(info.yTitle.c_str());
     mc_light_prof->GetYaxis()->SetTitle(info.yTitle.c_str());
     mc_none_prof->GetYaxis()->SetTitle(info.yTitle.c_str());
     profiles.mc_b_hist = (TH1D*)mc_b_prof;
+    profiles.mc_bglusplit_hist = (TH1D*)mc_bglusplit_prof;
     profiles.mc_c_hist = (TH1D*)mc_c_prof;
     profiles.mc_light_hist = (TH1D*)mc_light_prof;
     profiles.mc_none_hist = (TH1D*)mc_none_prof;
@@ -3018,19 +3068,22 @@ void MakeATrackHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSele
 {
   dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
   if(dataVsmc) {
-    string bcut,ccut,lightcut,nonecut;
-    bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5)";
+    string bcut,bglusplitcut, ccut,lightcut,nonecut;
+    bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isGluonSplitting==0)";
+    bglusplitcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isGluonSplitting==1)";
     ccut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==4)";
     lightcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==1 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==2 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==3 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==21)";
     nonecut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==0)";
     if(info.cut!="")  
       {
 	bcut = "("+info.cut+")&&"+bcut;
+	bglusplitcut = "("+info.cut+")&&"+bglusplitcut;
 	ccut = "("+info.cut+")&&"+ccut;
 	lightcut ="("+info.cut+")&&"+lightcut;
 	nonecut ="("+info.cut+")&&"+nonecut;
       }      
     mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_b_hist->GetName()),(bcut));
+    mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_bglusplit_hist->GetName()),(bglusplitcut));
     mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_c_hist->GetName()),(ccut));
     mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_light_hist->GetName()),(lightcut));
     mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_none_hist->GetName()),(nonecut));
@@ -3043,19 +3096,22 @@ void MakeAHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector,
 {
   dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
   if(dataVsmc) {//only for data vs mc comparison
-    string bcut,ccut,lightcut,nonecut;
-    bcut = "("+info.label+"MCTrueFlavor==5)";
+    string bcut,bglusplitcut, ccut,lightcut,nonecut;
+    bcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==0)";
+    bglusplitcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==1)";
     ccut = "("+info.label+"MCTrueFlavor==4)";
     lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
     nonecut = "("+info.label+"MCTrueFlavor==0)";     
     if(info.cut!="")  
       {
 	bcut = "("+info.cut+")&&"+bcut;
+	bglusplitcut = "("+info.cut+")&&"+bglusplitcut;
 	ccut = "("+info.cut+")&&"+ccut;
 	lightcut ="("+info.cut+")&&"+lightcut;
 	nonecut ="("+info.cut+")&&"+nonecut;
       }
     mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_b_hist->GetName()),(bcut));
+    mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_bglusplit_hist->GetName()),(bglusplitcut));
     mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_c_hist->GetName()),(ccut));
     mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_light_hist->GetName()),(lightcut));
     mcSelector->LoadVariables((info.aliasx+">>+"+hists.mc_none_hist->GetName()),(nonecut));
@@ -3067,19 +3123,19 @@ void MakeAHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector,
 
 void MakeATrackCutHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, informationTrackCuts info, flavorHists1D hists, int dataVsmc)
 {
-  dataSelector->AddTrackSelector(true,  hists.data_hist, hists.mc_b_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
+  dataSelector->AddTrackSelector(true,  hists.data_hist, hists.mc_b_hist, hists.mc_bglusplit_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
 
-  if(dataVsmc) mcSelector->  AddTrackSelector(false, hists.data_hist, hists.mc_b_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
-  else         mcSelector->  AddTrackSelector(true, hists.data_hist, hists.mc_b_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
+  if(dataVsmc) mcSelector->  AddTrackSelector(false, hists.data_hist, hists.mc_b_hist, hists.mc_bglusplit_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
+  else         mcSelector->  AddTrackSelector(true, hists.data_hist, hists.mc_b_hist, hists.mc_bglusplit_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
 
   return;
 }
 
 void MakeAMuonCutHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector, informationMuonCuts info, flavorHists1D hists, int dataVsmc)
 {
-  dataSelector->AddMuonSelector(true,  hists.data_hist, hists.mc_b_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
-  if(dataVsmc) mcSelector->  AddMuonSelector(false, hists.data_hist, hists.mc_b_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
-  else         mcSelector->  AddMuonSelector(true, hists.data_hist, hists.mc_b_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
+  dataSelector->AddMuonSelector(true,  hists.data_hist, hists.mc_b_hist, hists.mc_bglusplit_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
+  if(dataVsmc) mcSelector->  AddMuonSelector(false, hists.data_hist, hists.mc_b_hist, hists.mc_bglusplit_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
+  else         mcSelector->  AddMuonSelector(true, hists.data_hist, hists.mc_b_hist, hists.mc_bglusplit_hist, hists.mc_c_hist, hists.mc_light_hist, hists.mc_none_hist, info);
 
   return;
 }
@@ -3150,19 +3206,22 @@ void MakeA2DHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelecto
 {
   dataSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
   if(dataVsmc) {//only for data vs mc comparison
-    string bcut,ccut,lightcut,nonecut;
-    bcut = "("+info.label+"MCTrueFlavor==5)";
+    string bcut,bglusplitcut, ccut,lightcut,nonecut;
+    bcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==0)";
+    bglusplitcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==1)";
     ccut = "("+info.label+"MCTrueFlavor==4)";
     lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
     nonecut = "("+info.label+"MCTrueFlavor==0)";
     if(info.cut!="")  
       {
 	bcut = "("+info.cut+")&&"+bcut;
+	bglusplitcut = "("+info.cut+")&&"+bglusplitcut;
 	ccut = "("+info.cut+")&&"+ccut;
 	lightcut ="("+info.cut+")&&"+lightcut;
 	nonecut ="("+info.cut+")&&"+nonecut;
       }
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_b_hist->GetName()),(bcut));
+    mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_bglusplit_hist->GetName()),(bglusplitcut));
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_c_hist->GetName()),(ccut));
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_light_hist->GetName()),(lightcut));
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_none_hist->GetName()),(nonecut));
@@ -3175,19 +3234,22 @@ void MakeA2DTrackHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSe
 {
   dataSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
   if(dataVsmc) {//only for data vs mc comparison
-    string bcut,ccut,lightcut,nonecut;
-    bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5)";
+    string bcut,bglusplitcut, ccut,lightcut,nonecut;
+    bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isGluonSplitting==0)";
+    bglusplitcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isGluonSplitting==1)";
     ccut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==4)";
     lightcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==1 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==2 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==3 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==21)";
     nonecut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==0)";
     if(info.cut!="")  
       {
 	bcut = "("+info.cut+")&&"+bcut;
+	bglusplitcut = "("+info.cut+")&&"+bglusplitcut;
 	ccut = "("+info.cut+")&&"+ccut;
 	lightcut ="("+info.cut+")&&"+lightcut;
 	nonecut ="("+info.cut+")&&"+nonecut;
       }      
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_b_hist->GetName()),(bcut));
+    mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_bglusplit_hist->GetName()),(bglusplitcut));
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_c_hist->GetName()),(ccut));
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_light_hist->GetName()),(lightcut));
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_none_hist->GetName()),(nonecut));
@@ -3200,19 +3262,22 @@ void MakeACutHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelect
 {
   dataSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
   if(dataVsmc) {//only for data vs mc comparison
-    string bcut,ccut,lightcut,nonecut;
-    bcut = "("+info.label+"MCTrueFlavor==5)";
+    string bcut,bglusplitcut, ccut,lightcut,nonecut;
+    bcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==0)";
+    bglusplitcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==1)";
     ccut = "("+info.label+"MCTrueFlavor==4)";
     lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
     nonecut = "("+info.label+"MCTrueFlavor==0)";
     if(info.cut!="")  
       {
 	bcut = "("+info.cut+")&&"+bcut;
+	bglusplitcut = "("+info.cut+")&&"+bglusplitcut;
 	ccut = "("+info.cut+")&&"+ccut;
 	lightcut ="("+info.cut+")&&"+lightcut;
 	nonecut ="("+info.cut+")&&"+nonecut;
       }
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_b_hist->GetName()),(bcut));
+    mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_bglusplit_hist->GetName()),(bglusplitcut));
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_c_hist->GetName()),(ccut));
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_light_hist->GetName()),(lightcut));
     mcSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.mc_none_hist->GetName()),(nonecut));
@@ -3260,6 +3325,7 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
   list<pair<string,double> > mcList;
   list<pair<string,double> > dataList;
 
+
   while (! mcFiles.eof()) {
     string line;
     getline (mcFiles,line);
@@ -3280,6 +3346,7 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
     double thisWeight = atof(line.substr(position+1).c_str());
     dataList.push_back(pair<string,double>(thisFileName,thisWeight));
   }
+
 
   information1d defaultInformation1d;
   information2d defaultInformation2d;
@@ -3308,6 +3375,7 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
 
   int plotCounter=0;
   while (! plotFiles.eof()) {
+
     string line;
     getline (plotFiles,line);
     if (line.find("#")==0) continue;
@@ -3341,18 +3409,22 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
 	theseHists.mc_all_hist->Sumw2();
 	if(dataVsmc) {//define only for data vs mc comparison
 	  theseHists.mc_b_hist = new TH1D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	  theseHists.mc_bglusplit_hist = new TH1D((thisPlot.plotName+"_mc_bglusplit_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_c_hist = new TH1D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_light_hist = new TH1D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_none_hist = new TH1D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
+	  theseHists.mc_bglusplit_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
 	  theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_b_hist->Sumw2();
+	  theseHists.mc_bglusplit_hist->Sumw2();
 	  theseHists.mc_c_hist->Sumw2();
 	  theseHists.mc_light_hist->Sumw2();
 	  theseHists.mc_none_hist->Sumw2();
@@ -3376,18 +3448,22 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
 	theseHists.mc_all_hist->Sumw2();
 	if(dataVsmc) {//define only for data vs mc comparison
 	  theseHists.mc_b_hist = new TH1D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	  theseHists.mc_bglusplit_hist = new TH1D((thisPlot.plotName+"_mc_bglusplit_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_c_hist = new TH1D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_light_hist = new TH1D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_none_hist = new TH1D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	  theseHists.mc_bglusplit_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
+	  theseHists.mc_bglusplit_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
 	  theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_b_hist->Sumw2();
+	  theseHists.mc_bglusplit_hist->Sumw2();
 	  theseHists.mc_c_hist->Sumw2();
 	  theseHists.mc_light_hist->Sumw2();
 	  theseHists.mc_none_hist->Sumw2();
@@ -3411,18 +3487,22 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
 	theseHists.mc_all_hist->Sumw2();
 	if(dataVsmc) {//define only for data vs mc comparison
 	  theseHists.mc_b_hist = new TH1D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	  theseHists.mc_bglusplit_hist = new TH1D((thisPlot.plotName+"_mc_bglusplit_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_c_hist = new TH1D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_light_hist = new TH1D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_none_hist = new TH1D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
+	  theseHists.mc_bglusplit_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
 	  theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_b_hist->Sumw2();
+	  theseHists.mc_bglusplit_hist->Sumw2();
 	  theseHists.mc_c_hist->Sumw2();
 	  theseHists.mc_light_hist->Sumw2();
 	  theseHists.mc_none_hist->Sumw2();
@@ -3544,18 +3624,22 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
 	theseHists.mc_all_hist->Sumw2();
 	if(dataVsmc) {//define only for data vs mc comparison
 	  theseHists.mc_b_hist = new TH2D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	  theseHists.mc_bglusplit_hist = new TH2D((thisPlot.plotName+"_mc_bglusplit_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_c_hist = new TH2D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_light_hist = new TH2D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_none_hist = new TH2D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_b_hist->Sumw2();
+	  theseHists.mc_bglusplit_hist->Sumw2();
 	  theseHists.mc_c_hist->Sumw2();
 	  theseHists.mc_light_hist->Sumw2();
 	  theseHists.mc_none_hist->Sumw2();
@@ -3643,18 +3727,22 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
 	theseHists.mc_all_hist->Sumw2();
 	if(dataVsmc) {//define only for data vs mc comparison
 	  theseHists.mc_b_hist = new TH2D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	  theseHists.mc_bglusplit_hist = new TH2D((thisPlot.plotName+"_mc_bglusplit_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_c_hist = new TH2D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_light_hist = new TH2D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_none_hist = new TH2D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_b_hist->Sumw2();
+	  theseHists.mc_bglusplit_hist->Sumw2();
 	  theseHists.mc_c_hist->Sumw2();
 	  theseHists.mc_light_hist->Sumw2();
 	  theseHists.mc_none_hist->Sumw2();
@@ -3676,18 +3764,22 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
 	theseHists.mc_all_hist->Sumw2();
 	if(dataVsmc) {//define only for data vs mc comparison
 	  theseHists.mc_b_hist = new TH1D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	  theseHists.mc_bglusplit_hist = new TH1D((thisPlot.plotName+"_mc_bglusplit_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_c_hist = new TH1D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_light_hist = new TH1D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_none_hist = new TH1D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
+	  theseHists.mc_bglusplit_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str()  );
 	  theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_b_hist->Sumw2();
+	  theseHists.mc_bglusplit_hist->Sumw2();
 	  theseHists.mc_c_hist->Sumw2();
 	  theseHists.mc_light_hist->Sumw2();
 	  theseHists.mc_none_hist->Sumw2();
@@ -3710,18 +3802,22 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
 	theseHists.mc_all_hist->Sumw2();
 	if(dataVsmc) {//define only for data vs mc comparison
 	  theseHists.mc_b_hist = new TH1D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
+	  theseHists.mc_bglusplit_hist = new TH1D((thisPlot.plotName+"_mc_bglusplit_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_c_hist = new TH1D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_light_hist = new TH1D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_none_hist = new TH1D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup);
 	  theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_light_hist->GetYaxis()->SetTitle(thisPlot.yTitle.c_str() );
 	  theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_b_hist->Sumw2();
+	  theseHists.mc_bglusplit_hist->Sumw2();
 	  theseHists.mc_c_hist->Sumw2();
 	  theseHists.mc_light_hist->Sumw2();
 	  theseHists.mc_none_hist->Sumw2();
@@ -3765,6 +3861,7 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
   TSelectorMultiDraw* mcSelector = new TSelectorMultiDraw();
   TSelectorMultiDraw* dataSelector = new TSelectorMultiDraw();
 
+ 
   for(list< pair< information1d , flavorHists1D > >::iterator iPlot = jetPlots1D.begin(); iPlot != jetPlots1D.end(); iPlot++)
     {
       MakeAHist(mcSelector,dataSelector,iPlot->first,iPlot->second,dataVsmc);
@@ -3857,8 +3954,10 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
       if(dataVsmc) {//only for data vs mc comparison
 	// apply the flavor re scaling
 	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_bglusplit_hist->Scale( iPlot->first.bScale );
 	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
+	iPlot->second.mc_all_hist->Add(iPlot->second.mc_bglusplit_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
@@ -3871,8 +3970,10 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
       if(dataVsmc) {//only for data vs mc comparison      
 	// apply the flavor re scaling
 	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_bglusplit_hist->Scale( iPlot->first.bScale );
 	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
+	iPlot->second.mc_all_hist->Add(iPlot->second.mc_bglusplit_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
@@ -3885,8 +3986,10 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
       if(dataVsmc) {//only for data vs mc comparison
 	// apply the flavor re scaling
 	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_bglusplit_hist->Scale( iPlot->first.bScale );
 	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
+	iPlot->second.mc_all_hist->Add(iPlot->second.mc_bglusplit_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
@@ -3907,8 +4010,10 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
       if(dataVsmc) {//only for data vs mc comparison
 	// apply the flavor re scaling
 	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_bglusplit_hist->Scale( iPlot->first.bScale );
 	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
+	iPlot->second.mc_all_hist->Add(iPlot->second.mc_bglusplit_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
@@ -3924,8 +4029,10 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
       if(dataVsmc) {//only for data vs mc comparison
 	// apply the flavor re scaling
 	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_bglusplit_hist->Scale( iPlot->first.bScale );
 	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
+	iPlot->second.mc_all_hist->Add(iPlot->second.mc_bglusplit_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);
@@ -3960,8 +4067,10 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
       if(dataVsmc) {//only for data vs mc comparison
 	// apply the flavor re scaling
 	iPlot->second.mc_b_hist->Scale( iPlot->first.bScale );
+	iPlot->second.mc_bglusplit_hist->Scale( iPlot->first.bScale );
 	iPlot->second.mc_c_hist->Scale( iPlot->first.cScale );
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_b_hist);
+	iPlot->second.mc_all_hist->Add(iPlot->second.mc_bglusplit_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_c_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_light_hist);
 	iPlot->second.mc_all_hist->Add(iPlot->second.mc_none_hist);

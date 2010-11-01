@@ -69,6 +69,7 @@ Bool_t MuonSelector::Process(Long64_t entry)
    // The return value is currently not used.
 
   b_triggerHLTJet30U->GetEntry(entry);
+  b_isGluonSplitting->GetEntry(entry);
 
   b_nJets -> GetEntry(entry);
   b_jetPt->GetEntry(entry);
@@ -218,7 +219,8 @@ Bool_t MuonSelector::Process(Long64_t entry)
     // fill number of muons in histograms depending on jet flavour etc...
     if( isData ) dataHist->Fill(Nmupassingcuts, fChain->GetWeight());
     else{//MC
-      if( abs(MCTrueFlavor[i]) == 5) mcHistb->Fill(Nmupassingcuts,  fChain->GetWeight()); 
+      if( abs(MCTrueFlavor[i]) == 5 && isGluonSplitting == 0) mcHistb->Fill(Nmupassingcuts,  fChain->GetWeight()); 
+      else if( abs(MCTrueFlavor[i]) == 5 && isGluonSplitting==1) mcHistbglusplit->Fill(Nmupassingcuts,  fChain->GetWeight()); 
       else if( abs(MCTrueFlavor[i]) == 4) mcHistc->Fill(Nmupassingcuts,  fChain->GetWeight()); 
       else if( abs(MCTrueFlavor[i]) == 3
 	  || abs(MCTrueFlavor[i]) == 2
