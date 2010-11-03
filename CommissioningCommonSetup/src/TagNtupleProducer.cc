@@ -129,7 +129,8 @@ public:
   float PVNormalizedChi2;
 
   float pthat;
-  bool isGluonSplitting;
+  bool isBGluonSplitting;
+  bool isCGluonSplitting;
 
   //Basic Jet Information
   int nJets;
@@ -602,7 +603,9 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "PVNormalizedChi2" , &PVNormalizedChi2 , "PVNormalizedChi2/F"); 
 
   tree->Branch(  "pthat" , &pthat, "pthat/F");
-  tree->Branch(  "isGluonSplitting" , &isGluonSplitting, "isGluonSplitting/O");
+  tree->Branch(  "isBGluonSplitting" , &isBGluonSplitting, "isBGluonSplitting/O");
+  tree->Branch(  "isCGluonSplitting" , &isCGluonSplitting, "isCGluonSplitting/O");
+
 
   //Basic Jet Information
   //  math::XYZTLorentzVector jetP4[nJets];    
@@ -1059,10 +1062,13 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     }
 
   // determine gluon splitting
-  isGluonSplitting = 0;
+  isBGluonSplitting = 0;
+  isCGluonSplitting = 0;
   if(getMCTruth_) {
     bool bFoundS3BQuark = false;
     bool bFoundS2BQuark = false;
+    bool bFoundS3CQuark = false;
+    bool bFoundS2CQuark = false;
     edm::Handle<GenParticleCollection> genParticles;
     iEvent.getByLabel("genParticles" , genParticles );
     for( size_t i = 0; i < genParticles->size(); ++ i ) {
@@ -1074,9 +1080,19 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       if(genCand.status() == 2 && MC_particleID ==5){
 	bFoundS2BQuark = true;
       }
+
+
+      if(genCand.status() == 3 && MC_particleID ==4){
+	bFoundS3CQuark = true;
+      }
+      if(genCand.status() == 2 && MC_particleID ==4){
+	bFoundS2CQuark = true;
+      }
     }
     // if no status 3 b quark but status 2
-    if( (!bFoundS3BQuark) && bFoundS2BQuark  ) isGluonSplitting  = 1;
+    if( (!bFoundS3BQuark) && bFoundS2BQuark  ) isBGluonSplitting  = 1;
+    // if no status 3 c quark but status 2
+    if( (!bFoundS3CQuark) && bFoundS2CQuark  ) isCGluonSplitting  = 1;
   }
 
   //Get the btaggers that are defined in the configuration file
