@@ -126,6 +126,8 @@ public:
   float PVx;
   float PVy;
   float PVz;
+  float PVChi2;
+  float PVndof;
   float PVNormalizedChi2;
 
   float pthat;
@@ -602,6 +604,8 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "PVx" , &PVx , "PVx/F"); 
   tree->Branch(  "PVy" , &PVy , "PVy/F"); 
   tree->Branch(  "PVz" , &PVz , "PVz/F"); 
+  tree->Branch(  "PVChi2" , &PVChi2 , "PVChi2/F"); 
+  tree->Branch(  "PVndof" , &PVndof , "PVndof/F"); 
   tree->Branch(  "PVNormalizedChi2" , &PVNormalizedChi2 , "PVNormalizedChi2/F"); 
 
   tree->Branch(  "pthat" , &pthat, "pthat/F");
@@ -986,6 +990,8 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   Handle<reco::VertexCollection> primaryVertex;
   iEvent.getByLabel(primaryVertexProducer_, primaryVertex);
 
+  // offlinePrimaryVertices are already selected with
+  // ndof > 4 && abs(z) <= 24 && position.Rho <= 2
   numberOfPrimaryVertices = primaryVertex->size();
 
   edm::ESHandle<TransientTrackBuilder> builder;
@@ -1204,6 +1210,8 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       PVx = pv->x();
       PVy = pv->y();
       PVz = pv->z();
+      PVChi2 = pv->chi2();
+      PVndof = pv->ndof();
       PVNormalizedChi2 = pv->normalizedChi2();
 
       //some counters
