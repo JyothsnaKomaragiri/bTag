@@ -115,7 +115,7 @@ public:
   bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U;
   bool triggerHLTJet30U, triggerHLTJet50U, triggerHLTJet70U, triggerHLTJet100U ;
   bool triggerHLTBTagIPJet50U, triggerHLTBTagMuJet10U, triggerHLTBTagMuJet20U;
-  bool triggerHLTBTagMuDiJet10U, triggerHLTBTagMuDiJet20U, triggerHLTBTagMuDiJet20UMu5;
+  bool triggerHLTBTagMuDiJet10U, triggerHLTBTagMuDiJet20U, triggerHLTBTagMuDiJet20UMu5, triggerHLTBTagMuDiJet30U, triggerHLTBTagMuDiJet30UMu5;
 
   unsigned int eventNumber ;
   unsigned int runNumber ;
@@ -590,7 +590,9 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "triggerHLTBTagMuJet20U", &triggerHLTBTagMuJet20U, "triggerHLTBTagMuJet20U/O");
   tree->Branch(  "triggerHLTBTagMuDiJet10U", &triggerHLTBTagMuDiJet10U, "triggerHLTBTagMuDiJet10U/O");
   tree->Branch(  "triggerHLTBTagMuDiJet20U", &triggerHLTBTagMuDiJet20U, "triggerHLTBTagMuDiJet20U/O");
-
+  tree->Branch(  "triggerHLTBTagMuDiJet20UMu5", &triggerHLTBTagMuDiJet20UMu5, "triggerHLTBTagMuDiJet20UMu5/O");
+  tree->Branch(  "triggerHLTBTagMuDiJet30U", &triggerHLTBTagMuDiJet30U, "triggerHLTBTagMuDiJet30U/O");
+  tree->Branch(  "triggerHLTBTagMuDiJet30UMu5", &triggerHLTBTagMuDiJet30UMu5, "triggerHLTBTagMuDiJet30UMu5/O");
 
   tree->Branch(  "eventNumber"             , &eventNumber             , "eventNumber/i"            );
   tree->Branch(  "runNumber"		    , &runNumber               , "runNumber/i"   	    );
@@ -934,7 +936,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   triggerHLTL1Jet6U= triggerHLTL1Jet10U= triggerHLTJet15U = 0;
   triggerHLTJet30U = triggerHLTJet50U = triggerHLTJet70U= triggerHLTJet100U = 0;
   triggerHLTBTagIPJet50U = triggerHLTBTagMuJet10U = triggerHLTBTagMuJet20U = 0;
-  triggerHLTBTagMuDiJet10U = triggerHLTBTagMuDiJet20U = triggerHLTBTagMuDiJet20UMu5 = 0;
+  triggerHLTBTagMuDiJet10U = triggerHLTBTagMuDiJet20U = triggerHLTBTagMuDiJet20UMu5 = triggerHLTBTagMuDiJet30U = triggerHLTBTagMuDiJet30UMu5 = 0;
 
   //Get The Various collections defined in the configuration file
   edm::Handle<edm::TriggerResults>  hltresults;
@@ -957,9 +959,17 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     if (trigName=="HLT_BTagIP_Jet50U")         triggerHLTBTagIPJet50U = hltresults->accept(itrig) ;
     if (trigName=="HLT_BTagMu_Jet10U")         triggerHLTBTagMuJet10U = hltresults->accept(itrig) ;
     if (trigName=="HLT_BTagMu_Jet20U")         triggerHLTBTagMuJet20U = hltresults->accept(itrig) ;
-    if (trigName=="HLT_BTagMu_DiJet10U")       triggerHLTBTagMuDiJet10U = hltresults->accept(itrig) ;
-    if (trigName=="HLT_BTagMu_DiJet20U")       triggerHLTBTagMuDiJet20U = hltresults->accept(itrig) ;
-    if (trigName=="HLT_BTagMu_DiJet20U_Mu5")   triggerHLTBTagMuDiJet20UMu5 = hltresults->accept(itrig) ;
+    //BTagMu paths from 6E31 and 2E32 menu
+    if (trigName=="HLT_BTagMu_DiJet10U" || trigName=="HLT_BTagMu_DiJet10U_v1" || trigName=="HLT_BTagMu_DiJet10U_v2" || trigName=="HLT_BTagMu_DiJet10U_v3")
+      triggerHLTBTagMuDiJet10U = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagMu_DiJet20U" || trigName=="HLT_BTagMu_DiJet20U_v1" || trigName=="HLT_BTagMu_DiJet20U_v2" || trigName=="HLT_BTagMu_DiJet20U_v3")
+      triggerHLTBTagMuDiJet20U = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagMu_DiJet20U_Mu5" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v1" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v2" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v3")
+      triggerHLTBTagMuDiJet20UMu5 = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagMu_DiJet30U" || trigName=="HLT_BTagMu_DiJet30U_v1" || trigName=="HLT_BTagMu_DiJet30U_v2" || trigName=="HLT_BTagMu_DiJet30U_v3")
+      triggerHLTBTagMuDiJet20U = hltresults->accept(itrig) ;
+    if (trigName=="HLT_BTagMu_DiJet30U_Mu5" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v1" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v2" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v3")
+      triggerHLTBTagMuDiJet20UMu5 = hltresults->accept(itrig) ;
   }  
  
 
