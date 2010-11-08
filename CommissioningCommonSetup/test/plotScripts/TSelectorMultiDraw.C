@@ -126,15 +126,15 @@ void TSelectorMultiDraw::LoadVariables(string varexp, string selection)
   //  mySelector = thisSelector;
 }
 
-void TSelectorMultiDraw::AddTrackSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationTrackCuts info){
+void TSelectorMultiDraw::AddTrackSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistbglusplit, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationTrackCuts info){
   TrackSelector *trackSel = new TrackSelector();
-  trackSel->SetUp(isData, dataHist, mcHistb, mcHistc, mcHistl, mcHistn, info);
+  trackSel->SetUp(isData, dataHist, mcHistb, mcHistbglusplit, mcHistc, mcHistl, mcHistn, info);
   fTrackSelectors.push_back(trackSel);
 }
 
-void TSelectorMultiDraw::AddMuonSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationMuonCuts info){
+void TSelectorMultiDraw::AddMuonSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistbglusplit, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationMuonCuts info){
   MuonSelector *muSel = new MuonSelector();
-  muSel->MuSetUp(isData, dataHist, mcHistb, mcHistc, mcHistl, mcHistn, info);
+  muSel->MuSetUp(isData, dataHist, mcHistb, mcHistbglusplit, mcHistc, mcHistl, mcHistn, info);
   fMuonSelectors.push_back(muSel);
 }
 

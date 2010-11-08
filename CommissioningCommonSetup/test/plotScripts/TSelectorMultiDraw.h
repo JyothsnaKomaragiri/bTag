@@ -61,8 +61,8 @@ public :
    virtual void    SlaveTerminate();
    virtual void    Terminate();
    virtual void    LoadVariables(std::string varexp, std::string selection);
-   virtual void    AddTrackSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationTrackCuts info);
-   virtual void    AddMuonSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationMuonCuts info);
+   virtual void    AddTrackSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistbglusplit, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationTrackCuts info);
+   virtual void    AddMuonSelector(bool isData, TH1D*dataHist, TH1D* mcHistb, TH1D* mcHistbglusplit, TH1D* mcHistc, TH1D* mcHistl, TH1D* mcHistn, informationMuonCuts info);
    //   virtual void    SetOption(const char* option);
 
    ClassDef(TSelectorMultiDraw,0);
