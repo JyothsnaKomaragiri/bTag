@@ -56,12 +56,12 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
         "HLT_BTagMu_Jet20U",
         "HLT_BTagMu_DiJet10U",
         "HLT_BTagMu_DiJet20U",
-        "HLT_BTagMu_DiJet20U_Mu5"
+        "HLT_BTagMu_DiJet20U_Mu5",
         "HLT_BTagMu_DiJet30U",
-        "HLT_BTagMu_DiJet30U_Mu5"
+        "HLT_BTagMu_DiJet30U_Mu5",
         "HLT_BTagMu_DiJet10U_v*",
         "HLT_BTagMu_DiJet20U_v*",
-        "HLT_BTagMu_DiJet20U_Mu5_v*"
+        "HLT_BTagMu_DiJet20U_Mu5_v*",
         "HLT_BTagMu_DiJet30U_v*",
         "HLT_BTagMu_DiJet30U_Mu5_v*"
         ),

@@ -69,6 +69,8 @@
 #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
 #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
 
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+
 #include <TTree.h>
 #include <TFile.h>
 
@@ -121,6 +123,7 @@ public:
   unsigned int runNumber ;
   unsigned int lumiBlockNumber ;
 
+  unsigned int numberOfPUVertices;
   unsigned int numberOfPrimaryVertices ;
   unsigned int numberOfTracksAtPV;
   float PVx;
@@ -599,6 +602,8 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "eventNumber"             , &eventNumber             , "eventNumber/i"            );
   tree->Branch(  "runNumber"		    , &runNumber               , "runNumber/i"   	    );
   tree->Branch(  "lumiBlockNumber" 	    , &lumiBlockNumber         , "lumiBlockNumber/i" 	    );
+
+  tree->Branch(  "numberOfPUVertices",       &numberOfPUVertices, "numberOfPUVertices/i");
   tree->Branch(  "numberOfPrimaryVertices" , &numberOfPrimaryVertices , "numberOfPrimaryVertices/i"); 
   tree->Branch(  "numberOfTracksAtPV" , &numberOfTracksAtPV , "numberOfTracksAtPV/i"); 
   tree->Branch(  "PVx" , &PVx , "PVx/F"); 
@@ -994,7 +999,15 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   // offlinePrimaryVertices are already selected with
   // ndof > 4 && abs(z) <= 24 && position.Rho <= 2
   numberOfPrimaryVertices = primaryVertex->size();
-
+  
+  if(getMCTruth_) {
+    
+    Handle<PileupSummaryInfo> puInfo;
+    bool PuInfo=iEvent.getByLabel("addPileupInfo", puInfo);
+    
+    if (PuInfo) numberOfPUVertices = puInfo->getPU_NumInteractions();
+  }
+  
   edm::ESHandle<TransientTrackBuilder> builder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
 
