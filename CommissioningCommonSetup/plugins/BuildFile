@@ -4,4 +4,5 @@
   <use name=FWCore/ParameterSet>
   <use name=DataFormats/JetReco>
   <use name=CommonTools/Utils>
+  <use name=clhep>
 </library>
