@@ -3069,8 +3069,8 @@ void MakeATrackHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSele
   dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
   if(dataVsmc) {
     string bcut,bglusplitcut, ccut,lightcut,nonecut;
-    bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isGluonSplitting==0)";
-    bglusplitcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isGluonSplitting==1)";
+    bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isBGluonSplitting==0)";
+    bglusplitcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isBGluonSplitting==1)";
     ccut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==4)";
     lightcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==1 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==2 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==3 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==21)";
     nonecut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==0)";
@@ -3097,8 +3097,8 @@ void MakeAHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelector,
   dataSelector->LoadVariables((info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
   if(dataVsmc) {//only for data vs mc comparison
     string bcut,bglusplitcut, ccut,lightcut,nonecut;
-    bcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==0)";
-    bglusplitcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==1)";
+    bcut = "("+info.label+"MCTrueFlavor==5 && isBGluonSplitting==0)";
+    bglusplitcut = "("+info.label+"MCTrueFlavor==5 && isBGluonSplitting==1)";
     ccut = "("+info.label+"MCTrueFlavor==4)";
     lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
     nonecut = "("+info.label+"MCTrueFlavor==0)";     
@@ -3207,8 +3207,8 @@ void MakeA2DHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelecto
   dataSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
   if(dataVsmc) {//only for data vs mc comparison
     string bcut,bglusplitcut, ccut,lightcut,nonecut;
-    bcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==0)";
-    bglusplitcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==1)";
+    bcut = "("+info.label+"MCTrueFlavor==5 && isBGluonSplitting==0)";
+    bglusplitcut = "("+info.label+"MCTrueFlavor==5 && isBGluonSplitting==1)";
     ccut = "("+info.label+"MCTrueFlavor==4)";
     lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
     nonecut = "("+info.label+"MCTrueFlavor==0)";
@@ -3235,8 +3235,8 @@ void MakeA2DTrackHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSe
   dataSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
   if(dataVsmc) {//only for data vs mc comparison
     string bcut,bglusplitcut, ccut,lightcut,nonecut;
-    bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isGluonSplitting==0)";
-    bglusplitcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isGluonSplitting==1)";
+    bcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isBGluonSplitting==0)";
+    bglusplitcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==5 && isBGluonSplitting==1)";
     ccut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==4)";
     lightcut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==1 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==2 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==3 ||"+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==21)";
     nonecut = "("+info.label+"MCTrueFlavor["+info.label+"trackJetIndex[Iteration$]]==0)";
@@ -3263,8 +3263,8 @@ void MakeACutHist(TSelectorMultiDraw* mcSelector, TSelectorMultiDraw* dataSelect
   dataSelector->LoadVariables((info.aliasy+":"+info.aliasx+">>+"+hists.data_hist->GetName()),(info.cut));
   if(dataVsmc) {//only for data vs mc comparison
     string bcut,bglusplitcut, ccut,lightcut,nonecut;
-    bcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==0)";
-    bglusplitcut = "("+info.label+"MCTrueFlavor==5 && isGluonSplitting==1)";
+    bcut = "("+info.label+"MCTrueFlavor==5 && isBGluonSplitting==0)";
+    bglusplitcut = "("+info.label+"MCTrueFlavor==5 && isBGluonSplitting==1)";
     ccut = "("+info.label+"MCTrueFlavor==4)";
     lightcut = "("+info.label+"MCTrueFlavor==1 ||"+info.label+"MCTrueFlavor==2 ||"+info.label+"MCTrueFlavor==3 ||"+info.label+"MCTrueFlavor==21)";
     nonecut = "("+info.label+"MCTrueFlavor==0)";
