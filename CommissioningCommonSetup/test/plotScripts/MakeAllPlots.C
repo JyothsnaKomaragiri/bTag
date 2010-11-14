@@ -3661,18 +3661,22 @@ void MakeAllPlots(string mcfilename, string datafilename, string plotfilename, d
 	theseHists.mc_all_hist->Sumw2();
 	if(dataVsmc) {//define only for data vs mc comparison
 	  theseHists.mc_b_hist = new TH2D((thisPlot.plotName+"_mc_b_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
+	  theseHists.mc_bglusplit_hist = new TH2D((thisPlot.plotName+"_mc_bglusplit_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_c_hist = new TH2D((thisPlot.plotName+"_mc_c_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_light_hist = new TH2D((thisPlot.plotName+"_mc_light_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_none_hist = new TH2D((thisPlot.plotName+"_mc_none_hist").c_str(),thisPlot.plotTitle.c_str(),thisPlot.nbinsx,thisPlot.xlow,thisPlot.xup,thisPlot.nbinsy,thisPlot.ylow,thisPlot.yup);
 	  theseHists.mc_b_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_c_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_light_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
 	  theseHists.mc_none_hist->GetXaxis()->SetTitle( thisPlot.xTitle.c_str() );
-	  theseHists.mc_b_hist->GetYaxis()->SetTitle(thisPlot.yTitle.c_str() );
+	  theseHists.mc_b_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	  theseHists.mc_bglusplit_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_c_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
-	  theseHists.mc_light_hist->GetYaxis()->SetTitle(thisPlot.yTitle.c_str()  );
-	  theseHists.mc_none_hist->GetYaxis()->SetTitle(thisPlot.yTitle.c_str()  );
+	  theseHists.mc_light_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
+	  theseHists.mc_none_hist->GetYaxis()->SetTitle( thisPlot.yTitle.c_str() );
 	  theseHists.mc_b_hist->Sumw2();
+	  theseHists.mc_bglusplit_hist->Sumw2();
 	  theseHists.mc_c_hist->Sumw2();
 	  theseHists.mc_light_hist->Sumw2();
 	  theseHists.mc_none_hist->Sumw2();
