@@ -2333,6 +2333,7 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale, 
   hists.mc_all_hist->Scale(scale);
   if(dataVsmc) {
     hists.mc_b_hist->Scale(scale);
+    hists.mc_bglusplit_hist->Scale(scale);
     hists.mc_c_hist->Scale(scale);
     hists.mc_light_hist->Scale(scale);
     hists.mc_none_hist->Scale(scale);
