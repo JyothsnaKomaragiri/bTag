@@ -2381,15 +2381,23 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale, 
     TH1D* mc_light_temp;
     TH1D* mc_none_temp;
     
+    TH1D* data_temp1;
+    TH1D* mc_all_temp1;
+
     for(int iYbin = 0; iYbin<info.nbinsy+2; iYbin++){
+
+      data_temp1 = hists.data_hist->ProjectionX("data_temp1",iYbin,iYbin);
+      mc_all_temp1 = hists.mc_all_hist->ProjectionX("mc_all_temp1",iYbin,iYbin);
+      double tempScale;
+      if(mc_all_temp1->Integral(0,info.nbinsy+1) !=0 ) tempScale = data_temp1->Integral(0,info.nbinsy+1)/mc_all_temp1->Integral(0,info.nbinsy+1);
+      else tempScale = 1;
+
       mc_b_temp = hists.mc_b_hist->ProjectionX("mc_b_temp",iYbin,iYbin);
       mc_bglusplit_temp = hists.mc_bglusplit_hist->ProjectionX("mc_bglusplit_temp",iYbin,iYbin);
       mc_c_temp = hists.mc_c_hist->ProjectionX("mc_c_temp",iYbin,iYbin);
       mc_light_temp = hists.mc_light_hist->ProjectionX("mc_light_temp",iYbin,iYbin);
       mc_none_temp = hists.mc_none_hist->ProjectionX("mc_none_temp",iYbin,iYbin);
-      double tempScale;
-      if(mc_all_temp->Integral(0,info.nbinsy+1) !=0 ) tempScale = data_temp->Integral(0,info.nbinsy+1)/mc_all_temp->Integral(0,info.nbinsy+1);
-      else tempScale = 1;
+
       mc_b_temp->Scale(tempScale);
       mc_bglusplit_temp->Scale(tempScale);
       mc_c_temp->Scale(tempScale);
@@ -2400,6 +2408,10 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale, 
       reweightedHists.mc_c_hist->Add(mc_c_temp);
       reweightedHists.mc_light_hist->Add(mc_light_temp);
       reweightedHists.mc_none_hist->Add(mc_none_temp);
+
+      delete data_temp1;
+      delete mc_all_temp1;
+    
       delete mc_b_temp;
       delete mc_bglusplit_temp;
       delete mc_c_temp;
