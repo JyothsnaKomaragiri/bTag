@@ -2366,6 +2366,7 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale, 
 
   if(dataVsmc) {
     reweightedHists.mc_b_hist = hists.mc_b_hist->ProjectionX();
+    reweightedHists.mc_bglusplit_hist = hists.mc_bglusplit_hist->ProjectionX();
     reweightedHists.mc_c_hist = hists.mc_c_hist->ProjectionX();
     reweightedHists.mc_light_hist = hists.mc_light_hist->ProjectionX();
     reweightedHists.mc_none_hist = hists.mc_none_hist->ProjectionX();
@@ -2374,12 +2375,14 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale, 
     reweightedHists.mc_light_hist->Reset();
     reweightedHists.mc_none_hist->Reset();  
     TH1D* mc_b_temp;
+    TH1D* mc_bglusplit_temp;
     TH1D* mc_c_temp;
     TH1D* mc_light_temp;
     TH1D* mc_none_temp;
     
     for(int iYbin = 0; iYbin<info.nbinsy+2; iYbin++){
       mc_b_temp = hists.mc_b_hist->ProjectionX("mc_b_temp",iYbin,iYbin);
+      mc_bglusplit_temp = hists.mc_bglusplit_hist->ProjectionX("mc_bglusplit_temp",iYbin,iYbin);
       mc_c_temp = hists.mc_c_hist->ProjectionX("mc_c_temp",iYbin,iYbin);
       mc_light_temp = hists.mc_light_hist->ProjectionX("mc_light_temp",iYbin,iYbin);
       mc_none_temp = hists.mc_none_hist->ProjectionX("mc_none_temp",iYbin,iYbin);
@@ -2387,14 +2390,17 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale, 
       if(mc_all_temp->Integral(0,info.nbinsy+1) !=0 ) tempScale = data_temp->Integral(0,info.nbinsy+1)/mc_all_temp->Integral(0,info.nbinsy+1);
       else tempScale = 1;
       mc_b_temp->Scale(tempScale);
+      mc_bglusplit_temp->Scale(tempScale);
       mc_c_temp->Scale(tempScale);
       mc_light_temp->Scale(tempScale);
       mc_none_temp->Scale(tempScale);
       reweightedHists.mc_b_hist->Add(mc_b_temp);
+      reweightedHists.mc_bglusplit_hist->Add(mc_bglusplit_temp);
       reweightedHists.mc_c_hist->Add(mc_c_temp);
       reweightedHists.mc_light_hist->Add(mc_light_temp);
       reweightedHists.mc_none_hist->Add(mc_none_temp);
       delete mc_b_temp;
+      delete mc_bglusplit_temp;
       delete mc_c_temp;
       delete mc_light_temp;
       delete mc_none_temp;
