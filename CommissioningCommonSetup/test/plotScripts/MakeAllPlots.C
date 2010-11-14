@@ -2371,6 +2371,7 @@ void MakeAReweightedPlot(information2d info, flavorHists2D hists, double scale, 
     reweightedHists.mc_light_hist = hists.mc_light_hist->ProjectionX();
     reweightedHists.mc_none_hist = hists.mc_none_hist->ProjectionX();
     reweightedHists.mc_b_hist->Reset();
+    reweightedHists.mc_bglusplit_hist->Reset();
     reweightedHists.mc_c_hist->Reset();
     reweightedHists.mc_light_hist->Reset();
     reweightedHists.mc_none_hist->Reset();  
