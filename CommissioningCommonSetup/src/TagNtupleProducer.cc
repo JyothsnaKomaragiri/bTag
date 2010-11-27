@@ -958,17 +958,30 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 
   for (int itrig = 0; itrig != ntrigs; ++itrig){
+
     string trigName=triggerNames_.triggerName(itrig);
     if (trigName=="HLT_L1Jet6U")               triggerHLTL1Jet6U  = hltresults->accept(itrig) ;
     if (trigName=="HLT_L1Jet10U")              triggerHLTL1Jet10U = hltresults->accept(itrig) ; 
-    if (trigName=="HLT_Jet15U")                triggerHLTJet15U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet30U")                triggerHLTJet30U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet50U")                triggerHLTJet50U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet70U")                triggerHLTJet70U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet100U")               triggerHLTJet100U   = hltresults->accept(itrig) ; 
+
+    //Take care of versioning even for the single jet triggers
+    if (trigName=="HLT_Jet15U" || trigName=="HLT_Jet15U_v1" || trigName=="HLT_Jet15U_v2" || trigName=="HLT_Jet15U_v3")
+      triggerHLTJet15U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet30U" || trigName=="HLT_Jet30U_v1" || trigName=="HLT_Jet30U_v2" || trigName=="HLT_Jet30U_v3")
+      triggerHLTJet30U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet50U" || trigName=="HLT_Jet50U_v1" || trigName=="HLT_Jet50U_v2" || trigName=="HLT_Jet50U_v3")
+      triggerHLTJet50U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet70U" || trigName=="HLT_Jet70U_v1" || trigName=="HLT_Jet70U_v2" || trigName=="HLT_Jet70U_v3")
+      triggerHLTJet70U   = hltresults->accept(itrig) ;
+    if (trigName=="HLT_Jet100U" || trigName=="HLT_Jet100U_v1" || trigName=="HLT_Jet100U_v2" || trigName=="HLT_Jet100U_v3")
+      triggerHLTJet100U   = hltresults->accept(itrig) ; 
+
+    //BTagIP path till 2E31 menu
     if (trigName=="HLT_BTagIP_Jet50U")         triggerHLTBTagIPJet50U = hltresults->accept(itrig) ;
+    
+    //BTagMu paths till 2E31 menu
     if (trigName=="HLT_BTagMu_Jet10U")         triggerHLTBTagMuJet10U = hltresults->accept(itrig) ;
     if (trigName=="HLT_BTagMu_Jet20U")         triggerHLTBTagMuJet20U = hltresults->accept(itrig) ;
+
     //BTagMu paths in 6E31 and 2E32 menu
     if (trigName=="HLT_BTagMu_DiJet10U" || trigName=="HLT_BTagMu_DiJet10U_v1" || trigName=="HLT_BTagMu_DiJet10U_v2" || trigName=="HLT_BTagMu_DiJet10U_v3")
       triggerHLTBTagMuDiJet10U = hltresults->accept(itrig) ;

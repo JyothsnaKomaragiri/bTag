@@ -18,13 +18,11 @@ process.GlobalTag.globaltag = 'START38_V12::All'
 
 ########### Event cleaning ###########
 #Require a good vertex
-process.oneGoodVertexFilter = cms.EDFilter("GoodVertexFilter",
-                                           vertexCollection = cms.InputTag('offlinePrimaryVertices'),
-                                           minimumNDOF = cms.uint32(4) ,
-                                           maxAbsZ = cms.double(24),	
-                                           maxd0 = cms.double(2)	
-                                           )
-
+process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
+   src = cms.InputTag("offlinePrimaryVertices"),
+   cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"),
+   filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
+)
 
 #Filter for removing scraping events
 process.noscraping = cms.EDFilter("FilterOutScraping",
@@ -52,6 +50,11 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
         "HLT_Jet50U",
         "HLT_Jet70U",
         "HLT_Jet100U",
+        "HLT_Jet15U_v*", 
+        "HLT_Jet30U_v*", 
+        "HLT_Jet50U_v*",
+        "HLT_Jet70U_v*",
+        "HLT_Jet100U_v*",
         "HLT_BTagIP_Jet50U",
         "HLT_BTagMu_Jet10U",
         "HLT_BTagMu_Jet20U",
