@@ -13,7 +13,9 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
+#include "DataFormats/Math/interface/deltaPhi.h"
 
 #include "CLHEP/Random/RandGaussQ.h"
 //
@@ -116,15 +118,18 @@ void SmearedJetProducer<T>::produce(edm::Event& iEvent, const edm::EventSetup& i
   typename JetCollection::const_iterator jet;
   for(jet = jets->begin(); jet != jets->end(); ++jet)
   {
-    double jetEta = jet->eta() + gaussianEta_->fire();
-    double jetPhi = jet->phi() + gaussianPhi_->fire();
-    if(jetPhi > M_PI) jetPhi -= 2.0 * M_PI;
-    if(jetPhi < -M_PI) jetPhi += 2.0 * M_PI;
-    double jetPt = jet->p() / sinh(jetEta);
-    math::XYZTLorentzVector newVec(math::PtEtaPhiELorentzVectorD(jetPt, jetEta, jetPhi, jet->energy()));
-    T smearedJet = *jet;
-    smearedJet.setP4(newVec);
-    output->push_back(smearedJet);
+   double deta = gaussianEta_->fire();
+   double dphi = gaussianPhi_->fire();
+   double jetEta = jet->eta() + deta;
+   double jetPhi = deltaPhi( jet->phi() , -dphi );
+
+   double theta = 2 * atan( exp(-1.0 * jetEta) );
+   double jetPt = jet->p() * sin(theta);
+   reco::Candidate::PolarLorentzVector newVec(jetPt, jetEta, jetPhi,
+jet->mass());
+   T smearedJet = *jet;
+   smearedJet.setP4(newVec);
+   output->push_back(smearedJet);
   }
 
   iEvent.put(output);
