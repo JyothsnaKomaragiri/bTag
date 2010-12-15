@@ -1,4 +1,6 @@
-
+2010-12-15  Jyothsna Rani Komaragiri  <jyothsna@cern.ch>
+	* Tagged V02-01-00  Contains the ntuplizer code and config files relevant only for running over RECO files
+	
 2010-10-26  Jyothsna Rani Komaragiri  <jyothsna@cern.ch>
 	* Tagged V02-00-00  First tag of ntuplizer ported for 38X
 	* TagNtupleProducer.cc :: Removed hardcoded trigger selection and added BTagMu triggers present in 2E31 menu in the ntuplizer.
