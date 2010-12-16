@@ -69,7 +69,7 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
         "HLT_BTagMu_DiJet30U_v*",
         "HLT_BTagMu_DiJet30U_Mu5_v*"
         ),
-   hltResults = cms.InputTag("TriggerResults","","REDIGI38X"),
+   hltResults = cms.InputTag("TriggerResults","","HLT"),
    l1tResults = cms.InputTag( "" ),
    throw = cms.bool( False) #set to false to deal with missing triggers while running over different trigger menus
 )
@@ -233,9 +233,9 @@ process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 process.standardPFBTagNtuple = process.bTagNtuple.clone()
 process.standardPFBTagNtuple.jetSrc = cms.InputTag( "ak5PFJetsJEC" )
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
-process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI38X")
+process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::HLT")
 process.standardPFBTagNtuple.jetMCSrc = cms.InputTag( "AK5PFbyValAlgo" )
-process.standardPFBTagNtuple.getSharedHitInfo = cms.bool(True)
+process.standardPFBTagNtuple.getSharedHitInfo = cms.bool(False)
 process.standardPFBTagNtuple.jetTracks = cms.InputTag( "ak5PFJetTracksAssociatorAtVertex" )
 process.standardPFBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexPFTagInfos" )
 process.standardPFBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParameterPFTagInfos" )
@@ -304,13 +304,12 @@ process.standardPFBTagNtuple.bTagConfig = cms.VPSet(
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(1000)
 )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-  'file:/storage/5/jyothsna/QCD_Pt_80to120_TuneZ2_7TeV_pythia6_Fall10-START38_V12-v1/DE0CA996-41CB-DF11-A68D-0025B3E06378.root',
-  'file:/storage/5/jyothsna/QCD_Pt_80to120_TuneZ2_7TeV_pythia6_Fall10-START38_V12-v1/F4A9BA39-57CB-DF11-8D97-003048D46006.root'
+  'file:/storage/cluster/jyothsna/QCD_Pt-80to120_7TeV-herwig6_AODSIM/24ADA2DE-0BD9-DF11-BA82-002481E0D448.root'
      )
 )
 

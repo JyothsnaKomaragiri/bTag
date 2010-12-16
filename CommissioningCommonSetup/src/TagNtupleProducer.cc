@@ -95,6 +95,7 @@ public:
   // ----------member data ---------------------------
   
   bool getMCTruth_;
+  bool getSharedHitInfo_;
   
   edm::InputTag jet_src_;
   edm::InputTag SVComputer_;
@@ -465,7 +466,8 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
 {
   string alias;
   getMCTruth_     = iConfig.getParameter<bool>( "getMCTruth" );
-  
+  getSharedHitInfo_ = iConfig.getParameter<bool>( "getSharedHitInfo" );   
+
   jet_src_        = iConfig.getParameter<edm::InputTag>( "jetSrc" );
   SVComputer_     = iConfig.getParameter<edm::InputTag>( "svComputer");
   triggerTag_ = iConfig.getParameter<edm::InputTag>("TriggerTag");
@@ -709,7 +711,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   tree->Branch(  "IPghostTrackPtRel", IPghostTrackPtRel, "IPghostTrackPtRel[nJets]/F");                        
   tree->Branch(  "IPghostTrackEta",  IPghostTrackEta, "IPghostTrackEta[nJets]/F");                       
   tree->Branch(  "IPghostTrackPhi",  IPghostTrackPhi, "IPghostTrackPhi[nJets]/F");                       
-  tree->Branch(  "IPghostTrackDeltaR", IPghostTrackDeltaR, "IPghostTrackDeltaR[nJets]/F");        
+  tree->Branch(  "IPghostTrackDeltaR", IPghostTrackDeltaR, "IPghostTrackDeltaR[nJets]/F");
   tree->Branch(  "IPPix1SharedHits",  IPPix1SharedHits, "IPPix1SharedHits[nJets]/I");
   tree->Branch(  "IPPix1TotalHits",  IPPix1TotalHits, "IPPix1TotalHits[nJets]/I");
   tree->Branch(  "IPPix2SharedHits", IPPix2SharedHits, "IPPix2SharedHits[nJets]/I");
@@ -1326,11 +1328,14 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  double distJetAxis =  IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value();
 	  trackDistJetAxis[iTotalTracksCounter] = ( distJetAxis );
 	  trackDeltaR[iTotalTracksCounter] = ( ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),(*iTrack)->momentum()) );
-	  int tsharedP1, tsharedP2, tsharedP3;
-	  trackHasSharedPix1[iTotalTracksCounter] = ( tsharedP1 = hasSharedHit(1, counter, (*jetTracks)[thisJetRef]));
-	  trackHasSharedPix2[iTotalTracksCounter] = ( tsharedP2 = hasSharedHit(2, counter, (*jetTracks)[thisJetRef]));
-	  trackHasSharedPix3[iTotalTracksCounter] = ( tsharedP3 = hasSharedHit(3, counter, (*jetTracks)[thisJetRef]));
-	  trackHasSharedPixAll[iTotalTracksCounter] = ( tsharedP1 || tsharedP2 || tsharedP3 );
+
+	  if(getSharedHitInfo_) {
+	    int tsharedP1, tsharedP2, tsharedP3;
+	    trackHasSharedPix1[iTotalTracksCounter] = ( tsharedP1 = hasSharedHit(1, counter, (*jetTracks)[thisJetRef]));
+	    trackHasSharedPix2[iTotalTracksCounter] = ( tsharedP2 = hasSharedHit(2, counter, (*jetTracks)[thisJetRef]));
+	    trackHasSharedPix3[iTotalTracksCounter] = ( tsharedP3 = hasSharedHit(3, counter, (*jetTracks)[thisJetRef]));
+	    trackHasSharedPixAll[iTotalTracksCounter] = ( tsharedP1 || tsharedP2 || tsharedP3 );
+	  }
 	  
 	  if(isSelected && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixTracks++;   //cut is hardcoded for now
 
@@ -1463,18 +1468,20 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       IPghostTrackPhi[iJet] = (ipTagInfo[thisJetRef]->ghostTrack()->phi());                       
       IPghostTrackDeltaR[iJet] = (deltaR(thisJetRef->eta(), thisJetRef->phi(), ipTagInfo[thisJetRef]->ghostTrack()->eta(), ipTagInfo[thisJetRef]->ghostTrack()->phi()));                    
 
-      int nPix1Shared, nPix1Total;
-      int nPix2Shared, nPix2Total;
-      int nPix3Shared, nPix3Total;
-      getSharedHitsInfo(1, ipTagInfo[thisJetRef]->selectedTracks(), nPix1Shared, nPix1Total);
-      getSharedHitsInfo(2, ipTagInfo[thisJetRef]->selectedTracks(), nPix2Shared, nPix2Total);
-      getSharedHitsInfo(3, ipTagInfo[thisJetRef]->selectedTracks(), nPix3Shared, nPix3Total);
-
-      IPPix1TotalHits[iJet] = (nPix1Total); IPPix1SharedHits[iJet] = (nPix1Shared);
-      IPPix2TotalHits[iJet] = (nPix2Total); IPPix2SharedHits[iJet] = (nPix2Shared);
-      IPPix3TotalHits[iJet] = (nPix3Total); IPPix3SharedHits[iJet] = (nPix3Shared);
-      IPPixAllTotalHits[iJet] = (nPix1Total + nPix2Total + nPix3Total); IPPixAllSharedHits[iJet] = (nPix1Shared + nPix2Shared + nPix3Shared);
-
+      if(getSharedHitInfo_) {
+	int nPix1Shared, nPix1Total;
+	int nPix2Shared, nPix2Total;
+	int nPix3Shared, nPix3Total;
+	getSharedHitsInfo(1, ipTagInfo[thisJetRef]->selectedTracks(), nPix1Shared, nPix1Total);
+	getSharedHitsInfo(2, ipTagInfo[thisJetRef]->selectedTracks(), nPix2Shared, nPix2Total);
+	getSharedHitsInfo(3, ipTagInfo[thisJetRef]->selectedTracks(), nPix3Shared, nPix3Total);
+	
+	IPPix1TotalHits[iJet] = (nPix1Total); IPPix1SharedHits[iJet] = (nPix1Shared);
+	IPPix2TotalHits[iJet] = (nPix2Total); IPPix2SharedHits[iJet] = (nPix2Shared);
+	IPPix3TotalHits[iJet] = (nPix3Total); IPPix3SharedHits[iJet] = (nPix3Shared);
+	IPPixAllTotalHits[iJet] = (nPix1Total + nPix2Total + nPix3Total); IPPixAllSharedHits[iJet] = (nPix1Shared + nPix2Shared + nPix3Shared);
+      }
+      
       for(unsigned int iTrack = 0; iTrack < 4; iTrack++)
 	{
 	  if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
@@ -1486,12 +1493,15 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		  break;
 		}
 	      }
-	      int sharedP1, sharedP2, sharedP3;
-	      IP3dHasSharedPix1[iTrack][iJet] = (sharedP1=hasSharedHit(1, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
-	      IP3dHasSharedPix2[iTrack][iJet] = (sharedP2=hasSharedHit(2, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
-	      IP3dHasSharedPix3[iTrack][iJet] = (sharedP3=hasSharedHit(3, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
-	      IP3dHasSharedPixAll[iTrack][iJet] = ( sharedP1 || sharedP2 || sharedP3  );
 
+	      if(getSharedHitInfo_) {
+		int sharedP1, sharedP2, sharedP3;
+		IP3dHasSharedPix1[iTrack][iJet] = (sharedP1=hasSharedHit(1, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
+		IP3dHasSharedPix2[iTrack][iJet] = (sharedP2=hasSharedHit(2, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
+		IP3dHasSharedPix3[iTrack][iJet] = (sharedP3=hasSharedHit(3, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
+		IP3dHasSharedPixAll[iTrack][iJet] = ( sharedP1 || sharedP2 || sharedP3  );
+	      }
+	      
 	      IP3d[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.value());
 	      IP3dError[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.error());
 	      IP3dProbability[iTrack][iJet] = (ipTagInfo[thisJetRef]->probabilities(0)[location3D]);

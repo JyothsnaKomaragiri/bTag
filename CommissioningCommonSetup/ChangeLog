@@ -1,3 +1,6 @@
+2010-12-17  Jyothsna Rani Komaragiri  <jyothsna@cern.ch>
+	* Tagged V02-02-00 Contains config files both for Data and MC to run over AODSIM files apart from RECO.
+
 2010-12-15  Jyothsna Rani Komaragiri  <jyothsna@cern.ch>
 	* Tagged V02-01-00  Contains the ntuplizer code and config files relevant only for running over RECO files
 	

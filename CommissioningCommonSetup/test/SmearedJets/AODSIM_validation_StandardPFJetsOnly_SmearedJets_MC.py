@@ -16,6 +16,14 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 #Global tag for 3_8_4
 process.GlobalTag.globaltag = 'START38_V12::All'
 
+
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+  smearedPFJets = cms.PSet(
+    initialSeed = cms.untracked.uint32(183694527)
+  )  
+)
+
+
 ########### Event cleaning ###########
 #Require a good vertex
 process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
@@ -98,6 +106,13 @@ process.ak5PFResidual.useCondDB = False
 
 #............................................
 
+process.smearedPFJets = cms.EDProducer("SmearedPFJetProducer",
+  src = cms.InputTag("ak5PFJetsJEC"),
+  MeanEta = cms.double(0.0),
+  StdDevEta = cms.double(0.25),
+  MeanPhi = cms.double(0.0),
+  StdDevPhi = cms.double(0.25),
+)
 
 #Filter to remove pthat>15 events in MinBias samples
 process.pthat_filter = cms.EDFilter("MCProcessFilter",
@@ -112,7 +127,7 @@ process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 
 process.ak5PFJetTracksAssociatorAtVertex = cms.EDProducer("JetTracksAssociatorAtVertex",
    process.j2tParametersVX,
-   jets = cms.InputTag("ak5PFJetsJEC")
+   jets = cms.InputTag("smearedPFJets")
 )
 
 
@@ -185,11 +200,11 @@ process.standardCombinedSecondaryVertexMVAPFBJetTags = process.combinedSecondary
 )
 
 process.standardSoftMuonPFTagInfos = process.softMuonTagInfos.clone(
-  jets = "ak5PFJetsJEC"
+  jets = "smearedPFJets"
 )
 
 process.standardSoftElectronPFTagInfos = process.softElectronTagInfos.clone(
-  jets = "ak5PFJetsJEC"
+  jets = "smearedPFJets"
 )
 
 process.standardSoftMuonPFBJetTags = process.softMuonBJetTags.clone(
@@ -216,7 +231,7 @@ process.standardSoftElectronByIP3dPFBJetTags = process.softElectronByIP3dBJetTag
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 
 process.AK5PFbyRef = process.AK5byRef.clone(
-  jets = "ak5PFJetsJEC"
+  jets = "smearedPFJets"
 )
 process.AK5PFbyValAlgo = process.AK5byValAlgo.clone(
   srcByReference = "AK5PFbyRef"
@@ -231,11 +246,11 @@ process.flavourSeq = cms.Sequence(
 process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 
 process.standardPFBTagNtuple = process.bTagNtuple.clone()
-process.standardPFBTagNtuple.jetSrc = cms.InputTag( "ak5PFJetsJEC" )
+process.standardPFBTagNtuple.jetSrc = cms.InputTag( "smearedPFJets" )
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
 process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI38X")
 process.standardPFBTagNtuple.jetMCSrc = cms.InputTag( "AK5PFbyValAlgo" )
-process.standardPFBTagNtuple.getSharedHitInfo = cms.bool(True)
+process.standardPFBTagNtuple.getSharedHitInfo = cms.bool(False)
 process.standardPFBTagNtuple.jetTracks = cms.InputTag( "ak5PFJetTracksAssociatorAtVertex" )
 process.standardPFBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexPFTagInfos" )
 process.standardPFBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParameterPFTagInfos" )
@@ -359,6 +374,7 @@ process.plots = cms.Path(
   process.oneGoodVertexFilter +
   process.PFJetsFilter *
   process.ak5PFJetsJEC *
+  process.smearedPFJets *
   process.ak5PFJetTracksAssociatorAtVertex  *
   process.standardImpactParameterPFTagInfos  *
   process.svTagInfos *
