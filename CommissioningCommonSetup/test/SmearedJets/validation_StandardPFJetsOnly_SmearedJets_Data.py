@@ -9,12 +9,12 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 process.load('Configuration.StandardSequences.Services_cff')
-process.load('Configuration.StandardSequences.GeometryExtended_cff')
-process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+process.load('Configuration.StandardSequences.GeometryDB_cff')
+process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #Global tag for 3_8_X data reprocessing
-process.GlobalTag.globaltag = 'GR_R_38X_V13A::All'
+process.GlobalTag.globaltag = 'GR_R_38X_V15::All'
 
 process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
   smearedPFJets = cms.PSet(
@@ -97,10 +97,6 @@ process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 process.ak5PFJetsJEC = process.ak5PFJetsL2L3.clone(
     src = 'PFJetsFilter', 
     correctors = ['ak5PFL2L3'])
-
-process.ak5PFL2Relative.useCondDB = False
-process.ak5PFL3Absolute.useCondDB = False
-process.ak5PFResidual.useCondDB = False
 
 process.smearedPFJets = cms.EDProducer("SmearedPFJetProducer",
   src = cms.InputTag("ak5PFJetsJEC"),
@@ -330,9 +326,7 @@ process.svTaggers = cms.Sequence(
 
 process.slTagInfos = cms.Sequence(
     process.standardSoftMuonPFTagInfos +
-    process.softElectronCands * (
     process.standardSoftElectronPFTagInfos
-    ) 
 )
 
 process.slTaggers = cms.Sequence(

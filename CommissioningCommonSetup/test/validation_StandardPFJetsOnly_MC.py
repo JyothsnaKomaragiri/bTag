@@ -9,12 +9,12 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 process.load('Configuration.StandardSequences.Services_cff')
-process.load('Configuration.StandardSequences.GeometryExtended_cff')
+process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-#Global tag for 3_8_4
-process.GlobalTag.globaltag = 'START38_V12::All'
+#Global tag for 3_8_7
+process.GlobalTag.globaltag = 'START38_V14::All'
 
 ########### Event cleaning ###########
 #Require a good vertex
@@ -92,10 +92,6 @@ process.ak5PFJetsJEC = process.ak5PFJetsL2L3.clone(
     src = 'PFJetsFilter', 
     correctors = ['ak5PFL2L3'])
 
-process.ak5PFL2Relative.useCondDB = False
-process.ak5PFL3Absolute.useCondDB = False
-process.ak5PFResidual.useCondDB = False
-
 #............................................
 
 
@@ -106,6 +102,7 @@ process.pthat_filter = cms.EDFilter("MCProcessFilter",
 	  MinPthat = cms.untracked.vdouble(1.0)
 )
 
+process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryPaths_cfi")
 
 ########### Rerun b-tagging for PF Jets ###########
 process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
@@ -234,8 +231,9 @@ process.standardPFBTagNtuple = process.bTagNtuple.clone()
 process.standardPFBTagNtuple.jetSrc = cms.InputTag( "ak5PFJetsJEC" )
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
 process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI38X")
+process.standardPFBTagNtuple.flavorHistory = cms.InputTag("flavorHistoryFilter")
+process.standardPFBTagNtuple.getSharedHitInfo = cms.bool(False)
 process.standardPFBTagNtuple.jetMCSrc = cms.InputTag( "AK5PFbyValAlgo" )
-process.standardPFBTagNtuple.getSharedHitInfo = cms.bool(True)
 process.standardPFBTagNtuple.jetTracks = cms.InputTag( "ak5PFJetTracksAssociatorAtVertex" )
 process.standardPFBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexPFTagInfos" )
 process.standardPFBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParameterPFTagInfos" )
@@ -309,8 +307,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-  'file:/storage/5/jyothsna/QCD_Pt_80to120_TuneZ2_7TeV_pythia6_Fall10-START38_V12-v1/DE0CA996-41CB-DF11-A68D-0025B3E06378.root',
-  'file:/storage/5/jyothsna/QCD_Pt_80to120_TuneZ2_7TeV_pythia6_Fall10-START38_V12-v1/F4A9BA39-57CB-DF11-8D97-003048D46006.root'
+    '/store/mc/Fall10/QCD_Pt_30to50_TuneZ2_7TeV_pythia6/AODSIM/START38_V12-v1/0000/341D505F-37C8-DF11-BDCD-00304867BFAE.root'
      )
 )
 
@@ -338,9 +335,7 @@ process.svTaggers = cms.Sequence(
 
 process.slTagInfos = cms.Sequence(
     process.standardSoftMuonPFTagInfos +
-    process.softElectronCands * (
     process.standardSoftElectronPFTagInfos
-    ) 
 )
 
 process.slTaggers = cms.Sequence(
@@ -357,6 +352,7 @@ process.plots = cms.Path(
   process.JetHLTFilter +
   process.noscraping +
   process.oneGoodVertexFilter +
+  process.flavorHistorySeq +
   process.PFJetsFilter *
   process.ak5PFJetsJEC *
   process.ak5PFJetTracksAssociatorAtVertex  *

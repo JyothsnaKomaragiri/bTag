@@ -9,12 +9,21 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("RecoBTag.Configuration.RecoBTag_cff")
 
 process.load('Configuration.StandardSequences.Services_cff')
-process.load('Configuration.StandardSequences.GeometryExtended_cff')
+process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-#Global tag for 3_8_4
-process.GlobalTag.globaltag = 'START38_V12::All'
+import FWCore.ParameterSet.VarParsing as VarParsing
+options = VarParsing.VarParsing ()
+options.register('MeanEta', '0.0', VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.float, "Mean for eta smearing")
+options.register('StdDevEta', '0.02', VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.float, "Sigma for eta smearing")
+options.register('MeanPhi', '0.0', VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.float, "Mean for phi smearing")
+options.register('StdDevPhi', '0.02', VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.float, "Sigma for phi smearing")
+
+options.parseArguments()
+
+#Global tag for 3_8_7
+process.GlobalTag.globaltag = 'START38_V14::All'
 
 
 process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
@@ -26,11 +35,13 @@ process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService
 
 ########### Event cleaning ###########
 #Require a good vertex
-process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
-   src = cms.InputTag("offlinePrimaryVertices"),
-   cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"),
-   filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
-)
+process.oneGoodVertexFilter = cms.EDFilter("GoodVertexFilter",
+                                           vertexCollection = cms.InputTag('offlinePrimaryVertices'),
+                                           minimumNDOF = cms.uint32(4) ,
+                                           maxAbsZ = cms.double(24),	
+                                           maxd0 = cms.double(2)	
+                                           )
+
 
 #Filter for removing scraping events
 process.noscraping = cms.EDFilter("FilterOutScraping",
@@ -58,11 +69,6 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
         "HLT_Jet50U",
         "HLT_Jet70U",
         "HLT_Jet100U",
-        "HLT_Jet15U_v*", 
-        "HLT_Jet30U_v*", 
-        "HLT_Jet50U_v*",
-        "HLT_Jet70U_v*",
-        "HLT_Jet100U_v*",
         "HLT_BTagIP_Jet50U",
         "HLT_BTagMu_Jet10U",
         "HLT_BTagMu_Jet20U",
@@ -100,18 +106,14 @@ process.ak5PFJetsJEC = process.ak5PFJetsL2L3.clone(
     src = 'PFJetsFilter', 
     correctors = ['ak5PFL2L3'])
 
-process.ak5PFL2Relative.useCondDB = False
-process.ak5PFL3Absolute.useCondDB = False
-process.ak5PFResidual.useCondDB = False
-
 #............................................
 
 process.smearedPFJets = cms.EDProducer("SmearedPFJetProducer",
   src = cms.InputTag("ak5PFJetsJEC"),
-  MeanEta = cms.double(0.0),
-  StdDevEta = cms.double(0.25),
-  MeanPhi = cms.double(0.0),
-  StdDevPhi = cms.double(0.25),
+  MeanEta = cms.double(options.MeanEta),
+  StdDevEta = cms.double(options.StdDevEta),
+  MeanPhi = cms.double(options.MeanPhi),
+  StdDevPhi = cms.double(options.StdDevPhi)
 )
 
 #Filter to remove pthat>15 events in MinBias samples
@@ -250,7 +252,6 @@ process.standardPFBTagNtuple.jetSrc = cms.InputTag( "smearedPFJets" )
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
 process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI38X")
 process.standardPFBTagNtuple.jetMCSrc = cms.InputTag( "AK5PFbyValAlgo" )
-process.standardPFBTagNtuple.getSharedHitInfo = cms.bool(True)
 process.standardPFBTagNtuple.jetTracks = cms.InputTag( "ak5PFJetTracksAssociatorAtVertex" )
 process.standardPFBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexPFTagInfos" )
 process.standardPFBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParameterPFTagInfos" )
@@ -353,9 +354,7 @@ process.svTaggers = cms.Sequence(
 
 process.slTagInfos = cms.Sequence(
     process.standardSoftMuonPFTagInfos +
-    process.softElectronCands * (
     process.standardSoftElectronPFTagInfos
-    ) 
 )
 
 process.slTaggers = cms.Sequence(
@@ -368,7 +367,7 @@ process.slTaggers = cms.Sequence(
 
 
 process.plots = cms.Path(
-#  process.pthat_filter+
+  process.pthat_filter+
   process.JetHLTFilter +
   process.noscraping +
   process.oneGoodVertexFilter +
