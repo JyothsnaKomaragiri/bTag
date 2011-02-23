@@ -14,7 +14,7 @@ process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #Global tag for 3_8_X data reprocessing
-process.GlobalTag.globaltag = 'GR_R_38X_V15::All'
+process.GlobalTag.globaltag = 'GR_R_39X_V6::All'
 
 ########### Event cleaning ###########
 #Require a good vertex
@@ -313,6 +313,7 @@ process.svTaggers = cms.Sequence(
 
 process.slTagInfos = cms.Sequence(
     process.standardSoftMuonPFTagInfos +
+    process.softElectronCands *
     process.standardSoftElectronPFTagInfos
 )
 

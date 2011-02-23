@@ -333,6 +333,7 @@ process.svTaggers = cms.Sequence(
 
 process.slTagInfos = cms.Sequence(
     process.standardSoftMuonPFTagInfos +
+    process.softElectronCands *
     process.standardSoftElectronPFTagInfos
 )
 
