@@ -13,6 +13,7 @@ bTagNtuple = cms.EDAnalyzer('TagNtupleProducer',
                             filename = cms.string("testfile.root"),
                             ElectronTagInfos = cms.InputTag( "softElectronTagInfos" ),
                             MuonTagInfos = cms.InputTag( "softMuonTagInfos" ),
+                            getSharedHitInfo = cms.bool(False),
                             Label = cms.string(""),
                             bTagConfig = cms.VPSet(
                                 cms.PSet(
