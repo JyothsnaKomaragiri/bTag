@@ -66,19 +66,7 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
         "HLT_BTagMu_DiJet80_Mu9_v*",
 #        "HLT_BTagMu_DiJet100_Mu9_v*",
         "HLT_Mu17_CentralJet40_BTagIP_v*",
-        "HLT_IsoMu17_CentralJet40_BTagIP_v*",
-         "HLT_DoubleJet30_ForwardBackward_v*",
-         "HLT_DoubleJet60_ForwardBackward_v*",
-         "HLT_DoubleJet70_ForwardBackward_v*",
-         "HLT_DoubleJet80_ForwardBackward_v*",
-         "HLT_CentralJet80_MET65_v*",
-         "HLT_CentralJet80_MET80_v*",
-         "HLT_CentralJet80_MET100_v*",
-         "HLT_CentralJet80_MET160_v*",
-         "HLT_DiJet60_MET45_v*",
-         "HLT_DiJet70_PT70_v*",
-         "HLT_DiJet100_PT100_v*",
-         "HLT_DiJet130_PT130_v*",
+        "HLT_IsoMu17_CentralJet40_BTagIP_v*"
         ),
    hltResults = cms.InputTag("TriggerResults","","HLT"),
    l1tResults = cms.InputTag( "" ),
@@ -219,6 +207,7 @@ process.standardPFBTagNtuple.jetSrc = cms.InputTag( "ak5PFJetsJEC" )
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
 process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::HLT")
 process.standardPFBTagNtuple.getMCTruth = cms.bool(False)
+process.standardPFBTagNtuple.getMCPUInfo = cms.bool(False)
 process.standardPFBTagNtuple.jetTracks = cms.InputTag( "ak5PFJetTracksAssociatorAtVertex" )
 process.standardPFBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexPFTagInfos" )
 process.standardPFBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParameterPFTagInfos" )

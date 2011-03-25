@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 bTagNtuple = cms.EDAnalyzer('TagNtupleProducer',
                             getMCTruth = cms.bool(True),
+                            getMCPUInfo = cms.bool(True),
                             jetSrc = cms.InputTag( "ak5CaloJets" ),
                             svComputer = cms.InputTag( "combinedSecondaryVertex" ),
                             TriggerTag = cms.InputTag("TriggerResults::HLT8E29"),

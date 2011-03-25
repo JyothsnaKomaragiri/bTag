@@ -14,7 +14,7 @@ process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #Global tag for 3_8_7
-process.GlobalTag.globaltag = 'START38_V14::All'
+process.GlobalTag.globaltag = 'START311_V1G1::All'
 
 ########### Event cleaning ###########
 #Require a good vertex
@@ -69,7 +69,7 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
         "HLT_BTagMu_DiJet30U_v*",
         "HLT_BTagMu_DiJet30U_Mu5_v*"
         ),
-   hltResults = cms.InputTag("TriggerResults","","REDIGI38X"),
+   hltResults = cms.InputTag("TriggerResults","","REDIGI311X"),
    l1tResults = cms.InputTag( "" ),
    throw = cms.bool( False) #set to false to deal with missing triggers while running over different trigger menus
 )
@@ -230,10 +230,12 @@ process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 process.standardPFBTagNtuple = process.bTagNtuple.clone()
 process.standardPFBTagNtuple.jetSrc = cms.InputTag( "ak5PFJetsJEC" )
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
-process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI38X")
+process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::REDIGI311X")
 process.standardPFBTagNtuple.flavorHistory = cms.InputTag("flavorHistoryFilter")
 process.standardPFBTagNtuple.getSharedHitInfo = cms.bool(False)
 process.standardPFBTagNtuple.jetMCSrc = cms.InputTag( "AK5PFbyValAlgo" )
+#set this to FALSE for 39X samples, set it to TRUE for 3_11 samples
+#process.standardPFBTagNtuple.getMCPUInfo = cms.bool(False)
 process.standardPFBTagNtuple.jetTracks = cms.InputTag( "ak5PFJetTracksAssociatorAtVertex" )
 process.standardPFBTagNtuple.SVTagInfos = cms.InputTag( "standardSecondaryVertexPFTagInfos" )
 process.standardPFBTagNtuple.IPTagInfos = cms.InputTag( "standardImpactParameterPFTagInfos" )
@@ -307,7 +309,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-    '/store/mc/Fall10/QCD_Pt_30to50_TuneZ2_7TeV_pythia6/AODSIM/START38_V12-v1/0000/341D505F-37C8-DF11-BDCD-00304867BFAE.root'
+    'file:F0210CE0-EF52-E011-BB08-00E0817918C9.root'
      )
 )
 
