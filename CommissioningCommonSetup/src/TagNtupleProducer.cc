@@ -38,6 +38,10 @@
 #include "DataFormats/MuonReco/interface/MuonTrackLinks.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 
+#include <DataFormats/EgammaCandidates/interface/GsfElectron.h>
+//#include "DataFormats/EgammaCandidates/interface/ElectronTrackLinks.h"
+#include <DataFormats/EgammaCandidates/interface/GsfElectronFwd.h>
+
 #include "DataFormats/Math/interface/deltaR.h"
 #include "Math/GenVector/VectorUtil.h"
 #include "DataFormats/GeometryVector/interface/VectorUtil.h"
@@ -53,7 +57,7 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
-
+#include <DataFormats/GsfTrackReco/interface/GsfTrack.h>
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
@@ -94,9 +98,9 @@ public:
   int  hasSharedHit(unsigned int layer, size_t location, const reco::TrackRefVector & tracks);      
   // ----------member data ---------------------------
   
+  //Input from python config
   bool getMCTruth_;
-  bool getSharedHitInfo_;
-  
+  bool getSharedHitInfo_;  
   edm::InputTag jet_src_;
   edm::InputTag SVComputer_;
   edm::InputTag triggerTag_;
@@ -104,12 +108,12 @@ public:
   edm::InputTag jet_tracks_;
   edm::InputTag primaryVertexProducer_;
   edm::InputTag SV_tag_infos_;
-  edm::InputTag IP_tag_infos_;
-  
+  edm::InputTag IP_tag_infos_;  
   edm::InputTag electron_tag_infos_;
   edm::InputTag muon_tag_infos_;
-  std::vector< edm::ParameterSet > bTag_Config_;
   std::string label_;
+  std::string filename_;
+  std::vector< edm::ParameterSet > bTag_Config_;
   
   // data formats
   TTree *tree;
@@ -264,27 +268,162 @@ public:
   std::vector< float* > IP2dTrackPtRel;
 
   //softElectronTagInfos
-  int nElectrons[MAXJETS];                            
-  float electronPt[MAXJETS];   			       
-  float electronEta[MAXJETS];  			       
-  float electronPhi[MAXJETS];  			       
-  int electronNHits[MAXJETS];   		     
-  int electronNExpectedOuterHits[MAXJETS];   		       
-  int electronNPixelHits[MAXJETS];   		       
-  float electronNChi2[MAXJETS];			       
-  float electronPtRel[MAXJETS];   		       
-  float electronSip2d[MAXJETS];   		       
-  float electronIp2d[MAXJETS];   		       
-  float electronIpe2d[MAXJETS];   		       
-  float electronSip3d[MAXJETS];
-  float electronIp3d[MAXJETS];
-  float electronIpe3d[MAXJETS];   		          		          		       
-  float electronP0Par[MAXJETS];   		       
-  float electronDeltaR[MAXJETS];  		       
-  float electronEtaRel[MAXJETS];  		       
-  float electronRatio[MAXJETS];   		     
-  int electronTrackQuality[MAXJETS];   		       
-  float electronRatioRel[MAXJETS];                      
+  int nElectrons[MAXJETS]; 
+                           
+  float electron1Pt[MAXJETS];   			       
+  float electron1Eta[MAXJETS];  			       
+  float electron1Phi[MAXJETS];  			       
+  int electron1NHits[MAXJETS];   		     
+  int electron1NExpectedOuterHits[MAXJETS];   		       
+  int electron1NPixelHits[MAXJETS];   		       
+  float electron1NChi2[MAXJETS];			       
+  float electron1PtRel[MAXJETS];   		       
+  float electron1Sip2d[MAXJETS];   		       
+  float electron1Ip2d[MAXJETS];   		       
+  float electron1Ipe2d[MAXJETS];   		       
+  float electron1Sip3d[MAXJETS];
+  float electron1Ip3d[MAXJETS];
+  float electron1Ipe3d[MAXJETS];   		          		          		       
+  float electron1P0Par[MAXJETS];   		       
+  float electron1DeltaR[MAXJETS];  		       
+  float electron1EtaRel[MAXJETS];  		       
+  float electron1Ratio[MAXJETS];   		     
+  int electron1TrackQuality[MAXJETS];   		       
+  float electron1RatioRel[MAXJETS];  
+  float electron1eSuperClusterOverP[MAXJETS];
+  float electron1eSeedClusterOverP[MAXJETS];
+  float electron1eSeedClusterOverPout[MAXJETS];
+  float electron1eEleClusterOverPout[MAXJETS];
+  float electron1deltaEtaSuperClusterTrackAtVtx[MAXJETS];
+  float electron1deltaEtaSeedClusterTrackAtCalo[MAXJETS];
+  float electron1deltaEtaEleClusterTrackAtCalo[MAXJETS];
+  float electron1deltaPhiSuperClusterTrackAtVtx[MAXJETS];
+  float electron1deltaPhiSeedClusterTrackAtCalo[MAXJETS];
+  float electron1deltaPhiEleClusterTrackAtCalo[MAXJETS];                  
+
+  float electron2Pt[MAXJETS];   			       
+  float electron2Eta[MAXJETS];  			       
+  float electron2Phi[MAXJETS];  			       
+  int electron2NHits[MAXJETS];   		     
+  int electron2NExpectedOuterHits[MAXJETS];   		       
+  int electron2NPixelHits[MAXJETS];   		       
+  float electron2NChi2[MAXJETS];			       
+  float electron2PtRel[MAXJETS];   		       
+  float electron2Sip2d[MAXJETS];   		       
+  float electron2Ip2d[MAXJETS];   		       
+  float electron2Ipe2d[MAXJETS];   		       
+  float electron2Sip3d[MAXJETS];
+  float electron2Ip3d[MAXJETS];
+  float electron2Ipe3d[MAXJETS];   		          		          		       
+  float electron2P0Par[MAXJETS];   		       
+  float electron2DeltaR[MAXJETS];  		       
+  float electron2EtaRel[MAXJETS];  		       
+  float electron2Ratio[MAXJETS];   		     
+  int electron2TrackQuality[MAXJETS];   		       
+  float electron2RatioRel[MAXJETS];
+  float electron2eSuperClusterOverP[MAXJETS];
+  float electron2eSeedClusterOverP[MAXJETS];
+  float electron2eSeedClusterOverPout[MAXJETS];
+  float electron2eEleClusterOverPout[MAXJETS];
+  float electron2deltaEtaSuperClusterTrackAtVtx[MAXJETS];
+  float electron2deltaEtaSeedClusterTrackAtCalo[MAXJETS];
+  float electron2deltaEtaEleClusterTrackAtCalo[MAXJETS];
+  float electron2deltaPhiSuperClusterTrackAtVtx[MAXJETS];
+  float electron2deltaPhiSeedClusterTrackAtCalo[MAXJETS];
+  float electron2deltaPhiEleClusterTrackAtCalo[MAXJETS];
+
+  float electron3Pt[MAXJETS];   			       
+  float electron3Eta[MAXJETS];  			       
+  float electron3Phi[MAXJETS];  			       
+  int electron3NHits[MAXJETS];   		     
+  int electron3NExpectedOuterHits[MAXJETS];   		       
+  int electron3NPixelHits[MAXJETS];   		       
+  float electron3NChi2[MAXJETS];			       
+  float electron3PtRel[MAXJETS];   		       
+  float electron3Sip2d[MAXJETS];   		       
+  float electron3Ip2d[MAXJETS];   		       
+  float electron3Ipe2d[MAXJETS];   		       
+  float electron3Sip3d[MAXJETS];
+  float electron3Ip3d[MAXJETS];
+  float electron3Ipe3d[MAXJETS];   		          		          		       
+  float electron3P0Par[MAXJETS];   		       
+  float electron3DeltaR[MAXJETS];  		       
+  float electron3EtaRel[MAXJETS];  		       
+  float electron3Ratio[MAXJETS];   		     
+  int electron3TrackQuality[MAXJETS];   		       
+  float electron3RatioRel[MAXJETS];
+  float electron3eSuperClusterOverP[MAXJETS];
+  float electron3eSeedClusterOverP[MAXJETS];
+  float electron3eSeedClusterOverPout[MAXJETS];
+  float electron3eEleClusterOverPout[MAXJETS];
+  float electron3deltaEtaSuperClusterTrackAtVtx[MAXJETS];
+  float electron3deltaEtaSeedClusterTrackAtCalo[MAXJETS];
+  float electron3deltaEtaEleClusterTrackAtCalo[MAXJETS];
+  float electron3deltaPhiSuperClusterTrackAtVtx[MAXJETS];
+  float electron3deltaPhiSeedClusterTrackAtCalo[MAXJETS];
+  float electron3deltaPhiEleClusterTrackAtCalo[MAXJETS];
+
+  float electron4Pt[MAXJETS];   			       
+  float electron4Eta[MAXJETS];  			       
+  float electron4Phi[MAXJETS];  			       
+  int electron4NHits[MAXJETS];   		     
+  int electron4NExpectedOuterHits[MAXJETS];   		       
+  int electron4NPixelHits[MAXJETS];   		       
+  float electron4NChi2[MAXJETS];			       
+  float electron4PtRel[MAXJETS];   		       
+  float electron4Sip2d[MAXJETS];   		       
+  float electron4Ip2d[MAXJETS];   		       
+  float electron4Ipe2d[MAXJETS];   		       
+  float electron4Sip3d[MAXJETS];
+  float electron4Ip3d[MAXJETS];
+  float electron4Ipe3d[MAXJETS];   		          		          		       
+  float electron4P0Par[MAXJETS];   		       
+  float electron4DeltaR[MAXJETS];  		       
+  float electron4EtaRel[MAXJETS];  		       
+  float electron4Ratio[MAXJETS];   		     
+  int electron4TrackQuality[MAXJETS];   		       
+  float electron4RatioRel[MAXJETS];
+  float electron4eSuperClusterOverP[MAXJETS];
+  float electron4eSeedClusterOverP[MAXJETS];
+  float electron4eSeedClusterOverPout[MAXJETS];
+  float electron4eEleClusterOverPout[MAXJETS];
+  float electron4deltaEtaSuperClusterTrackAtVtx[MAXJETS];
+  float electron4deltaEtaSeedClusterTrackAtCalo[MAXJETS];
+  float electron4deltaEtaEleClusterTrackAtCalo[MAXJETS];
+  float electron4deltaPhiSuperClusterTrackAtVtx[MAXJETS];
+  float electron4deltaPhiSeedClusterTrackAtCalo[MAXJETS];
+  float electron4deltaPhiEleClusterTrackAtCalo[MAXJETS];
+
+  std::vector<float*> electronPt;   			       
+  std::vector<float*> electronEta;  			       
+  std::vector<float*> electronPhi;  			       
+  std::vector<int*> electronNHits;   		     
+  std::vector<int*> electronNExpectedOuterHits;   		       
+  std::vector<int*> electronNPixelHits;   		       
+  std::vector<float*> electronNChi2;			       
+  std::vector<float*> electronPtRel;   		       
+  std::vector<float*> electronSip2d;   		       
+  std::vector<float*> electronIp2d;   		       
+  std::vector<float*> electronIpe2d;   		       
+  std::vector<float*> electronSip3d;
+  std::vector<float*> electronIp3d;
+  std::vector<float*> electronIpe3d;   		          		          		       
+  std::vector<float*> electronP0Par;   		       
+  std::vector<float*> electronDeltaR;  		       
+  std::vector<float*> electronEtaRel;  		       
+  std::vector<float*> electronRatio;   		     
+  std::vector<int*> electronTrackQuality;   		       
+  std::vector<float*> electronRatioRel;
+  std::vector<float*> electroneSuperClusterOverP;
+  std::vector<float*> electroneSeedClusterOverP;
+  std::vector<float*> electroneSeedClusterOverPout;
+  std::vector<float*> electroneEleClusterOverPout;
+  std::vector<float*> electrondeltaEtaSuperClusterTrackAtVtx;
+  std::vector<float*> electrondeltaEtaSeedClusterTrackAtCalo;
+  std::vector<float*> electrondeltaEtaEleClusterTrackAtCalo;
+  std::vector<float*> electrondeltaPhiSuperClusterTrackAtVtx;
+  std::vector<float*> electrondeltaPhiSeedClusterTrackAtCalo;
+  std::vector<float*> electrondeltaPhiEleClusterTrackAtCalo;
 						       
   //softMuonTagInfos	
   int nMuons[MAXJETS];                                
@@ -462,35 +601,29 @@ namespace{
   };
 }
 
-TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
+TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
+  getMCTruth_ (iConfig.getParameter<bool>( "getMCTruth" )),
+  getSharedHitInfo_(iConfig.getParameter<bool>( "getSharedHitInfo" )),
+  jet_src_(iConfig.getParameter<edm::InputTag>( "jetSrc" )),
+  SVComputer_ (iConfig.getParameter<edm::InputTag>( "svComputer")),
+  triggerTag_(iConfig.getParameter<edm::InputTag>("TriggerTag")),
+  jet_MC_src_(iConfig.getParameter<edm::InputTag>( "jetMCSrc" )),
+  jet_tracks_(iConfig.getParameter<edm::InputTag>( "jetTracks" )),
+  primaryVertexProducer_  (iConfig.getParameter<InputTag>("primaryVertex")),
+  SV_tag_infos_(iConfig.getParameter<edm::InputTag>( "SVTagInfos" )),
+  IP_tag_infos_(iConfig.getParameter<edm::InputTag>( "IPTagInfos" )),
+  electron_tag_infos_(iConfig.getParameter<edm::InputTag>( "ElectronTagInfos" )),
+  muon_tag_infos_(iConfig.getParameter<edm::InputTag>( "MuonTagInfos" )),
+  label_(iConfig.getParameter<string>( "Label" )),
+  filename_(iConfig.getParameter<string>( "filename" )),
+  bTag_Config_(iConfig.getParameter< vector<edm::ParameterSet> >("bTagConfig"))  //b tagger outputs configured in python file
 {
   string alias;
-  getMCTruth_     = iConfig.getParameter<bool>( "getMCTruth" );
-  getSharedHitInfo_ = iConfig.getParameter<bool>( "getSharedHitInfo" );   
-
-  jet_src_        = iConfig.getParameter<edm::InputTag>( "jetSrc" );
-  SVComputer_     = iConfig.getParameter<edm::InputTag>( "svComputer");
-  triggerTag_ = iConfig.getParameter<edm::InputTag>("TriggerTag");
-  jet_MC_src_     = iConfig.getParameter<edm::InputTag>( "jetMCSrc" );
-  jet_tracks_     = iConfig.getParameter<edm::InputTag>( "jetTracks" ); 
-  primaryVertexProducer_   = iConfig.getParameter<InputTag>("primaryVertex"); 
-  SV_tag_infos_   = iConfig.getParameter<edm::InputTag>( "SVTagInfos" );
-  IP_tag_infos_   = iConfig.getParameter<edm::InputTag>( "IPTagInfos" );
   
-  electron_tag_infos_ = iConfig.getParameter<edm::InputTag>( "ElectronTagInfos" );
-  muon_tag_infos_ = iConfig.getParameter<edm::InputTag>( "MuonTagInfos" );
-  label_ = iConfig.getParameter<string>( "Label" );
-
-  std::string filename = iConfig.getParameter<string>( "filename" );
-  
-  //b tagger outputs configured in python file
-  bTag_Config_ = iConfig.getParameter< vector<edm::ParameterSet> >("bTagConfig");
-  
-  file = new TFile (filename.c_str(), "RECREATE" );
+  file = new TFile (filename_.c_str(), "RECREATE" );
   // create tree structure
   tree = new TTree("t","t");
-  
-  
+    
   
   for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
     {
@@ -524,9 +657,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
     IP2dTrackPtRel.push_back( new float[MAXJETS]);
   }
   
-  muonIsGlobal.push_back(muon1IsGlobal); 
-  muonIsGlobal.push_back(muon2IsGlobal);
-  
+  muonIsGlobal            .push_back(muon1IsGlobal           ); muonIsGlobal            .push_back(muon2IsGlobal);
   muonIsTracker           .push_back(muon1IsTracker          ); muonIsTracker           .push_back(muon2IsTracker          ); 
   muonIsStandalone        .push_back(muon1IsStandalone       ); muonIsStandalone        .push_back(muon2IsStandalone       ); 
   muonPt                  .push_back(muon1Pt                 ); muonPt                  .push_back(muon2Pt                 );       
@@ -583,7 +714,92 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   muonRatioRel            .push_back(muon3RatioRel           ); muonRatioRel            .push_back(muon4RatioRel           ); 
 
 
+  electronPt                 .push_back(electron1Pt                   );  electronPt                 .push_back(electron2Pt                   );
+  electronEta                .push_back(electron1Eta                  );  electronEta                .push_back(electron2Eta                  );			
+  electronPhi                .push_back(electron1Phi                  );  electronPhi                .push_back(electron2Phi                  );			
+  electronNHits              .push_back(electron1NHits                );  electronNHits              .push_back(electron2NHits                );		
+  electronNExpectedOuterHits .push_back(electron1NExpectedOuterHits   );  electronNExpectedOuterHits .push_back(electron2NExpectedOuterHits   );		
+  electronNPixelHits         .push_back(electron1NPixelHits           );  electronNPixelHits         .push_back(electron2NPixelHits           );		
+  electronNChi2              .push_back(electron1NChi2                );  electronNChi2              .push_back(electron2NChi2                );			
+  electronPtRel              .push_back(electron1PtRel                );  electronPtRel              .push_back(electron2PtRel                );		
+  electronSip2d              .push_back(electron1Sip2d                );  electronSip2d              .push_back(electron2Sip2d                );		
+  electronIp2d               .push_back(electron1Ip2d                 );  electronIp2d               .push_back(electron2Ip2d                 );		
+  electronIpe2d              .push_back(electron1Ipe2d                );  electronIpe2d              .push_back(electron2Ipe2d                );		
+  electronSip3d              .push_back(electron1Sip3d                );  electronSip3d              .push_back(electron2Sip3d                );
+  electronIp3d               .push_back(electron1Ip3d                 );  electronIp3d               .push_back(electron2Ip3d                 );
+  electronIpe3d              .push_back(electron1Ipe3d                );  electronIpe3d              .push_back(electron2Ipe3d                );
+  electronP0Par              .push_back(electron1P0Par                );  electronP0Par              .push_back(electron2P0Par                );		
+  electronDeltaR             .push_back(electron1DeltaR               );  electronDeltaR             .push_back(electron2DeltaR               );		
+  electronEtaRel             .push_back(electron1EtaRel               );  electronEtaRel             .push_back(electron2EtaRel               );		
+  electronRatio              .push_back(electron1Ratio                );  electronRatio              .push_back(electron2Ratio                );		
+  electronTrackQuality       .push_back(electron1TrackQuality         );  electronTrackQuality       .push_back(electron2TrackQuality         );	    
+  electronRatioRel           .push_back(electron1RatioRel             );  electronRatioRel           .push_back(electron2RatioRel             );
 
+  electronPt                 .push_back(electron3Pt                   );  electronPt                 .push_back(electron4Pt                   );
+  electronEta                .push_back(electron3Eta                  );  electronEta                .push_back(electron4Eta                  );			
+  electronPhi                .push_back(electron3Phi                  );  electronPhi                .push_back(electron4Phi                  );			
+  electronNHits              .push_back(electron3NHits                );  electronNHits              .push_back(electron4NHits                );		
+  electronNExpectedOuterHits .push_back(electron3NExpectedOuterHits   );  electronNExpectedOuterHits .push_back(electron4NExpectedOuterHits   );		
+  electronNPixelHits         .push_back(electron3NPixelHits           );  electronNPixelHits         .push_back(electron4NPixelHits           );		
+  electronNChi2              .push_back(electron3NChi2                );  electronNChi2              .push_back(electron4NChi2                );			
+  electronPtRel              .push_back(electron3PtRel                );  electronPtRel              .push_back(electron4PtRel                );		
+  electronSip2d              .push_back(electron3Sip2d                );  electronSip2d              .push_back(electron4Sip2d                );		
+  electronIp2d               .push_back(electron3Ip2d                 );  electronIp2d               .push_back(electron4Ip2d                 );		
+  electronIpe2d              .push_back(electron3Ipe2d                );  electronIpe2d              .push_back(electron4Ipe2d                );		
+  electronSip3d              .push_back(electron3Sip3d                );  electronSip3d              .push_back(electron4Sip3d                );
+  electronIp3d               .push_back(electron3Ip3d                 );  electronIp3d               .push_back(electron4Ip3d                 );
+  electronIpe3d              .push_back(electron3Ipe3d                );  electronIpe3d              .push_back(electron4Ipe3d                );
+  electronP0Par              .push_back(electron3P0Par                );  electronP0Par              .push_back(electron4P0Par                );		
+  electronDeltaR             .push_back(electron3DeltaR               );  electronDeltaR             .push_back(electron4DeltaR               );		
+  electronEtaRel             .push_back(electron3EtaRel               );  electronEtaRel             .push_back(electron4EtaRel               );		
+  electronRatio              .push_back(electron3Ratio                );  electronRatio              .push_back(electron4Ratio                );		
+  electronTrackQuality       .push_back(electron3TrackQuality         );  electronTrackQuality       .push_back(electron4TrackQuality         );	    
+  electronRatioRel           .push_back(electron3RatioRel             );  electronRatioRel           .push_back(electron4RatioRel             );
+
+  //Some Electron Information on gsfTrack/ClusterMatching
+  electroneSuperClusterOverP.            push_back(electron1eSuperClusterOverP);
+  electroneSeedClusterOverP.             push_back(electron1eSeedClusterOverP);
+  electroneSeedClusterOverPout.          push_back(electron1eSeedClusterOverPout);
+  electroneEleClusterOverPout.           push_back(electron1eEleClusterOverPout);
+  electrondeltaEtaSuperClusterTrackAtVtx.push_back(electron1deltaEtaSuperClusterTrackAtVtx);
+  electrondeltaEtaSeedClusterTrackAtCalo.push_back(electron1deltaEtaSeedClusterTrackAtCalo);
+  electrondeltaEtaEleClusterTrackAtCalo. push_back(electron1deltaEtaEleClusterTrackAtCalo);
+  electrondeltaPhiSuperClusterTrackAtVtx.push_back(electron1deltaPhiSuperClusterTrackAtVtx);
+  electrondeltaPhiSeedClusterTrackAtCalo.push_back(electron1deltaPhiSeedClusterTrackAtCalo);
+  electrondeltaPhiEleClusterTrackAtCalo. push_back(electron1deltaPhiEleClusterTrackAtCalo);
+
+  electroneSuperClusterOverP.            push_back(electron2eSuperClusterOverP);
+  electroneSeedClusterOverP.             push_back(electron2eSeedClusterOverP);
+  electroneSeedClusterOverPout.          push_back(electron2eSeedClusterOverPout);
+  electroneEleClusterOverPout.           push_back(electron2eEleClusterOverPout);
+  electrondeltaEtaSuperClusterTrackAtVtx.push_back(electron2deltaEtaSuperClusterTrackAtVtx);
+  electrondeltaEtaSeedClusterTrackAtCalo.push_back(electron2deltaEtaSeedClusterTrackAtCalo);
+  electrondeltaEtaEleClusterTrackAtCalo. push_back(electron2deltaEtaEleClusterTrackAtCalo);
+  electrondeltaPhiSuperClusterTrackAtVtx.push_back(electron2deltaPhiSuperClusterTrackAtVtx);
+  electrondeltaPhiSeedClusterTrackAtCalo.push_back(electron2deltaPhiSeedClusterTrackAtCalo);
+  electrondeltaPhiEleClusterTrackAtCalo. push_back(electron2deltaPhiEleClusterTrackAtCalo);
+
+  electroneSuperClusterOverP.            push_back(electron3eSuperClusterOverP);
+  electroneSeedClusterOverP.             push_back(electron3eSeedClusterOverP);
+  electroneSeedClusterOverPout.          push_back(electron3eSeedClusterOverPout);
+  electroneEleClusterOverPout.           push_back(electron3eEleClusterOverPout);
+  electrondeltaEtaSuperClusterTrackAtVtx.push_back(electron3deltaEtaSuperClusterTrackAtVtx);
+  electrondeltaEtaSeedClusterTrackAtCalo.push_back(electron3deltaEtaSeedClusterTrackAtCalo);
+  electrondeltaEtaEleClusterTrackAtCalo. push_back(electron3deltaEtaEleClusterTrackAtCalo);
+  electrondeltaPhiSuperClusterTrackAtVtx.push_back(electron3deltaPhiSuperClusterTrackAtVtx);
+  electrondeltaPhiSeedClusterTrackAtCalo.push_back(electron3deltaPhiSeedClusterTrackAtCalo);
+  electrondeltaPhiEleClusterTrackAtCalo. push_back(electron3deltaPhiEleClusterTrackAtCalo);
+
+  electroneSuperClusterOverP.            push_back(electron4eSuperClusterOverP);
+  electroneSeedClusterOverP.             push_back(electron4eSeedClusterOverP);
+  electroneSeedClusterOverPout.          push_back(electron4eSeedClusterOverPout);
+  electroneEleClusterOverPout.           push_back(electron4eEleClusterOverPout);
+  electrondeltaEtaSuperClusterTrackAtVtx.push_back(electron4deltaEtaSuperClusterTrackAtVtx);
+  electrondeltaEtaSeedClusterTrackAtCalo.push_back(electron4deltaEtaSeedClusterTrackAtCalo);
+  electrondeltaEtaEleClusterTrackAtCalo. push_back(electron4deltaEtaEleClusterTrackAtCalo);
+  electrondeltaPhiSuperClusterTrackAtVtx.push_back(electron4deltaPhiSuperClusterTrackAtVtx);
+  electrondeltaPhiSeedClusterTrackAtCalo.push_back(electron4deltaPhiSeedClusterTrackAtCalo);
+  electrondeltaPhiEleClusterTrackAtCalo. push_back(electron4deltaPhiEleClusterTrackAtCalo);
 
   tree->Branch(  "triggerHLTL1Jet6U", &triggerHLTL1Jet6U, "triggerHLTL1Jet6U/O"); 
   tree->Branch(  "triggerHLTL1Jet10U", &triggerHLTL1Jet10U, "triggerHLTL1Jet10U/O"); 
@@ -774,28 +990,132 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig)
   }
 
   //softElectronTagInfos
-  tree->Branch(  "nElectrons",  nElectrons, "nElectrons[nJets]/I");                            
-  tree->Branch(  "electronPt",  electronPt, "electronPt[nJets]/F");   			       
-  tree->Branch(  "electronEta", electronEta, "electronEta[nJets]/F");  			       
-  tree->Branch(  "electronPhi",  electronPhi, "electronPhi[nJets]/F");  			       
-  tree->Branch(  "electronNHits", electronNHits, "electronNHits[nJets]/I");   		     
-  tree->Branch(  "electronNExpectedOuterHits", electronNExpectedOuterHits, "electronNExpectedOuterHits[nJets]/I");   		       
-  tree->Branch(  "electronNPixelHits",  electronNPixelHits, "electronNPixelHits[nJets]/I");   		       
-  tree->Branch(  "electronNChi2", electronNChi2, "electronNChi2[nJets]/F");			       
-  tree->Branch(  "electronPtRel", electronPtRel, "electronPtRel[nJets]/F");   		       
-  tree->Branch(  "electronSip2d", electronSip2d, "electronSip2d[nJets]/F");   		       
-  tree->Branch(  "electronIp2d", electronIp2d, "electronIp2d[nJets]/F");   		       
-  tree->Branch(  "electronIpe2d", electronIpe2d, "electronIpe2d[nJets]/F");   		       
-  tree->Branch(  "electronSip3d", electronSip3d, "electronSip3d[nJets]/F");
-  tree->Branch(  "electronIp3d", electronIp3d, "electronIp3d[nJets]/F");
-  tree->Branch(  "electronIpe3d", electronIpe3d, "electronIpe3d[nJets]/F");   		          		          		       
-  tree->Branch(  "electronP0Par", electronP0Par, "electronP0Par[nJets]/F");   		       
-  tree->Branch(  "electronDeltaR", electronDeltaR, "electronDeltaR[nJets]/F");  		       
-  tree->Branch(  "electronEtaRel", electronEtaRel, "electronEtaRel[nJets]/F");  		       
-  tree->Branch(  "electronRatio", electronRatio, "electronRatio[nJets]/F");   		     
-  tree->Branch(  "electronTrackQuality", electronTrackQuality, "electronTrackQuality[nJets]/I");   		       
-  tree->Branch(  "electronRatioRel", electronRatioRel, "electronRatioRel[nJets]/F");                      
-  
+  tree->Branch(  "nElectrons",  nElectrons, "nElectrons[nJets]/I");  
+                          
+  tree->Branch(  "electron1Pt",                  electron1Pt,                 "electron1Pt[nJets]/F");   			       
+  tree->Branch(  "electron1Eta",                 electron1Eta,                "electron1Eta[nJets]/F");  			       
+  tree->Branch(  "electron1Phi",                 electron1Phi,                "electron1Phi[nJets]/F");  			       
+  tree->Branch(  "electron1NHits",               electron1NHits,              "electron1NHits[nJets]/I");   		     
+  tree->Branch(  "electron1NExpectedOuterHits",  electron1NExpectedOuterHits, "electron1NExpectedOuterHits[nJets]/I");   		       
+  tree->Branch(  "electron1NPixelHits",          electron1NPixelHits,         "electron1NPixelHits[nJets]/I");   		       
+  tree->Branch(  "electron1NChi2",               electron1NChi2,              "electron1NChi2[nJets]/F");			       
+  tree->Branch(  "electron1PtRel",               electron1PtRel,              "electron1PtRel[nJets]/F");   		       
+  tree->Branch(  "electron1Sip2d",               electron1Sip2d,              "electron1Sip2d[nJets]/F");   		       
+  tree->Branch(  "electron1Ip2d",                electron1Ip2d,               "electron1Ip2d[nJets]/F");   		       
+  tree->Branch(  "electron1Ipe2d",               electron1Ipe2d,              "electron1Ipe2d[nJets]/F");   		       
+  tree->Branch(  "electron1Sip3d",               electron1Sip3d,              "electron1Sip3d[nJets]/F");
+  tree->Branch(  "electron1Ip3d",                electron1Ip3d,               "electron1Ip3d[nJets]/F");
+  tree->Branch(  "electron1Ipe3d",               electron1Ipe3d,              "electron1Ipe3d[nJets]/F");   		          		          		       
+  tree->Branch(  "electron1P0Par",               electron1P0Par,              "electron1P0Par[nJets]/F");   		       
+  tree->Branch(  "electron1DeltaR",              electron1DeltaR,             "electron1DeltaR[nJets]/F");  		       
+  tree->Branch(  "electron1EtaRel",              electron1EtaRel,             "electron1EtaRel[nJets]/F");  		       
+  tree->Branch(  "electron1Ratio",               electron1Ratio,              "electron1Ratio[nJets]/F");   		     
+  tree->Branch(  "electron1TrackQuality",        electron1TrackQuality,       "electron1TrackQuality[nJets]/I");   		       
+  tree->Branch(  "electron1RatioRel",            electron1RatioRel,           "electron1RatioRel[nJets]/F");                      
+  tree->Branch(  "electron1eSuperClusterOverP",             electron1eSuperClusterOverP,             "electron1eSuperClusterOverP[nJets]/F");
+  tree->Branch(  "electron1eSeedClusterOverP",              electron1eSeedClusterOverP,              "electron1eSeedClusterOverP[nJets]/F");
+  tree->Branch(  "electron1eSeedClusterOverPout",           electron1eSeedClusterOverPout,           "electron1eSeedClusterOverPout[nJets]/F");
+  tree->Branch(  "electron1eEleClusterOverPout",            electron1eEleClusterOverPout,            "electron1eEleClusterOverPout[nJets]/F");
+  tree->Branch(  "electron1deltaEtaSuperClusterTrackAtVtx", electron1deltaEtaSuperClusterTrackAtVtx, "electron1deltaEtaSuperClusterTrackAtVtx[nJets]/F");
+  tree->Branch(  "electron1deltaEtaSeedClusterTrackAtCalo", electron1deltaEtaSeedClusterTrackAtCalo, "electron1deltaEtaSeedClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron1deltaEtaEleClusterTrackAtCalo",  electron1deltaEtaEleClusterTrackAtCalo,  "electron1deltaEtaEleClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron1deltaPhiSuperClusterTrackAtVtx", electron1deltaPhiSuperClusterTrackAtVtx, "electron1deltaPhiSuperClusterTrackAtVtx[nJets]/F");
+  tree->Branch(  "electron1deltaPhiSeedClusterTrackAtCalo", electron1deltaPhiSeedClusterTrackAtCalo, "electron1deltaPhiSeedClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron1deltaPhiEleClusterTrackAtCalo",  electron1deltaPhiEleClusterTrackAtCalo,  "electron1deltaPhiEleClusterTrackAtCalo[nJets]/F");
+            
+  tree->Branch(  "electron2Pt",                  electron2Pt,                 "electron2Pt[nJets]/F");   			       
+  tree->Branch(  "electron2Eta",                 electron2Eta,                "electron2Eta[nJets]/F");  			       
+  tree->Branch(  "electron2Phi",                 electron2Phi,                "electron2Phi[nJets]/F");  			       
+  tree->Branch(  "electron2NHits",               electron2NHits,              "electron2NHits[nJets]/I");   		     
+  tree->Branch(  "electron2NExpectedOuterHits",  electron2NExpectedOuterHits, "electron2NExpectedOuterHits[nJets]/I");   		       
+  tree->Branch(  "electron2NPixelHits",          electron2NPixelHits,         "electron2NPixelHits[nJets]/I");   		       
+  tree->Branch(  "electron2NChi2",               electron2NChi2,              "electron2NChi2[nJets]/F");			       
+  tree->Branch(  "electron2PtRel",               electron2PtRel,              "electron2PtRel[nJets]/F");   		       
+  tree->Branch(  "electron2Sip2d",               electron2Sip2d,              "electron2Sip2d[nJets]/F");   		       
+  tree->Branch(  "electron2Ip2d",                electron2Ip2d,               "electron2Ip2d[nJets]/F");   		       
+  tree->Branch(  "electron2Ipe2d",               electron2Ipe2d,              "electron2Ipe2d[nJets]/F");   		       
+  tree->Branch(  "electron2Sip3d",               electron2Sip3d,              "electron2Sip3d[nJets]/F");
+  tree->Branch(  "electron2Ip3d",                electron2Ip3d,               "electron2Ip3d[nJets]/F");
+  tree->Branch(  "electron2Ipe3d",               electron2Ipe3d,              "electron2Ipe3d[nJets]/F");   		          		          		       
+  tree->Branch(  "electron2P0Par",               electron2P0Par,              "electron2P0Par[nJets]/F");   		       
+  tree->Branch(  "electron2DeltaR",              electron2DeltaR,             "electron2DeltaR[nJets]/F");  		       
+  tree->Branch(  "electron2EtaRel",              electron2EtaRel,             "electron2EtaRel[nJets]/F");  		       
+  tree->Branch(  "electron2Ratio",               electron2Ratio,              "electron2Ratio[nJets]/F");   		     
+  tree->Branch(  "electron2TrackQuality",        electron2TrackQuality,       "electron2TrackQuality[nJets]/I");   		       
+  tree->Branch(  "electron2RatioRel",            electron2RatioRel,           "electron2RatioRel[nJets]/F"); 
+  tree->Branch(  "electron2eSuperClusterOverP",             electron2eSuperClusterOverP,             "electron2eSuperClusterOverP[nJets]/F");
+  tree->Branch(  "electron2eSeedClusterOverP",              electron2eSeedClusterOverP,              "electron2eSeedClusterOverP[nJets]/F");
+  tree->Branch(  "electron2eSeedClusterOverPout",           electron2eSeedClusterOverPout,           "electron2eSeedClusterOverPout[nJets]/F");
+  tree->Branch(  "electron2eEleClusterOverPout",            electron2eEleClusterOverPout,            "electron2eEleClusterOverPout[nJets]/F");
+  tree->Branch(  "electron2deltaEtaSuperClusterTrackAtVtx", electron2deltaEtaSuperClusterTrackAtVtx, "electron2deltaEtaSuperClusterTrackAtVtx[nJets]/F");
+  tree->Branch(  "electron2deltaEtaSeedClusterTrackAtCalo", electron2deltaEtaSeedClusterTrackAtCalo, "electron2deltaEtaSeedClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron2deltaEtaEleClusterTrackAtCalo",  electron2deltaEtaEleClusterTrackAtCalo,  "electron2deltaEtaEleClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron2deltaPhiSuperClusterTrackAtVtx", electron2deltaPhiSuperClusterTrackAtVtx, "electron2deltaPhiSuperClusterTrackAtVtx[nJets]/F");
+  tree->Branch(  "electron2deltaPhiSeedClusterTrackAtCalo", electron2deltaPhiSeedClusterTrackAtCalo, "electron2deltaPhiSeedClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron2deltaPhiEleClusterTrackAtCalo",  electron2deltaPhiEleClusterTrackAtCalo,  "electron2deltaPhiEleClusterTrackAtCalo[nJets]/F");
+                          
+  tree->Branch(  "electron3Pt",                  electron3Pt,                 "electron3Pt[nJets]/F");   			       
+  tree->Branch(  "electron3Eta",                 electron3Eta,                "electron3Eta[nJets]/F");  			       
+  tree->Branch(  "electron3Phi",                 electron3Phi,                "electron3Phi[nJets]/F");  			       
+  tree->Branch(  "electron3NHits",               electron3NHits,              "electron3NHits[nJets]/I");   		     
+  tree->Branch(  "electron3NExpectedOuterHits",  electron3NExpectedOuterHits, "electron3NExpectedOuterHits[nJets]/I");   		       
+  tree->Branch(  "electron3NPixelHits",          electron3NPixelHits,         "electron3NPixelHits[nJets]/I");   		       
+  tree->Branch(  "electron3NChi2",               electron3NChi2,              "electron3NChi2[nJets]/F");			       
+  tree->Branch(  "electron3PtRel",               electron3PtRel,              "electron3PtRel[nJets]/F");   		       
+  tree->Branch(  "electron3Sip2d",               electron3Sip2d,              "electron3Sip2d[nJets]/F");   		       
+  tree->Branch(  "electron3Ip2d",                electron3Ip2d,               "electron3Ip2d[nJets]/F");   		       
+  tree->Branch(  "electron3Ipe2d",               electron3Ipe2d,              "electron3Ipe2d[nJets]/F");   		       
+  tree->Branch(  "electron3Sip3d",               electron3Sip3d,              "electron3Sip3d[nJets]/F");
+  tree->Branch(  "electron3Ip3d",                electron3Ip3d,               "electron3Ip3d[nJets]/F");
+  tree->Branch(  "electron3Ipe3d",               electron3Ipe3d,              "electron3Ipe3d[nJets]/F");   		          		          		       
+  tree->Branch(  "electron3P0Par",               electron3P0Par,              "electron3P0Par[nJets]/F");   		       
+  tree->Branch(  "electron3DeltaR",              electron3DeltaR,             "electron3DeltaR[nJets]/F");  		       
+  tree->Branch(  "electron3EtaRel",              electron3EtaRel,             "electron3EtaRel[nJets]/F");  		       
+  tree->Branch(  "electron3Ratio",               electron3Ratio,              "electron3Ratio[nJets]/F");   		     
+  tree->Branch(  "electron3TrackQuality",        electron3TrackQuality,       "electron3TrackQuality[nJets]/I");   		       
+  tree->Branch(  "electron3RatioRel",            electron3RatioRel,           "electron3RatioRel[nJets]/F");  
+  tree->Branch(  "electron3eSuperClusterOverP",             electron3eSuperClusterOverP,             "electron3eSuperClusterOverP[nJets]/F");
+  tree->Branch(  "electron3eSeedClusterOverP",              electron3eSeedClusterOverP,              "electron3eSeedClusterOverP[nJets]/F");
+  tree->Branch(  "electron3eSeedClusterOverPout",           electron3eSeedClusterOverPout,           "electron3eSeedClusterOverPout[nJets]/F");
+  tree->Branch(  "electron3eEleClusterOverPout",            electron3eEleClusterOverPout,            "electron3eEleClusterOverPout[nJets]/F");
+  tree->Branch(  "electron3deltaEtaSuperClusterTrackAtVtx", electron3deltaEtaSuperClusterTrackAtVtx, "electron3deltaEtaSuperClusterTrackAtVtx[nJets]/F");
+  tree->Branch(  "electron3deltaEtaSeedClusterTrackAtCalo", electron3deltaEtaSeedClusterTrackAtCalo, "electron3deltaEtaSeedClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron3deltaEtaEleClusterTrackAtCalo",  electron3deltaEtaEleClusterTrackAtCalo,  "electron3deltaEtaEleClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron3deltaPhiSuperClusterTrackAtVtx", electron3deltaPhiSuperClusterTrackAtVtx, "electron3deltaPhiSuperClusterTrackAtVtx[nJets]/F");
+  tree->Branch(  "electron3deltaPhiSeedClusterTrackAtCalo", electron3deltaPhiSeedClusterTrackAtCalo, "electron3deltaPhiSeedClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron3deltaPhiEleClusterTrackAtCalo",  electron3deltaPhiEleClusterTrackAtCalo,  "electron3deltaPhiEleClusterTrackAtCalo[nJets]/F"); 
+                          
+  tree->Branch(  "electron4Pt",                  electron4Pt,                 "electron4Pt[nJets]/F");   			       
+  tree->Branch(  "electron4Eta",                 electron4Eta,                "electron4Eta[nJets]/F");  			       
+  tree->Branch(  "electron4Phi",                 electron4Phi,                "electron4Phi[nJets]/F");  			       
+  tree->Branch(  "electron4NHits",               electron4NHits,              "electron4NHits[nJets]/I");   		     
+  tree->Branch(  "electron4NExpectedOuterHits",  electron4NExpectedOuterHits, "electron4NExpectedOuterHits[nJets]/I");   		       
+  tree->Branch(  "electron4NPixelHits",          electron4NPixelHits,         "electron4NPixelHits[nJets]/I");   		       
+  tree->Branch(  "electron4NChi2",               electron4NChi2,              "electron4NChi2[nJets]/F");			       
+  tree->Branch(  "electron4PtRel",               electron4PtRel,              "electron4PtRel[nJets]/F");   		       
+  tree->Branch(  "electron4Sip2d",               electron4Sip2d,              "electron4Sip2d[nJets]/F");   		       
+  tree->Branch(  "electron4Ip2d",                electron4Ip2d,               "electron4Ip2d[nJets]/F");   		       
+  tree->Branch(  "electron4Ipe2d",               electron4Ipe2d,              "electron4Ipe2d[nJets]/F");   		       
+  tree->Branch(  "electron4Sip3d",               electron4Sip3d,              "electron4Sip3d[nJets]/F");
+  tree->Branch(  "electron4Ip3d",                electron4Ip3d,               "electron4Ip3d[nJets]/F");
+  tree->Branch(  "electron4Ipe3d",               electron4Ipe3d,              "electron4Ipe3d[nJets]/F");   		          		          		       
+  tree->Branch(  "electron4P0Par",               electron4P0Par,              "electron4P0Par[nJets]/F");   		       
+  tree->Branch(  "electron4DeltaR",              electron4DeltaR,             "electron4DeltaR[nJets]/F");  		       
+  tree->Branch(  "electron4EtaRel",              electron4EtaRel,             "electron4EtaRel[nJets]/F");  		       
+  tree->Branch(  "electron4Ratio",               electron4Ratio,              "electron4Ratio[nJets]/F");   		     
+  tree->Branch(  "electron4TrackQuality",        electron4TrackQuality,       "electron4TrackQuality[nJets]/I");   		       
+  tree->Branch(  "electron4RatioRel",            electron4RatioRel,           "electron4RatioRel[nJets]/F"); 
+  tree->Branch(  "electron4eSuperClusterOverP",             electron4eSuperClusterOverP,             "electron4eSuperClusterOverP[nJets]/F");
+  tree->Branch(  "electron4eSeedClusterOverP",              electron4eSeedClusterOverP,              "electron4eSeedClusterOverP[nJets]/F");
+  tree->Branch(  "electron4eSeedClusterOverPout",           electron4eSeedClusterOverPout,           "electron4eSeedClusterOverPout[nJets]/F");
+  tree->Branch(  "electron4eEleClusterOverPout",            electron4eEleClusterOverPout,            "electron4eEleClusterOverPout[nJets]/F");
+  tree->Branch(  "electron4deltaEtaSuperClusterTrackAtVtx", electron4deltaEtaSuperClusterTrackAtVtx, "electron4deltaEtaSuperClusterTrackAtVtx[nJets]/F");
+  tree->Branch(  "electron4deltaEtaSeedClusterTrackAtCalo", electron4deltaEtaSeedClusterTrackAtCalo, "electron4deltaEtaSeedClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron4deltaEtaEleClusterTrackAtCalo",  electron4deltaEtaEleClusterTrackAtCalo,  "electron4deltaEtaEleClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron4deltaPhiSuperClusterTrackAtVtx", electron4deltaPhiSuperClusterTrackAtVtx, "electron4deltaPhiSuperClusterTrackAtVtx[nJets]/F");
+  tree->Branch(  "electron4deltaPhiSeedClusterTrackAtCalo", electron4deltaPhiSeedClusterTrackAtCalo, "electron4deltaPhiSeedClusterTrackAtCalo[nJets]/F");
+  tree->Branch(  "electron4deltaPhiEleClusterTrackAtCalo",  electron4deltaPhiEleClusterTrackAtCalo,  "electron4deltaPhiEleClusterTrackAtCalo[nJets]/F");
+
   //softMuonTagInfos	
   tree->Branch(  "nMuons", nMuons, "nMuons[nJets]/I");                                
   
@@ -1574,77 +1894,138 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       
 
       //softElectronTagInfos
-  
+
+      for(unsigned int i=0; i<4; i++){
+	nElectrons[iJet] = ( 0 );
+	electronPt[i][iJet] = (-9999 );   			       
+	electronEta[i][iJet] = (-9999);  			       
+	electronPhi[i][iJet] = (-9999);  			       
+	electronNHits[i][iJet] = (-9999 );   
+	electronNExpectedOuterHits[i][iJet] = ( -9999 );
+	electronNPixelHits[i][iJet] = (-9999 );   
+	electronNChi2[i][iJet] = (-9999);			       
+	electronPtRel[i][iJet] = (-9999);   
+	electronTrackQuality[i][iJet] = (-9999 );
+	electronSip2d[i][iJet] = (-9999);   
+	electronIp2d[i][iJet] = (-9999 );   
+	electronIpe2d[i][iJet] = ( -9999 );   		       
+	electronSip3d[i][iJet] = (-9999);   
+	electronIp3d[i][iJet] = (-9999 );   
+	electronIpe3d[i][iJet] = ( -9999 );   
+	electronP0Par[i][iJet] = (-9999);   		       
+	electronDeltaR[i][iJet] = (-9999);  		       
+	electronEtaRel[i][iJet] = (-9999);  		       
+	electronRatio[i][iJet] = (-9999);   		       
+	electronRatioRel[i][iJet] = (-9999);
+	electroneSuperClusterOverP[i][iJet] = (-9999);
+	electroneSeedClusterOverP[i][iJet] = (-9999);
+	electroneSeedClusterOverPout[i][iJet] = (-9999);
+	electroneEleClusterOverPout[i][iJet] = (-9999);
+	electrondeltaEtaSuperClusterTrackAtVtx[i][iJet] = (-9999);
+	electrondeltaEtaSeedClusterTrackAtCalo[i][iJet] = (-9999);
+	electrondeltaEtaEleClusterTrackAtCalo[i][iJet] = (-9999);
+	electrondeltaPhiSuperClusterTrackAtVtx[i][iJet] = (-9999);
+	electrondeltaPhiSeedClusterTrackAtCalo[i][iJet] = (-9999);
+	electrondeltaPhiEleClusterTrackAtCalo[i][iJet] = (-9999);
+      } 
+
       bool hasLeptons = softElectronTagInfo[thisJetRef]->leptons() > 0;
       if(hasLeptons)
 	{
 	  nElectrons[iJet] = (softElectronTagInfo[thisJetRef]->leptons());
-	  unsigned int maxPtElectron = 0;
+
+
+	  edm::Handle<reco::GsfElectronCollection> allelectrons;
+	  iEvent.getByLabel("gsfElectrons",allelectrons);
+	  // loop over all electrons in tag info and match them to gsfelectron collection 
+	  // create pt sorted map of electrons
+	  std::map<double, const GsfElectron*> elMap;
+	  std::map<const GsfElectron*, unsigned int> tagInfoMap;
+
 	  for(unsigned int iElectron = 0; iElectron < softElectronTagInfo[thisJetRef]->leptons(); iElectron++)
 	    {
-	      if(softElectronTagInfo[thisJetRef]->lepton(iElectron)->pt() > softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->pt() )
-		maxPtElectron = iElectron;
+	      //loop on electron collection
+	      //count electrons
+	      unsigned int iElCounter = 0;
+	      for(size_t i=0; i < allelectrons->size(); ++i){
+		const GsfElectron & el = (*allelectrons)[i];
+		GsfTrackRef gsftrack = el.gsfTrack();
+ 		if(gsftrack.isNull() && !gsftrack.isAvailable()){
+ 		  std::cout<<"track is null"<<std::endl;
+ 		  continue;
+ 		}
+ 		reco::GsfTrackRef softLepTrack =  (softElectronTagInfo[thisJetRef]->lepton(iElectron)).castTo<GsfTrackRef>();
+		if( gsftrack == softLepTrack){
+ 		  iElCounter++;
+		  elMap[gsftrack->pt()] = &el ;
+		  tagInfoMap[&el] = iElectron;
+		}
+	      }
+		
+	      if(iElCounter != 1){
+		std::cout<<"ERROR: iElCounter= "<<iElCounter<<"this should never happen" << std::endl;
+		exit(1);
+	      }	      
 	    }
-	  electronPt[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->pt());   			       
-	  electronEta[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->eta());  			       
-	  electronPhi[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->phi());  			       
-	  electronNHits[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->hitPattern().numberOfValidHits() );   
-	  electronNExpectedOuterHits[iJet] = ( softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->trackerExpectedHitsOuter().numberOfHits() );   
-	  electronNPixelHits[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->hitPattern().numberOfValidPixelHits() );   
-	  electronNChi2[iJet] = (softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)->normalizedChi2());			       
-	  electronPtRel[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ptRel);   
-	      
-	  for(int i = 2; i>-2; i--){
-	    if( (*softElectronTagInfo[thisJetRef]->lepton(maxPtElectron)).quality(reco::TrackBase::TrackQuality(i))){
-	      electronTrackQuality[iJet] = (i);
-	      break;
-	    }
+
+	
+	  if( elMap.size() != softElectronTagInfo[thisJetRef]->leptons()){
+	    std::cout<<"ERROR: softElectronTagInfo[thisJetRef]->leptons():  this should never happen"<< std::endl;
+	    exit(1);
 	  }
 
-	  TransientTrack transientTrack = builder->build( *softElectronTagInfo[thisJetRef]->lepton(maxPtElectron) );
-	  GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
-	  Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
-	  Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
-		       
-	  electronSip2d[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).sip2d);   
-	  electronIp2d[iJet] = ( ip2d.value() );   
-	  electronIpe2d[iJet] = ( ip2d.error() );   		       
-   
+	  // now loop over el map and fill info
+	  int iElMapCounter = 0;
+	  for(std::map<double, const GsfElectron*>::reverse_iterator it= elMap.rbegin(); it != elMap.rend(); it++){
 
-	  electronSip3d[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).sip3d);   
-	  electronIp3d[iJet] = ( ip3d.value() );   
-	  electronIpe3d[iJet] = ( ip3d.error() );   
-	   
+	    const GsfElectron * el =  it->second;
 
-	  electronP0Par[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).p0Par);   		       
-	  electronDeltaR[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).deltaR);  		       
-	  electronEtaRel[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).etaRel);  		       
-	  electronRatio[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ratio);   		       
-	  electronRatioRel[iJet] = (softElectronTagInfo[thisJetRef]->properties(maxPtElectron).ratioRel);                      
+	    electronPt[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->lepton(tagInfoMap[el])->pt());   			       
+	    electronEta[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->lepton(tagInfoMap[el])->eta());  			       
+	    electronPhi[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->lepton(tagInfoMap[el])->phi());  			       
+	    electronNHits[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->lepton(tagInfoMap[el])->hitPattern().numberOfValidHits() );   
+	    electronNExpectedOuterHits[iElMapCounter][iJet] = ( softElectronTagInfo[thisJetRef]->lepton(tagInfoMap[el])->trackerExpectedHitsOuter().numberOfHits() );   
+	    electronNPixelHits[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->lepton(tagInfoMap[el])->hitPattern().numberOfValidPixelHits() );   
+	    electronNChi2[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->lepton(tagInfoMap[el])->normalizedChi2());			       
+	    electronPtRel[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->properties(tagInfoMap[el]).ptRel);   
+	      
+	    TransientTrack transientTrack = builder->build( *softElectronTagInfo[thisJetRef]->lepton(tagInfoMap[el]) );
+	    GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
+	    Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
+	    Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
+
+	    electronSip2d[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->properties(tagInfoMap[el]).sip2d);   
+	    electronIp2d[iElMapCounter][iJet] = ( ip2d.value() );   
+	    electronIpe2d[iElMapCounter][iJet] = ( ip2d.error() );   		       
+	    electronSip3d[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->properties(tagInfoMap[el]).sip3d);   
+	    electronIp3d[iElMapCounter][iJet] = ( ip3d.value() );   
+	    electronIpe3d[iElMapCounter][iJet] = ( ip3d.error() );   
+	    electronP0Par[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->properties(tagInfoMap[el]).p0Par);   		       
+	    electronDeltaR[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->properties(tagInfoMap[el]).deltaR);  		       
+	    electronEtaRel[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->properties(tagInfoMap[el]).etaRel);  		       
+	    electronRatio[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->properties(tagInfoMap[el]).ratio);   		       
+	    electronRatioRel[iElMapCounter][iJet] = (softElectronTagInfo[thisJetRef]->properties(tagInfoMap[el]).ratioRel);
+
+	    electroneSuperClusterOverP[iElMapCounter][iJet] = el->eSuperClusterOverP();
+	    electroneSeedClusterOverP[iElMapCounter][iJet] = el->eSeedClusterOverP();
+	    electroneSeedClusterOverPout[iElMapCounter][iJet] = el->eSeedClusterOverPout();
+	    electroneEleClusterOverPout[iElMapCounter][iJet] = el->eEleClusterOverPout();
+	    electrondeltaEtaSuperClusterTrackAtVtx[iElMapCounter][iJet] = el->deltaEtaSuperClusterTrackAtVtx();
+	    electrondeltaEtaSeedClusterTrackAtCalo[iElMapCounter][iJet] = el->deltaEtaSeedClusterTrackAtCalo();
+	    electrondeltaEtaEleClusterTrackAtCalo[iElMapCounter][iJet] = el->deltaEtaEleClusterTrackAtCalo();
+	    electrondeltaPhiSuperClusterTrackAtVtx[iElMapCounter][iJet] = el->deltaPhiSuperClusterTrackAtVtx();
+	    electrondeltaPhiSeedClusterTrackAtCalo[iElMapCounter][iJet] = el->deltaPhiSeedClusterTrackAtCalo();
+	    electrondeltaPhiEleClusterTrackAtCalo[iElMapCounter][iJet] = el->deltaPhiEleClusterTrackAtCalo();
+
+	    for(int i = 2; i>-2; i--){
+	      if( (*softElectronTagInfo[thisJetRef]->lepton(tagInfoMap[el])).quality(reco::TrackBase::TrackQuality(i))){
+		electronTrackQuality[iElMapCounter][iJet] = (i);
+		break;
+	      }
+	    }
+	  }
 	}
-      else{
-	nElectrons[iJet] = ( 0 );
-	electronPt[iJet] = (-9999 );   			       
-	electronEta[iJet] = (-9999);  			       
-	electronPhi[iJet] = (-9999);  			       
-	electronNHits[iJet] = (-9999 );   
-	electronNExpectedOuterHits[iJet] = ( -9999 );
-	electronNPixelHits[iJet] = (-9999 );   
-	electronNChi2[iJet] = (-9999);			       
-	electronPtRel[iJet] = (-9999);   
-	electronTrackQuality[iJet] = (-9999 );
-	electronSip2d[iJet] = (-9999);   
-	electronIp2d[iJet] = (-9999 );   
-	electronIpe2d[iJet] = ( -9999 );   		       
-	electronSip3d[iJet] = (-9999);   
-	electronIp3d[iJet] = (-9999 );   
-	electronIpe3d[iJet] = ( -9999 );   
-	electronP0Par[iJet] = (-9999);   		       
-	electronDeltaR[iJet] = (-9999);  		       
-	electronEtaRel[iJet] = (-9999);  		       
-	electronRatio[iJet] = (-9999);   		       
-	electronRatioRel[iJet] = (-9999);  
-      }
+	
       
       //softMuonTagInfos
       for(unsigned int i=0; i<4; i++){
@@ -1678,7 +2059,6 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	muonRatioRel[i][iJet] = -999;             
 
       }
-
 
       hasLeptons = softMuonTagInfo[thisJetRef]->leptons() > 0;
       if(hasLeptons)
@@ -1725,9 +2105,9 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 	    const Muon * mu =  it->second;
 
-	    muonIsGlobal[iMuMapCounter][iJet] =           mu->isGlobalMuon();                
-	    muonIsTracker[iMuMapCounter][iJet] =                          mu->isTrackerMuon();
-	    muonIsStandalone[iMuMapCounter][iJet] =                       mu->isStandAloneMuon();
+	    muonIsGlobal[iMuMapCounter][iJet] =  mu->isGlobalMuon();                
+	    muonIsTracker[iMuMapCounter][iJet] =  mu->isTrackerMuon();
+	    muonIsStandalone[iMuMapCounter][iJet] =  mu->isStandAloneMuon();
 	    muonPt[iMuMapCounter][iJet] = softMuonTagInfo[thisJetRef]->lepton(tagInfoMap[mu])->pt(); 
 	    muonEta[iMuMapCounter][iJet] = softMuonTagInfo[thisJetRef]->lepton(tagInfoMap[mu])->eta(); 
 	    muonPhi[iMuMapCounter][iJet] = softMuonTagInfo[thisJetRef]->lepton(tagInfoMap[mu])->phi(); 
