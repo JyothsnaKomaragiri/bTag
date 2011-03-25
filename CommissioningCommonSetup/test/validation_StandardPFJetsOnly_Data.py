@@ -64,9 +64,21 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
         "HLT_BTagMu_DiJet20_Mu5_v*",
         "HLT_BTagMu_DiJet60_Mu7_v*",
         "HLT_BTagMu_DiJet80_Mu9_v*",
-        "HLT_BTagMu_DiJet100_Mu9_v*",
+#        "HLT_BTagMu_DiJet100_Mu9_v*",
         "HLT_Mu17_CentralJet40_BTagIP_v*",
-        "HLT_IsoMu17_CentralJet40_BTagIP_v*"
+        "HLT_IsoMu17_CentralJet40_BTagIP_v*",
+         "HLT_DoubleJet30_ForwardBackward_v*",
+         "HLT_DoubleJet60_ForwardBackward_v*",
+         "HLT_DoubleJet70_ForwardBackward_v*",
+         "HLT_DoubleJet80_ForwardBackward_v*",
+         "HLT_CentralJet80_MET65_v*",
+         "HLT_CentralJet80_MET80_v*",
+         "HLT_CentralJet80_MET100_v*",
+         "HLT_CentralJet80_MET160_v*",
+         "HLT_DiJet60_MET45_v*",
+         "HLT_DiJet70_PT70_v*",
+         "HLT_DiJet100_PT100_v*",
+         "HLT_DiJet130_PT130_v*",
         ),
    hltResults = cms.InputTag("TriggerResults","","HLT"),
    l1tResults = cms.InputTag( "" ),
@@ -275,45 +287,47 @@ process.standardPFBTagNtuple.bTagConfig = cms.VPSet(
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10000)
+    input = cms.untracked.int32(-1)
+#    input = cms.untracked.int32(100)
 )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-     '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/954/2EF6D49C-2355-E011-BE0F-001617C3B70E.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/943/58A09E66-FD54-E011-9AC1-0016177CA7A0.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/942/947D60CA-F054-E011-A7AB-003048F1183E.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/940/F0D5C5D5-EE54-E011-82C6-001617DBCF6A.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/939/E670AC30-F954-E011-9515-003048F1C420.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/938/4EADCC18-F754-E011-A70E-003048F11942.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/937/709C33E1-F254-E011-8CDF-001617C3B5E4.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/937/3A7C6AA1-1A55-E011-9709-001617E30F48.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/936/96C8B24B-EE54-E011-A082-003048D37456.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/935/964F0173-F154-E011-872B-001D09F2A49C.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/935/2687B169-F654-E011-ACB1-001D09F231C9.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/916/22A24F34-A954-E011-815E-0030487CD184.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/915/CC358858-9654-E011-AA61-0030487C778E.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/915/7E8EC303-9154-E011-8118-0030487CD76A.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/914/3C6CFC53-9454-E011-B491-001617C3B706.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/913/04F396ED-9854-E011-81F7-0030487CD162.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/911/E87873A4-7354-E011-B801-003048F1C424.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/911/E64C09CD-8854-E011-BA64-0030487CD7B4.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/907/C27F2E90-7854-E011-A82A-00304879FBB2.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/898/564A650C-F953-E011-979F-003048D375AA.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/894/5450EDBC-4354-E011-9B72-000423D94494.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/890/F23CB99E-4754-E011-AAE3-000423D33970.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/890/762AD04D-4254-E011-94DA-001D09F291D7.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/890/30614F67-6854-E011-84A2-001617E30CE8.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/888/BCAAEB40-3B54-E011-851F-003048F11C5C.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/888/9C31F599-3554-E011-862C-001617C3B706.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/888/5C033F97-3E54-E011-B299-001D09F24DDF.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/877/626D250F-E453-E011-8E65-000423D987E0.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/876/36B905CE-D453-E011-8939-003048F117EC.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/875/669E7ED4-F953-E011-A0CC-001617C3B6C6.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/875/4825A855-1854-E011-851B-0030487CD906.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/874/7A7BD15A-0C54-E011-9143-001617E30CC8.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/873/3080B6D3-DF53-E011-B00B-001617C3B778.root',
-        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/872/00D23A36-EB53-E011-BFF8-003048F11CF0.root'
+    'file:E2428E6C-A954-E011-8F8A-001D09F34488.root'
+#     '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/954/2EF6D49C-2355-E011-BE0F-001617C3B70E.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/943/58A09E66-FD54-E011-9AC1-0016177CA7A0.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/942/947D60CA-F054-E011-A7AB-003048F1183E.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/940/F0D5C5D5-EE54-E011-82C6-001617DBCF6A.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/939/E670AC30-F954-E011-9515-003048F1C420.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/938/4EADCC18-F754-E011-A70E-003048F11942.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/937/709C33E1-F254-E011-8CDF-001617C3B5E4.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/937/3A7C6AA1-1A55-E011-9709-001617E30F48.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/936/96C8B24B-EE54-E011-A082-003048D37456.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/935/964F0173-F154-E011-872B-001D09F2A49C.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/935/2687B169-F654-E011-ACB1-001D09F231C9.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/916/22A24F34-A954-E011-815E-0030487CD184.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/915/CC358858-9654-E011-AA61-0030487C778E.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/915/7E8EC303-9154-E011-8118-0030487CD76A.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/914/3C6CFC53-9454-E011-B491-001617C3B706.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/913/04F396ED-9854-E011-81F7-0030487CD162.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/911/E87873A4-7354-E011-B801-003048F1C424.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/911/E64C09CD-8854-E011-BA64-0030487CD7B4.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/907/C27F2E90-7854-E011-A82A-00304879FBB2.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/898/564A650C-F953-E011-979F-003048D375AA.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/894/5450EDBC-4354-E011-9B72-000423D94494.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/890/F23CB99E-4754-E011-AAE3-000423D33970.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/890/762AD04D-4254-E011-94DA-001D09F291D7.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/890/30614F67-6854-E011-84A2-001617E30CE8.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/888/BCAAEB40-3B54-E011-851F-003048F11C5C.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/888/9C31F599-3554-E011-862C-001617C3B706.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/888/5C033F97-3E54-E011-B299-001D09F24DDF.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/877/626D250F-E453-E011-8E65-000423D987E0.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/876/36B905CE-D453-E011-8939-003048F117EC.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/875/669E7ED4-F953-E011-A0CC-001617C3B6C6.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/875/4825A855-1854-E011-851B-0030487CD906.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/874/7A7BD15A-0C54-E011-9143-001617E30CC8.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/873/3080B6D3-DF53-E011-B00B-001617C3B778.root',
+#        '/store/data/Run2011A/METBTag/RECO/PromptReco-v1/000/160/872/00D23A36-EB53-E011-BFF8-003048F11CF0.root'
     )
 )
 
@@ -341,6 +355,7 @@ process.svTaggers = cms.Sequence(
 
 process.slTagInfos = cms.Sequence(
     process.standardSoftMuonPFTagInfos +
+    process.softElectronCands+
     process.standardSoftElectronPFTagInfos
 )
 

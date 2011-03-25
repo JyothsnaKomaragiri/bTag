@@ -16,4 +16,5 @@
 <use name=FWCore/ParameterSet>
 <use name=RecoBTau/JetTagComputer>
 <use name=RecoBTag/SecondaryVertex>
+<use name=HLTrigger/HLTcore>
 <flags EDM_PLUGIN=1>

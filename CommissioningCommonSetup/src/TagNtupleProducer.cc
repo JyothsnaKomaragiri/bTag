@@ -20,6 +20,9 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 //#include "FWCore/Framework/interface/TriggerNames.h"
 #include "FWCore/Common/interface/TriggerNames.h"
+// added by Caroline
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+// end add
 
 #include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
 #include "DataFormats/BTauReco/interface/SecondaryVertexTagInfo.h"
@@ -75,6 +78,10 @@
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
+//added by Caroline
+#include "DataFormats/GeometrySurface/interface/Line.h"
+//end add
+
 #include <TTree.h>
 #include <TFile.h>
 
@@ -91,7 +98,9 @@ public:
   
   
   virtual void beginJob() ;
+  virtual void beginRun(const edm::Run&, const edm::EventSetup&);
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  virtual void endRun(const edm::Run&, const edm::EventSetup&);
   virtual void endJob() ;
   
   void getSharedHitsInfo(unsigned int layer, const reco::TrackRefVector & tracks, int &nSharedHits, int &nTotalHits);
@@ -123,6 +132,59 @@ public:
   bool triggerHLTJet30U, triggerHLTJet50U, triggerHLTJet70U, triggerHLTJet100U ;
   bool triggerHLTBTagIPJet50U, triggerHLTBTagMuJet10U, triggerHLTBTagMuJet20U;
   bool triggerHLTBTagMuDiJet10U, triggerHLTBTagMuDiJet20U, triggerHLTBTagMuDiJet20UMu5, triggerHLTBTagMuDiJet30U, triggerHLTBTagMuDiJet30UMu5;
+
+  // added by Caroline
+  int prescaleHLTL1Jet6U, prescaleHLTL1Jet10U, prescaleHLTJet15U;
+  int prescaleHLTJet30U, prescaleHLTJet50U, prescaleHLTJet70U, prescaleHLTJet100U ;
+  int prescaleHLTBTagIPJet50U, prescaleHLTBTagMuJet10U, prescaleHLTBTagMuJet20U;
+  int prescaleHLTBTagMuDiJet10U, prescaleHLTBTagMuDiJet20U, prescaleHLTBTagMuDiJet20UMu5, prescaleHLTBTagMuDiJet30U, prescaleHLTBTagMuDiJet30UMu5;
+  // end add
+
+  //added by Caroline (4_1_2_patch1)
+  bool triggerHLT_L1SingleJet36, triggerHLT_Jet30, triggerHLT_Jet60, triggerHLT_Jet80, triggerHLT_Jet110, triggerHLT_Jet150;
+  bool triggerHLT_Jet190, triggerHLT_Jet240, triggerHLT_Jet370, triggerHLT_Jet370_NoJetID;
+  bool prescaleHLT_L1SingleJet36, prescaleHLT_Jet30, prescaleHLT_Jet60, prescaleHLT_Jet80, prescaleHLT_Jet110, prescaleHLT_Jet150;
+  bool prescaleHLT_Jet190, prescaleHLT_Jet240, prescaleHLT_Jet370, prescaleHLT_Jet370_NoJetID;
+
+/*
+        HLT_L1SingleJet36_v1
+        HLT_Jet30_v1
+        HLT_Jet60_v1
+        HLT_Jet80_v1
+        HLT_Jet110_v1
+        HLT_Jet150_v1
+        HLT_Jet190_v1
+        HLT_Jet240_v1
+        HLT_Jet370_v1
+        HLT_Jet370_NoJetID_v1
+        HLT_DiJetAve15U_v4
+        HLT_DiJetAve30U_v4
+        HLT_DiJetAve50U_v4
+        HLT_DiJetAve70U_v4
+        HLT_DiJetAve100U_v4
+        HLT_DiJetAve140U_v4
+        HLT_DiJetAve180U_v4
+        HLT_DiJetAve300U_v4
+        HLT_DoubleJet30_ForwardBackward_v1
+        HLT_DoubleJet60_ForwardBackward_v1
+        HLT_DoubleJet70_ForwardBackward_v1
+        HLT_DoubleJet80_ForwardBackward_v1
+        HLT_CentralJet80_MET65_v1
+        HLT_CentralJet80_MET80_v1
+        HLT_CentralJet80_MET100_v1
+        HLT_CentralJet80_MET160_v1
+        HLT_DiJet60_MET45_v1
+        HLT_DiJet70_PT70_v1
+        HLT_DiJet100_PT100_v1
+        HLT_DiJet130_PT130_v1
+        HLT_BTagMu_DiJet20_Mu5_v1
+        HLT_BTagMu_DiJet60_Mu7_v1
+        HLT_BTagMu_DiJet80_Mu9_v1
+        HLT_Mu17_CentralJet40_BTagIP_v1
+        HLT_IsoMu17_CentralJet40_BTagIP_v1
+
+*/
+
 
   unsigned int eventNumber ;
   unsigned int runNumber ;
@@ -224,6 +286,12 @@ public:
   float SVvtxSumDirPhi[MAXJETS];
   float SVvtxDirEta[MAXJETS];
   float SVvtxDirPhi[MAXJETS];
+  // added by Caroline
+  float SVvtxSumPTrel[MAXJETS];
+  float SVvtxDirPTrel[MAXJETS];
+  float SVvtxDistJetAxis[MAXJETS];
+  int   SVtotCharge[MAXJETS];
+  // end add
                
   //impactParameterTagInfos
   int IPnSelectedTracks[MAXJETS];                       
@@ -574,6 +642,12 @@ public:
 
   std::map< std::string, float* > bTagArrays;
 
+
+  //added by Caroline for prescale
+  bool isValidHltConfig_;
+  HLTConfigProvider  hltConfigProvider_;
+  //end add
+
 };
 
 //
@@ -817,6 +891,46 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   tree->Branch(  "triggerHLTBTagMuDiJet30U", &triggerHLTBTagMuDiJet30U, "triggerHLTBTagMuDiJet30U/O");
   tree->Branch(  "triggerHLTBTagMuDiJet30UMu5", &triggerHLTBTagMuDiJet30UMu5, "triggerHLTBTagMuDiJet30UMu5/O");
 
+  tree->Branch(  "prescaleHLTL1Jet6U", &prescaleHLTL1Jet6U, "prescaleHLTL1Jet6U/i"); 
+  tree->Branch(  "prescaleHLTL1Jet10U", &prescaleHLTL1Jet10U, "prescaleHLTL1Jet10U/i"); 
+  tree->Branch(  "prescaleHLTJet15U",  &prescaleHLTJet15U, "prescaleHLTJet15U/i");
+  tree->Branch(  "prescaleHLTJet30U",  &prescaleHLTJet30U, "prescaleHLTJet30U/i");
+  tree->Branch(  "prescaleHLTJet50U",  &prescaleHLTJet50U, "prescaleHLTJet50U/i");
+  tree->Branch(  "prescaleHLTJet70U",  &prescaleHLTJet70U, "prescaleHLTJet70U/i");
+  tree->Branch(  "prescaleHLTJet100U",  &prescaleHLTJet100U, "prescaleHLTJet100U/i");
+  tree->Branch(  "prescaleHLTBTagIPJet50U", &prescaleHLTBTagIPJet50U, "prescaleHLTBTagIPJet50U/i");
+  tree->Branch(  "prescaleHLTBTagMuJet10U", &prescaleHLTBTagMuJet10U, "prescaleHLTBTagMuJet10U/i");
+  tree->Branch(  "prescaleHLTBTagMuJet20U", &prescaleHLTBTagMuJet20U, "prescaleHLTBTagMuJet20U/i");
+  tree->Branch(  "prescaleHLTBTagMuDiJet10U", &prescaleHLTBTagMuDiJet10U, "prescaleHLTBTagMuDiJet10U/i");
+  tree->Branch(  "prescaleHLTBTagMuDiJet20U", &prescaleHLTBTagMuDiJet20U, "prescaleHLTBTagMuDiJet20U/i");
+  tree->Branch(  "prescaleHLTBTagMuDiJet20UMu5", &prescaleHLTBTagMuDiJet20UMu5, "prescaleHLTBTagMuDiJet20UMu5/i");
+  tree->Branch(  "prescaleHLTBTagMuDiJet30U", &prescaleHLTBTagMuDiJet30U, "prescaleHLTBTagMuDiJet30U/i");
+  tree->Branch(  "prescaleHLTBTagMuDiJet30UMu5", &prescaleHLTBTagMuDiJet30UMu5, "prescaleHLTBTagMuDiJet30UMu5/i");
+
+
+// added (4_1_2_patch1)
+  tree->Branch(  "triggerHLT_L1SingleJet36", &triggerHLT_L1SingleJet36, "triggerHLT_L1SingleJet36/O");
+  tree->Branch(  "triggerHLT_Jet30", &triggerHLT_Jet30, "triggerHLT_Jet30/O");
+  tree->Branch(  "triggerHLT_Jet60", &triggerHLT_Jet60, "triggerHLT_Jet50/O");
+  tree->Branch(  "triggerHLT_Jet80", &triggerHLT_Jet80, "triggerHLT_Jet80/O");
+  tree->Branch(  "triggerHLT_Jet110", &triggerHLT_Jet110, "triggerHLT_Jet110/O");
+  tree->Branch(  "triggerHLT_Jet150", &triggerHLT_Jet150, "triggerHLT_Jet150/O");
+  tree->Branch(  "triggerHLT_Jet190", &triggerHLT_Jet190, "triggerHLT_Jet190/O");
+  tree->Branch(  "triggerHLT_Jet240", &triggerHLT_Jet240, "triggerHLT_Jet240/O");
+  tree->Branch(  "triggerHLT_Jet370", &triggerHLT_Jet370, "triggerHLT_Jet370/O");
+  tree->Branch(  "triggerHLT_Jet370_NoJetID", &triggerHLT_Jet370_NoJetID, "triggerHLT_Je370_NoJetID/O");
+
+  tree->Branch(  "prescaleHLT_L1SingleJet36", &prescaleHLT_L1SingleJet36, "prescaleHLT_L1SingleJet36/O");
+  tree->Branch(  "prescaleHLT_Jet30", &prescaleHLT_Jet30, "prescaleHLT_Jet30/O");
+  tree->Branch(  "prescaleHLT_Jet60", &prescaleHLT_Jet60, "prescaleHLT_Jet50/O");
+  tree->Branch(  "prescaleHLT_Jet80", &prescaleHLT_Jet80, "prescaleHLT_Jet80/O");
+  tree->Branch(  "prescaleHLT_Jet110", &prescaleHLT_Jet110, "prescaleHLT_Jet110/O");
+  tree->Branch(  "prescaleHLT_Jet150", &prescaleHLT_Jet150, "prescaleHLT_Jet150/O");
+  tree->Branch(  "prescaleHLT_Jet190", &prescaleHLT_Jet190, "prescaleHLT_Jet190/O");
+  tree->Branch(  "prescaleHLT_Jet240", &prescaleHLT_Jet240, "prescaleHLT_Jet240/O");
+  tree->Branch(  "prescaleHLT_Jet370", &prescaleHLT_Jet370, "prescaleHLT_Jet370/O");
+  tree->Branch(  "prescaleHLT_Jet370_NoJetID", &prescaleHLT_Jet370_NoJetID, "prescaleHLT_Je370_NoJetID/O");
+
   tree->Branch(  "eventNumber"             , &eventNumber             , "eventNumber/i"            );
   tree->Branch(  "runNumber"		    , &runNumber               , "runNumber/i"   	    );
   tree->Branch(  "lumiBlockNumber" 	    , &lumiBlockNumber         , "lumiBlockNumber/i" 	    );
@@ -919,6 +1033,13 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   tree->Branch(  "SVvtxSumDirPhi",  SVvtxSumDirPhi, "SVvtxSumDirPhi[nJets]/F");
   tree->Branch(  "SVvtxDirEta",  SVvtxDirEta, "SVvtxDirEta[nJets]/F");
   tree->Branch(  "SVvtxDirPhi",  SVvtxDirPhi, "SVvtxDirPhi[nJets]/F");
+
+  // added by Caroline
+   tree->Branch(  "SVvtxSumPTrel",  SVvtxSumPTrel, "SVvtxSumPTrel[nJets]/F");
+   tree->Branch(  "SVvtxDirPTrel",  SVvtxDirPTrel, "SVvtxDirPTrel[nJets]/F");
+   tree->Branch(  "SVvtxDistJetAxis",  SVvtxDistJetAxis, "SVvtxDistJetAxis[nJets]/F");
+   tree->Branch(  "SVtotCharge",  SVtotCharge, "SVtotCharge[nJets]/I");
+  // end add
                
   //impactParameterTagInfos
   tree->Branch(  "IPnSelectedTracks",  IPnSelectedTracks, "IPnSelectedTracks[nJets]/I");                       
@@ -1243,7 +1364,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
     tree->Branch(  name, it->second, nameExt ); 
   }
 
-
+  isValidHltConfig_ = false;
 }
 
 
@@ -1270,6 +1391,19 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   //BTagMu paths in 6E31 and 2E32 menu
   triggerHLTBTagMuDiJet10U = triggerHLTBTagMuDiJet20U = triggerHLTBTagMuDiJet20UMu5 = triggerHLTBTagMuDiJet30U = triggerHLTBTagMuDiJet30UMu5 = 0;
 
+  // added by Caroline
+  prescaleHLTL1Jet6U= prescaleHLTL1Jet10U= prescaleHLTJet15U = 0;
+  prescaleHLTJet30U = prescaleHLTJet50U = prescaleHLTJet70U= prescaleHLTJet100U = 0;
+  prescaleHLTBTagIPJet50U = prescaleHLTBTagMuJet10U = prescaleHLTBTagMuJet20U = 0;
+  prescaleHLTBTagMuDiJet10U = prescaleHLTBTagMuDiJet20U = prescaleHLTBTagMuDiJet20UMu5 = prescaleHLTBTagMuDiJet30U = prescaleHLTBTagMuDiJet30UMu5 = 0;
+
+  // 4_1_2_patch1
+  triggerHLT_L1SingleJet36= triggerHLT_Jet30= triggerHLT_Jet60= triggerHLT_Jet80= triggerHLT_Jet110= triggerHLT_Jet150=0;
+  triggerHLT_Jet190 = triggerHLT_Jet240 = triggerHLT_Jet370 = triggerHLT_Jet370_NoJetID =0;
+  prescaleHLT_L1SingleJet36= prescaleHLT_Jet30= prescaleHLT_Jet60= prescaleHLT_Jet80= prescaleHLT_Jet110= prescaleHLT_Jet150=0;
+  prescaleHLT_Jet190 = prescaleHLT_Jet240 = prescaleHLT_Jet370 = prescaleHLT_Jet370_NoJetID =0;
+  // end add
+
   //Get The Various collections defined in the configuration file
   edm::Handle<edm::TriggerResults>  hltresults;
   iEvent.getByLabel(triggerTag_, hltresults);
@@ -1282,6 +1416,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   for (int itrig = 0; itrig != ntrigs; ++itrig){
 
     string trigName=triggerNames_.triggerName(itrig);
+
     if (trigName=="HLT_L1Jet6U")               triggerHLTL1Jet6U  = hltresults->accept(itrig) ;
     if (trigName=="HLT_L1Jet10U")              triggerHLTL1Jet10U = hltresults->accept(itrig) ; 
 
@@ -1315,6 +1450,87 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       triggerHLTBTagMuDiJet30U = hltresults->accept(itrig) ;
     if (trigName=="HLT_BTagMu_DiJet30U_Mu5" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v1" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v2" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v3")
       triggerHLTBTagMuDiJet30UMu5 = hltresults->accept(itrig) ;
+
+    // added by Caroline for prescale
+    int prescaleval=  hltConfigProvider_.prescaleValue(iEvent, iSetup, trigName);
+
+    if (trigName=="HLT_L1Jet6U")               prescaleHLTL1Jet6U  = prescaleval ;
+    if (trigName=="HLT_L1Jet10U")              prescaleHLTL1Jet10U = prescaleval ; 
+
+    //Take care of versioning even for the single jet prescales
+    if (trigName=="HLT_Jet15U" || trigName=="HLT_Jet15U_v1" || trigName=="HLT_Jet15U_v2" || trigName=="HLT_Jet15U_v3")
+      prescaleHLTJet15U   = prescaleval ;
+    if (trigName=="HLT_Jet30U" || trigName=="HLT_Jet30U_v1" || trigName=="HLT_Jet30U_v2" || trigName=="HLT_Jet30U_v3")
+      prescaleHLTJet30U   = prescaleval ;
+    if (trigName=="HLT_Jet50U" || trigName=="HLT_Jet50U_v1" || trigName=="HLT_Jet50U_v2" || trigName=="HLT_Jet50U_v3")
+      prescaleHLTJet50U   = prescaleval ;
+    if (trigName=="HLT_Jet70U" || trigName=="HLT_Jet70U_v1" || trigName=="HLT_Jet70U_v2" || trigName=="HLT_Jet70U_v3")
+      prescaleHLTJet70U   = prescaleval ;
+    if (trigName=="HLT_Jet100U" || trigName=="HLT_Jet100U_v1" || trigName=="HLT_Jet100U_v2" || trigName=="HLT_Jet100U_v3")
+      prescaleHLTJet100U   = prescaleval ; 
+
+    //BTagIP path till 2E31 menu
+    if (trigName=="HLT_BTagIP_Jet50U")         prescaleHLTBTagIPJet50U = prescaleval ;
+    
+    //BTagMu paths till 2E31 menu
+    if (trigName=="HLT_BTagMu_Jet10U")         prescaleHLTBTagMuJet10U = prescaleval ;
+    if (trigName=="HLT_BTagMu_Jet20U")         prescaleHLTBTagMuJet20U = prescaleval ;
+
+    //BTagMu paths in 6E31 and 2E32 menu
+    if (trigName=="HLT_BTagMu_DiJet10U" || trigName=="HLT_BTagMu_DiJet10U_v1" || trigName=="HLT_BTagMu_DiJet10U_v2" || trigName=="HLT_BTagMu_DiJet10U_v3")
+      prescaleHLTBTagMuDiJet10U = prescaleval ;
+    if (trigName=="HLT_BTagMu_DiJet20U" || trigName=="HLT_BTagMu_DiJet20U_v1" || trigName=="HLT_BTagMu_DiJet20U_v2" || trigName=="HLT_BTagMu_DiJet20U_v3")
+      prescaleHLTBTagMuDiJet20U = prescaleval ;
+    if (trigName=="HLT_BTagMu_DiJet20U_Mu5" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v1" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v2" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v3")
+      prescaleHLTBTagMuDiJet20UMu5 = prescaleval ;
+    if (trigName=="HLT_BTagMu_DiJet30U" || trigName=="HLT_BTagMu_DiJet30U_v1" || trigName=="HLT_BTagMu_DiJet30U_v2" || trigName=="HLT_BTagMu_DiJet30U_v3")
+      prescaleHLTBTagMuDiJet30U = prescaleval ;
+    if (trigName=="HLT_BTagMu_DiJet30U_Mu5" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v1" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v2" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v3")
+      prescaleHLTBTagMuDiJet30UMu5 = prescaleval ;
+    //end add
+
+    //Single Jet trigger in 4_1_2_patch1
+    if (trigName=="HLT_L1SingleJet36_v1") {
+        triggerHLT_L1SingleJet36=hltresults->accept(itrig) ;
+        prescaleHLT_L1SingleJet36= prescaleval;
+    }
+    if (trigName=="HLT_Jet30_v1") {
+        triggerHLT_Jet30=hltresults->accept(itrig) ;
+        prescaleHLT_Jet30= prescaleval;
+    }
+    if (trigName=="HLT_Jet60_v1") {
+        triggerHLT_Jet60=hltresults->accept(itrig) ;
+        prescaleHLT_Jet60= prescaleval;
+    }
+    if (trigName=="HLT_Jet80_v1") {
+        triggerHLT_Jet80=hltresults->accept(itrig) ;
+        prescaleHLT_Jet80= prescaleval;
+    }
+    if (trigName=="HLT_Jet110_v1") {
+        triggerHLT_Jet110=hltresults->accept(itrig) ;
+        prescaleHLT_Jet110= prescaleval;
+    }
+    if (trigName=="HLT_Jet150_v1") {
+        triggerHLT_Jet150=hltresults->accept(itrig) ;
+        prescaleHLT_Jet150= prescaleval;
+    }
+    if (trigName=="HLT_Jet190_v1") {
+        triggerHLT_Jet190=hltresults->accept(itrig) ;
+        prescaleHLT_Jet190= prescaleval;
+    }
+    if (trigName=="HLT_Jet240_v1") {
+        triggerHLT_Jet240=hltresults->accept(itrig) ;
+        prescaleHLT_Jet240= prescaleval;
+    }
+    if (trigName=="HLT_Jet370_v1") {
+        triggerHLT_Jet370=hltresults->accept(itrig) ;
+        prescaleHLT_Jet370= prescaleval;
+    }
+    if (trigName=="HLT_Jet370_NoJetID_v1") {
+        triggerHLT_Jet370_NoJetID=hltresults->accept(itrig) ;
+        prescaleHLT_Jet370_NoJetID= prescaleval;
+    }
+    
   }  
  
 
@@ -1709,6 +1925,10 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  if(vars.checkTag(reco::btau::trackSip3dSigAboveCharm) ) SVIPFirstAboveCharm[iJet] = (  vars.get( reco::btau::trackSip3dSigAboveCharm ));
 	  else SVIPFirstAboveCharm[iJet] = (  -9999 );
 	  
+//        added by Caroline
+          int totcharge=0;
+//        end add
+
 	  TrackKinematics vertexKinematics;
 	  const Vertex &vertex = svTagInfo[thisJetRef]->secondaryVertex(0);
 	  bool hasRefittedTracks = vertex.hasRefittedTracks();
@@ -1721,9 +1941,18 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	    if (hasRefittedTracks) {
 	      Track actualTrack = vertex.refittedTrack(*track);
 	      vertexKinematics.add(actualTrack, w);
+
+              // added Caroline
+              totcharge+=actualTrack.charge();
+              // end add
 		  
 	    } else {
 	      vertexKinematics.add(**track, w);
+
+              // added Caroline
+              const reco::Track& mytrack = **track;
+              totcharge+=mytrack.charge();
+              // end add
 	    }
 	  }
 	  bool useTrackWeights = true;
@@ -1740,6 +1969,34 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  SVvtxSumDirPhi[iJet] = vertex.p4().phi();
 	  SVvtxDirEta[iJet] =  flightDir.eta();
 	  SVvtxDirPhi[iJet] =  flightDir.phi();
+
+          // new variables (added by Caroline)
+          // PTrel info
+          math::XYZVector flightDir2=math::XYZVector(flightDir.x(),flightDir.y(),flightDir.z());
+          //math::XYZVector vertexSum2=math::XYZVector(vertex.p4().px(),vertex.p4().py(),vertex.p4().pz());
+          math::XYZVector vertexSum2=math::XYZVector(vertexSum.x(),vertexSum.y(),vertexSum.z());
+          SVvtxSumPTrel[iJet]=Perp(vertexSum2, jetDir);
+          SVvtxDirPTrel[iJet]=Perp(flightDir2, jetDir);
+
+          // Distance to Jet Axis (inspired from RecoBTag/BTagTools/src/SignedImpactParameter3D.cc (l 141 -> 154)
+
+          //get the  secondary vertex line
+          //Line::PositionType pos(GlobalPoint(vertexSum.x(),vertexSum.y(),vertexSum.z()));
+          Line::PositionType pos(GlobalPoint(vertex.p4().x(),vertex.p4().y(),vertex.p4().z()));
+          Line::DirectionType dir(GlobalVector(flightDir.px(),flightDir.py(),flightDir.pz()));
+          Line trackline(pos,dir);
+          // get the Jet  line 
+          Line::PositionType pos2(GlobalPoint(jetVertex[iJet].x(),jetVertex[iJet].y(),jetVertex[iJet].z()));
+          Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
+          Line jetline(pos2,dir2);
+          // now compute the distance between the two lines
+          SVvtxDistJetAxis[iJet] = (jetline.distance(trackline)).mag();
+
+
+          // total charge at the secondary vertex
+          SVtotCharge[iJet]=totcharge;
+
+          //end add
 	  
 	}
       else
@@ -1770,6 +2027,12 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  SVvtxSumDirPhi[iJet] = (-9999 );
 	  SVvtxDirEta[iJet] = (-9999 );
 	  SVvtxDirPhi[iJet] = (-9999 );
+
+          SVvtxSumPTrel[iJet] = (-9999 );
+          SVvtxDirPTrel[iJet] = (-9999 );
+          SVvtxDistJetAxis[iJet] =  (-9999 );
+          SVtotCharge[iJet] = (-9999 );
+
 	}
       
       
@@ -2171,6 +2434,40 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 void TagNtupleProducer::beginJob()
 {
 }
+
+//added by Caroline for prescale
+// ------------ method called at the beginning of the run  ------------
+void TagNtupleProducer::beginRun(const Run& r, const EventSetup& iSet)
+{
+     // passed as parameter to HLTConfigProvider::init(), not yet used
+      bool isConfigChanged = false;
+      // isValidHltConfig_ used to short-circuit analyze() in case of problems
+      isValidHltConfig_ = hltConfigProvider_.init( r, iSet, "HLT", isConfigChanged );
+
+     if (isValidHltConfig_) {
+      // if init returns TRUE, initialisation has succeeded!
+      if (isConfigChanged) {
+       // The HLT config has actually changed wrt the previous Run, hence rebook your
+      // histograms or do anything else dependent on the revised HLT config
+      std::cout << "Initalizing HLTConfigProvider"  << std::endl;
+      }
+     } else {
+      // if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
+      // with the file and/or code and needs to be investigated!
+      std::cout << " HLT config extraction failure with process name HLT "  << std::endl;
+      // In this case, all access methods will return empty values!
+     }
+
+
+}
+
+
+// ------------ method called at the end of the run  ------------
+void TagNtupleProducer::endRun(const Run& r, const EventSetup& iSet)
+{
+}
+
+// end add
 
 // ------------ method called once each job just after ending the event loop  ------------
 void TagNtupleProducer::endJob() {
