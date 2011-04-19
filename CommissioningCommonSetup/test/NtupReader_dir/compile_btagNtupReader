@@ -1,0 +1,1 @@
+g++ -I `root-config --incdir` -L $ROOTSYS/lib -lGenVector -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic btagNtupReader.C -o btagNtupReader
