@@ -2932,7 +2932,7 @@ int main(int argc, char* argv[])
     thisTree->SetWeight(thisWeight);
     thisTree->Process(selector, "", thisTree->GetEntries(), 0);
     thisFile->Close("r");
-    delete thisTree;
+    delete thisFile;
   }
   dataFiles.close();
   std::cout << "done." << std::endl;
