@@ -13,7 +13,6 @@
 #include "TDirectory.h"
 #include "TPaveText.h"
 #include "TStyle.h"
-#include "TTreePerfStats.h"
 
 #include <boost/program_options.hpp>
 #include <math.h>
@@ -2899,7 +2898,6 @@ int main(int argc, char* argv[])
   std::cout << "done." << std::endl;
 
   selector->SetIsData(false);
-  unsigned int i = 1;
   std::cout << "Looping over input files..." << std::endl;
   while (! mcFiles.eof()) {
     std::string line;
@@ -2912,19 +2910,10 @@ int main(int argc, char* argv[])
     std::cout<<"opening file " << thisFileName << std::endl;
     TFile* thisFile = TFile::Open(thisFileName.c_str());
     TTree* thisTree = (TTree*)thisFile->Get("t");
-    TTreePerfStats* perf = new TTreePerfStats("perf", thisTree);
-    thisTree->SetCacheSize();
-    std::cout << thisTree->GetCacheSize() << std::endl;
     thisTree->SetWeight(thisWeight);
     thisTree->Process(selector, "", thisTree->GetEntries(), 0);
-    printf("Reading %lld bytes in %d transactions\n",thisFile->GetBytesRead(),  thisFile->GetReadCalls());
-    std::stringstream stream("");
-    stream << "perf_" << i << ".root";
-    perf->SaveAs(stream.str().c_str());
-    delete perf;
     thisFile->Close("r");
     delete thisFile;
-    ++i;
   }
   mcFiles.close();
 

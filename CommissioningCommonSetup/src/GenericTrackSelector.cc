@@ -2,7 +2,6 @@
 #include "bTag/CommissioningCommonSetup/interface/generateName.h"
 
 #include <cstdlib>
-#include <iostream>
 
 GenericTrackSelector::GenericTrackSelector() : BaseSelector(), histograms() {} 
 
@@ -28,7 +27,7 @@ void GenericTrackSelector::Init(TTree* tree)
   nJets = SetPtrToValue<Int_t>(b_nJets, "nJets");
   nTracks = SetPtrToValue<Int_t>(b_nTracks, "nTracks");
   MCTrueFlavor = SetPtrToValue<Int_t>(b_MCTrueFlavor, "MCTrueFlavor");
-  //trackJetIndex = SetPtrToValue<Int_t>(b_trackJetIndex, "trackJetIndex");
+  trackJetIndex = SetPtrToValue<Int_t>(b_trackJetIndex, "trackJetIndex");
   isBGluonSplitting = SetPtrToValue<Bool_t>(b_isBGluonSplitting, "isBGluonSplitting");
 
   if(fFormula == 0)
@@ -80,12 +79,10 @@ Bool_t GenericTrackSelector::Process(Long64_t entry)
   b_nTracks->GetEntry(entry);
   b_MCTrueFlavor->GetEntry(entry);
   b_isBGluonSplitting->GetEntry(entry);
-  //b_trackJetIndex->GetEntry(entry);
+  b_trackJetIndex->GetEntry(entry);
 
   int nDataJet = fSelectionJet ? fSelectionJet->GetNdata() : *nJets;
-  //int nDataTrack = fSelectionTrack ? fSelectionTrack->GetNdata() : *nTracks;
-  //std::cout << nDataTrack << std::endl;
-  if(fSelectionTrack) fSelectionTrack->GetNdata();
+  int nDataTrack = fSelectionTrack ? fSelectionTrack->GetNdata() : *nTracks;
   fFormula->GetNdata();
 
   //This is needed to ensure the needed
@@ -96,12 +93,9 @@ Bool_t GenericTrackSelector::Process(Long64_t entry)
   {
     if(!fSelectionJet || fSelectionJet->EvalInstance(i))
     {
-      //for(int j = 0; j != nDataTrack; ++j)
-      int nDataTrack = nTracks[i];
-      for(int j = i * 300; j != i * 300 + nDataTrack; ++j)
+      for(int j = 0; j != nDataTrack; ++j)
       {
-        //if(trackJetIndex[j] == i && (!fSelectionTrack || fSelectionTrack->EvalInstance(j)))
-        if((!fSelectionTrack || fSelectionTrack->EvalInstance(j)))
+        if(trackJetIndex[j] == i && (!fSelectionTrack || fSelectionTrack->EvalInstance(j)))
           histograms.fill(fFormula->EvalInstance(j), treeWeight, isData, MCTrueFlavor[i], *isBGluonSplitting);
       }
     }
