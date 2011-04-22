@@ -683,7 +683,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
 {
   string alias;
   
-  file = new TFile (filename_.c_str(), "RECREATE" );
+  file = new TFile (filename_.c_str(), "RECREATE");
   // create tree structure
   tree = new TTree("t","t");
     
