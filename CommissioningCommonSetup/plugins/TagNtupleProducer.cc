@@ -156,7 +156,10 @@ public:
   bool triggerHLT_DiJetAve140U_v4          ;
   bool triggerHLT_DiJetAve180U_v4          ;
   bool triggerHLT_DiJetAve300U_v4          ;
-  bool triggerHLT_BTagMu_DiJet20_Mu5_v2    ;
+  bool triggerHLT_BTagMu_DiJet20_Mu5       ;
+  bool triggerHLT_BTagMu_DiJet40_Mu5       ;
+  bool triggerHLT_BTagMu_DiJet70_Mu5       ;
+  bool triggerHLT_BTagMu_DiJet110_Mu5      ;
   bool triggerHLT_BTagMu_DiJet60_Mu7_v2    ;
   bool triggerHLT_BTagMu_DiJet80_Mu9_v2    ;
   bool triggerHLT_BTagMu_DiJet100_Mu9_v2   ;
@@ -169,7 +172,10 @@ public:
   int prescaleHLT_DiJetAve140U_v4          ;
   int prescaleHLT_DiJetAve180U_v4          ;
   int prescaleHLT_DiJetAve300U_v4          ;
-  int prescaleHLT_BTagMu_DiJet20_Mu5_v2    ;
+  int prescaleHLT_BTagMu_DiJet20_Mu5       ;
+  int prescaleHLT_BTagMu_DiJet40_Mu5       ;
+  int prescaleHLT_BTagMu_DiJet70_Mu5       ;
+  int prescaleHLT_BTagMu_DiJet110_Mu5      ;
   int prescaleHLT_BTagMu_DiJet60_Mu7_v2    ;
   int prescaleHLT_BTagMu_DiJet80_Mu9_v2    ;
   int prescaleHLT_BTagMu_DiJet100_Mu9_v2   ;
@@ -683,7 +689,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
 {
   string alias;
   
-  file = new TFile (filename_.c_str(), "RECREATE");
+  file = new TFile (filename_.c_str(), "RECREATE" );
   // create tree structure
   tree = new TTree("t","t");
     
@@ -929,7 +935,10 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   tree->Branch( "triggerHLT_DiJetAve140U_v4",                 &triggerHLT_DiJetAve140U_v4               , "triggerHLT_DiJetAve140U_v4/O");           
   tree->Branch( "triggerHLT_DiJetAve180U_v4",                 &triggerHLT_DiJetAve180U_v4               , "triggerHLT_DiJetAve180U_v4/O");           
   tree->Branch( "triggerHLT_DiJetAve300U_v4",                 &triggerHLT_DiJetAve300U_v4               , "triggerHLT_DiJetAve300U_v4/O");           
-  tree->Branch( "triggerHLT_BTagMu_DiJet20_Mu5_v2",           &triggerHLT_BTagMu_DiJet20_Mu5_v2         , "triggerHLT_BTagMu_DiJet20_Mu5_v2/O");     
+  tree->Branch( "triggerHLT_BTagMu_DiJet20_Mu5",              &triggerHLT_BTagMu_DiJet20_Mu5            , "triggerHLT_BTagMu_DiJet20_Mu5/O");     
+  tree->Branch( "triggerHLT_BTagMu_DiJet110_Mu5",             &triggerHLT_BTagMu_DiJet110_Mu5           , "triggerHLT_BTagMu_DiJet110_Mu5/O");     
+  tree->Branch( "triggerHLT_BTagMu_DiJet40_Mu5",              &triggerHLT_BTagMu_DiJet40_Mu5            , "triggerHLT_BTagMu_DiJet40_Mu5/O");     
+  tree->Branch( "triggerHLT_BTagMu_DiJet70_Mu5",              &triggerHLT_BTagMu_DiJet70_Mu5            , "triggerHLT_BTagMu_DiJet70_Mu5/O");     
   tree->Branch( "triggerHLT_BTagMu_DiJet60_Mu7_v2",           &triggerHLT_BTagMu_DiJet60_Mu7_v2         , "triggerHLT_BTagMu_DiJet60_Mu7_v2/O");     
   tree->Branch( "triggerHLT_BTagMu_DiJet80_Mu9_v2",           &triggerHLT_BTagMu_DiJet80_Mu9_v2         , "triggerHLT_BTagMu_DiJet80_Mu9_v2/O");     
   tree->Branch( "triggerHLT_BTagMu_DiJet100_Mu9_v2",          &triggerHLT_BTagMu_DiJet100_Mu9_v2        , "triggerHLT_BTagMu_DiJet100_Mu9_v2/O");    
@@ -941,7 +950,10 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   tree->Branch( "prescaleHLT_DiJetAve140U_v4",         &prescaleHLT_DiJetAve140U_v4       , "prescaleHLT_DiJetAve140U_v4/I");         
   tree->Branch( "prescaleHLT_DiJetAve180U_v4",         &prescaleHLT_DiJetAve180U_v4       , "prescaleHLT_DiJetAve180U_v4/I");         
   tree->Branch( "prescaleHLT_DiJetAve300U_v4",         &prescaleHLT_DiJetAve300U_v4       , "prescaleHLT_DiJetAve300U_v4/I");         
-  tree->Branch( "prescaleHLT_BTagMu_DiJet20_Mu5_v2",   &prescaleHLT_BTagMu_DiJet20_Mu5_v2 , "prescaleHLT_BTagMu_DiJet20_Mu5_v2/I");   
+  tree->Branch( "prescaleHLT_BTagMu_DiJet20_Mu5",      &prescaleHLT_BTagMu_DiJet20_Mu5    , "prescaleHLT_BTagMu_DiJet20_Mu5/I");   
+  tree->Branch( "prescaleHLT_BTagMu_DiJet40_Mu5",      &prescaleHLT_BTagMu_DiJet40_Mu5    , "prescaleHLT_BTagMu_DiJet40_Mu5/I");   
+  tree->Branch( "prescaleHLT_BTagMu_DiJet70_Mu5",      &prescaleHLT_BTagMu_DiJet70_Mu5    , "prescaleHLT_BTagMu_DiJet70_Mu5/I");   
+  tree->Branch( "prescaleHLT_BTagMu_DiJet110_Mu5",     &prescaleHLT_BTagMu_DiJet110_Mu5   , "prescaleHLT_BTagMu_DiJet110_Mu5/I");   
   tree->Branch( "prescaleHLT_BTagMu_DiJet60_Mu7_v2",   &prescaleHLT_BTagMu_DiJet60_Mu7_v2 , "prescaleHLT_BTagMu_DiJet60_Mu7_v2/I");   
   tree->Branch( "prescaleHLT_BTagMu_DiJet80_Mu9_v2",   &prescaleHLT_BTagMu_DiJet80_Mu9_v2 , "prescaleHLT_BTagMu_DiJet80_Mu9_v2/I");   
   tree->Branch( "prescaleHLT_BTagMu_DiJet100_Mu9_v2",  &prescaleHLT_BTagMu_DiJet100_Mu9_v2, "prescaleHLT_BTagMu_DiJet100_Mu9_v2/I");  
@@ -1428,7 +1440,10 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
    triggerHLT_DiJetAve140U_v4         =0 ;
    triggerHLT_DiJetAve180U_v4         =0 ;
    triggerHLT_DiJetAve300U_v4         =0 ;
-   triggerHLT_BTagMu_DiJet20_Mu5_v2   =0 ;
+   triggerHLT_BTagMu_DiJet20_Mu5      =0 ;
+   triggerHLT_BTagMu_DiJet40_Mu5      =0 ;
+   triggerHLT_BTagMu_DiJet70_Mu5      =0 ;
+   triggerHLT_BTagMu_DiJet110_Mu5      =0 ;
    triggerHLT_BTagMu_DiJet60_Mu7_v2   =0 ;
    triggerHLT_BTagMu_DiJet80_Mu9_v2   =0 ;
    triggerHLT_BTagMu_DiJet100_Mu9_v2  =0 ;
@@ -1441,7 +1456,10 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
    prescaleHLT_DiJetAve140U_v4         =0 ;
    prescaleHLT_DiJetAve180U_v4         =0 ;
    prescaleHLT_DiJetAve300U_v4         =0 ;
-   prescaleHLT_BTagMu_DiJet20_Mu5_v2   =0 ;
+   prescaleHLT_BTagMu_DiJet20_Mu5      =0 ;
+   prescaleHLT_BTagMu_DiJet40_Mu5      =0 ;
+   prescaleHLT_BTagMu_DiJet70_Mu5      =0 ;
+   prescaleHLT_BTagMu_DiJet110_Mu5     =0 ;
    prescaleHLT_BTagMu_DiJet60_Mu7_v2   =0 ;
    prescaleHLT_BTagMu_DiJet80_Mu9_v2   =0 ;
    prescaleHLT_BTagMu_DiJet100_Mu9_v2  =0 ;
@@ -1532,35 +1550,35 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     //end add
 
     //Single Jet trigger in 4_1_2_patch1
-    if (trigName=="HLT_L1SingleJet36_v1") {
+    if (trigName=="HLT_L1SingleJet36_v1" || trigName=="HLT_L1SingleJet36_v2") {
         triggerHLT_L1SingleJet36=hltresults->accept(itrig) ;
         prescaleHLT_L1SingleJet36= prescaleval;
     }
-    if (trigName=="HLT_Jet30_v1") {
+    if (trigName=="HLT_Jet30_v1" || trigName=="HLT_Jet30_v2") {
         triggerHLT_Jet30=hltresults->accept(itrig) ;
         prescaleHLT_Jet30= prescaleval;
     }
-    if (trigName=="HLT_Jet60_v1") {
+    if (trigName=="HLT_Jet60_v1" || trigName=="HLT_Jet60_v2") {
         triggerHLT_Jet60=hltresults->accept(itrig) ;
         prescaleHLT_Jet60= prescaleval;
     }
-    if (trigName=="HLT_Jet80_v1") {
+    if (trigName=="HLT_Jet80_v1" || trigName=="HLT_Jet80_v2") {
         triggerHLT_Jet80=hltresults->accept(itrig) ;
         prescaleHLT_Jet80= prescaleval;
     }
-    if (trigName=="HLT_Jet110_v1") {
+    if (trigName=="HLT_Jet110_v1" || trigName=="HLT_Jet110_v2") {
         triggerHLT_Jet110=hltresults->accept(itrig) ;
         prescaleHLT_Jet110= prescaleval;
     }
-    if (trigName=="HLT_Jet150_v1") {
+    if (trigName=="HLT_Jet150_v1" || trigName=="HLT_Jet150_v2") {
         triggerHLT_Jet150=hltresults->accept(itrig) ;
         prescaleHLT_Jet150= prescaleval;
     }
-    if (trigName=="HLT_Jet190_v1") {
+    if (trigName=="HLT_Jet190_v1" || trigName=="HLT_Jet190_v2") {
         triggerHLT_Jet190=hltresults->accept(itrig) ;
         prescaleHLT_Jet190= prescaleval;
     }
-    if (trigName=="HLT_Jet240_v1") {
+    if (trigName=="HLT_Jet240_v1" || trigName=="HLT_Jet240_v2") {
         triggerHLT_Jet240=hltresults->accept(itrig) ;
         prescaleHLT_Jet240= prescaleval;
     }
@@ -1605,14 +1623,22 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       triggerHLT_DiJetAve300U_v4= hltresults->accept(itrig) ;
       prescaleHLT_DiJetAve300U_v4= prescaleval;               
     }       
-    if(trigName=="HLT_BTagMu_DiJet20_Mu5_v2") { 
-      triggerHLT_BTagMu_DiJet20_Mu5_v2= hltresults->accept(itrig) ;
-      prescaleHLT_BTagMu_DiJet20_Mu5_v2= prescaleval;               
+    if(trigName=="HLT_BTagMu_DiJet20_Mu5_v2" || trigName=="HLT_BTagMu_DiJet20_Mu5_v3") { 
+      triggerHLT_BTagMu_DiJet20_Mu5= hltresults->accept(itrig) ;
+      prescaleHLT_BTagMu_DiJet20_Mu5= prescaleval;               
+    }  
+    if(trigName=="HLT_BTagMu_DiJet40_Mu5_v3") { 
+      triggerHLT_BTagMu_DiJet40_Mu5= hltresults->accept(itrig) ;
+      prescaleHLT_BTagMu_DiJet40_Mu5= prescaleval;               
     }  
     if(trigName=="HLT_BTagMu_DiJet60_Mu7_v2") {
       triggerHLT_BTagMu_DiJet60_Mu7_v2= hltresults->accept(itrig) ;
       prescaleHLT_BTagMu_DiJet60_Mu7_v2= prescaleval;               
     }   
+    if(trigName=="HLT_BTagMu_DiJet70_Mu5_v3") { 
+      triggerHLT_BTagMu_DiJet70_Mu5= hltresults->accept(itrig) ;
+      prescaleHLT_BTagMu_DiJet70_Mu5= prescaleval;               
+    }  
     if(trigName=="HLT_BTagMu_DiJet80_Mu9_v2") { 
       triggerHLT_BTagMu_DiJet80_Mu9_v2= hltresults->accept(itrig) ;
       prescaleHLT_BTagMu_DiJet80_Mu9_v2= prescaleval;               
@@ -1621,6 +1647,10 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       triggerHLT_BTagMu_DiJet100_Mu9_v2= hltresults->accept(itrig) ;
       prescaleHLT_BTagMu_DiJet100_Mu9_v2= prescaleval;               
     }  
+    if(trigName=="HLT_BTagMu_DiJet110_Mu5_v3") {
+      triggerHLT_BTagMu_DiJet110_Mu5= hltresults->accept(itrig) ;
+      prescaleHLT_BTagMu_DiJet110_Mu5= prescaleval;               
+    }
   }  
   
   
