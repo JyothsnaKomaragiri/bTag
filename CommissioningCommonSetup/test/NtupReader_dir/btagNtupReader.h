@@ -88,6 +88,10 @@ public :
    Bool_t          triggerHLT_DiJetAve180U_v4;
    Bool_t          triggerHLT_DiJetAve300U_v4;
    Bool_t          triggerHLT_BTagMu_DiJet20_Mu5_v2;
+   Bool_t          triggerHLT_BTagMu_DiJet20_Mu5;
+   Bool_t          triggerHLT_BTagMu_DiJet40_Mu5;
+   Bool_t          triggerHLT_BTagMu_DiJet70_Mu5;
+   Bool_t          triggerHLT_BTagMu_DiJet110_Mu5;
    Bool_t          triggerHLT_BTagMu_DiJet60_Mu7_v2;
    Bool_t          triggerHLT_BTagMu_DiJet80_Mu9_v2;
    Bool_t          triggerHLT_BTagMu_DiJet100_Mu9_v2;
@@ -100,6 +104,10 @@ public :
    Int_t           prescaleHLT_DiJetAve180U_v4;
    Int_t           prescaleHLT_DiJetAve300U_v4;
    Int_t           prescaleHLT_BTagMu_DiJet20_Mu5_v2;
+   Int_t           prescaleHLT_BTagMu_DiJet20_Mu5;
+   Int_t           prescaleHLT_BTagMu_DiJet40_Mu5;
+   Int_t           prescaleHLT_BTagMu_DiJet70_Mu5;
+   Int_t           prescaleHLT_BTagMu_DiJet110_Mu5;
    Int_t           prescaleHLT_BTagMu_DiJet60_Mu7_v2;
    Int_t           prescaleHLT_BTagMu_DiJet80_Mu9_v2;
    Int_t           prescaleHLT_BTagMu_DiJet100_Mu9_v2;
@@ -627,6 +635,10 @@ public :
    TBranch        *b_triggerHLT_DiJetAve180U_v4;   //!
    TBranch        *b_triggerHLT_DiJetAve300U_v4;   //!
    TBranch        *b_triggerHLT_BTagMu_DiJet20_Mu5_v2;   //!
+   TBranch        *b_triggerHLT_BTagMu_DiJet20_Mu5;   //!
+   TBranch        *b_triggerHLT_BTagMu_DiJet40_Mu5;   //!
+   TBranch        *b_triggerHLT_BTagMu_DiJet70_Mu5;   //!
+   TBranch        *b_triggerHLT_BTagMu_DiJet110_Mu5;   //!
    TBranch        *b_triggerHLT_BTagMu_DiJet60_Mu7_v2;   //!
    TBranch        *b_triggerHLT_BTagMu_DiJet80_Mu9_v2;   //!
    TBranch        *b_triggerHLT_BTagMu_DiJet100_Mu9_v2;   //!
@@ -639,6 +651,10 @@ public :
    TBranch        *b_prescaleHLT_DiJetAve180U_v4;   //!
    TBranch        *b_prescaleHLT_DiJetAve300U_v4;   //!
    TBranch        *b_prescaleHLT_BTagMu_DiJet20_Mu5_v2;   //!
+   TBranch        *b_prescaleHLT_BTagMu_DiJet20_Mu5;   //!
+   TBranch        *b_prescaleHLT_BTagMu_DiJet40_Mu5;   //!
+   TBranch        *b_prescaleHLT_BTagMu_DiJet70_Mu5;   //!
+   TBranch        *b_prescaleHLT_BTagMu_DiJet110_Mu5;   //!
    TBranch        *b_prescaleHLT_BTagMu_DiJet60_Mu7_v2;   //!
    TBranch        *b_prescaleHLT_BTagMu_DiJet80_Mu9_v2;   //!
    TBranch        *b_prescaleHLT_BTagMu_DiJet100_Mu9_v2;   //!
@@ -1318,7 +1334,15 @@ void btagNtupReader::Init(TTree *tree)
    fChain->SetBranchAddress("triggerHLT_DiJetAve140U_v4", &triggerHLT_DiJetAve140U_v4, &b_triggerHLT_DiJetAve140U_v4);
    fChain->SetBranchAddress("triggerHLT_DiJetAve180U_v4", &triggerHLT_DiJetAve180U_v4, &b_triggerHLT_DiJetAve180U_v4);
    fChain->SetBranchAddress("triggerHLT_DiJetAve300U_v4", &triggerHLT_DiJetAve300U_v4, &b_triggerHLT_DiJetAve300U_v4);
-   fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet20_Mu5_v2", &triggerHLT_BTagMu_DiJet20_Mu5_v2, &b_triggerHLT_BTagMu_DiJet20_Mu5_v2);
+   if (dataflag<=2) {
+       fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet20_Mu5_v2", &triggerHLT_BTagMu_DiJet20_Mu5_v2, &b_triggerHLT_BTagMu_DiJet20_Mu5_v2);
+   }
+   else {
+       fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet20_Mu5", &triggerHLT_BTagMu_DiJet20_Mu5, &b_triggerHLT_BTagMu_DiJet20_Mu5);
+       fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet40_Mu5", &triggerHLT_BTagMu_DiJet40_Mu5, &b_triggerHLT_BTagMu_DiJet40_Mu5);
+       fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet70_Mu5", &triggerHLT_BTagMu_DiJet70_Mu5, &b_triggerHLT_BTagMu_DiJet70_Mu5);
+       fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet110_Mu5", &triggerHLT_BTagMu_DiJet110_Mu5, &b_triggerHLT_BTagMu_DiJet110_Mu5);
+   }
    fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet60_Mu7_v2", &triggerHLT_BTagMu_DiJet60_Mu7_v2, &b_triggerHLT_BTagMu_DiJet60_Mu7_v2);
    fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet80_Mu9_v2", &triggerHLT_BTagMu_DiJet80_Mu9_v2, &b_triggerHLT_BTagMu_DiJet80_Mu9_v2);
    fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet100_Mu9_v2", &triggerHLT_BTagMu_DiJet100_Mu9_v2, &b_triggerHLT_BTagMu_DiJet100_Mu9_v2);
@@ -1330,7 +1354,15 @@ void btagNtupReader::Init(TTree *tree)
    fChain->SetBranchAddress("prescaleHLT_DiJetAve140U_v4", &prescaleHLT_DiJetAve140U_v4, &b_prescaleHLT_DiJetAve140U_v4);
    fChain->SetBranchAddress("prescaleHLT_DiJetAve180U_v4", &prescaleHLT_DiJetAve180U_v4, &b_prescaleHLT_DiJetAve180U_v4);
    fChain->SetBranchAddress("prescaleHLT_DiJetAve300U_v4", &prescaleHLT_DiJetAve300U_v4, &b_prescaleHLT_DiJetAve300U_v4);
-   fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet20_Mu5_v2", &prescaleHLT_BTagMu_DiJet20_Mu5_v2, &b_prescaleHLT_BTagMu_DiJet20_Mu5_v2);
+   if (dataflag<=2) {
+       fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet20_Mu5_v2", &prescaleHLT_BTagMu_DiJet20_Mu5_v2, &b_prescaleHLT_BTagMu_DiJet20_Mu5_v2);
+   }
+   else {
+       fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet20_Mu5", &prescaleHLT_BTagMu_DiJet20_Mu5, &b_prescaleHLT_BTagMu_DiJet20_Mu5);
+       fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet40_Mu5", &prescaleHLT_BTagMu_DiJet40_Mu5, &b_prescaleHLT_BTagMu_DiJet40_Mu5);
+       fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet70_Mu5", &prescaleHLT_BTagMu_DiJet70_Mu5, &b_prescaleHLT_BTagMu_DiJet70_Mu5);
+       fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet110_Mu5", &prescaleHLT_BTagMu_DiJet110_Mu5, &b_prescaleHLT_BTagMu_DiJet110_Mu5);
+   }
    fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet60_Mu7_v2", &prescaleHLT_BTagMu_DiJet60_Mu7_v2, &b_prescaleHLT_BTagMu_DiJet60_Mu7_v2);
    fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet80_Mu9_v2", &prescaleHLT_BTagMu_DiJet80_Mu9_v2, &b_prescaleHLT_BTagMu_DiJet80_Mu9_v2);
    fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet100_Mu9_v2", &prescaleHLT_BTagMu_DiJet100_Mu9_v2, &b_prescaleHLT_BTagMu_DiJet100_Mu9_v2);

@@ -15,12 +15,12 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   string ptval;
   string dir;
    if (mu==false) {
-     ptval="30";
-     dir ="jambo_jet"+ptval+"/";
+     ptval="80";
+     dir ="dir_jet"+ptval+"/";
    }
    else {
-     ptval="20";
-     dir ="jambo_btag"+ptval+"_mu/";
+     ptval="60";
+     dir ="dir_btag"+ptval+"/";
    }
   cout << dir << endl;
 
@@ -28,7 +28,7 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   if (mu==false) {
 
 // PUT HERE THE NAME OF QCD ROOTFILES
-  if (ptval!="80") nameroot.push_back(dir+"histo_qcd15.root");
+  if (ptval!="60" && ptval!="80" && ptval!="110") nameroot.push_back(dir+"histo_qcd15.root");
   nameroot.push_back(dir+"histo_qcd30.root");
   nameroot.push_back(dir+"histo_qcd50.root");
   nameroot.push_back(dir+"histo_qcd80.root");
@@ -67,7 +67,8 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   }
   TFile * data   = new TFile(dataroot.c_str());
 
-  if (mu==false) {dataroot2=dir+"histo_minijet2010.root"; }
+//  if (mu==false) {dataroot2=dir+"histo_minijet2010.root"; }
+  if (mu==false) {dataroot2=dir+"histo_minijet2011.root"; } // pas de 2010 pour l'instant
   else           {dataroot2=dir+"histo_minibtag2011.root"; }  // AS NO 2010 BTAG DATA YET, PUT 2011 TO AVOID CRASH...
   TFile * data2  = new TFile(dataroot2.c_str());
 
@@ -97,23 +98,17 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   histo0_Data = (TH1F*)data->Get(selection);
   histo0_2010 = (TH1F*)data2->Get(selection);
 
-  TString bsel;
-  TString csel;
-  TString lsel; 
-  TString gsel;
-  if (selection!="npv" && selection!="pthat") {
-   bsel = selection+"_b";
-   csel = selection+"_c";
-   lsel = selection+"_udsg";
-   gsel = selection+"_gspl";
-  }
-  else {
+  TString bsel = selection+"_b";
+  TString csel = selection+"_c";
+  TString lsel = selection+"_udsg"; 
+  TString gsel = selection+"_gspl";
+  if (selection=="npv" || selection=="pthat" || selection=="npv_no_scaled") {
    // IF selection=="npv" or selection=="pthat", no _b info
    // PUT DUMMY NAMES TO AVOID CRASH...
-   bsel = "jetpt_b";
-   csel = "jetpt_b";
-   lsel = "jetpt_b";
-   gsel = "jetpt_b";
+   bsel = "sv_jetpt_b";
+   csel = "sv_jetpt_b";
+   lsel = "sv_jetpt_b";
+   gsel = "sv_jetpt_b";
   }
   for (int i=0; i<nameroot.size(); i++){
    histo_MC[i]     =(TH1F*)mc[i]->Get(selection);
@@ -122,6 +117,7 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
    histo_MC_udsg[i]=(TH1F*)mc[i]->Get(lsel);
    histo_MC_gspl[i]=(TH1F*)mc[i]->Get(gsel);
   
+//   if (selection=="npv") cout <<  " somme MC :      i = " << i  << endl;
  
    if (i==0) {
     histo0_MC=      (TH1F*)mc[i]->Get(selection);
@@ -144,11 +140,25 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
 
   // SCALE MC TO DATA
   float scaleparam=histo0_Data->Integral()/histo0_MC->Integral();
-  histo0_MC_b->Scale(scaleparam);
-  histo0_MC_c->Scale(scaleparam);
-  histo0_MC_udsg->Scale(scaleparam);
-  histo0_MC_gspl->Scale(scaleparam);
-  histo0_MC->Scale(scaleparam);
+  if (selection!="npv_no_scaled") {
+   histo0_MC_b->Scale(scaleparam);
+   histo0_MC_c->Scale(scaleparam);
+   histo0_MC_udsg->Scale(scaleparam);
+   histo0_MC_gspl->Scale(scaleparam);
+   histo0_MC->Scale(scaleparam);
+  }
+  else {
+   float scaleaa=1./histo0_MC->Integral();
+   float scalebb=1./histo0_Data->Integral();
+   histo0_MC_b->Scale(scaleaa);
+   histo0_MC_c->Scale(scaleaa);
+   histo0_MC_udsg->Scale(scaleaa);
+   histo0_MC_gspl->Scale(scaleaa);
+   histo0_MC->Scale(scaleaa);
+   histo0_Data->Scale(scalebb);
+    histo0_MC->SetMaximum(histo0_Data->GetMaximum()*1.1);
+
+  }
 
 
   // SCALE 2010 TO 2011
@@ -163,7 +173,8 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
 
 
   // REBIN 
-  if (selection=="vtxdir_eta" || selection=="vtxdir_phi" ) {
+/*
+  if (selection=="sv_vtxdir_eta" || selection=="sv_vtxdir_phi" ) {
      histo0_ratio->Rebin(2);
      histo0_Data->Rebin(2);
      histo0_2010->Rebin(2);
@@ -173,9 +184,16 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
      histo0_MC_udsg->Rebin(2);
      histo0_MC_gspl->Rebin(2);
    }
+*/
 
 
   histo0_ratio->Divide(histo0_MC);
+
+  if (selection=="npv_no_scaled"){
+    for (int iii=1; iii<histo0_ratio->GetNbinsX(); iii++) {
+       cout << iii-1 << " " << histo0_ratio->GetBinContent(iii) << endl;
+    }
+  }
  
   // MAKE 2010/2011 RATIO 
   histo0_rat2010 = (TH1F*) histo0_2010->Clone();
@@ -213,7 +231,7 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   histo0_Data->SetMarkerStyle(20);
   histo0_Data->SetMarkerSize(0.75);
   histo0_Data->GetXaxis()->SetTitle(histo0_MC->GetName());  
-  if (selection=="npv") histo0_Data->GetXaxis()->SetTitle(histo0_MC->GetTitle());  
+  if (selection=="npv" || selection=="npv_no_scaled") histo0_Data->GetXaxis()->SetTitle(histo0_MC->GetTitle());  
 
   histo0_2010->SetMarkerStyle(21);
   histo0_2010->SetMarkerColor(7);
@@ -222,7 +240,7 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
 
   hs->SetTitle(histo0_Data->GetTitle());
 
-  if (selection=="vtxsum_phi" || selection=="vtxdir_phi") {
+  if (selection=="sv_vtxsum_phi" || selection=="sv_vtxdir_phi") {
       hs->SetMaximum(hs->GetMaximum()*1.5);
       hs->SetMinimum(0.);
       histo0_Data->SetMinimum(0.);
@@ -243,7 +261,12 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   if (histo0_Data->GetMaximum() > hs->GetMaximum() ) {
     hs->SetMaximum(histo0_Data->GetMaximum() );
   }
-  if (selection!="npv") {
+  if (selection=="sv_eratio") {
+    hs->SetMaximum(hs->GetMaximum() *1.25 );
+    if (ptval=="110" && mu==true) hs->SetMaximum(hs->GetMaximum() *1.5 );
+  }
+  if (ptval=="110" && mu==true && selection=="sv_vtx_pt" ) hs->SetMaximum(hs->GetMaximum() *1.5 );
+  if (selection!="npv" && selection!="npv_no_scaled") {
    hs->Draw("hist");
   }
   else {
@@ -254,7 +277,7 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   // ADD LEGEND
   TLegend* qw = 0;
   if (mu==false) {
-    if (selection=="eratio") {
+    if (selection=="sv_eratio") {
      qw = new TLegend(0.55,0.73,0.85,0.95);
     }
     else {
@@ -262,7 +285,7 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
     }
   } 
   else {
-    if (selection=="eratio") {
+    if (selection=="sv_eratio") {
      qw = new TLegend(0.12,0.68,0.47,0.90);
     }
     else if (selection=="IP3d1" || selection=="IP3d10") {
@@ -281,32 +304,48 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   else if (date==2011) {
    if (mu==false) {
       if (ptval=="30") {
-       qw->SetHeader("2011 effective lumi : 0.00072  pb^{-1}"); // 30
+       qw->SetHeader("2011 effective lumi : 0.0022  pb^{-1}"); // 30
        qw->AddEntry(histo0_Data,        "HLT_JET30",           "p"); 
       }
       else if (ptval=="60") { 
-       qw->SetHeader("2011 effective lumi : 0.010  pb^{-1}"); // 60
+       qw->SetHeader("2011 effective lumi : 0.040  pb^{-1}"); // 60
        qw->AddEntry(histo0_Data,        "HLT_JET60",           "p"); 
       }
       else if (ptval=="80") {
-       qw->SetHeader("2011 effective lumi : 0.061  pb^{-1}"); // 80
+       qw->SetHeader("2011 effective lumi : 0.218  pb^{-1}"); // 80
        qw->AddEntry(histo0_Data,        "HLT_JET80",           "p"); 
+      }
+      else if (ptval=="110") {
+       qw->SetHeader("2011 effective lumi : 1.157  pb^{-1}"); // 110
+       qw->AddEntry(histo0_Data,        "HLT_JET110",           "p"); 
       }
 
    }
    else  { 
       if (ptval=="20") {
-       qw->SetHeader("2011 effective lumi : 0.17  pb^{-1}"); // 20
+       qw->SetHeader("2011 effective lumi : 1.12  pb^{-1}"); // 20
        qw->AddEntry(histo0_Data,        "HLT_BTagMu_DiJet20_Mu5",           "p"); 
       }
       else if (ptval=="60") { 
-       qw->SetHeader("2011 effective lumi : 8.06  pb^{-1}"); // 60
+       qw->SetHeader("2011 effective lumi : 11.5  pb^{-1}"); // 60
        qw->AddEntry(histo0_Data,        "HLT_BTagMu_DiJet60_Mu7",           "p"); 
+      }
+      else if (ptval=="40") { 
+       qw->SetHeader("2011 effective lumi : 2.0  pb^{-1}"); // 40
+       qw->AddEntry(histo0_Data,        "HLT_BTagMu_DiJet40_Mu5",           "p"); 
+      }
+      else if (ptval=="70") { 
+       qw->SetHeader("2011 effective lumi : 10.0  pb^{-1}"); // 70
+       qw->AddEntry(histo0_Data,        "HLT_BTagMu_DiJet70_Mu5",           "p"); 
+      }
+      else if (ptval=="110") { 
+       qw->SetHeader("2011 effective lumi : 57.0  pb^{-1}"); // 110
+       qw->AddEntry(histo0_Data,        "HLT_BTagMu_DiJet110_Mu5",           "p"); 
       }
    }
 
   }
-  if (selection!="npv") {
+  if (selection!="npv" && selection!="npv_no_scaled") {
     qw->AddEntry(histo0_MC_b,        "QCD (b quark) "           ,"f");
     qw->AddEntry(histo0_MC_c,        "QCD (c quark) "           ,"f");
     qw->AddEntry(histo0_MC_udsg,     "QCD (uds quark & g) "     ,"f");
@@ -324,7 +363,8 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
 
 
   // SECOND DATA/MC RATIO
-  TPad *canvas_2 = new TPad("canvas_2", "canvas_2",0,0.12,1.0,0.32);
+//  TPad *canvas_2 = new TPad("canvas_2", "canvas_2",0,0.12,1.0,0.32);
+  TPad *canvas_2 = new TPad("canvas_2", "canvas_2",0,0.,1.0,0.32);
   canvas_2->Draw();
   canvas_2->cd();
   gPad->SetBottomMargin(0.375);
@@ -350,6 +390,7 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
    canvas->cd();
 
 
+/*
   // THIRD 2011/2010 RATIO, only for jet dataset
   TPad *canvas_3 = new TPad("canvas_3", "canvas_3",0,0.,1.0,0.20);
   if (mu==false && selection!="npv") {
@@ -378,6 +419,7 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   histo0_ratdata->SetMarkerSize(0.75);
   histo0_ratdata->Draw("E1X0");
   }
+*/
 
    canvas->cd();
 

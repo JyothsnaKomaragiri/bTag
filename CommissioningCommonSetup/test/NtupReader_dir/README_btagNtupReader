@@ -31,11 +31,11 @@ system("mv  jambo_btag20_mu/histoFile.root jambo_btag20_mu/histo_minibtag2011.ro
 	the first one "jambo_btag20_mu/histoFile.root" is defined in the "Loop" function, 
 	the last one "jambo_btag20_mu/histo_minibtag2011.root" is the final destination.
 
-IMPORTANT : you have to specify  in the "Loop" function of btagNtupReader.C
-	4. the PT cut for jets --> cutJetPt
-	5. the PT cut for muons --> cutMuonPt
-        6. if you ask for a muon inside the jet --> cut_on_mu (true = yes)
-	7. the trigger you want to use 
+IMPORTANT : you have to specify  at the bginning of the file btagNtupReader.C  "TO BE DEFINED FIRST !"
+	4. if you run on Jet or on MetBtag --> Run_on_Jet and Run_on_Btag (true = yes)
+	5. the trigger you want to use --> my_trigger_path
+	6. the PT cut for jets --> cutJetPt
+	7. the PT cut for muons --> cutMuonPt (applied only in the case Run_on_Btag==true)
 
 IF YOU WANT TO ADD AN HISTO SEE BELOW : 3)
 
@@ -54,7 +54,7 @@ where selection  is the name of the histogram you want to plot,
       down determines the way of the stack histo (b,c,udgs or udsg,c,b),
       logy =1 means Logy option,
       mu = false means jet dataset and mu = true is for btagmet datset
---> example :  PlotStack("npu",2011, 0, 0,1);
+--> example :  PlotStack("npv",2011, 0, 0,1);
 
 IMPORTANT : Inside LoadDisplayRootPlot.C, you have to specify 
 the name of the different rootfiles and the directory where they are.
@@ -66,7 +66,7 @@ the name of the different rootfiles and the directory where they are.
 
 - Define your histo following the template :
 AddHisto(string name_of_histo, int j, string title, string xaxis, const int& nbins, const float& min, const float& max)
-	example: " AddHisto(HistoBtag, "alljetpt",       j,"PT of all jets",80,0.,400.);"
+	example: " AddHisto(HistoBtag, "all_jetpt",       j,"PT of all jets",80,0.,400.);"
 	the "j" index is used for MC samples to produce global histogram, b contribution, c contribution, light 
 	contribution and gluon splitting into b.  If you need to keep this quark content info, put your new line
 	in the "j" loop. Otherwise, put it after the loop.
@@ -84,29 +84,29 @@ AddHisto(string name_of_histo, int j, string title, string xaxis, const int& nbi
 example of code : inside "j" loop
 ...
    // last histo in the definition part
-        AddHisto(HistoBtag, "muonRatio", j,"Muon1 energy ratio",50,0.,1.4);
+        AddHisto(HistoBtag, "npv3_svmass_3tr",       j,"SV mass for >=3tracks (#PV:>10)",               50,0.,8.);
    // my new histo 
 	AddHisto(HistoBtag, "new_histo", j,"Test Caro",50,0.,1.);
 ....
    // filling part for last histo :
-        HistoBtag[62+j*nhisto_to_clone]->Fill(muon1Ratio[i], weight);
+        HistoBtag[133+j*nhisto_to_clone]->Fill(SVMass[i], weight);
    // my new histo
         float caro_new_info=0.6;
-        HistoBtag[63+j*nhisto_to_clone]->Fill(caro_new_info, weight); // the previous "62" becomes a "63"
+        HistoBtag[134+j*nhisto_to_clone]->Fill(caro_new_info, weight); // the "133" of "npv3_svmass_3tr" becomes here a "134" for "new_histo"
 
 
 
 other example of code :  outside "j" loop
 ...
    // last histo :
-   AddHisto(HistoBtag, "npv",  0,"numberOfPrimaryVertices",50,-0.5,49.5);
+   AddHisto(HistoBtag, "npv_no_scaled",  0,"numberOfPrimaryVertices",50,-0.5,49.5);
    // my new histo  
         AddHisto(HistoBtag, "another_new_histo", 0,"Test Caro 2",50,0.,1.);
 ....
    // last histo :
-        HistoBtag[jmax*nhisto_to_clone+7]->Fill(numberOfPrimaryVertices,weight);
+        HistoBtag[jmax*nhisto_to_clone+8]->Fill(numberOfPrimaryVertices,weightsave);
    // my new histo
         float caro_test_2=0.2;
-        HistoBtag[jmax*nhisto_to_clone+8]->Fill(caro_test_2, weight);   // the previous "7" becomes a "8"
+        HistoBtag[jmax*nhisto_to_clone+9]->Fill(caro_test_2, weight);   // increase the "8" of "npv_no_scaled" histo into a "9"
 
 
