@@ -8,7 +8,7 @@
   gStyle->SetPalette(1);
   gStyle->SetOptStat(0);
 
-  bool runJet=true;
+  bool runJet=false;
   int date=2011;
 // PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu=false){
 
@@ -103,6 +103,56 @@
   PlotStack("sv_deltar_jet",date, 0, 1, 0);
   PlotStack("sv_deltar_sum_jet",date, 0, 1, 0);
   PlotStack("sv_deltar_sum_dir",date, 0, 1, 0);
+
+  PlotStack("n_cutseltracks_jet", date, 1, 0, 0);
+  PlotStack("pt_cutseltracks", date, 1, 1, 0);
+
+  // IP
+  PlotStack("IP3d1Errorsorted",date, 1, 1, 0);
+  PlotStack("IP3d2Errorsorted",date, 1, 1, 0);
+  PlotStack("IP3d3Errorsorted",date, 1, 1, 0);
+  PlotStack("trackIP3d_bin1_cutsel",date, 1, 1, 0);
+  PlotStack("trackIP3d_bin2_cutsel",date, 1, 1, 0);
+  PlotStack("trackIP3d_bin3_cutsel",date, 1, 1, 0);
+  PlotStack("trackIP3d_bin4_cutsel",date, 1, 1, 0);
+  PlotStack("trackIP3d_bin5_cutsel",date, 1, 1, 0);
+  PlotStack("trackIP3d_bin6_cutsel",date, 1, 1, 0);
+
+
+  TagRate("discri_tche", 1,1,0);
+  TagRate("discri_tchp", 1,1,0);
+  TagRate("discri_ssche", 0,0,0);
+  TagRate("discri_sschp", 0,0,0);
+  TagRate("discri_jetprob", 1,1,0);
+  TagRate("discri_jetbprob", 1,1,0);
+
+
+  PlotData("IP3d2sig0",date, 1, 1, 0);
+  PlotData("IP3d3sig0",date, 1, 1, 0);
+  PlotData("ntracks_jet",date, 1, 1, 0);
+  PlotData("nseltracks_jet",date, 1, 1, 0);
+  PlotData("ncutseltracks_jet",date, 1, 1, 0);
+
+  PlotData("pt_tracks",date, 1, 1, 0);
+  PlotData("pt_seltracks",date, 1, 1, 0);
+  PlotData("pt_cutseltracks",date, 1, 1, 0);
+
+  PlotData("nsv0",date, 1, 1, 0);
+  PlotData("nsv",date, 1, 1, 0);
+  PlotData("flightsig3d",date, 1, 1, 0);
+  PlotData("flightsig3d_3tr",date, 1, 1, 0);
+  PlotData("svmass", date, 0, 0, 0);
+  PlotData("svmass_3tr", date, 0, 0, 0);
+
+  PlotData("nsv_3tr",date, 1, 1, 0);
+  PlotData("nsv0_3tr",date, 1, 1, 0);
+
+  PlotStack2D("track_vs_jetpt",  0, 0);
+  PlotStack2D("cutseltrack_vs_jetpt",  0, 0);
+  PlotStack2D("sv_track_vs_jetpt",  0, 0);
+
+
+
  }
  else {
 
@@ -206,6 +256,53 @@
   PlotStack("sv_deltar_jet",date, 0, 1, 1);
   PlotStack("sv_deltar_sum_jet",date, 0, 1, 1);
   PlotStack("sv_deltar_sum_dir",date, 0, 1, 1);
+
+  PlotStack("n_cutseltracks_jet", date, 1, 0, 1);
+  PlotStack("pt_cutseltracks", date, 1, 1, 1);
+
+  // IP
+  PlotStack("IP3d1Errorsorted",date, 1, 1, 1);
+  PlotStack("IP3d2Errorsorted",date, 1, 1, 1);
+  PlotStack("IP3d3Errorsorted",date, 1, 1, 1);
+  PlotStack("trackIP3d_bin1_cutsel",date, 1, 1, 1);
+  PlotStack("trackIP3d_bin2_cutsel",date, 1, 1, 1);
+  PlotStack("trackIP3d_bin3_cutsel",date, 1, 1, 1);
+  PlotStack("trackIP3d_bin4_cutsel",date, 1, 1, 1);
+  PlotStack("trackIP3d_bin5_cutsel",date, 1, 1, 1);
+  PlotStack("trackIP3d_bin6_cutsel",date, 1, 1, 1);
+
+
+  TagRate("discri_tche", 1,1,1);
+  TagRate("discri_tchp", 1,1,1);
+  TagRate("discri_ssche", 0,0,1);
+  TagRate("discri_sschp", 0,0,1);
+  TagRate("discri_jetprob", 1,1,1);
+  TagRate("discri_jetbprob", 1,1,1);
+
+
+  PlotData("IP3d2sig0",date, 1, 1, 1);
+  PlotData("IP3d3sig0",date, 1, 1, 1);
+  PlotData("ntracks_jet",date, 1, 1, 1);
+  PlotData("nseltracks_jet",date, 1, 1, 1);
+  PlotData("ncutseltracks_jet",date, 1, 1, 1);
+  PlotData("pt_tracks",date, 1, 1, 1);
+  PlotData("pt_seltracks",date, 1, 1, 1);
+  PlotData("pt_cutseltracks",date, 1, 1, 1);
+
+  PlotData("nsv",date, 1, 1, 1);
+  PlotData("flightsig3d",date, 1, 1, 1);
+  PlotData("flightsig3d_3tr",date, 1, 1, 1);
+  PlotData("svmass", date, 0, 0, 1);
+  PlotData("svmass_3tr", date, 0, 0, 1);
+  PlotData("nsv_3tr",date, 1, 1, 1);
+  PlotData("nsv0_3tr",date, 1, 1, 1);
+
+  PlotStack2D("track_vs_jetpt",  0, 1);
+  PlotStack2D("cutseltrack_vs_jetpt",  0, 1);
+  PlotStack2D("sv_track_vs_jetpt",  0, 1);
+
+
+
 
  }
 

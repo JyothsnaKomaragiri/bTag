@@ -14,31 +14,31 @@
 // ----------- 
 
 // TO BE DEFINED FIRST !
-  bool Run_on_Jet = true;
-  bool Run_on_Btag = false;
-  TString final_dir = "dir_jet30";
+  bool Run_on_Jet = false;
+  bool Run_on_Btag = true;
+  TString final_dir = "dir_btag40";
   // + check the data and MC input files
 
-  TString my_trigger_path="HLT_Jet30";
+//  TString my_trigger_path="HLT_Jet30";
 //  TString my_trigger_path="HLT_Jet60";
 //  TString my_trigger_path="HLT_Jet80";
 //  TString my_trigger_path="HLT_Jet110";
 //  TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";
-//  TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";
+  TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";
+//  TString my_trigger_path="HLT_BTagMu_DiJet60_Mu7";
 //  TString my_trigger_path="HLT_BTagMu_DiJet70_Mu5";
 //  TString my_trigger_path="HLT_BTagMu_DiJet110_Mu5";
-//  TString my_trigger_path="HLT_BTagMu_DiJet60_Mu7";
 
   // CUT VALUES
-  float cutJetPt=30.;  // FOR JETS HLT_Jet30
+//  float cutJetPt=30.;  // FOR JETS HLT_Jet30
 //  float cutJetPt=60.;  // FOR JETS HLT_Jet60
 //  float cutJetPt=80.;  // FOR JETS HLT_Jet80
 //  float cutJetPt=110.;  // FOR JETS HLT_Jet80
-//  float cutJetPt=40.;  // FOR JETS HLT_BTagMu_DiJet20_Mu5
-//  float cutJetPt=60.;  // FOR JETS HLT_BTagMu_DiJet40_Mu5
-//  float cutJetPt=80.;  // FOR JETS HLT_BTagMu_DiJet60_Mu7
-//  float cutJetPt=90.;  // FOR JETS HLT_BTagMu_DiJet70_Mu5
-//  float cutJetPt=130.;  // FOR JETS HLT_BTagMu_DiJet110_Mu5
+//  float cutJetPt=45.;  // FOR JETS HLT_BTagMu_DiJet20_Mu5
+  float cutJetPt=65.;  // FOR JETS HLT_BTagMu_DiJet40_Mu5
+//  float cutJetPt=95.;  // FOR JETS HLT_BTagMu_DiJet60_Mu7
+//  float cutJetPt=105.;  // FOR JETS HLT_BTagMu_DiJet70_Mu5
+//  float cutJetPt=160.;  // FOR JETS HLT_BTagMu_DiJet110_Mu5
 
   float cutMuonPt=7.;  // FOR MUON HLT_BTagMu_DiJet20_Mu5, 40, 70,110
 //  float cutMuonPt=9.;  // FOR MUON HLT_BTagMu_DiJet60_Mu7
@@ -83,23 +83,23 @@ float wmu150=(0.05964   *47580.)/1022541.;
 // MC 311X
 //QCD
 // w = sect / n_ev;
-float weight15=   815900000. / 4106800.;
-float weight30=   53120000.  / 3264660.;
-float weight50=   6359000.   / 3173042.;
-float weight80=   784300.    / 3203869.;
-float weight120=  115100.    / 3030480.;
-float weight170=  24260.     / 2464080.;
-float weight300=  1168.      / 3168480.;
+float weight15=   815900000. / 8213600.;
+float weight30=   53120000.  / 6529320.;
+float weight50=   6359000.   / 4301392.;
+float weight80=   784300.    / 6407732.;
+float weight120=  115100.    / 6090400.;
+float weight170=  24260.     / 5684160.;
+float weight300=  1168.      / 6336960.;
 
 //Mu enriched QCD
 // (filter* sect) /n_ev
 float wmu15=(0.00254    *579200000.)/2884915.;
-float wmu20=(0.00518    *236300000.)/8819654.; 
-float wmu30=(0.01090    *53070000. )/6518326.;
+float wmu20=(0.00518    *236300000.)/11352301.; 
+float wmu30=(0.01090    *53070000. )/10909951.;
 float wmu50=(0.02274    *6351000.  )/10686315.;
 float wmu80=(0.03700    *785100.   )/3183540.;
 float wmu120=(0.04777   *92950.    )/991024.;
-float wmu150=(0.05964   *47580.)/1015900.;
+float wmu150=(0.05964   *47580.    )/1015900.;
 
 cout << " MC weights " << endl;
 cout << "------------" << endl;
@@ -124,21 +124,23 @@ cout << endl;
 
 TString action;
 
+
 cout << " ----> DATA 2011" << endl;
   weight=1;
 
   if (Run_on_Jet)      { 
-     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/Jet_all_2011/*.root");   // jason
+     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/Data/Jet2011/*.root");   
      yt.Loop(0, weight); 
      action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minijet2011.root";
      system(action);
   }
   if (Run_on_Btag){ 
-     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/Met_all_2011/*.root");    // jason  
+     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/Data/Met2011/*.root");    
      yt.Loop(0, weight); 
      action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minibtag2011.root";
      system(action);
   }
+
 
 /*
 if (Run_on_Jet)  {
@@ -151,12 +153,14 @@ if (Run_on_Jet)  {
 }
 */
 
+
 if (Run_on_Jet) {
 
 cout << " ----> MC : QCD 15-30 " << endl;
    weight=weight15;
 //  btagNtupReader xt15(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_15to30_TuneZ2_7TeV_pythia6_PU/*.root"); // 39X
-  btagNtupReader xt15(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD15to30/QCD15to30/*.root"); // 311X
+//  btagNtupReader xt15(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD15to30/QCD15to30/*.root"); // 311X
+   btagNtupReader xt15(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_15to30/*.root"); // 311X DA & SV fix
    xt15.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd15.root";
    system(action);
@@ -164,7 +168,8 @@ cout << " ----> MC : QCD 15-30 " << endl;
 cout << " ----> MC : QCD 30-50 " << endl;
    weight=weight30;
 //   btagNtupReader xt30(0, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_30to50_TuneZ2_7TeV_pythia6_PU/*.root"); // 39X
-   btagNtupReader xt30(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD30to50/*.root"); // 311X
+//   btagNtupReader xt30(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD30to50/*.root"); // 311X
+   btagNtupReader xt30(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_30to50/*.root"); // 311X DA & SV fix
    xt30.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd30.root";
    system(action);
@@ -173,7 +178,8 @@ cout << " ----> MC : QCD 30-50 " << endl;
 cout << " ----> MC : QCD 50-80 " << endl;
    weight=weight50;
 //   btagNtupReader xt50(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_50to80_TuneZ2_7TeV_pythia6_PU_v2/*.root"); // 39X
-   btagNtupReader xt50(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD50to80/*.root"); // 311X
+//   btagNtupReader xt50(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD50to80/*.root"); // 311X
+   btagNtupReader xt50(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_50to80/*.root"); // 311X DA & SV fix
    xt50.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd50.root";
    system(action);
@@ -183,7 +189,8 @@ cout << " ----> MC : QCD 50-80 " << endl;
 cout << " ----> MC : QCD 80-120 " << endl;
    weight=weight80;
 //   btagNtupReader xt80(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_80to120_TuneZ2_7TeV_pythia6_PU_prescale/*.root"); // 39X
-   btagNtupReader xt80(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD80to120/*.root"); //311X
+//   btagNtupReader xt80(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD80to120/*.root"); //311X
+   btagNtupReader xt80(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_80to120/*.root"); // 311X DA & SV fix
    xt80.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd80.root";
    system(action);
@@ -192,7 +199,8 @@ cout << " ----> MC : QCD 80-120 " << endl;
 cout << " ----> MC : QCD 120-170 " << endl;
    weight=weight120;
 //   btagNtupReader xt120(0, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_120to170_TuneZ2_7TeV_pythia6_PU/*.root"); // 39X
-   btagNtupReader xt120(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD120to170/*.root"); // 311X
+//   btagNtupReader xt120(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD120to170/*.root"); // 311X
+   btagNtupReader xt120(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCD_Pt_120to170/*.root"); // 311X DA & SV fix
    xt120.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd120.root";
    system(action);
@@ -201,7 +209,8 @@ cout << " ----> MC : QCD 120-170 " << endl;
 cout << " ----> MC : QCD 170-300 " << endl;
    weight=weight170;
 //   btagNtupReader xt170(0, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_170to300_TuneZ2_7TeV_pythia6_PU/*.root"); // 39X
-   btagNtupReader xt170(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD170to300/*.root");  //311X
+//   btagNtupReader xt170(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD170to300/*.root");  //311X
+   btagNtupReader xt170(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_170to300/*.root"); // 311X DA & SV fix
    xt170.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd170.root";
    system(action);
@@ -210,7 +219,8 @@ cout << " ----> MC : QCD 170-300 " << endl;
 cout << " ----> MC : QCD 300-470 " << endl;
    weight=weight300;
 //   btagNtupReader xt300(0, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_300to470_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
-   btagNtupReader xt300(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD300to470/*.root");  // 311X
+//   btagNtupReader xt300(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD300to470/*.root");  // 311X
+   btagNtupReader xt300(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_300to470/*.root"); // 311X DA & SV fix
    xt300.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd300.root";
    system(action);
@@ -220,10 +230,12 @@ cout << " ----> MC : QCD 300-470 " << endl;
 
 if (Run_on_Btag) {
 //  BTAGMET
+
 cout << " ----> MC : QCD  MU 15-20 " << endl;
    weight=wmu15;
 //   btagNtupReader xmu15(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT15to20_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
-   btagNtupReader xmu15(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu15to20/*.root");
+//   btagNtupReader xmu15(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu15to20/*.root");
+   btagNtupReader xmu15(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_15to20/*.root"); // 311X DA & SV fix
    xmu15.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu15.root";
    system(action);
@@ -231,24 +243,29 @@ cout << " ----> MC : QCD  MU 15-20 " << endl;
 cout << " ----> MC : QCD  MU 20-30 " << endl;
    weight=wmu20;
 //   btagNtupReader xmu20(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT20to30_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
-   btagNtupReader xmu20(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu20to30/*.root"); //311X
+//   btagNtupReader xmu20(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu20to30/*.root"); //311X
+   btagNtupReader xmu20(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_20to30/*.root"); // 311X DA & SV fix
    xmu20.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu20.root";
    system(action);
 
 
+
 cout << " ----> MC : QCD  MU 30-50 " << endl;
    weight=wmu30;
 //   btagNtupReader xmu30(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT30to50_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
-   btagNtupReader xmu30(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu30to50/*.root"); //311X
+//   btagNtupReader xmu30(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu30to50/*.root"); //311X
+   btagNtupReader xmu30(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCDMuEnriched_Pt-30to50/*.root"); // 311X DA & SV fix
    xmu30.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu30.root";
    system(action);
 
+
 cout << " ----> MC : QCD  MU 50-80 " << endl;
    weight=wmu50;
 //   btagNtupReader xmu50(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT50to80_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
-   btagNtupReader xmu50(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu50to80/QCDMu50to80/*.root"); //311X
+//   btagNtupReader xmu50(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu50to80/QCDMu50to80/*.root"); //311X
+   btagNtupReader xmu50(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCDMuEnriched_Pt-50to80/*.root"); // 311X DA & SV fix
    xmu50.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu50.root";
    system(action);
@@ -256,7 +273,8 @@ cout << " ----> MC : QCD  MU 50-80 " << endl;
 cout << " ----> MC : QCD  MU 80-120 " << endl;
    weight=wmu80;
 //   btagNtupReader xmu80(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT80to120_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
-   btagNtupReader xmu80(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu80to120/QCDMu80to120/*.root"); //311X
+//   btagNtupReader xmu80(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu80to120/QCDMu80to120/*.root"); //311X
+   btagNtupReader xmu80(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCDMuEnriched_Pt-80to120/*.root"); // 311X DA & SV fix
    xmu80.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu80.root";
    system(action);
@@ -264,7 +282,8 @@ cout << " ----> MC : QCD  MU 80-120 " << endl;
 cout << " ----> MC : QCD  MU 120-150 " << endl;
    weight=wmu120;
 //   btagNtupReader xmu120(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT120to150_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
-   btagNtupReader xmu120(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu120to150/QCDMu120to150/*.root"); //311X
+//   btagNtupReader xmu120(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu120to150/QCDMu120to150/*.root"); //311X
+   btagNtupReader xmu120(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_120to150/*.root"); // 311X DA & SV fix
    xmu120.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu120.root";
    system(action);
@@ -273,10 +292,12 @@ cout << " ----> MC : QCD  MU 120-150 " << endl;
 cout << " ----> MC : QCD  MU 150 " << endl;
    weight=wmu150;
 //   btagNtupReader xmu150(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT150_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
-   btagNtupReader xmu150(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu150/QCDMu150/*.root"); //311X
+//   btagNtupReader xmu150(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu150/QCDMu150/*.root"); //311X
+   btagNtupReader xmu150(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_150/*.root"); // 311X DA & SV fix
    xmu150.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu150.root";
    system(action);
+
 
 }
 
@@ -447,60 +468,78 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "muon_Ratio", j,"Muon1 energy ratio",50,0.,1.4);
 
 // additional plots : with #PV selection
-     // #PV: 1-5
-     AddHisto(HistoBtag, "npv1_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:1-5)",100,-35.,35.);
-     AddHisto(HistoBtag, "npv1_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:1-5)",100,-35.,35.);
-     AddHisto(HistoBtag, "npv1_ntracks_jet",      j,"# of tracks in jet (#PV:1-5)",                 100,0.,100.);
-     AddHisto(HistoBtag, "npv1_nseltracks_jet",   j,"# of sel tracks in jet (#PV:1-5)",              50,0.,50.); //95
-     AddHisto(HistoBtag, "npv1_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:1-5)",          50,0.,50.);
-     AddHisto(HistoBtag, "npv1_pt_tracks",        j,"Pt of tracks (#PV:1-5)",                        80,0.,200.);
-     AddHisto(HistoBtag, "npv1_pt_seltracks",     j,"Pt of  sel tracks (#PV:1-5)",                   80,0.,200.);
-     AddHisto(HistoBtag, "npv1_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:1-5)",               80,0.,200.);
+     // #PV: 1-3
+     AddHisto(HistoBtag, "npv1_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:1-3)",100,-35.,35.);
+     AddHisto(HistoBtag, "npv1_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:1-3)",100,-35.,35.);
+     AddHisto(HistoBtag, "npv1_ntracks_jet",      j,"# of tracks in jet (#PV:1-3)",                 100,0.,100.);
+     AddHisto(HistoBtag, "npv1_nseltracks_jet",   j,"# of sel tracks in jet (#PV:1-3)",              50,0.,50.); //95
+     AddHisto(HistoBtag, "npv1_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:1-3)",          50,0.,50.);
+     AddHisto(HistoBtag, "npv1_pt_tracks",        j,"Pt of tracks (#PV:1-3)",                        80,0.,200.);
+     AddHisto(HistoBtag, "npv1_pt_seltracks",     j,"Pt of  sel tracks (#PV:1-3)",                   80,0.,200.);
+     AddHisto(HistoBtag, "npv1_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:1-3)",               80,0.,200.);
 
-     AddHisto(HistoBtag, "npv1_nsv0",              j,"# of secondary vertices (#PV:1-5)",              5,0,5); //100
-     AddHisto(HistoBtag, "npv1_nsv",              j,"# of secondary vertices (#PV:1-5)",              5,0,5);
-     AddHisto(HistoBtag, "npv1_flightsig3d",      j,"Flight Significance 3D (#PV:1-5)",                  50,0.,100.);
-     AddHisto(HistoBtag, "npv1_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (#PV:1-5)",    50,0.,100.);
-     AddHisto(HistoBtag, "npv1_svmass",           j,"SV mass (#PV:1-5)",                             50,0.,8.);
-     AddHisto(HistoBtag, "npv1_svmass_3tr",       j,"SV mass for >=3tracks (#PV:1-5)",               50,0.,8.); //105
+     AddHisto(HistoBtag, "npv1_nsv0",              j,"# of secondary vertices (#PV:1-3)",              5,0,5); //100
+     AddHisto(HistoBtag, "npv1_nsv",              j,"# of secondary vertices (#PV:1-3)",              5,0,5);
+     AddHisto(HistoBtag, "npv1_flightsig3d",      j,"Flight Significance 3D (#PV:1-3)",                  50,0.,100.);
+     AddHisto(HistoBtag, "npv1_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (#PV:1-3)",    50,0.,100.);
+     AddHisto(HistoBtag, "npv1_svmass",           j,"SV mass (#PV:1-3)",                             50,0.,8.);
+     AddHisto(HistoBtag, "npv1_svmass_3tr",       j,"SV mass for >=3tracks (#PV:1-3)",               50,0.,8.); //105
 
-     // #PV: 6-10
-     AddHisto(HistoBtag, "npv2_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:6-10)",100,-35.,35.);
-     AddHisto(HistoBtag, "npv2_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:6-10)",100,-35.,35.);
-     AddHisto(HistoBtag, "npv2_ntracks_jet",      j,"# of tracks in jet (#PV:6-10)",                 100,0.,100.);
-     AddHisto(HistoBtag, "npv2_nseltracks_jet",   j,"# of sel tracks in jet (#PV:6-10)",              50,0.,50.); 
-     AddHisto(HistoBtag, "npv2_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:6-10)",          50,0.,50.);//110
-     AddHisto(HistoBtag, "npv2_pt_tracks",        j,"Pt of tracks (#PV:6-10)",                        80,0.,200.);
-     AddHisto(HistoBtag, "npv2_pt_seltracks",     j,"Pt of  sel tracks (#PV:6-10)",                   80,0.,200.);
-     AddHisto(HistoBtag, "npv2_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:6-10)",               80,0.,200.);
+     // #PV: 4-7
+     AddHisto(HistoBtag, "npv2_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:4-7)",100,-35.,35.);
+     AddHisto(HistoBtag, "npv2_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:4-7)",100,-35.,35.);
+     AddHisto(HistoBtag, "npv2_ntracks_jet",      j,"# of tracks in jet (#PV:4-7)",                 100,0.,100.);
+     AddHisto(HistoBtag, "npv2_nseltracks_jet",   j,"# of sel tracks in jet (#PV:4-7)",              50,0.,50.); 
+     AddHisto(HistoBtag, "npv2_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:4-7)",          50,0.,50.);//110
+     AddHisto(HistoBtag, "npv2_pt_tracks",        j,"Pt of tracks (#PV:4-7)",                        80,0.,200.);
+     AddHisto(HistoBtag, "npv2_pt_seltracks",     j,"Pt of  sel tracks (#PV:4-7)",                   80,0.,200.);
+     AddHisto(HistoBtag, "npv2_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:4-7)",               80,0.,200.);
 
-     AddHisto(HistoBtag, "npv2_nsv0",              j,"# of secondary vertices (#PV:6-10)",              5,0,5);
-     AddHisto(HistoBtag, "npv2_nsv",              j,"# of secondary vertices (#PV:6-10)",              5,0,5); //115
-     AddHisto(HistoBtag, "npv2_flightsig3d",      j,"Flight Significance 3D (#PV:6-10)",                  50,0.,100.);
-     AddHisto(HistoBtag, "npv2_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (#PV:6-10)",    50,0.,100.);
-     AddHisto(HistoBtag, "npv2_svmass",           j,"SV mass (#PV:6-10)",                             50,0.,8.);
-     AddHisto(HistoBtag, "npv2_svmass_3tr",       j,"SV mass for >=3tracks (#PV:6-10)",               50,0.,8.);
+     AddHisto(HistoBtag, "npv2_nsv0",              j,"# of secondary vertices (#PV:4-7)",              5,0,5);
+     AddHisto(HistoBtag, "npv2_nsv",              j,"# of secondary vertices (#PV:4-7)",              5,0,5); //115
+     AddHisto(HistoBtag, "npv2_flightsig3d",      j,"Flight Significance 3D (#PV:4-7)",                  50,0.,100.);
+     AddHisto(HistoBtag, "npv2_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (#PV:4-7)",    50,0.,100.);
+     AddHisto(HistoBtag, "npv2_svmass",           j,"SV mass (#PV:4-7)",                             50,0.,8.);
+     AddHisto(HistoBtag, "npv2_svmass_3tr",       j,"SV mass for >=3tracks (#PV:4-7)",               50,0.,8.);
 
-     // #PV: >10
-     AddHisto(HistoBtag, "npv3_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:>10)",100,-35.,35.); //120
-     AddHisto(HistoBtag, "npv3_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:>10)",100,-35.,35.);
-     AddHisto(HistoBtag, "npv3_ntracks_jet",      j,"# of tracks in jet (#PV:>10)",                 100,0.,100.);
-     AddHisto(HistoBtag, "npv3_nseltracks_jet",   j,"# of sel tracks in jet (#PV:>10)",              50,0.,50.);
-     AddHisto(HistoBtag, "npv3_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:>10)",          50,0.,50.); 
-     AddHisto(HistoBtag, "npv3_pt_tracks",        j,"Pt of tracks (#PV:>10)",                        80,0.,200.); //125
-     AddHisto(HistoBtag, "npv3_pt_seltracks",     j,"Pt of  sel tracks (#PV:>10)",                   80,0.,200.);
-     AddHisto(HistoBtag, "npv3_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:>10)",               80,0.,200.);
+     // #PV: >7
+     AddHisto(HistoBtag, "npv3_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:>7)",100,-35.,35.); //120
+     AddHisto(HistoBtag, "npv3_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:>7)",100,-35.,35.);
+     AddHisto(HistoBtag, "npv3_ntracks_jet",      j,"# of tracks in jet (#PV:>7)",                 100,0.,100.);
+     AddHisto(HistoBtag, "npv3_nseltracks_jet",   j,"# of sel tracks in jet (#PV:>7)",              50,0.,50.);
+     AddHisto(HistoBtag, "npv3_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:>7)",          50,0.,50.); 
+     AddHisto(HistoBtag, "npv3_pt_tracks",        j,"Pt of tracks (#PV:>7)",                        80,0.,200.); //125
+     AddHisto(HistoBtag, "npv3_pt_seltracks",     j,"Pt of  sel tracks (#PV:>7)",                   80,0.,200.);
+     AddHisto(HistoBtag, "npv3_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:>7)",               80,0.,200.);
 
-     AddHisto(HistoBtag, "npv3_nsv0",              j,"# of secondary vertices (#PV:>10)",              5,0,5); 
-     AddHisto(HistoBtag, "npv3_nsv",              j,"# of secondary vertices (#PV:>10)",              5,0,5);
-     AddHisto(HistoBtag, "npv3_flightsig3d",      j,"Flight Significance 3D (#PV:>10)",                  50,0.,100.); //130
-     AddHisto(HistoBtag, "npv3_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (#PV:>10)",    50,0.,100.);
-     AddHisto(HistoBtag, "npv3_svmass",           j,"SV mass (#PV:>10)",                             50,0.,8.);
-     AddHisto(HistoBtag, "npv3_svmass_3tr",       j,"SV mass for >=3tracks (#PV:>10)",               50,0.,8.);
-
-
+     AddHisto(HistoBtag, "npv3_nsv0",              j,"# of secondary vertices (#PV:>7)",              5,0,5); 
+     AddHisto(HistoBtag, "npv3_nsv",              j,"# of secondary vertices (#PV:>7)",              5,0,5);
+     AddHisto(HistoBtag, "npv3_flightsig3d",      j,"Flight Significance 3D (#PV:>7)",                  50,0.,100.); //130
+     AddHisto(HistoBtag, "npv3_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (#PV:>7)",    50,0.,100.);
+     AddHisto(HistoBtag, "npv3_svmass",           j,"SV mass (#PV:>7)",                             50,0.,8.);
+     AddHisto(HistoBtag, "npv3_svmass_3tr",       j,"SV mass for >=3tracks (#PV:>7)",               50,0.,8.);
 
 
+
+
+// additional plots for AN-11-180 
+     AddHisto(HistoBtag, "n_cutseltracks_jet",   j,"# of sel tracks in jet",100,0.,100.);
+     AddHisto(HistoBtag, "pt_cutseltracks",   j,"Pt of  sel tracks",80,0.,200.);  //135
+     AddHisto(HistoBtag, "IP3d1Errorsorted",  j,"1st track 3D IP Error",100,0.,0.1); 
+     AddHisto(HistoBtag, "IP3d2Errorsorted",  j,"2nd track 3D IP Error",100,0.,0.1); 
+     AddHisto(HistoBtag, "IP3d3Errorsorted",  j,"3rd track 3D IP Error",100,0.,0.1); 
+     AddHisto(HistoBtag, "trackIP3d_bin1_cutsel",  j,"Track 3D IP value (1<Pt<=2 GeV/c)",100,-0.05,0.05); 
+     AddHisto(HistoBtag, "trackIP3d_bin2_cutsel",  j,"Track 3D IP value (2<Pt<=5 GeV/c)",100,-0.05,0.05); //140
+     AddHisto(HistoBtag, "trackIP3d_bin3_cutsel",  j,"Track 3D IP value (5<Pt<=8 GeV/c)",100,-0.05,0.05); 
+     AddHisto(HistoBtag, "trackIP3d_bin4_cutsel",  j,"Track 3D IP value (8<Pt<=12 GeV/c)",100,-0.05,0.05); 
+     AddHisto(HistoBtag, "trackIP3d_bin5_cutsel",  j,"Track 3D IP value (12<Pt<=20 GeV/c)",100,-0.05,0.05); 
+     AddHisto(HistoBtag, "trackIP3d_bin6_cutsel",  j,"Track 3D IP value (20<Pt<=50 GeV/c)",100,-0.05,0.05); 
+     AddHisto(HistoBtag, "npv1_nsv_3tr",              j,"# of secondary vertices (>=3tr) (#PV:1-3)",              5,0,5); //145
+     AddHisto(HistoBtag, "npv2_nsv_3tr",              j,"# of secondary vertices (>=3tr) (#PV:4-7)",              5,0,5); 
+     AddHisto(HistoBtag, "npv3_nsv_3tr",              j,"# of secondary vertices (>=3tr) (#PV:>7)",              5,0,5);
+     AddHisto(HistoBtag, "npv1_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:1-3)",              5,0,5);
+     AddHisto(HistoBtag, "npv2_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:4-7)",              5,0,5); 
+     AddHisto(HistoBtag, "npv3_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:>7)",              5,0,5); //150
 
 
 
@@ -509,9 +548,14 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
     // AddHisto(HistoBtag, "new_histo", j,"Test Caro",50,0.,1.);
 
 // 2D plots SV
-     AddHisto2D(Histo2DB, "svtrack_vs_jetpt", j,"SV track multiplicity vs jet pt",30,25,120, 100,0,10);
-     AddHisto2D(Histo2DB, "SVMass_vs_flightDistSignCut", j, " SVMass vs Cut on SV sign ", 100,0, 80,100,0,6);
-     AddHisto2D(Histo2DB, "SVmass_vs_flightDistCut", j, " SVMass vs Cut on SV distance ",100,0, 80,100,0,6);
+     AddHisto2D(Histo2DB, "sv_track_vs_jetpt", j,"SV track multiplicity vs jet pt",80,0,400, 10,0,10);
+     AddHisto2D(Histo2DB, "sv_mass_vs_flightDistSignCut", j, " SVMass vs Cut on SV sign ", 100,0, 80,100,0,6);
+     AddHisto2D(Histo2DB, "sv_mass_vs_flightDistCut", j, " SVMass vs Cut on SV distance ",100,0, 80,100,0,6);
+
+     AddHisto2D(Histo2DB, "track_vs_jetpt", j,"track multiplicity vs jet pt",80,0,400, 100,0,100);
+     AddHisto2D(Histo2DB, "seltrack_vs_jetpt", j,"sel track multiplicity vs jet pt",80,0,400, 100,0,100);
+     AddHisto2D(Histo2DB, "cutseltrack_vs_jetpt", j,"sel track multiplicity vs jet pt",80,0,400, 100,0,100);
+
 
     // ====> ADD HERE NEW HISTO AT 2D FOR WHICH QUARK CONTENT INFO IS NEEDED
 
@@ -527,6 +571,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
    AddHisto(HistoBtag, "weight_prescale",  0,"weight from prescale HLTJET50to100",400,0.,400.);
    AddHisto(HistoBtag, "npv",  0,"numberOfPrimaryVertices",50,-0.5,49.5);
    AddHisto(HistoBtag, "npv_no_scaled",  0,"numberOfPrimaryVertices",50,-0.5,49.5);
+
+   AddHisto(HistoBtag, "npu",  0,"numberOfPUVertices",50,-0.5,49.5);
+   AddHisto(HistoBtag, "npu_no_scaled",  0,"numberOfPUVertices",50,-0.5,49.5);
 
     // ====> ADD HERE NEW HISTO AT 1D OR 2D FOR WHICH QUARK CONTENT INFO IS NOT NEEDED
     // in this case, do not put "j" but 0!
@@ -589,6 +636,7 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
 // 152 pb-1
           if (Run_on_Jet) {
+/*
            // HLT_Jet30
            weightnpv[0]=0;   // npu=0
            weightnpv[1]=0.312893;  // npu=1
@@ -612,9 +660,35 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
            weightnpv[19]=0.101843;
            weightnpv[20]=0.0630489;
            weightnpv[21]=0.;
+*/
+           //HLT_Jet80
+           weightnpv[0]=0;
+           weightnpv[1]=0.229418;
+           weightnpv[2]=0.80637;
+           weightnpv[3]=1.51697;
+           weightnpv[4]=1.8971;
+           weightnpv[5]=1.96651;
+           weightnpv[6]=1.65706;
+           weightnpv[7]=1.23141;
+           weightnpv[8]=0.81926;
+           weightnpv[9]=0.528817;
+           weightnpv[10]=0.34538;
+           weightnpv[11]=0.233533;
+           weightnpv[12]=0.16382;
+           weightnpv[13]=0.112897;
+           weightnpv[14]=0.0902319;
+           weightnpv[15]=0.0661547;
+           weightnpv[16]=0.0600564;
+           weightnpv[17]=0.0452439;
+           weightnpv[18]=0.0295257;
+           weightnpv[19]=0.101689;
+           weightnpv[20]=0.0522156;
+           weightnpv[21]=0;
+
            }
            else if (Run_on_Btag) {
            // BTagMu_Dijet20_Mu5
+/*
            weightnpv[0]=0;   // npu=0
            weightnpv[1]=0.264676;  // npu=1
            weightnpv[2]=0.833291;
@@ -637,6 +711,30 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
            weightnpv[19]=0.;
            weightnpv[20]=0.;
            weightnpv[21]=0.;
+*/
+           weightnpv[0]=0;
+           weightnpv[1]=0.24709;
+           weightnpv[2]=0.842741;
+           weightnpv[3]=1.62052;
+           weightnpv[4]=2.01121;
+           weightnpv[5]=2.02031;
+           weightnpv[6]=1.6808;
+           weightnpv[7]=1.2486;
+           weightnpv[8]=0.840173;
+           weightnpv[9]=0.534628;
+           weightnpv[10]=0.356541;
+           weightnpv[11]=0.232851;
+           weightnpv[12]=0.173515;
+           weightnpv[13]=0.119841;
+           weightnpv[14]=0.0902945;
+           weightnpv[15]=0.0781384;
+           weightnpv[16]=0.0603114;
+           weightnpv[17]=0.0442252;
+           weightnpv[18]=0.0525518;
+           weightnpv[19]=0.;
+           weightnpv[20]=0.;
+           weightnpv[21]=0.;
+
            }
   
            int npvval=numberOfPrimaryVertices;
@@ -676,7 +774,8 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
          if (jetPt[i]>60) nmu40++;
          if (jetPt[i]>90) nmu60++;
          if (jetPt[i]>100) nmu70++;
-         if (jetPt[i]>130) nmu110++;
+//         if (jetPt[i]>130) nmu110++;
+         if (jetPt[i]>155) nmu110++;
         }
       }
 
@@ -840,10 +939,12 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
        HistoBtag[jmax*nhisto_to_clone+7]->Fill(numberOfPrimaryVertices,weight);
        HistoBtag[jmax*nhisto_to_clone+8]->Fill(numberOfPrimaryVertices,weightsave);
+       HistoBtag[jmax*nhisto_to_clone+9]->Fill(numberOfPUVertices,weight);
+       HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave);
        // FILL HERE YOUR NEW HISTO outside "j" loop
        // example :
        // float caro_test_2=0.2;
-       // HistoBtag[jmax*nhisto_to_clone+9]->Fill(caro_test_2, weight);   // increase the "8" of "npv_no_scaled" histo into a "9"
+       // HistoBtag[jmax*nhisto_to_clone+11]->Fill(caro_test_2, weight);   // increase the "10" of "npu" histo into a "11"
 
 
        for (int i=0; i<nJets; i++) {
@@ -944,10 +1045,10 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
 
                             //depending on #PV
-                            if (numberOfPrimaryVertices<=5) {          
+                            if (numberOfPrimaryVertices<=3) {          
                               HistoBtag[97+j*nhisto_to_clone]->Fill(trackTransverseMomentum[k], weight);  //pt_tracks
                             }
-                            else if (numberOfPrimaryVertices>=6 && numberOfPrimaryVertices<=10) {
+                            else if (numberOfPrimaryVertices>=4 && numberOfPrimaryVertices<=7) {
                               HistoBtag[111+j*nhisto_to_clone]->Fill(trackTransverseMomentum[k], weight);  //pt_tracks
                             }
                             else {
@@ -963,10 +1064,10 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
 
                               //depending on #PV
-                              if (numberOfPrimaryVertices<=5) {          
+                              if (numberOfPrimaryVertices<=3) {          
                                   HistoBtag[98+j*nhisto_to_clone]->Fill(trackTransverseMomentum[k], weight); //pt_seltracks
                               }
-                              else if (numberOfPrimaryVertices>=6 && numberOfPrimaryVertices<=10) {
+                              else if (numberOfPrimaryVertices>=4 && numberOfPrimaryVertices<=7) {
                                   HistoBtag[112+j*nhisto_to_clone]->Fill(trackTransverseMomentum[k], weight); //pt_seltracks
                               }
                               else {
@@ -981,12 +1082,20 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                               HistoBtag[35+j*nhisto_to_clone]->Fill(trackIP3d[k], weight);
                               HistoBtag[36+j*nhisto_to_clone]->Fill(trackIP3dError[k], weight);
                               HistoBtag[37+j*nhisto_to_clone]->Fill(trackIP3d[k]/trackIP3dError[k], weight);
+                              HistoBtag[135+j*nhisto_to_clone]->Fill(trackTransverseMomentum[k], weight); //pt_seltracks
+
+                              if (1<trackTransverseMomentum[k] && trackTransverseMomentum[k]<=2) HistoBtag[139+j*nhisto_to_clone]->Fill(trackIP3d[k], weight);
+                              if (2<trackTransverseMomentum[k] && trackTransverseMomentum[k]<=5) HistoBtag[140+j*nhisto_to_clone]->Fill(trackIP3d[k], weight);
+                              if (5<trackTransverseMomentum[k] && trackTransverseMomentum[k]<=8) HistoBtag[141+j*nhisto_to_clone]->Fill(trackIP3d[k], weight);
+                              if (8<trackTransverseMomentum[k] && trackTransverseMomentum[k]<=12) HistoBtag[142+j*nhisto_to_clone]->Fill(trackIP3d[k], weight);
+                              if (12<trackTransverseMomentum[k] && trackTransverseMomentum[k]<=20) HistoBtag[143+j*nhisto_to_clone]->Fill(trackIP3d[k], weight);
+                              if (20<trackTransverseMomentum[k] && trackTransverseMomentum[k]<=50) HistoBtag[144+j*nhisto_to_clone]->Fill(trackIP3d[k], weight);
 
                               //depending on #PV
-                              if (numberOfPrimaryVertices<=5) {          
+                              if (numberOfPrimaryVertices<=3) {          
                                 HistoBtag[99+j*nhisto_to_clone]->Fill(trackTransverseMomentum[k], weight); //pt_seltracks
                               }
-                              else if (numberOfPrimaryVertices>=6 && numberOfPrimaryVertices<=10) {
+                              else if (numberOfPrimaryVertices>=4 && numberOfPrimaryVertices<=7) {
                                 HistoBtag[113+j*nhisto_to_clone]->Fill(trackTransverseMomentum[k], weight); //pt_seltracks
                               }
                               else {
@@ -1040,17 +1149,29 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
                        // tracks sorted by ip
 
-                       if (n1_ip>-1) HistoBtag[47+j*nhisto_to_clone]->Fill(trackIP3d[n1_ip], weight);
+                       if (n1_ip>-1)  {
+                          HistoBtag[47+j*nhisto_to_clone]->Fill(trackIP3d[n1_ip], weight);
+                          HistoBtag[136+j*nhisto_to_clone]->Fill(trackIP3dError[n1_ip], weight);
+                       }
                        HistoBtag[48+j*nhisto_to_clone]->Fill(sig1_ip, weight);
                        HistoBtag[49+j*nhisto_to_clone]->Fill(sig1_ip, weight);
 
-                       if (n2_ip>-1) HistoBtag[50+j*nhisto_to_clone]->Fill(trackIP3d[n2_ip], weight);
+                       if (n2_ip>-1) {
+                          HistoBtag[50+j*nhisto_to_clone]->Fill(trackIP3d[n2_ip], weight);
+                          HistoBtag[137+j*nhisto_to_clone]->Fill(trackIP3dError[n2_ip], weight);
+                       }
                        HistoBtag[51+j*nhisto_to_clone]->Fill(sig2_ip, weight);
                        HistoBtag[52+j*nhisto_to_clone]->Fill(sig2_ip, weight);
 
-                       if (n3_ip>-1) HistoBtag[53+j*nhisto_to_clone]->Fill(trackIP3d[n3_ip], weight);
+                       if (n3_ip>-1) {
+                          HistoBtag[53+j*nhisto_to_clone]->Fill(trackIP3d[n3_ip], weight);
+                          HistoBtag[138+j*nhisto_to_clone]->Fill(trackIP3dError[n3_ip], weight);
+                       }
                        HistoBtag[54+j*nhisto_to_clone]->Fill(sig3_ip, weight);
                        HistoBtag[55+j*nhisto_to_clone]->Fill(sig3_ip, weight);
+                       Histo2DB[3+j*nhisto_to_clone2D]->Fill(jetPt[i],ntrack_jet, weight);
+                       Histo2DB[4+j*nhisto_to_clone2D]->Fill(jetPt[i],nseltrack_jet, weight);
+                       Histo2DB[5+j*nhisto_to_clone2D]->Fill(jetPt[i],ncutseltrack_jet, weight);
 
                        // SV
                        Histo2DB[0+j*nhisto_to_clone2D]->Fill(jetPt[i],SVnVertexTracks[i], weight);
@@ -1109,8 +1230,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                 HistoBtag[90+j*nhisto_to_clone]->Fill(muon1DeltaR[i], weight);
                 HistoBtag[91+j*nhisto_to_clone]->Fill(muon1Ratio[i], weight);
       
+                HistoBtag[134+j*nhisto_to_clone]->Fill(ncutseltrack_jet, weight); // nseltracks_jet
                 // depending on #PV
-                if (numberOfPrimaryVertices<=5) {          
+                if (numberOfPrimaryVertices<=3) {          
                  HistoBtag[92+j*nhisto_to_clone]->Fill(sig2_ip, weight);
                  HistoBtag[93+j*nhisto_to_clone]->Fill(sig3_ip, weight);
                  HistoBtag[94+j*nhisto_to_clone]->Fill(ntrack_jet, weight);  // ntracks_jet
@@ -1120,6 +1242,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                  // 98 : see above in track loop
                  // 99 : see above in track loop
                  HistoBtag[100+j*nhisto_to_clone]->Fill(SVnVertices[i], weight);
+                 int nnsv3tr=0;
+                 if (SVnVertexTracks[i]>=3) nnsv3tr=SVnVertices[i];
+                 HistoBtag[148+j*nhisto_to_clone]->Fill(nnsv3tr, weight);
                  if(SVnVertices[i]>0) {
                      HistoBtag[101+j*nhisto_to_clone]->Fill(SVnVertices[i], weight);
                      HistoBtag[102+j*nhisto_to_clone]->Fill(SV3dDistance[i]/SV3dDistanceError[i], weight);
@@ -1127,10 +1252,11 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                      if (SVnVertexTracks[i]>=3) {
                           HistoBtag[103+j*nhisto_to_clone]->Fill(SV3dDistance[i]/SV3dDistanceError[i], weight);
                           HistoBtag[105+j*nhisto_to_clone]->Fill(SVMass[i], weight);
+                          HistoBtag[145+j*nhisto_to_clone]->Fill(SVnVertices[i], weight);
                      }
                  }
                 }
-                else if (numberOfPrimaryVertices>=6 && numberOfPrimaryVertices<=10) {
+                else if (numberOfPrimaryVertices>=4 && numberOfPrimaryVertices<=7) {
                  HistoBtag[106+j*nhisto_to_clone]->Fill(sig2_ip, weight);
                  HistoBtag[107+j*nhisto_to_clone]->Fill(sig3_ip, weight);
                  HistoBtag[108+j*nhisto_to_clone]->Fill(ntrack_jet, weight);  // ntracks_jet
@@ -1140,6 +1266,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                  // 112 : see above in track loop
                  // 113 : see above in track loop
                  HistoBtag[114+j*nhisto_to_clone]->Fill(SVnVertices[i], weight);
+                 int nnsv3tr=0;
+                 if (SVnVertexTracks[i]>=3) nnsv3tr=SVnVertices[i];
+                 HistoBtag[149+j*nhisto_to_clone]->Fill(nnsv3tr, weight);
                  if(SVnVertices[i]>0) {
                      HistoBtag[115+j*nhisto_to_clone]->Fill(SVnVertices[i], weight);
                      HistoBtag[116+j*nhisto_to_clone]->Fill(SV3dDistance[i]/SV3dDistanceError[i], weight);
@@ -1147,6 +1276,7 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                      if (SVnVertexTracks[i]>=3) {
                           HistoBtag[117+j*nhisto_to_clone]->Fill(SV3dDistance[i]/SV3dDistanceError[i], weight);
                           HistoBtag[119+j*nhisto_to_clone]->Fill(SVMass[i], weight);
+                          HistoBtag[146+j*nhisto_to_clone]->Fill(SVnVertices[i], weight);
                      }
                  }
                 }
@@ -1160,6 +1290,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                  // 126 : see above in track loop
                  // 127 : see above in track loop
                  HistoBtag[128+j*nhisto_to_clone]->Fill(SVnVertices[i], weight);
+                 int nnsv3tr=0;
+                 if (SVnVertexTracks[i]>=3) nnsv3tr=SVnVertices[i];
+                 HistoBtag[150+j*nhisto_to_clone]->Fill(nnsv3tr, weight);
                  if(SVnVertices[i]>0) {
                      HistoBtag[129+j*nhisto_to_clone]->Fill(SVnVertices[i], weight);
                      HistoBtag[130+j*nhisto_to_clone]->Fill(SV3dDistance[i]/SV3dDistanceError[i], weight);
@@ -1167,6 +1300,7 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                      if (SVnVertexTracks[i]>=3) {
                           HistoBtag[131+j*nhisto_to_clone]->Fill(SV3dDistance[i]/SV3dDistanceError[i], weight);
                           HistoBtag[133+j*nhisto_to_clone]->Fill(SVMass[i], weight);
+                          HistoBtag[147+j*nhisto_to_clone]->Fill(SVnVertices[i], weight);
                      }
                  }
                 }
@@ -1174,7 +1308,7 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                 // FILL HERE YOUR NEW HISTO in "j" loop
                 // example :
 	        // float caro_new_info=0.6;
-                // HistoBtag[134+j*nhisto_to_clone]->Fill(caro_new_info, weight); // the "133" of "npv3_svmass_3tr" becomes here a "134" for "new_histo"
+                // HistoBtag[151+j*nhisto_to_clone]->Fill(caro_new_info, weight); // the "150" of "nnsv3tr" becomes here a "150" for "new_histo"
 
 
 

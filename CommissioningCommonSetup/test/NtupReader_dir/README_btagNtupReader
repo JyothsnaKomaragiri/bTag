@@ -84,29 +84,32 @@ AddHisto(string name_of_histo, int j, string title, string xaxis, const int& nbi
 example of code : inside "j" loop
 ...
    // last histo in the definition part
-        AddHisto(HistoBtag, "npv3_svmass_3tr",       j,"SV mass for >=3tracks (#PV:>10)",               50,0.,8.);
+        ddHisto(HistoBtag, "npv3_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:>7)",              5,0,5); //150
    // my new histo 
 	AddHisto(HistoBtag, "new_histo", j,"Test Caro",50,0.,1.);
 ....
    // filling part for last histo :
-        HistoBtag[133+j*nhisto_to_clone]->Fill(SVMass[i], weight);
+        HistoBtag[150+j*nhisto_to_clone]->Fill(nnsv3tr, weight);
    // my new histo
         float caro_new_info=0.6;
-        HistoBtag[134+j*nhisto_to_clone]->Fill(caro_new_info, weight); // the "133" of "npv3_svmass_3tr" becomes here a "134" for "new_histo"
+        HistoBtag[151+j*nhisto_to_clone]->Fill(caro_new_info, weight); // the "150" of "nnsv3tr" becomes here a "150" for "new_histo"
 
 
 
 other example of code :  outside "j" loop
 ...
    // last histo :
-   AddHisto(HistoBtag, "npv_no_scaled",  0,"numberOfPrimaryVertices",50,-0.5,49.5);
+   AddHisto(HistoBtag, "npu_no_scaled",  0,"numberOfPUVertices",50,-0.5,49.5);
    // my new histo  
         AddHisto(HistoBtag, "another_new_histo", 0,"Test Caro 2",50,0.,1.);
 ....
    // last histo :
-        HistoBtag[jmax*nhisto_to_clone+8]->Fill(numberOfPrimaryVertices,weightsave);
+        HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave);
    // my new histo
+       // FILL HERE YOUR NEW HISTO outside "j" loop
+       // example :
         float caro_test_2=0.2;
-        HistoBtag[jmax*nhisto_to_clone+9]->Fill(caro_test_2, weight);   // increase the "8" of "npv_no_scaled" histo into a "9"
+        HistoBtag[jmax*nhisto_to_clone+11]->Fill(caro_test_2, weight);   // increase the "10" of "npu" histo into a "11"
+
 
 
