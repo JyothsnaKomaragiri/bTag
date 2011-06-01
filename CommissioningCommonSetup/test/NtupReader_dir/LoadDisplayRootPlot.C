@@ -4,8 +4,9 @@
 
 #include <vector>
 
-string ptval_jet="60";
-string ptval_btag="40";
+string ptval_jet="30";
+string ptval_btag="20";
+TString format="pdf"; // png
 
 PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu=false){
   
@@ -456,12 +457,12 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
    canvas->cd();
 
   // SAVE PNG FILES
-  string name_can=selection+"_Linear.png";
+  string name_can=selection+"_Linear."+format;
   canvas->SaveAs(name_can.c_str());
 
   if (logy==1) {
    canvas_1->SetLogy(logy);
-   string name_can2=selection+"_Log.png";
+   string name_can2=selection+"_Log."+format;
    canvas->SaveAs(name_can2.c_str());
   }
 
@@ -824,13 +825,13 @@ TagRate(TString selection, bool down=false, bool logy=false, bool mu=false){
 */
 
   // SAVE PNG FILES
-  string name_can="tagRate_"+selection+"_Linear.png";
+  string name_can="tagRate_"+selection+"_Linear."+format;
   canvas->SaveAs(name_can.c_str());
 
   if (logy==1) {
 //   canvas_1->SetLogy(logy);
    canvas->SetLogy(logy);
-   string name_can2="tagRate_"+selection+"_Log.png";
+   string name_can2="tagRate_"+selection+"_Log."+format;
    canvas->SaveAs(name_can2.c_str());
   }
 
@@ -1092,12 +1093,12 @@ PlotData(TString selection, int date, bool down=false, bool logy=false, bool mu=
 
 
   // SAVE PNG FILES
-  string name_can="npv_"+selection+"_Linear.png";
+  string name_can="npv_"+selection+"_Linear."+format;
   canvas->SaveAs(name_can.c_str());
 
   if (logy==1) {
    canvas_1->SetLogy(logy);
-   string name_can2="npv_"+selection+"_Log.png";
+   string name_can2="npv_"+selection+"_Log."+format;
    canvas->SaveAs(name_can2.c_str());
   }
 
@@ -1324,12 +1325,12 @@ PlotStack2D(TString selection, bool logy=false, bool mu=false){
 
 
   // SAVE PNG FILES
-  string name_can=selection+"_Linear.png";
+  string name_can=selection+"_Linear."+format;
   canvas->SaveAs(name_can.c_str());
 
   if (logy==1) {
    canvas_1->SetLogy(logy);
-   string name_can2=selection+"_Log.png";
+   string name_can2=selection+"_Log."+format;
    canvas->SaveAs(name_can2.c_str());
   }
 
