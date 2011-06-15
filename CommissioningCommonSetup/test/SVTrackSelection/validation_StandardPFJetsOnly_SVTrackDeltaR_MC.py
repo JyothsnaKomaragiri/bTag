@@ -75,7 +75,7 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
 # Apply "loose PF JetID" first
 process.PFJetsFilter = cms.EDFilter("PFJetSelector",
   src = cms.InputTag("ak5PFJets"),
-  cut = cms.string("pt > 10.0 && abs(eta) < 2.5 && neutralHadronEnergyFraction < 1.0 && neutralEmEnergyFraction < 1.0 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 1.0"),
+  cut = cms.string("pt > 10.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99"),
   filter = cms.bool(True)
 )
 
