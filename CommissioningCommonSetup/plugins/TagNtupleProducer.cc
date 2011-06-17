@@ -184,7 +184,8 @@ public:
   unsigned int runNumber ;
   unsigned int lumiBlockNumber ;
 
-  unsigned int numberOfPUVertices;
+  unsigned int numberOfPUVertices;   // at BC=0
+  unsigned int numberOfPUVerticesTot;  // all PU : BC=0 and out-of-time PU
   unsigned int numberOfPrimaryVertices ;
   unsigned int numberOfTracksAtPV;
   float PVx;
@@ -195,6 +196,7 @@ public:
   float PVNormalizedChi2;
 
   float pthat;
+  float mcweight;
   bool isBGluonSplitting;
   bool isCGluonSplitting;
 
@@ -965,6 +967,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   tree->Branch(  "lumiBlockNumber" 	    , &lumiBlockNumber         , "lumiBlockNumber/i" 	    );
 
   tree->Branch(  "numberOfPUVertices",       &numberOfPUVertices, "numberOfPUVertices/i");
+  tree->Branch(  "numberOfPUVerticesTot",       &numberOfPUVerticesTot, "numberOfPUVerticesTot/i");
   tree->Branch(  "numberOfPrimaryVertices" , &numberOfPrimaryVertices , "numberOfPrimaryVertices/i"); 
   tree->Branch(  "numberOfTracksAtPV" , &numberOfTracksAtPV , "numberOfTracksAtPV/i"); 
   tree->Branch(  "PVx" , &PVx , "PVx/F"); 
@@ -975,6 +978,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   tree->Branch(  "PVNormalizedChi2" , &PVNormalizedChi2 , "PVNormalizedChi2/F"); 
 
   tree->Branch(  "pthat" , &pthat, "pthat/F");
+  tree->Branch(  "mcweight" , &mcweight, "mcweight/F");
   tree->Branch(  "isBGluonSplitting" , &isBGluonSplitting, "isBGluonSplitting/O");
   tree->Branch(  "isCGluonSplitting" , &isCGluonSplitting, "isCGluonSplitting/O");
 
@@ -1673,6 +1677,9 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   
   if(getMCPUInfo_) {
     edm::InputTag PileupSrc_("addPileupInfo");
+ 
+
+//  TO GET PU INFO IN 4_1_2 
     Handle<std::vector< PileupSummaryInfo > >  puInfo;
     bool bPuInfo=iEvent.getByLabel(PileupSrc_, puInfo);
     
@@ -1682,6 +1689,28 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       //   std::cout<<" numberOfPUVertices = " << numberOfPUVertices << std::endl;
 
     }
+    numberOfPUVerticesTot=numberOfPUVertices;
+//  END PU INFO IN 4_1_2
+
+/*  
+//   TO GET PU INFO IN 4_1_3 or later 
+     Handle<std::vector< PileupSummaryInfo > >  PupInfo;
+     iEvent.getByLabel(PileupSrc_, PupInfo);
+
+     std::vector<PileupSummaryInfo>::const_iterator PVI;
+
+     numberOfPUVertices=0;
+     numberOfPUVerticesTot=0;
+     for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
+       int n_bc=PVI->getBunchCrossing();
+       for (int ipu=0; ipu <PVI->getPU_NumInteractions(); ipu++) {
+        if (n_bc==0) numberOfPUVertices++;
+        numberOfPUVerticesTot++;
+       }
+    }
+//  END PU INFO IN 4_1_3 or later
+*/
+
   }
   
   edm::ESHandle<TransientTrackBuilder> builder;
@@ -1748,6 +1777,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
       // fill pt hat
       pthat = -1;
+      mcweight=-1;
       Handle< GenEventInfoProduct   > genInfo;
       iEvent.getByLabel("generator", genInfo  );      
       if (genInfo.isValid()) {
@@ -1755,6 +1785,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  if( genInfo->binningValues().size() > 0 ){
 	    pthat = genInfo->binningValues()[0];  
 	  }
+        mcweight=genInfo->weight();
       }
     } 
   else 
@@ -1765,6 +1796,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  flavor[RefToBase<Jet>(jets, iJet)] = fl;
 	}
       pthat = -2;
+      mcweight=-2;
     }
 
   // determine gluon splitting
