@@ -1549,36 +1549,36 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       prescaleHLTBTagMuDiJet30UMu5 = prescaleval ;
     //end add
 
-    //Single Jet trigger in 4_1_2_patch1
+    //Single Jet trigger in 4_1_2_patch1 and 42X
     if (trigName=="HLT_L1SingleJet36_v1" || trigName=="HLT_L1SingleJet36_v2") {
         triggerHLT_L1SingleJet36=hltresults->accept(itrig) ;
         prescaleHLT_L1SingleJet36= prescaleval;
     }
-    if (trigName=="HLT_Jet30_v1" || trigName=="HLT_Jet30_v2") {
+    if (trigName=="HLT_Jet30_v1" || trigName=="HLT_Jet30_v2" || trigName=="HLT_Jet30_v3" || trigName=="HLT_Jet30_v4") {
         triggerHLT_Jet30=hltresults->accept(itrig) ;
         prescaleHLT_Jet30= prescaleval;
     }
-    if (trigName=="HLT_Jet60_v1" || trigName=="HLT_Jet60_v2") {
+    if (trigName=="HLT_Jet60_v1" || trigName=="HLT_Jet60_v2" ||  trigName=="HLT_Jet60_v3" || trigName=="HLT_Jet60_v4") {
         triggerHLT_Jet60=hltresults->accept(itrig) ;
         prescaleHLT_Jet60= prescaleval;
     }
-    if (trigName=="HLT_Jet80_v1" || trigName=="HLT_Jet80_v2") {
+    if (trigName=="HLT_Jet80_v1" || trigName=="HLT_Jet80_v2" || trigName=="HLT_Jet80_v3" ||  trigName=="HLT_Jet80_v4") {
         triggerHLT_Jet80=hltresults->accept(itrig) ;
         prescaleHLT_Jet80= prescaleval;
     }
-    if (trigName=="HLT_Jet110_v1" || trigName=="HLT_Jet110_v2") {
+    if (trigName=="HLT_Jet110_v1" || trigName=="HLT_Jet110_v2" || trigName=="HLT_Jet110_v3" || trigName=="HLT_Jet110_v4") {
         triggerHLT_Jet110=hltresults->accept(itrig) ;
         prescaleHLT_Jet110= prescaleval;
     }
-    if (trigName=="HLT_Jet150_v1" || trigName=="HLT_Jet150_v2") {
+    if (trigName=="HLT_Jet150_v1" || trigName=="HLT_Jet150_v2" || trigName=="HLT_Jet150_v3" || trigName=="HLT_Jet150_v4") {
         triggerHLT_Jet150=hltresults->accept(itrig) ;
         prescaleHLT_Jet150= prescaleval;
     }
-    if (trigName=="HLT_Jet190_v1" || trigName=="HLT_Jet190_v2") {
+    if (trigName=="HLT_Jet190_v1" || trigName=="HLT_Jet190_v2" || trigName=="HLT_Jet190_v3" || trigName=="HLT_Jet190_v4") {
         triggerHLT_Jet190=hltresults->accept(itrig) ;
         prescaleHLT_Jet190= prescaleval;
     }
-    if (trigName=="HLT_Jet240_v1" || trigName=="HLT_Jet240_v2") {
+    if (trigName=="HLT_Jet240_v1" || trigName=="HLT_Jet240_v2" || trigName=="HLT_Jet240_v3" || trigName=="HLT_Jet240_v4") {
         triggerHLT_Jet240=hltresults->accept(itrig) ;
         prescaleHLT_Jet240= prescaleval;
     }
@@ -1623,11 +1623,11 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       triggerHLT_DiJetAve300U_v4= hltresults->accept(itrig) ;
       prescaleHLT_DiJetAve300U_v4= prescaleval;               
     }       
-    if(trigName=="HLT_BTagMu_DiJet20_Mu5_v2" || trigName=="HLT_BTagMu_DiJet20_Mu5_v3") { 
+    if(trigName=="HLT_BTagMu_DiJet20_Mu5_v2" || trigName=="HLT_BTagMu_DiJet20_Mu5_v3" || trigName=="HLT_BTagMu_DiJet20_Mu5_v4" ||trigName=="HLT_BTagMu_DiJet20_Mu5_v5") { 
       triggerHLT_BTagMu_DiJet20_Mu5= hltresults->accept(itrig) ;
       prescaleHLT_BTagMu_DiJet20_Mu5= prescaleval;               
     }  
-    if(trigName=="HLT_BTagMu_DiJet40_Mu5_v3") { 
+    if(trigName=="HLT_BTagMu_DiJet40_Mu5_v3" || trigName=="HLT_BTagMu_DiJet40_Mu5_v4" || trigName=="HLT_BTagMu_DiJet40_Mu5_v5") { 
       triggerHLT_BTagMu_DiJet40_Mu5= hltresults->accept(itrig) ;
       prescaleHLT_BTagMu_DiJet40_Mu5= prescaleval;               
     }  
@@ -1635,7 +1635,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       triggerHLT_BTagMu_DiJet60_Mu7_v2= hltresults->accept(itrig) ;
       prescaleHLT_BTagMu_DiJet60_Mu7_v2= prescaleval;               
     }   
-    if(trigName=="HLT_BTagMu_DiJet70_Mu5_v3") { 
+    if(trigName=="HLT_BTagMu_DiJet70_Mu5_v3" || trigName=="HLT_BTagMu_DiJet70_Mu5_v4" || trigName=="HLT_BTagMu_DiJet70_Mu5_v5") { 
       triggerHLT_BTagMu_DiJet70_Mu5= hltresults->accept(itrig) ;
       prescaleHLT_BTagMu_DiJet70_Mu5= prescaleval;               
     }  
@@ -1647,7 +1647,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       triggerHLT_BTagMu_DiJet100_Mu9_v2= hltresults->accept(itrig) ;
       prescaleHLT_BTagMu_DiJet100_Mu9_v2= prescaleval;               
     }  
-    if(trigName=="HLT_BTagMu_DiJet110_Mu5_v3") {
+    if(trigName=="HLT_BTagMu_DiJet110_Mu5_v3" || trigName=="HLT_BTagMu_DiJet110_Mu5_v4" || trigName=="HLT_BTagMu_DiJet110_Mu5_v5") {
       triggerHLT_BTagMu_DiJet110_Mu5= hltresults->accept(itrig) ;
       prescaleHLT_BTagMu_DiJet110_Mu5= prescaleval;               
     }
