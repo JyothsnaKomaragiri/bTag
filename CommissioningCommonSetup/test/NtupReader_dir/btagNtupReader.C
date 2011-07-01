@@ -16,15 +16,15 @@
 // TO BE DEFINED FIRST !
   bool Run_on_Jet = false;
   bool Run_on_Btag = true;
-  TString final_dir = "dir_btag40";
+  TString final_dir = "dir_btag20pu";
   // + check the data and MC input files
 
 //  TString my_trigger_path="HLT_Jet30";
 //  TString my_trigger_path="HLT_Jet60";
 //  TString my_trigger_path="HLT_Jet80";
 //  TString my_trigger_path="HLT_Jet110";
-//  TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";
-  TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";
+  TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";
+//  TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";
 //  TString my_trigger_path="HLT_BTagMu_DiJet60_Mu7";
 //  TString my_trigger_path="HLT_BTagMu_DiJet70_Mu5";
 //  TString my_trigger_path="HLT_BTagMu_DiJet110_Mu5";
@@ -34,8 +34,8 @@
 //  float cutJetPt=60.;  // FOR JETS HLT_Jet60
 //  float cutJetPt=80.;  // FOR JETS HLT_Jet80
 //  float cutJetPt=110.;  // FOR JETS HLT_Jet80
-//  float cutJetPt=45.;  // FOR JETS HLT_BTagMu_DiJet20_Mu5
-  float cutJetPt=65.;  // FOR JETS HLT_BTagMu_DiJet40_Mu5
+  float cutJetPt=45.;  // FOR JETS HLT_BTagMu_DiJet20_Mu5
+//  float cutJetPt=65.;  // FOR JETS HLT_BTagMu_DiJet40_Mu5
 //  float cutJetPt=95.;  // FOR JETS HLT_BTagMu_DiJet60_Mu7
 //  float cutJetPt=105.;  // FOR JETS HLT_BTagMu_DiJet70_Mu5
 //  float cutJetPt=160.;  // FOR JETS HLT_BTagMu_DiJet110_Mu5
@@ -125,21 +125,25 @@ cout << endl;
 TString action;
 
 
+
 cout << " ----> DATA 2011" << endl;
   weight=1;
 
   if (Run_on_Jet)      { 
-     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/Data/Jet2011/*.root");   
+//     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/Data/Jet2011/*.root");   
+     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/v42x_v1/Data/link_jet/*.root");
      yt.Loop(0, weight); 
      action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minijet2011.root";
      system(action);
   }
   if (Run_on_Btag){ 
-     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/Data/Met2011/*.root");    
+//     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/Data/Met2011/*.root");    
+     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/v42x_v1/Data/link_met/*.root");    
      yt.Loop(0, weight); 
      action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minibtag2011.root";
      system(action);
   }
+
 
 
 /*
@@ -609,136 +613,122 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
       if(jentry%100000 == 0) cout << "number of processed events " << jentry << endl;
 
        if (cutgen==1) {
-           float weightnpv[22];
-/* jamboree
-           // MC : reweight # of PV, done on HLT_JET30 (16.9 pb-1 - april 2011)
-           weightnpv[0]=0;   // npu=0
-           weightnpv[1]=0.325644;  // npu=1
-           weightnpv[2]=0.945859;
-           weightnpv[3]=1.66591;
-           weightnpv[4]=2.00085;
-           weightnpv[5]=1.88967;
-           weightnpv[6]=1.50579;
-           weightnpv[7]=1.10176;
-           weightnpv[8]=0.772138;
-           weightnpv[9]=0.541927 ;
-           weightnpv[10]=0.404149;
-           weightnpv[11]=0.290918;
-           weightnpv[12]=0.230371;
-           weightnpv[13]=0.195486;
-           weightnpv[14]=0.150098 ;
-           weightnpv[15]=0.142274;
-           weightnpv[16]=0.108799;
-           weightnpv[17]=0.0874746;
-           weightnpv[18]=0.0536018;
-           weightnpv[19]=0.;
-*/
-
-// 152 pb-1
+           float weightnpv[26];
+// 499 pb-1
           if (Run_on_Jet) {
 /*
-           // HLT_Jet30
-           weightnpv[0]=0;   // npu=0
-           weightnpv[1]=0.312893;  // npu=1
-           weightnpv[2]=0.93032;
-           weightnpv[3]=1.61398;
-           weightnpv[4]=1.94037;
-           weightnpv[5]=1.84128;
-           weightnpv[6]=1.49916;
-           weightnpv[7]=1.11222;
-           weightnpv[8]=0.80533;
-           weightnpv[9]=0.573918 ;
-           weightnpv[10]=0.430057;
-           weightnpv[11]=0.321297;
-           weightnpv[12]=0.259626;
-           weightnpv[13]=0.218741;
-           weightnpv[14]=0.18579 ;
-           weightnpv[15]=0.153645;
-           weightnpv[16]=0.139422;
-           weightnpv[17]=0.112488;
-           weightnpv[18]=0.121916;
-           weightnpv[19]=0.101843;
-           weightnpv[20]=0.0630489;
-           weightnpv[21]=0.;
-*/
-           //HLT_Jet80
+           //HLT_Jet60
            weightnpv[0]=0;
-           weightnpv[1]=0.229418;
-           weightnpv[2]=0.80637;
-           weightnpv[3]=1.51697;
-           weightnpv[4]=1.8971;
-           weightnpv[5]=1.96651;
-           weightnpv[6]=1.65706;
-           weightnpv[7]=1.23141;
-           weightnpv[8]=0.81926;
-           weightnpv[9]=0.528817;
-           weightnpv[10]=0.34538;
-           weightnpv[11]=0.233533;
-           weightnpv[12]=0.16382;
-           weightnpv[13]=0.112897;
-           weightnpv[14]=0.0902319;
-           weightnpv[15]=0.0661547;
-           weightnpv[16]=0.0600564;
-           weightnpv[17]=0.0452439;
-           weightnpv[18]=0.0295257;
-           weightnpv[19]=0.101689;
-           weightnpv[20]=0.0522156;
+           weightnpv[1]=0.222754;
+           weightnpv[2]=0.754103;
+           weightnpv[3]=1.43403;
+           weightnpv[4]=1.85957;
+           weightnpv[5]=1.94963;
+           weightnpv[6]=1.68839;
+           weightnpv[7]=1.28163;
+           weightnpv[8]=0.884921;
+           weightnpv[9]=0.585522;
+           weightnpv[10]=0.386745;
+           weightnpv[11]=0.264428;
+           weightnpv[12]=0.192353;
+           weightnpv[13]=0.142132;
+           weightnpv[14]=0.113182;
+           weightnpv[15]=0.0891076;
+           weightnpv[16]=0.0787451;
+           weightnpv[17]=0.0544419;
+           weightnpv[18]=0.0678632;
+           weightnpv[19]=0.0861539;
+           weightnpv[20]=0;
            weightnpv[21]=0;
+*/
+           weightnpv[0]=0.129517;
+           weightnpv[1]=0.311049;
+           weightnpv[2]=0.877493;
+           weightnpv[3]=1.32235;
+           weightnpv[4]=1.91109;
+           weightnpv[5]=1.81043;
+           weightnpv[6]=1.83934;
+           weightnpv[7]=1.77981;
+           weightnpv[8]=1.29938;
+           weightnpv[9]=0.8919;
+           weightnpv[10]=0.590799;
+           weightnpv[11]=0.430463;
+           weightnpv[12]=0.306837;
+           weightnpv[13]=0.255782;
+           weightnpv[14]=0.20193;
+           weightnpv[15]=0.162117;
+           weightnpv[16]=0.133357;
+           weightnpv[17]=0.0979672;
+           weightnpv[18]=0.0954009;
+           weightnpv[19]=0.133177;
+           weightnpv[20]=0.201325;
+           weightnpv[21]=0.159833;
+           weightnpv[22]=0.336746;
+           weightnpv[23]=0.0713124;
+           weightnpv[24]=0.0463483;
+           weightnpv[25]=0;
 
            }
            else if (Run_on_Btag) {
-           // BTagMu_Dijet20_Mu5
+           // BTagMu_Dijet40_Mu5
 /*
-           weightnpv[0]=0;   // npu=0
-           weightnpv[1]=0.264676;  // npu=1
-           weightnpv[2]=0.833291;
-           weightnpv[3]=1.53216;
-           weightnpv[4]=1.85509;
-           weightnpv[5]=1.81211;
-           weightnpv[6]=1.48514;
-           weightnpv[7]=1.09538;
-           weightnpv[8]=0.77859;
-           weightnpv[9]=0.543221 ;
-           weightnpv[10]=0.388943;
-           weightnpv[11]=0.292292;
-           weightnpv[12]=0.219585;
-           weightnpv[13]=0.162671;
-           weightnpv[14]=0.131794 ;
-           weightnpv[15]=0.0917709;
-           weightnpv[16]=0.0929882;
-           weightnpv[17]=0.0713007;
-           weightnpv[18]=0.0807572;
-           weightnpv[19]=0.;
+           weightnpv[0]=0;
+           weightnpv[1]=0.185062;
+           weightnpv[2]=0.684153;
+           weightnpv[3]=1.36635;
+           weightnpv[4]=1.80395;
+           weightnpv[5]=1.95111;
+           weightnpv[6]=1.71438;
+           weightnpv[7]=1.31984;
+           weightnpv[8]=0.916886;
+           weightnpv[9]=0.604304;
+           weightnpv[10]=0.403362;
+           weightnpv[11]=0.285383;
+           weightnpv[12]=0.199778;
+           weightnpv[13]=0.148974;
+           weightnpv[14]=0.110441;
+           weightnpv[15]=0.0930386;
+           weightnpv[16]=0.0717144;
+           weightnpv[17]=0.0708401;
+           weightnpv[18]=0.0359999;
+           weightnpv[19]=0.0434156;
            weightnpv[20]=0.;
            weightnpv[21]=0.;
 */
-           weightnpv[0]=0;
-           weightnpv[1]=0.24709;
-           weightnpv[2]=0.842741;
-           weightnpv[3]=1.62052;
-           weightnpv[4]=2.01121;
-           weightnpv[5]=2.02031;
-           weightnpv[6]=1.6808;
-           weightnpv[7]=1.2486;
-           weightnpv[8]=0.840173;
-           weightnpv[9]=0.534628;
-           weightnpv[10]=0.356541;
-           weightnpv[11]=0.232851;
-           weightnpv[12]=0.173515;
-           weightnpv[13]=0.119841;
-           weightnpv[14]=0.0902945;
-           weightnpv[15]=0.0781384;
-           weightnpv[16]=0.0603114;
-           weightnpv[17]=0.0442252;
-           weightnpv[18]=0.0525518;
-           weightnpv[19]=0.;
-           weightnpv[20]=0.;
-           weightnpv[21]=0.;
+           weightnpv[0]=0.156498;
+           weightnpv[1]=0.348279;
+           weightnpv[2]=0.931435;
+           weightnpv[3]=1.38161;
+           weightnpv[4]=1.91335;
+           weightnpv[5]=1.8012;
+           weightnpv[6]=1.77467;
+           weightnpv[7]=1.70689;
+           weightnpv[8]=1.25496;
+           weightnpv[9]=0.849071;
+           weightnpv[10]=0.560916;
+           weightnpv[11]=0.410454;
+           weightnpv[12]=0.292295;
+           weightnpv[13]=0.236444;
+           weightnpv[14]=0.186692;
+           weightnpv[15]=0.151324;
+           weightnpv[16]=0.12243;
+           weightnpv[17]=0.0901566;
+           weightnpv[18]=0.0918909;
+           weightnpv[19]=0.12913;
+           weightnpv[20]=0.200706;
+           weightnpv[21]=0.181146;
+           weightnpv[22]=0.341892;
+           weightnpv[23]=0.0849563;
+           weightnpv[24]=0.0416172;
+           weightnpv[25]=0.;
+
 
            }
   
-           int npvval=numberOfPrimaryVertices;
-           if (numberOfPrimaryVertices>=21) npvval=21;
+//           int npvval=numberOfPrimaryVertices;
+//           if (numberOfPrimaryVertices>=21) npvval=21;
+           int npvval=numberOfPUVertices;
+           if (numberOfPUVertices>=25) npvval=25;
            weight*=weightnpv[npvval];
        }
 
@@ -749,6 +739,8 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
       HistoBtag[jmax*nhisto_to_clone+4]->Fill(prescaleHLT_Jet110);
       HistoBtag[jmax*nhisto_to_clone+5]->Fill(prescaleHLTJet100U);
 
+      HistoBtag[jmax*nhisto_to_clone+9]->Fill(numberOfPUVertices,weight);
+      HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave);
 
 
       bool cut_on_mu= false; 
@@ -939,8 +931,6 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
        HistoBtag[jmax*nhisto_to_clone+7]->Fill(numberOfPrimaryVertices,weight);
        HistoBtag[jmax*nhisto_to_clone+8]->Fill(numberOfPrimaryVertices,weightsave);
-       HistoBtag[jmax*nhisto_to_clone+9]->Fill(numberOfPUVertices,weight);
-       HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave);
        // FILL HERE YOUR NEW HISTO outside "j" loop
        // example :
        // float caro_test_2=0.2;
