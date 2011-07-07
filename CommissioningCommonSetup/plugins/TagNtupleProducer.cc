@@ -1,6 +1,7 @@
 // system include files
 #include <memory>
 #include <vector>
+#include <deque>
 #include <map>
 #include <string>
 #include <cmath>
@@ -128,6 +129,10 @@ public:
   // data formats
   TTree *tree;
   TFile *file;
+  
+  std::vector<std::string> trigNames_;
+  std::deque<bool> triggers_;
+  std::vector<int> prescales_;
   
   bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U;
   bool triggerHLTJet30U, triggerHLTJet50U, triggerHLTJet70U, triggerHLTJet100U ;
@@ -694,6 +699,50 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   file = new TFile (filename_.c_str(), "RECREATE" );
   // create tree structure
   tree = new TTree("t","t");
+
+  trigNames_.push_back("HLT_L1Jet6U");
+  trigNames_.push_back("HLT_L1Jet10U");
+  trigNames_.push_back("HLT_Jet15U");
+  trigNames_.push_back("HLT_Jet30U");
+  trigNames_.push_back("HLT_Jet50U");
+  trigNames_.push_back("HLT_Jet70U");
+  trigNames_.push_back("HLT_Jet100U");
+  trigNames_.push_back("HLT_BTagIP_Jet50U");
+  trigNames_.push_back("HLT_BTagMu_Jet10U");
+  trigNames_.push_back("HLT_BTagMu_Jet20U");
+  trigNames_.push_back("HLT_BTagMu_DiJet10U");
+  trigNames_.push_back("HLT_BTagMu_DiJet20U");
+  trigNames_.push_back("HLT_BTagMu_DiJet20U_Mu5");
+  trigNames_.push_back("HLT_BTagMu_DiJet30U");
+  trigNames_.push_back("HLT_BTagMu_DiJet30U_Mu5");
+  trigNames_.push_back("HLT_L1SingleJet36");
+  trigNames_.push_back("HLT_Jet30");
+  trigNames_.push_back("HLT_Jet60");
+  trigNames_.push_back("HLT_Jet80");
+  trigNames_.push_back("HLT_Jet110");
+  trigNames_.push_back("HLT_Jet150");
+  trigNames_.push_back("HLT_Jet190");
+  trigNames_.push_back("HLT_Jet240");
+  trigNames_.push_back("HLT_Jet370");
+  trigNames_.push_back("HLT_Jet370_NoJetID");
+  trigNames_.push_back("HLT_DiJetAve15U");
+  trigNames_.push_back("HLT_DiJetAve30U");
+  trigNames_.push_back("HLT_DiJetAve50U");
+  trigNames_.push_back("HLT_DiJetAve70U");
+  trigNames_.push_back("HLT_DiJetAve100U");
+  trigNames_.push_back("HLT_DiJetAve140U");
+  trigNames_.push_back("HLT_DiJetAve180U");
+  trigNames_.push_back("HLT_DiJetAve300U");
+  trigNames_.push_back("HLT_BTagMu_DiJet20_Mu5");
+  trigNames_.push_back("HLT_BTagMu_DiJet40_Mu5");
+  trigNames_.push_back("HLT_BTagMu_DiJet70_Mu5");
+  trigNames_.push_back("HLT_BTagMu_DiJet110_Mu5");
+  trigNames_.push_back("HLT_BTagMu_DiJet60_Mu7");
+  trigNames_.push_back("HLT_BTagMu_DiJet80_Mu9");
+  trigNames_.push_back("HLT_BTagMu_DiJet100_Mu9");
+
+  triggers_.resize(trigNames_.size(), false);
+  prescales_.resize(trigNames_.size(), 0);
     
   
   for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
@@ -872,7 +921,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   electrondeltaPhiSeedClusterTrackAtCalo.push_back(electron4deltaPhiSeedClusterTrackAtCalo);
   electrondeltaPhiEleClusterTrackAtCalo. push_back(electron4deltaPhiEleClusterTrackAtCalo);
 
-  tree->Branch(  "triggerHLTL1Jet6U", &triggerHLTL1Jet6U, "triggerHLTL1Jet6U/O"); 
+  /*tree->Branch(  "triggerHLTL1Jet6U", &triggerHLTL1Jet6U, "triggerHLTL1Jet6U/O"); 
   tree->Branch(  "triggerHLTL1Jet10U", &triggerHLTL1Jet10U, "triggerHLTL1Jet10U/O"); 
   tree->Branch(  "triggerHLTJet15U",  &triggerHLTJet15U, "triggerHLTJet15U/O");
   tree->Branch(  "triggerHLTJet30U",  &triggerHLTJet30U, "triggerHLTJet30U/O");
@@ -958,7 +1007,12 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   tree->Branch( "prescaleHLT_BTagMu_DiJet110_Mu5",     &prescaleHLT_BTagMu_DiJet110_Mu5   , "prescaleHLT_BTagMu_DiJet110_Mu5/I");   
   tree->Branch( "prescaleHLT_BTagMu_DiJet60_Mu7_v2",   &prescaleHLT_BTagMu_DiJet60_Mu7_v2 , "prescaleHLT_BTagMu_DiJet60_Mu7_v2/I");   
   tree->Branch( "prescaleHLT_BTagMu_DiJet80_Mu9_v2",   &prescaleHLT_BTagMu_DiJet80_Mu9_v2 , "prescaleHLT_BTagMu_DiJet80_Mu9_v2/I");   
-  tree->Branch( "prescaleHLT_BTagMu_DiJet100_Mu9_v2",  &prescaleHLT_BTagMu_DiJet100_Mu9_v2, "prescaleHLT_BTagMu_DiJet100_Mu9_v2/I");  
+  tree->Branch( "prescaleHLT_BTagMu_DiJet100_Mu9_v2",  &prescaleHLT_BTagMu_DiJet100_Mu9_v2, "prescaleHLT_BTagMu_DiJet100_Mu9_v2/I"); */
+  for(unsigned int i = 0; i != trigNames_.size(); ++i)
+  {
+    tree->Branch(("trigger" + trigNames_[i]).c_str(), &triggers_[i], ("trigger" + trigNames_[i] + "/O").c_str());
+    tree->Branch(("prescale" + trigNames_[i]).c_str(), &prescales_[i], ("prescales" + trigNames_[i] + "/I").c_str());
+  }
 
 
 
@@ -1480,8 +1534,17 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   for (int itrig = 0; itrig != ntrigs; ++itrig){
 
     string trigName=triggerNames_.triggerName(itrig);
+    for(unsigned int iter = 0; iter != trigNames_.size(); ++iter)
+    {
+      if(trigName.find(trigNames_[iter]) != std::string::npos)
+      {
+        triggers_[iter] = hltresults->accept(itrig);
+        prescales_[iter] = hltConfigProvider_.prescaleValue(iEvent, iSetup, trigName);
+        break;
+      }
+    }
 
-    if (trigName=="HLT_L1Jet6U")               triggerHLTL1Jet6U  = hltresults->accept(itrig) ;
+    /*if (trigName=="HLT_L1Jet6U")               triggerHLTL1Jet6U  = hltresults->accept(itrig) ;
     if (trigName=="HLT_L1Jet10U")              triggerHLTL1Jet10U = hltresults->accept(itrig) ; 
 
     //Take care of versioning even for the single jet triggers
@@ -1654,7 +1717,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     if(trigName=="HLT_BTagMu_DiJet110_Mu5_v3" || trigName=="HLT_BTagMu_DiJet110_Mu5_v4" || trigName=="HLT_BTagMu_DiJet110_Mu5_v5") {
       triggerHLT_BTagMu_DiJet110_Mu5= hltresults->accept(itrig) ;
       prescaleHLT_BTagMu_DiJet110_Mu5= prescaleval;               
-    }
+    }*/
   }  
   
   
