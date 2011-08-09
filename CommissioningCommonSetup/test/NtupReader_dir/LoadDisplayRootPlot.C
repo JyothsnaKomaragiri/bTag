@@ -4,11 +4,45 @@
 
 #include <vector>
 
+
 string ptval_jet="60";
 string ptval_btag="20";
 TString format="pdf"; // png
 
-PlotStack(TString selection, TString label, int date, bool down=false, bool logy=false, bool mu=false){
+void OverFlowBinFix(TH1F* histo){
+
+  Float_t val, errval;
+
+  val=histo->GetBinContent(1)+histo->GetBinContent(0);
+  errval=0;
+  if(histo->GetBinContent(1)!=0.)
+    errval+=pow(histo->GetBinError(1)/histo->GetBinContent(1),2);
+  if(histo->GetBinContent(0)!=0.)
+    errval+=pow(histo->GetBinError(0)/histo->GetBinContent(0),2);
+  errval=sqrt(errval)*val;
+  histo->SetBinContent(1,val);
+  histo->SetBinError(1,errval);
+  histo->SetBinContent(0,0);
+  histo->SetBinError(0,0);
+
+
+  Int_t highbin=histo->GetNbinsX();
+  
+  val=histo->GetBinContent(highbin)+histo->GetBinContent(highbin+1);
+  errval=0;
+  if(histo->GetBinContent(highbin)!=0.)
+    errval+=pow(histo->GetBinError(highbin)/histo->GetBinContent(highbin),2);
+  if(histo->GetBinContent(highbin+1)!=0.)
+    errval+=pow(histo->GetBinError(highbin+1)/histo->GetBinContent(highbin+1),2);
+  errval=sqrt(errval)*val;
+  histo->SetBinContent(highbin,val);
+  histo->SetBinError(highbin,errval);
+  histo->SetBinContent(highbin+1,0);
+  histo->SetBinError(highbin+1,0);
+
+}
+
+PlotStack(TString selection, TString label, int date, bool down=false, bool logy=false, bool mu=false ){
   
  
   const int maxmax=10;
@@ -141,7 +175,17 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
     histo0_MC_gspl->Add(histo_MC_gspl[i]);
    }
   }
-
+  // fix overflow bins:
+ 
+  
+  OverFlowBinFix(histo0_MC);
+  OverFlowBinFix(histo0_MC_b);
+  OverFlowBinFix(histo0_MC_c);
+  OverFlowBinFix(histo0_MC_udsg);
+  OverFlowBinFix(histo0_MC_gspl);
+  OverFlowBinFix(histo0_Data);
+  OverFlowBinFix(histo0_2010);
+  //
 
   // SCALE MC TO DATA
   float scaleparam=histo0_Data->Integral()/histo0_MC->Integral();
