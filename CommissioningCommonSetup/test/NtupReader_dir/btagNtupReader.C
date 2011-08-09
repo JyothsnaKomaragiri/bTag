@@ -14,16 +14,17 @@
 // ----------- 
 
 // TO BE DEFINED FIRST !
-  bool Run_on_Jet = false;
-  bool Run_on_Btag = true;
-  TString final_dir = "dir_btag20pu";
+  bool Run_on_Jet = true;
+  bool Run_on_Btag = false;
+//  TString final_dir = "dir_btag20pu";
+  TString final_dir = "dir_jet60pu_test";
   // + check the data and MC input files
 
 //  TString my_trigger_path="HLT_Jet30";
-//  TString my_trigger_path="HLT_Jet60";
+  TString my_trigger_path="HLT_Jet60";
 //  TString my_trigger_path="HLT_Jet80";
 //  TString my_trigger_path="HLT_Jet110";
-  TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";
+//  TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";
 //  TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";
 //  TString my_trigger_path="HLT_BTagMu_DiJet60_Mu7";
 //  TString my_trigger_path="HLT_BTagMu_DiJet70_Mu5";
@@ -31,10 +32,10 @@
 
   // CUT VALUES
 //  float cutJetPt=30.;  // FOR JETS HLT_Jet30
-//  float cutJetPt=60.;  // FOR JETS HLT_Jet60
+  float cutJetPt=60.;  // FOR JETS HLT_Jet60
 //  float cutJetPt=80.;  // FOR JETS HLT_Jet80
 //  float cutJetPt=110.;  // FOR JETS HLT_Jet80
-  float cutJetPt=45.;  // FOR JETS HLT_BTagMu_DiJet20_Mu5
+//  float cutJetPt=45.;  // FOR JETS HLT_BTagMu_DiJet20_Mu5
 //  float cutJetPt=65.;  // FOR JETS HLT_BTagMu_DiJet40_Mu5
 //  float cutJetPt=95.;  // FOR JETS HLT_BTagMu_DiJet60_Mu7
 //  float cutJetPt=105.;  // FOR JETS HLT_BTagMu_DiJet70_Mu5
@@ -131,7 +132,8 @@ cout << " ----> DATA 2011" << endl;
 
   if (Run_on_Jet)      { 
 //     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/Data/Jet2011/*.root");   
-     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/v42x_v1/Data/link_jet/*.root");
+//     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/v42x_v1/Data/link_jet/*.root");
+    btagNtupReader yt(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/BTAG/v42X_v1/Data/Jet2011_rerecomay10/standardPFNtuple_15*.root");
      yt.Loop(0, weight); 
      action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minijet2011.root";
      system(action);
@@ -164,7 +166,7 @@ cout << " ----> MC : QCD 15-30 " << endl;
    weight=weight15;
 //  btagNtupReader xt15(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_15to30_TuneZ2_7TeV_pythia6_PU/*.root"); // 39X
 //  btagNtupReader xt15(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD15to30/QCD15to30/*.root"); // 311X
-   btagNtupReader xt15(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_15to30/*.root"); // 311X DA & SV fix
+   btagNtupReader xt15(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_15to30/standardPFNtuple_10*.root"); // 311X DA & SV fix
    xt15.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd15.root";
    system(action);
@@ -173,7 +175,7 @@ cout << " ----> MC : QCD 30-50 " << endl;
    weight=weight30;
 //   btagNtupReader xt30(0, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_30to50_TuneZ2_7TeV_pythia6_PU/*.root"); // 39X
 //   btagNtupReader xt30(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD30to50/*.root"); // 311X
-   btagNtupReader xt30(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_30to50/*.root"); // 311X DA & SV fix
+   btagNtupReader xt30(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_30to50/standardPFNtuple_10*.root"); // 311X DA & SV fix
    xt30.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd30.root";
    system(action);
@@ -183,7 +185,7 @@ cout << " ----> MC : QCD 50-80 " << endl;
    weight=weight50;
 //   btagNtupReader xt50(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_50to80_TuneZ2_7TeV_pythia6_PU_v2/*.root"); // 39X
 //   btagNtupReader xt50(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD50to80/*.root"); // 311X
-   btagNtupReader xt50(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_50to80/*.root"); // 311X DA & SV fix
+   btagNtupReader xt50(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_50to80/standardPFNtuple_1*.root"); // 311X DA & SV fix
    xt50.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd50.root";
    system(action);
@@ -194,7 +196,7 @@ cout << " ----> MC : QCD 80-120 " << endl;
    weight=weight80;
 //   btagNtupReader xt80(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_80to120_TuneZ2_7TeV_pythia6_PU_prescale/*.root"); // 39X
 //   btagNtupReader xt80(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD80to120/*.root"); //311X
-   btagNtupReader xt80(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_80to120/*.root"); // 311X DA & SV fix
+   btagNtupReader xt80(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_80to120/standardPFNtuple_10*.root"); // 311X DA & SV fix
    xt80.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd80.root";
    system(action);
@@ -204,7 +206,7 @@ cout << " ----> MC : QCD 120-170 " << endl;
    weight=weight120;
 //   btagNtupReader xt120(0, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_120to170_TuneZ2_7TeV_pythia6_PU/*.root"); // 39X
 //   btagNtupReader xt120(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD120to170/*.root"); // 311X
-   btagNtupReader xt120(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCD_Pt_120to170/*.root"); // 311X DA & SV fix
+   btagNtupReader xt120(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/BTAG/V4_DA_SVfix/MC/QCD_Pt_120to170/standardPFNtuple_100*.root"); // 311X DA & SV fix
    xt120.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd120.root";
    system(action);
@@ -214,7 +216,7 @@ cout << " ----> MC : QCD 170-300 " << endl;
    weight=weight170;
 //   btagNtupReader xt170(0, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_170to300_TuneZ2_7TeV_pythia6_PU/*.root"); // 39X
 //   btagNtupReader xt170(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD170to300/*.root");  //311X
-   btagNtupReader xt170(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_170to300/*.root"); // 311X DA & SV fix
+   btagNtupReader xt170(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_170to300/standardPFNtuple_10*.root"); // 311X DA & SV fix
    xt170.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd170.root";
    system(action);
@@ -224,7 +226,7 @@ cout << " ----> MC : QCD 300-470 " << endl;
    weight=weight300;
 //   btagNtupReader xt300(0, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_300to470_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
 //   btagNtupReader xt300(2, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCD300to470/*.root");  // 311X
-   btagNtupReader xt300(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_300to470/*.root"); // 311X DA & SV fix
+   btagNtupReader xt300(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_300to470/standardPFNtuple_10*.root"); // 311X DA & SV fix
    xt300.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd300.root";
    system(action);
@@ -545,7 +547,21 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "npv2_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:4-7)",              5,0,5); 
      AddHisto(HistoBtag, "npv3_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:>7)",              5,0,5); //150
 
-
+     //IP significance sorted in bins of track pt
+     AddHisto(HistoBtag, "IP3d1sigsorted_bin1",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d1sigsorted_bin2",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d1sigsorted_bin3",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d1sigsorted_bin4",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d1sigsorted_bin5",j,"1st track 3D IP significance (sorted)",100,-35.,35.);//155
+     AddHisto(HistoBtag, "IP3d1sigsorted_bin6",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+ 
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin1",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin2",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin3",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin4",j,"1st track 3D IP significance (sorted)",100,-35.,35.);//160
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin5",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin6",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+ 
 
     // ====> ADD HERE NEW HISTO AT 1D FOR WHICH QUARK CONTENT INFO NEEDED
     // example :
@@ -1142,6 +1158,16 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                        if (n1_ip>-1)  {
                           HistoBtag[47+j*nhisto_to_clone]->Fill(trackIP3d[n1_ip], weight);
                           HistoBtag[136+j*nhisto_to_clone]->Fill(trackIP3dError[n1_ip], weight);
+
+			  if (1<trackTransverseMomentum[n1_ip] && trackTransverseMomentum[n1_ip]<=2)HistoBtag[151+j*nhisto_to_clone]->Fill(sig1_ip, weight);
+			  if (2<trackTransverseMomentum[n1_ip] && trackTransverseMomentum[n1_ip]<=5)HistoBtag[152+j*nhisto_to_clone]->Fill(sig1_ip, weight);
+			  if (5<trackTransverseMomentum[n1_ip] && trackTransverseMomentum[n1_ip]<=8)HistoBtag[153+j*nhisto_to_clone]->Fill(sig1_ip, weight);
+			  if (8<trackTransverseMomentum[n1_ip] && trackTransverseMomentum[n1_ip]<=12)HistoBtag[154+j*nhisto_to_clone]->Fill(sig1_ip, weight);
+			  if (12<trackTransverseMomentum[n1_ip] && trackTransverseMomentum[n1_ip]<=20)HistoBtag[155+j*nhisto_to_clone]->Fill(sig1_ip, weight);
+			  if (20<trackTransverseMomentum[n1_ip] && trackTransverseMomentum[n1_ip]<=50)HistoBtag[156+j*nhisto_to_clone]->Fill(sig1_ip, weight);
+		
+			  // add sorted
+			  //  std::cout<<"trackIP3d[n1_ip]/trackIP3dError[n1_ip] - sig1_ip = " << trackIP3d[n1_ip]/trackIP3dError[n1_ip] - sig1_ip << std::endl;
                        }
                        HistoBtag[48+j*nhisto_to_clone]->Fill(sig1_ip, weight);
                        HistoBtag[49+j*nhisto_to_clone]->Fill(sig1_ip, weight);
@@ -1149,6 +1175,14 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                        if (n2_ip>-1) {
                           HistoBtag[50+j*nhisto_to_clone]->Fill(trackIP3d[n2_ip], weight);
                           HistoBtag[137+j*nhisto_to_clone]->Fill(trackIP3dError[n2_ip], weight);
+
+			  if (1<trackTransverseMomentum[n2_ip] && trackTransverseMomentum[n2_ip]<=2)HistoBtag[157+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+			  if (2<trackTransverseMomentum[n2_ip] && trackTransverseMomentum[n2_ip]<=5)HistoBtag[158+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+			  if (5<trackTransverseMomentum[n2_ip] && trackTransverseMomentum[n2_ip]<=8)HistoBtag[159+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+			  if (8<trackTransverseMomentum[n2_ip] && trackTransverseMomentum[n2_ip]<=12)HistoBtag[160+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+			  if (12<trackTransverseMomentum[n2_ip] && trackTransverseMomentum[n2_ip]<=20)HistoBtag[161+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+			  if (20<trackTransverseMomentum[n2_ip] && trackTransverseMomentum[n2_ip]<=50)HistoBtag[162+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+
                        }
                        HistoBtag[51+j*nhisto_to_clone]->Fill(sig2_ip, weight);
                        HistoBtag[52+j*nhisto_to_clone]->Fill(sig2_ip, weight);

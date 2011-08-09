@@ -4,11 +4,11 @@
 
 #include <vector>
 
-string ptval_jet="30";
+string ptval_jet="60";
 string ptval_btag="20";
-TString format="png"; // png
+TString format="pdf"; // png
 
-PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu=false){
+PlotStack(TString selection, TString label, int date, bool down=false, bool logy=false, bool mu=false){
   
  
   const int maxmax=10;
@@ -32,7 +32,8 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   if (mu==false) {
 
 // PUT HERE THE NAME OF QCD ROOTFILES
-  if (ptval!="60" && ptval!="80" && ptval!="110") nameroot.push_back(dir+"histo_qcd15.root");
+  if (ptval!="60" && ptval!="80" && ptval!="110") 
+  nameroot.push_back(dir+"histo_qcd15.root");
   nameroot.push_back(dir+"histo_qcd30.root");
   nameroot.push_back(dir+"histo_qcd50.root");
   nameroot.push_back(dir+"histo_qcd80.root");
@@ -240,15 +241,17 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   // SET COSMETICS
   histo0_Data->SetMarkerStyle(20);
   histo0_Data->SetMarkerSize(0.75);
-  histo0_Data->GetXaxis()->SetTitle(histo0_MC->GetName());  
-  if (selection=="npv" || selection=="npv_no_scaled") histo0_Data->GetXaxis()->SetTitle(histo0_MC->GetTitle());  
+  // histo0_Data->GetXaxis()->SetTitle(histo0_MC->GetName());  
+  histo0_Data->GetXaxis()->SetTitle(label);  
+  //  if (selection=="npv" || selection=="npv_no_scaled") histo0_Data->GetXaxis()->SetTitle(histo0_MC->GetTitle());  
 
   histo0_2010->SetMarkerStyle(21);
   histo0_2010->SetMarkerColor(7);
   histo0_2010->SetLineColor(7);
   histo0_2010->SetMarkerSize(0.5);
 
-  hs->SetTitle(histo0_Data->GetTitle());
+  //  hs->SetTitle(histo0_Data->GetTitle());
+  hs->SetTitle(label);
 
   if (selection=="sv_vtxsum_phi" || selection=="sv_vtxdir_phi" || selection=="sv_vtxsum_eta" || selection=="sv_vtxdir_eta") {
       hs->SetMaximum(hs->GetMaximum()*1.5);
@@ -272,14 +275,20 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   }
 
 
+  gStyle->SetOptTitle(0);
+
   // CREATE CANVAS
   TCanvas *canvas = new TCanvas("c1", "c1",10,32,782,552);
   canvas->cd();
+
+ 
+
 
   // FIRST MC & DATA
   TPad *canvas_1 = new TPad("canvas_1", "canvas_1",0,0.25,1.0,0.98);
   canvas_1->Draw();
   canvas_1->cd();
+
 
 
   if (histo0_Data->GetMaximum() > hs->GetMaximum() ) {
@@ -331,49 +340,49 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
 
   if (selection!="pthat" && selection!="npu") {
   if (date==2010) {
-     qw->SetHeader("CMS Preliminary, 33 pb^{-1}");
+    //     qw->SetHeader("CMS Preliminary, 33 pb^{-1}");
      qw->AddEntry(histo0_Data,        "JET Run2010B ",           "p");
   }
   else if (date==2011) {
    if (mu==false) {
       if (ptval=="30") {
-       qw->SetHeader("2011 effective lumi : 0.0053  pb^{-1}"); // 30
-       qw->AddEntry(histo0_Data,        "HLT_JET30",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 0.0053  pb^{-1}"); // 30
+       qw->AddEntry(histo0_Data,        "data (HLT_JET30)",           "p"); 
       }
       else if (ptval=="60") { 
-       qw->SetHeader("2011 effective lumi : 0.110  pb^{-1}"); // 60
-       qw->AddEntry(histo0_Data,        "HLT_JET60",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 0.1  pb^{-1}"); // 60
+       qw->AddEntry(histo0_Data,        "data (HLT_JET60)",           "p"); 
       }
       else if (ptval=="80") {
-       qw->SetHeader("2011 effective lumi : 0.52  pb^{-1}"); // 80
-       qw->AddEntry(histo0_Data,        "HLT_JET80",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 0.52  pb^{-1}"); // 80
+       qw->AddEntry(histo0_Data,        "data( HLT_JET80)",           "p"); 
       }
       else if (ptval=="110") {
-       qw->SetHeader("2011 effective lumi : 2.5  pb^{-1}"); // 110
-       qw->AddEntry(histo0_Data,        "HLT_JET110",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 2.5  pb^{-1}"); // 110
+       qw->AddEntry(histo0_Data,        "data (HLT_JET110)",           "p"); 
       }
 
    }
    else  { 
       if (ptval=="20") {
-       qw->SetHeader("2011 effective lumi : 1.9  pb^{-1}"); // 20
-       qw->AddEntry(histo0_Data,        "HLT_BTagMu_DiJet20_Mu5",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 1.9  pb^{-1}"); // 20
+       qw->AddEntry(histo0_Data,        "data (HLT_BTagMu_DiJet20_Mu5)",           "p"); 
       }
       else if (ptval=="60") { 
-       qw->SetHeader("2011 effective lumi : 24.3  pb^{-1}"); // 60
-       qw->AddEntry(histo0_Data,        "HLT_BTagMu_DiJet60_Mu7",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 24.3  pb^{-1}"); // 60
+       qw->AddEntry(histo0_Data,        "data (HLT_BTagMu_DiJet60_Mu7)",           "p"); 
       }
       else if (ptval=="40") { 
-       qw->SetHeader("2011 effective lumi : 6.0  pb^{-1}"); // 40
-       qw->AddEntry(histo0_Data,        "HLT_BTagMu_DiJet40_Mu5",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 6.0  pb^{-1}"); // 40
+       qw->AddEntry(histo0_Data,        "data (HLT_BTagMu_DiJet40_Mu5)",           "p"); 
       }
       else if (ptval=="70") { 
-       qw->SetHeader("2011 effective lumi : 34.3  pb^{-1}"); // 70
-       qw->AddEntry(histo0_Data,        "HLT_BTagMu_DiJet70_Mu5",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 34.3  pb^{-1}"); // 70
+       qw->AddEntry(histo0_Data,        "data (HLT_BTagMu_DiJet70_Mu5)",           "p"); 
       }
       else if (ptval=="110") { 
-       qw->SetHeader("2011 effective lumi : 212 pb^{-1}"); // 110
-       qw->AddEntry(histo0_Data,        "HLT_BTagMu_DiJet110_Mu5",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 212 pb^{-1}"); // 110
+       qw->AddEntry(histo0_Data,        "data (HLT_BTagMu_DiJet110_Mu5)",           "p"); 
       }
    }
 
@@ -393,6 +402,15 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   qw->Draw();
 
 
+ TLatex *latex = new TLatex();
+  latex->SetNDC();
+  latex->SetTextSize(0.055);
+  latex->SetTextFont(42); //22
+
+  latex->SetTextAlign(13);
+  latex->DrawLatex(0.14, 0.96, "CMS Preliminary 2011,  #sqrt{s} = 7 TeV");
+
+
   canvas->cd();
 
 
@@ -408,7 +426,8 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   histo0_ratio->SetMarkerSize(0.75);
   histo0_ratio->SetLineWidth(2);
   histo0_ratio->GetYaxis()->SetTitle("Data/MC");
-  histo0_ratio->GetXaxis()->SetTitle(histo0_Data->GetName());  
+  //  histo0_ratio->GetXaxis()->SetTitle(histo0_Data->GetName());  
+  histo0_ratio->GetXaxis()->SetTitle(label);  
 
   histo0_ratio->GetYaxis()->SetTitleOffset( 0.4 );
   histo0_ratio->GetYaxis()->SetTitleSize( 0.1 );
@@ -420,6 +439,9 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
   histo0_ratio->SetMinimum(0.4);
   histo0_ratio->SetMaximum(1.6);
   histo0_ratio->Draw("E1X0");
+
+
+ 
 
    canvas->cd();
 
@@ -483,7 +505,7 @@ PlotStack(TString selection, int date, bool down=false, bool logy=false, bool mu
 
 }
 
-TagRate(TString selection, bool down=false, bool logy=false, bool mu=false){
+TagRate(TString selection, TString label, bool down=false, bool logy=false, bool mu=false){
   
  
   const int maxmax=10;
@@ -581,12 +603,12 @@ TagRate(TString selection, bool down=false, bool logy=false, bool mu=false){
   int nbinx=histo0_Data->GetNbinsX();
   float minx=histo0_Data->GetXaxis()->GetXmin();
   float maxx=histo0_Data->GetXaxis()->GetXmax();
-  TH1F * TagRate_Data = new TH1F ("TagRate_Data","",nbinx,minx,maxx);
-  TH1F * TagRate_MC   = new TH1F ("TagRate_MC","",nbinx,minx,maxx);
-  TH1F * TagRate_MC_b = new TH1F ("TagRate_MC_b","",nbinx,minx,maxx);
-  TH1F * TagRate_MC_c = new TH1F ("TagRate_MC_c","",nbinx,minx,maxx);
-  TH1F * TagRate_MC_udsg = new TH1F ("TagRate_MC_udsg","",nbinx,minx,maxx);
-  TH1F * TagRate_MC_gspl = new TH1F ("TagRate_MC_gspl","",nbinx,minx,maxx);
+  TH1F * TagRate_Data = new TH1F ("TagRate_Data",label,nbinx,minx,maxx);
+  TH1F * TagRate_MC   = new TH1F ("TagRate_MC",label,nbinx,minx,maxx);
+  TH1F * TagRate_MC_b = new TH1F ("TagRate_MC_b",label,nbinx,minx,maxx);
+  TH1F * TagRate_MC_c = new TH1F ("TagRate_MC_c",label,nbinx,minx,maxx);
+  TH1F * TagRate_MC_udsg = new TH1F ("TagRate_MC_udsg",label,nbinx,minx,maxx);
+  TH1F * TagRate_MC_gspl = new TH1F ("TagRate_MC_gspl",label,nbinx,minx,maxx);
 
   TString bsel = selection+"_b";
   TString csel = selection+"_c";
@@ -640,9 +662,14 @@ TagRate(TString selection, bool down=false, bool logy=false, bool mu=false){
       }
       float val = histo0_Data->Integral(ii+1,nbin_max+1) / totdata;
       float err = sqrt(totdata *val*(1-val))/ totdata;
+      
+      float valMC = histo0_MC->Integral(ii+1,nbin_max+1)/ totmc;
+      float errMC = sqrt(totmc *valMC*(1-valMC))/ totmc;
+
       TagRate_Data->SetBinContent(ii+1, val);
       TagRate_Data->SetBinError(ii+1, err);
       TagRate_MC->SetBinContent(ii+1,   histo0_MC->Integral(ii+1,nbin_max+1) / totmc);
+      TagRate_MC->SetBinError(ii+1, errMC  );
       TagRate_MC_b->SetBinContent(ii+1, histo0_MC_b->Integral(ii+1,nbin_max+1) / totmc);
       TagRate_MC_c->SetBinContent(ii+1, histo0_MC_c->Integral(ii+1,nbin_max+1) / totmc);
       TagRate_MC_udsg->SetBinContent(ii+1, histo0_MC_udsg->Integral(ii+1,nbin_max+1) / totmc);
@@ -682,21 +709,23 @@ TagRate(TString selection, bool down=false, bool logy=false, bool mu=false){
   // SET COSMETICS
   TagRate_Data->SetMarkerStyle(20);
   TagRate_Data->SetMarkerSize(0.75);
-  TagRate_Data->GetXaxis()->SetTitle(histo0_MC->GetName());  
+  TagRate_Data->GetXaxis()->SetTitle(label);  
 
   TString titlenam="Tag Rate for " + selection;
-  hs->SetTitle(titlenam);
+  // hs->SetTitle(label);
+
+  gStyle->SetOptTitle(0);
 
   // CREATE CANVAS
   TCanvas *canvas = new TCanvas("c1", "c1",10,32,782,552);
   canvas->cd();
 
   // FIRST MC & DATA
-/*
+
   TPad *canvas_1 = new TPad("canvas_1", "canvas_1",0,0.25,1.0,0.98);
   canvas_1->Draw();
   canvas_1->cd();
-*/
+
 
 
   if (TagRate_Data->GetMaximum() > hs->GetMaximum() ) {
@@ -735,49 +764,49 @@ TagRate(TString selection, bool down=false, bool logy=false, bool mu=false){
 
   if (selection!="pthat" && selection!="npu") {
   if (date==2010) {
-     qw->SetHeader("CMS Preliminary, 33 pb^{-1}");
+    //     qw->SetHeader("CMS Preliminary, 33 pb^{-1}");
      qw->AddEntry(TagRate_Data,        "JET Run2010B ",           "p");
   }
   else if (date==2011) {
    if (mu==false) {
       if (ptval=="30") {
-       qw->SetHeader("2011 effective lumi : 0.0053  pb^{-1}"); // 30
-       qw->AddEntry(TagRate_Data,        "HLT_JET30",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 0.0053  pb^{-1}"); // 30
+       qw->AddEntry(TagRate_Data,        "data (HLT_JET30)",           "p"); 
       }
       else if (ptval=="60") { 
-       qw->SetHeader("2011 effective lumi : 0.11  pb^{-1}"); // 60
-       qw->AddEntry(TagRate_Data,        "HLT_JET60",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 0.11  pb^{-1}"); // 60
+       qw->AddEntry(TagRate_Data,        "data (HLT_JET60)",           "p"); 
       }
       else if (ptval=="80") {
-       qw->SetHeader("2011 effective lumi : 0.52  pb^{-1}"); // 80
-       qw->AddEntry(TagRate_Data,        "HLT_JET80",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 0.52  pb^{-1}"); // 80
+       qw->AddEntry(TagRate_Data,        "data (HLT_JET80)",           "p"); 
       }
       else if (ptval=="110") {
-       qw->SetHeader("2011 effective lumi : 2.5  pb^{-1}"); // 110
-       qw->AddEntry(TagRate_Data,        "HLT_JET110",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 2.5  pb^{-1}"); // 110
+       qw->AddEntry(TagRate_Data,        "data (HLT_JET110)",           "p"); 
       }
 
    }
    else  { 
       if (ptval=="20") {
-       qw->SetHeader("2011 effective lumi : 1.9  pb^{-1}"); // 20
-       qw->AddEntry(TagRate_Data,        "HLT_BTagMu_DiJet20_Mu5",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 1.9  pb^{-1}"); // 20
+       qw->AddEntry(TagRate_Data,        "data (HLT_BTagMu_DiJet20_Mu5)",           "p"); 
       }
       else if (ptval=="60") { 
-       qw->SetHeader("2011 effective lumi : 24.3  pb^{-1}"); // 60
-       qw->AddEntry(TagRate_Data,        "HLT_BTagMu_DiJet60_Mu7",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 24.3  pb^{-1}"); // 60
+       qw->AddEntry(TagRate_Data,        "data (HLT_BTagMu_DiJet60_Mu7)",           "p"); 
       }
       else if (ptval=="40") { 
-       qw->SetHeader("2011 effective lumi : 6.0  pb^{-1}"); // 40
-       qw->AddEntry(TagRate_Data,        "HLT_BTagMu_DiJet40_Mu5",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 6.0  pb^{-1}"); // 40
+       qw->AddEntry(TagRate_Data,        "data (HLT_BTagMu_DiJet40_Mu5)",           "p"); 
       }
       else if (ptval=="70") { 
-       qw->SetHeader("2011 effective lumi : 34.3  pb^{-1}"); // 70
-       qw->AddEntry(TagRate_Data,        "HLT_BTagMu_DiJet70_Mu5",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 34.3  pb^{-1}"); // 70
+       qw->AddEntry(TagRate_Data,        "data (HLT_BTagMu_DiJet70_Mu5)",           "p"); 
       }
       else if (ptval=="110") { 
-       qw->SetHeader("2011 effective lumi : 212  pb^{-1}"); // 110
-       qw->AddEntry(TagRate_Data,        "HLT_BTagMu_DiJet110_Mu5",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 212  pb^{-1}"); // 110
+       qw->AddEntry(TagRate_Data,        "data (HLT_BTagMu_DiJet110_Mu5)",           "p"); 
       }
    }
 
@@ -791,11 +820,19 @@ TagRate(TString selection, bool down=false, bool logy=false, bool mu=false){
   qw->SetFillColor(0);
   qw->Draw();
 
+ TLatex *latex = new TLatex();
+  latex->SetNDC();
+  latex->SetTextSize(0.055);
+  latex->SetTextFont(42); //22
+
+  latex->SetTextAlign(13);
+  latex->DrawLatex(0.14, 0.96, "CMS Preliminary 2011,  #sqrt{s} = 7 TeV");
+
 
   canvas->cd();
 
 
-/*
+
   // SECOND DATA/MC RATIO
 //  TPad *canvas_2 = new TPad("canvas_2", "canvas_2",0,0.12,1.0,0.32);
   TPad *canvas_2 = new TPad("canvas_2", "canvas_2",0,0.,1.0,0.32);
@@ -808,7 +845,7 @@ TagRate(TString selection, bool down=false, bool logy=false, bool mu=false){
   histo0_ratio->SetMarkerSize(0.75);
   histo0_ratio->SetLineWidth(2);
   histo0_ratio->GetYaxis()->SetTitle("Data/MC");
-  histo0_ratio->GetXaxis()->SetTitle(histo0_Data->GetName());  
+  histo0_ratio->GetXaxis()->SetTitle(label);  
 
   histo0_ratio->GetYaxis()->SetTitleOffset( 0.4 );
   histo0_ratio->GetYaxis()->SetTitleSize( 0.1 );
@@ -823,14 +860,14 @@ TagRate(TString selection, bool down=false, bool logy=false, bool mu=false){
 
    canvas->cd();
 
-*/
+
 
   // SAVE PNG FILES
   string name_can="tagRate_"+selection+"_Linear."+format;
   canvas->SaveAs(name_can.c_str());
 
   if (logy==1) {
-//   canvas_1->SetLogy(logy);
+   canvas_1->SetLogy(logy);
    canvas->SetLogy(logy);
    string name_can2="tagRate_"+selection+"_Log."+format;
    canvas->SaveAs(name_can2.c_str());
@@ -858,7 +895,7 @@ TagRate(TString selection, bool down=false, bool logy=false, bool mu=false){
 
 #include <vector>
 
-PlotData(TString selection, int date, bool down=false, bool logy=false, bool mu=false){
+PlotData(TString selection, TString label, int date, bool down=false, bool logy=false, bool mu=false){
   
  
   const int maxmax=10;
@@ -964,12 +1001,12 @@ PlotData(TString selection, int date, bool down=false, bool logy=false, bool mu=
   // MAKE DATA/MC RATIO
   histo0_ratio = (TH1F*) histo0_Data2->Clone();
   histo0_ratio->SetName("histo0_ratio");
-  histo0_ratio->SetTitle("");
+  histo0_ratio->SetTitle(label);
   histo0_ratio->Divide(histo0_Data1);
 
   histo0_ratio2 = (TH1F*) histo0_Data2->Clone();
   histo0_ratio2->SetName("histo0_ratio2");
-  histo0_ratio2->SetTitle("");
+  histo0_ratio2->SetTitle(label);
   histo0_ratio2->Divide(histo0_Data3);
 
   // SET COSMETICS
@@ -1077,7 +1114,7 @@ PlotData(TString selection, int date, bool down=false, bool logy=false, bool mu=
   histo0_ratio->SetMarkerSize(0.75);
   histo0_ratio->SetLineWidth(2);
   histo0_ratio->GetYaxis()->SetTitle("#PV 4-7/#PV 1-3");
-  histo0_ratio->GetXaxis()->SetTitle(histo0_Data2->GetName());  
+  histo0_ratio->GetXaxis()->SetTitle(label);  
 
   histo0_ratio->GetYaxis()->SetTitleOffset( 0.4 );
   histo0_ratio->GetYaxis()->SetTitleSize( 0.1 );
