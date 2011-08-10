@@ -603,12 +603,12 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "IP3d1sigsorted_bin5",j,"1st track 3D IP significance (sorted)",100,-35.,35.);//155
      AddHisto(HistoBtag, "IP3d1sigsorted_bin6",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
  
-     AddHisto(HistoBtag, "IP3d2sigsorted_bin1",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
-     AddHisto(HistoBtag, "IP3d2sigsorted_bin2",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
-     AddHisto(HistoBtag, "IP3d2sigsorted_bin3",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
-     AddHisto(HistoBtag, "IP3d2sigsorted_bin4",j,"1st track 3D IP significance (sorted)",100,-35.,35.);//160
-     AddHisto(HistoBtag, "IP3d2sigsorted_bin5",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
-     AddHisto(HistoBtag, "IP3d2sigsorted_bin6",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin1",j,"2nd track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin2",j,"2nd track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin3",j,"2nd track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin4",j,"2nd track 3D IP significance (sorted)",100,-35.,35.);//160
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin5",j,"2nd track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d2sigsorted_bin6",j,"2nd track 3D IP significance (sorted)",100,-35.,35.);
  
      // muon-enriched (ptrel>0) standard track-based properties:
 
@@ -759,10 +759,22 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "discri_jetbprob_jetptbin2",   j,"JetBProb Discriminator (sorted)",50,0.,8.);
      AddHisto(HistoBtag, "discri_jetbprob_jetptbin3",   j,"JetBProb Discriminator (sorted)",50,0.,8.);  //270
 
+     // Vertex variables for 3 track vertices
+     AddHisto(HistoBtag, "sv_ipsigcharm_3tr", j,"IP significance 2D charm >=3tracks",50,-35.,35.);
+     AddHisto(HistoBtag, "sv_eratio_3tr", j,"Fractional energy >=3tracks",50,0.,1.);
+     AddHisto(HistoBtag, "sv_vtx_pt_3tr", j,"PT of vtx >=3tracks",50,0.,100.);
+
+     // Center integer binning for multiplicity plots
+     AddHisto(HistoBtag, "sv_trackmul_centered",  j,"Track multiplicity : SVnVertexTracks (centered)",13,-0.5,12.5);
+     AddHisto(HistoBtag, "sv_trackmul1_centered",  j,"Track multiplicity : SVnFirstVertexTracks (centered)",11,-0.5,10.5);  //275
+     AddHisto(HistoBtag, "sv_tracksel_centered",  j,"Track multiplicity : SVnSelectedTracks (centered)",21,-0.5,20.5);
+     AddHisto(HistoBtag, "muons_multiplicity_centered", j,"# of muons in jet (centered)",11,-0.5,10.5);
+
 
     // ====> ADD HERE NEW HISTO AT 1D FOR WHICH QUARK CONTENT INFO NEEDED
     // example :
     // AddHisto(HistoBtag, "new_histo", j,"Test Caro",50,0.,1.);
+     
 
 // 2D plots SV
      AddHisto2D(Histo2DB, "sv_track_vs_jetpt", j,"SV track multiplicity vs jet pt",80,0,400, 10,0,10);   //0
@@ -1548,6 +1560,11 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                         HistoBtag[63+j*nhisto_to_clone]->Fill(SVnFirstVertexTracks[i], weight);
                         HistoBtag[64+j*nhisto_to_clone]->Fill(SVnSelectedTracks[i], weight);
 
+			// Centered integer binned for multiplicity plots
+			HistoBtag[274+j*nhisto_to_clone]->Fill(SVnVertexTracks[i], weight);
+                        HistoBtag[275+j*nhisto_to_clone]->Fill(SVnFirstVertexTracks[i], weight);
+                        HistoBtag[276+j*nhisto_to_clone]->Fill(SVnSelectedTracks[i], weight);
+
                         HistoBtag[65+j*nhisto_to_clone]->Fill(SVIPFirstAboveCharm[i], weight);
                         HistoBtag[66+j*nhisto_to_clone]->Fill(SVEnergyRatio[i], weight);
 
@@ -1563,8 +1580,13 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                         HistoBtag[69+j*nhisto_to_clone]->Fill(SV2dDistance[i], weight);
                         HistoBtag[70+j*nhisto_to_clone]->Fill(SV3dDistance[i], weight);
                         if (SVnVertexTracks[i]>=3) {
-                             HistoBtag[61+j*nhisto_to_clone]->Fill(SVMass[i], weight);
+
+			     // 3-track vertex variables
+			     HistoBtag[61+j*nhisto_to_clone]->Fill(SVMass[i], weight);
                              HistoBtag[71+j*nhisto_to_clone]->Fill(SV3dDistance[i]/SV3dDistanceError[i], weight);
+			     HistoBtag[271+j*nhisto_to_clone]->Fill(SVIPFirstAboveCharm[i], weight);
+			     HistoBtag[272+j*nhisto_to_clone]->Fill(SVEnergyRatio[i], weight);
+			     HistoBtag[273+j*nhisto_to_clone]->Fill(SVvtxPt[i], weight);
 
 			     // Sory by jetPt
 			     if (50<jetPt[i] && jetPt[i]<80){
@@ -1649,6 +1671,10 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
                 // muon info
                 HistoBtag[83+j*nhisto_to_clone]->Fill(nMuons[i], weight);
+
+		// Centered at integer for muon multiplicity
+		HistoBtag[277+j*nhisto_to_clone]->Fill(nMuons[i], weight);
+
                 HistoBtag[84+j*nhisto_to_clone]->Fill(muon1Pt[i], weight);
                 HistoBtag[85+j*nhisto_to_clone]->Fill(muon1PtRel[i], weight);
                 HistoBtag[86+j*nhisto_to_clone]->Fill(muon1Ip3d[i], weight);
