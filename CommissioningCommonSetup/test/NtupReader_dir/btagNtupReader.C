@@ -608,6 +608,10 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "discri_ssche_muenriched",   j,"SSVHE Discriminator",50,0.,7.);   // 170
      AddHisto(HistoBtag, "discri_sschp_muenriched",   j,"SSVHP Discriminator",50,0.,7.);  //171
      AddHisto(HistoBtag, "muenriched_discrim",j,"muon pTrel cut on for b-enrichment",50,-5,10);// 172, for reference 
+     AddHisto(HistoBtag, "discri_jetprob_muenriched",   j,"JetProb Discriminator",50,0.,2.5); //173
+     AddHisto(HistoBtag, "discri_jetbprob_muenriched",   j,"JetBProb Discriminator",50,0.,8.); //174
+
+
 
     // ====> ADD HERE NEW HISTO AT 1D FOR WHICH QUARK CONTENT INFO NEEDED
     // example :
@@ -1042,6 +1046,8 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 			 HistoBtag[169+j*nhisto_to_clone]->Fill(standardTrackCountingHighPurPFBJetTags[i], weight);
 			 HistoBtag[170+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighEffPFBJetTags[i], weight);
 			 HistoBtag[171+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighPurPFBJetTags[i], weight);
+			 HistoBtag[173+j*nhisto_to_clone]->Fill(standardJetProbabilityPFBJetTags[i], weight);
+			 HistoBtag[174+j*nhisto_to_clone]->Fill(standardJetBProbabilityPFBJetTags[i], weight);
 		       }
 
                        // info on tracks
@@ -1240,7 +1246,7 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                        }
                        HistoBtag[51+j*nhisto_to_clone]->Fill(sig2_ip, weight);
                        HistoBtag[52+j*nhisto_to_clone]->Fill(sig2_ip, weight);
-		       if(muon1PtRel[i]>bEnrichCutSal){
+		       if(muon1PtRel[i]>bEnrichCutSal && n2_ip>-1){
 			 HistoBtag[164+j*nhisto_to_clone]->Fill(sig2_ip, weight);
 			 HistoBtag[165+j*nhisto_to_clone]->Fill(sig2_ip, weight);
 		       }
@@ -1255,7 +1261,7 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                        Histo2DB[4+j*nhisto_to_clone2D]->Fill(jetPt[i],nseltrack_jet, weight);
                        Histo2DB[5+j*nhisto_to_clone2D]->Fill(jetPt[i],ncutseltrack_jet, weight);
 
-		       if(muon1PtRel[i]>2.){
+		       if(muon1PtRel[i]>bEnrichCutSal){
 			 HistoBtag[166+j*nhisto_to_clone]->Fill(sig3_ip, weight);
 			 HistoBtag[167+j*nhisto_to_clone]->Fill(sig3_ip, weight);
 		       }
