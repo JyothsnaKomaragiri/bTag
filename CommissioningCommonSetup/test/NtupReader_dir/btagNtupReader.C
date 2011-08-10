@@ -14,17 +14,20 @@
 // ----------- 
 
 // TO BE DEFINED FIRST !
-  bool Run_on_Jet = true;
-  bool Run_on_Btag = false;
+  bool Run_on_Jet = false;
+  bool Run_on_Btag = true;
+// used to make muon-enriched basic plots (cut on muon1PtRel[i])
+  float bEnrichCutSal=1.0;
+
 //  TString final_dir = "dir_btag20pu";
   TString final_dir = "dir_jet60pu_test";
   // + check the data and MC input files
 
 //  TString my_trigger_path="HLT_Jet30";
-  TString my_trigger_path="HLT_Jet60";
+//  TString my_trigger_path="HLT_Jet60";
 //  TString my_trigger_path="HLT_Jet80";
 //  TString my_trigger_path="HLT_Jet110";
-//  TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";
+  TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";
 //  TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";
 //  TString my_trigger_path="HLT_BTagMu_DiJet60_Mu7";
 //  TString my_trigger_path="HLT_BTagMu_DiJet70_Mu5";
@@ -32,10 +35,10 @@
 
   // CUT VALUES
 //  float cutJetPt=30.;  // FOR JETS HLT_Jet30
-  float cutJetPt=60.;  // FOR JETS HLT_Jet60
+//  float cutJetPt=60.;  // FOR JETS HLT_Jet60
 //  float cutJetPt=80.;  // FOR JETS HLT_Jet80
 //  float cutJetPt=110.;  // FOR JETS HLT_Jet80
-//  float cutJetPt=45.;  // FOR JETS HLT_BTagMu_DiJet20_Mu5
+  float cutJetPt=45.;  // FOR JETS HLT_BTagMu_DiJet20_Mu5
 //  float cutJetPt=65.;  // FOR JETS HLT_BTagMu_DiJet40_Mu5
 //  float cutJetPt=95.;  // FOR JETS HLT_BTagMu_DiJet60_Mu7
 //  float cutJetPt=105.;  // FOR JETS HLT_BTagMu_DiJet70_Mu5
@@ -53,7 +56,6 @@ int main() {
 }
 
 void run(){
-
 
 
 float weight;
@@ -143,7 +145,7 @@ cout << " ----> DATA 2011" << endl;
 //     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/Data/Met2011/*.root");    
 
 //     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/v42x_v1/Data/link_met/*.root");    
-    btagNtupReader yt(3,"/user/fblekman/data/b-tagwork/Jet2011_prompt_15june11/*.root");
+    btagNtupReader yt(3,"/user/fblekman/data/b-tagwork/MetBtag2011_prompt_15june11/standardPFNtuple_100_0_PLL.root");
      yt.Loop(0, weight); 
      action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minibtag2011.root";
      system(action);
@@ -266,7 +268,7 @@ cout << " ----> MC : QCD  MU 15-20 " << endl;
 //   btagNtupReader xmu15(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT15to20_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
 //   btagNtupReader xmu15(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu15to20/*.root");
 //   btagNtupReader xmu15(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_15to20/*.root"); // 311X DA & SV fix
-   btagNtupReader xmu15(3, "/user/fblekman/data/b-tagwork/14MayQCDMuEnrichedPt_15to20/*.root"); // 311X DA & SV fix
+   btagNtupReader xmu15(3, "/user/fblekman/data/b-tagwork/14MayQCDMuEnrichedPt_15to20/standardPFNtuple_10*.root"); // 311X DA & SV fix
    xmu15.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu15.root";
    system(action);
@@ -276,7 +278,7 @@ cout << " ----> MC : QCD  MU 20-30 " << endl;
 //   btagNtupReader xmu20(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT20to30_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
 //   btagNtupReader xmu20(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu20to30/*.root"); //311X
 //   btagNtupReader xmu20(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_20to30/*.root"); // 311X DA & SV fix
-   btagNtupReader xmu20(3, "/user/fblekman/data/b-tagwork/14MayQCDMuEnrichedPt_20to30/*.root"); // 311X DA & SV fix
+   btagNtupReader xmu20(3, "/user/fblekman/data/b-tagwork/14MayQCDMuEnrichedPt_20to30/standardPFNtuple_11_1_POy.root"); // 311X DA & SV fix
    xmu20.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu20.root";
    system(action);
@@ -288,7 +290,7 @@ cout << " ----> MC : QCD  MU 30-50 " << endl;
 //   btagNtupReader xmu30(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT30to50_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
 //   btagNtupReader xmu30(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu30to50/*.root"); //311X
 //   btagNtupReader xmu30(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCDMuEnriched_Pt-30to50/*.root"); // 311X DA & SV fix
-   btagNtupReader xmu30(3, "/user/fblekman/data/b-tagwork/QCDMuEnriched_Pt-30to50/*.root"); // 311X DA & SV fix
+   btagNtupReader xmu30(3, "/user/fblekman/data/b-tagwork/QCDMuEnriched_Pt-30to50/standardPFNtuple_10_1_BYV.root"); // 311X DA & SV fix
    xmu30.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu30.root";
    system(action);
@@ -299,7 +301,7 @@ cout << " ----> MC : QCD  MU 50-80 " << endl;
 //   btagNtupReader xmu50(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT50to80_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
 //   btagNtupReader xmu50(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu50to80/QCDMu50to80/*.root"); //311X
 //   btagNtupReader xmu50(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCDMuEnriched_Pt-50to80/*.root"); // 311X DA & SV fix
-   btagNtupReader xmu50(3, "/user/fblekman/data/b-tagwork/QCDMuEnriched_Pt-50to80/*.root"); // 311X DA & SV fix
+   btagNtupReader xmu50(3, "/user/fblekman/data/b-tagwork/QCDMuEnriched_Pt-50to80/standardPFNtuple_10_1_tem.root"); // 311X DA & SV fix
    xmu50.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu50.root";
    system(action);
@@ -309,7 +311,7 @@ cout << " ----> MC : QCD  MU 80-120 " << endl;
 //   btagNtupReader xmu80(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT80to120_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
 //   btagNtupReader xmu80(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu80to120/QCDMu80to120/*.root"); //311X
 //   btagNtupReader xmu80(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCDMuEnriched_Pt-80to120/*.root"); // 311X DA & SV fix
-   btagNtupReader xmu80(3, "/user/fblekman/data/b-tagwork/QCDMuEnriched_Pt-80to120/*.root"); // 311X DA & SV fix
+   btagNtupReader xmu80(3, "/user/fblekman/data/b-tagwork/QCDMuEnriched_Pt-80to120/standardPFNtuple_10_0_nBN.root"); // 311X DA & SV fix
    xmu80.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu80.root";
    system(action);
@@ -319,7 +321,7 @@ cout << " ----> MC : QCD  MU 120-150 " << endl;
 //   btagNtupReader xmu120(1, "/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT120to150_TuneZ2_7TeV_pythia6_PU/*.root"); //39X
 //   btagNtupReader xmu120(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu120to150/QCDMu120to150/*.root"); //311X
 //   btagNtupReader xmu120(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_120to150/*.root"); // 311X DA & SV fix
-   btagNtupReader xmu120(3, "/user/fblekman/data/b-tagwork/14MayQCDMuEnrichedPt_120to150/*.root"); // 311X DA & SV fix
+   btagNtupReader xmu120(3, "/user/fblekman/data/b-tagwork/14MayQCDMuEnrichedPt_120to150/standardPFNtuple_15_1_M5f.root"); // 311X DA & SV fix
    xmu120.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu120.root";
    system(action);
@@ -598,14 +600,14 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "sv_mass_muenriched",    j,"SV mass",50,0.,8.); //163, similar to 60
      AddHisto(HistoBtag, "IP3d2sigsorted_muenriched",j,"2nd track 3D IP significance (sorted)",100,-35.,35.); //164, similar to 51
      AddHisto(HistoBtag, "IP3d2sigzsorted_muenriched",j,"2nd track 3D IP significance (sorted)",100,-2.,2.); //165, similar to 52
-     AddHisto(HistoBtag, "sv_flightsig2d_muenriched", j,"Flight significance 2D",50,0.,80.); //166, similar to 54
-     AddHisto(HistoBtag, "sv_flightsig3d_muenriched", j,"Flight significance 3D",50,0.,80.); //167, similar to 55
+     AddHisto(HistoBtag, "sv_flightsig2d_muenriched", j,"Flight significance 2D",50,0.,80.); //166, similar to 67
+     AddHisto(HistoBtag, "sv_flightsig3d_muenriched", j,"Flight significance 3D",50,0.,80.); //167, similar to 68
      // the following are filled just after the 'normal' discriminants (#4-10)
      AddHisto(HistoBtag, "discri_tche_muenriched",   j,"TCHE Discriminator",50,0.,30.);  // 168 
      AddHisto(HistoBtag, "discri_tchp_muenriched",   j,"TCHP Discriminator",50,0.,30.);  // 169
      AddHisto(HistoBtag, "discri_ssche_muenriched",   j,"SSVHE Discriminator",50,0.,7.);   // 170
      AddHisto(HistoBtag, "discri_sschp_muenriched",   j,"SSVHP Discriminator",50,0.,7.);  //171
-
+     AddHisto(HistoBtag, "muenriched_discrim",j,"muon pTrel cut on for b-enrichment",50,-5,10);// 172, for reference 
 
     // ====> ADD HERE NEW HISTO AT 1D FOR WHICH QUARK CONTENT INFO NEEDED
     // example :
@@ -1034,7 +1036,8 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                        HistoBtag[8+j*nhisto_to_clone]->Fill(standardJetBProbabilityPFBJetTags[i], weight);
 
 		       // and same but when requiring a pTrel cut, to enrich the jets in b's
-		       if(standardSoftMuonPFBJetTags[i]>0.){		       
+		       HistoBtag[172+j*nhisto_to_clone]->Fill(muon1PtRel[i],weight);
+		       if(muon1PtRel[i]>bEnrichCutSal){		       
 			 HistoBtag[168+j*nhisto_to_clone]->Fill(standardTrackCountingHighEffPFBJetTags[i], weight);
 			 HistoBtag[169+j*nhisto_to_clone]->Fill(standardTrackCountingHighPurPFBJetTags[i], weight);
 			 HistoBtag[170+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighEffPFBJetTags[i], weight);
@@ -1237,7 +1240,7 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                        }
                        HistoBtag[51+j*nhisto_to_clone]->Fill(sig2_ip, weight);
                        HistoBtag[52+j*nhisto_to_clone]->Fill(sig2_ip, weight);
-		       if(standardSoftMuonPFBJetTags[i]>0.){
+		       if(muon1PtRel[i]>bEnrichCutSal){
 			 HistoBtag[164+j*nhisto_to_clone]->Fill(sig2_ip, weight);
 			 HistoBtag[165+j*nhisto_to_clone]->Fill(sig2_ip, weight);
 		       }
@@ -1252,7 +1255,7 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                        Histo2DB[4+j*nhisto_to_clone2D]->Fill(jetPt[i],nseltrack_jet, weight);
                        Histo2DB[5+j*nhisto_to_clone2D]->Fill(jetPt[i],ncutseltrack_jet, weight);
 
-		       if(standardSoftMuonPFBJetTags[i]>0.){
+		       if(muon1PtRel[i]>2.){
 			 HistoBtag[166+j*nhisto_to_clone]->Fill(sig3_ip, weight);
 			 HistoBtag[167+j*nhisto_to_clone]->Fill(sig3_ip, weight);
 		       }
@@ -1267,8 +1270,6 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
                         HistoBtag[60+j*nhisto_to_clone]->Fill(SVMass[i], weight);
                         // 61 see below
-			if(standardSoftMuonPFBJetTags[i]>0)
-			  HistoBtag[163+j*nhisto_to_clone]->Fill(SVMass[i], weight);
 
                         HistoBtag[62+j*nhisto_to_clone]->Fill(SVnVertexTracks[i], weight);
                         HistoBtag[63+j*nhisto_to_clone]->Fill(SVnFirstVertexTracks[i], weight);
@@ -1279,6 +1280,13 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
                         HistoBtag[67+j*nhisto_to_clone]->Fill(SV2dDistance[i]/SV2dDistanceError[i], weight);
                         HistoBtag[68+j*nhisto_to_clone]->Fill(SV3dDistance[i]/SV3dDistanceError[i], weight);
+			if(muon1PtRel[i]>bEnrichCutSal){		 
+			  HistoBtag[163+j*nhisto_to_clone]->Fill(SVMass[i], weight);      
+			  HistoBtag[166+j*nhisto_to_clone]->Fill(SV2dDistance[i]/SV2dDistanceError[i], weight);
+			  HistoBtag[167+j*nhisto_to_clone]->Fill(SV3dDistance[i]/SV2dDistanceError[i], weight);
+
+		       }
+
                         HistoBtag[69+j*nhisto_to_clone]->Fill(SV2dDistance[i], weight);
                         HistoBtag[70+j*nhisto_to_clone]->Fill(SV3dDistance[i], weight);
                         if (SVnVertexTracks[i]>=3) {
