@@ -127,8 +127,6 @@ cout << endl;
 
 TString action;
 
-
-
 cout << " ----> DATA 2011" << endl;
   weight=1;
 
@@ -137,7 +135,7 @@ cout << " ----> DATA 2011" << endl;
 //     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/v42x_v1/Data/link_jet/*.root");
 //    btagNtupReader yt(3,"/user/fblekman/data/b-tagwork/Jet2011_prompt_15june11/*.root");
     //    btagNtupReader yt(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/BTAG/v42X_v1/Data/Jet2011_rerecomay10/standardPFNtuple_15*.root");
-    btagNtupReader yt(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/Jet2011_rerecomay10/standardPFNtuple_190_1_ELW.root");
+    btagNtupReader yt(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/BTAG/v42X_v1/Data/Jet2011_prompt_15june11/standard*.root");
      yt.Loop(0, weight); 
      action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minijet2011.root";
      system(action);
@@ -147,7 +145,7 @@ cout << " ----> DATA 2011" << endl;
 
 //     btagNtupReader yt(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/v42x_v1/Data/link_met/*.root");    
 //    btagNtupReader yt(3,"/user/fblekman/data/b-tagwork/MetBtag2011_prompt_15june11/standardPFNtuple_100_0_PLL.root");
-    btagNtupReader yt(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/MetBtag2011_rerecomay10/standardPFNtuple_18_2_3uA.root");
+    btagNtupReader yt(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/BTAG/v42X_v1/Data/MetBtag2011_prompt_15june11/standard*.root");
      yt.Loop(0, weight); 
      action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minibtag2011.root";
      system(action);
@@ -176,7 +174,7 @@ cout << " ----> MC : QCD 15-30 " << endl;
 //   btagNtupReader xt15(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_15to30/*.root"); // 311X DA & SV fix
 //   btagNtupReader xt15(3, "/user/fblekman/data/b-tagwork/14MayQCDPt_15to30/*.root"); // 311X DA & SV fix
    //   btagNtupReader xt15(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_15to30/standardPFNtuple_10*.root"); // 311X DA & SV fix
-   btagNtupReader xt15(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/14MayQCDPt_15to30/standardPFNtuple_78_1_FpW.root");
+   btagNtupReader xt15(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_15to30/standard*.root");
    xt15.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd15.root";
    system(action);
@@ -188,7 +186,7 @@ cout << " ----> MC : QCD 30-50 " << endl;
 //   btagNtupReader xt30(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_30to50/*.root"); // 311X DA & SV fix 
 //   btagNtupReader xt30(3, "/user/fblekman/data/b-tagwork/14MayQCDPt_30to50/*.root"); // 311X DA & SV fix
    //   btagNtupReader xt30(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_30to50/standardPFNtuple_10*.root"); // 311X DA & SV fix
-   btagNtupReader xt30(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/14MayQCDPt_30to50/standardPFNtuple_53_1_X16.root");
+   btagNtupReader xt30(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_30to50/standard*.root");
 
    xt30.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd30.root";
@@ -202,7 +200,7 @@ cout << " ----> MC : QCD 50-80 " << endl;
 //   btagNtupReader xt50(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_50to80/*.root"); // 311X DA & SV fix
 //   btagNtupReader xt50(3, "/user/fblekman/data/b-tagwork/14MayQCDPt_50to80/*.root"); // 311X DA & SV fix
    //   btagNtupReader xt50(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_50to80/standardPFNtuple_1*.root"); // 311X DA & SV fix
-   btagNtupReader xt50(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/14MayQCDPt_50to80/standardPFNtuple_13_1_wO6.root");
+   btagNtupReader xt50(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_50to80/standard*.root");
 
    xt50.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd50.root";
@@ -217,7 +215,7 @@ cout << " ----> MC : QCD 80-120 " << endl;
 //   btagNtupReader xt80(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_80to120/*.root"); // 311X DA & SV fix
 //   btagNtupReader xt80(3, "/user/fblekman/data/b-tagwork/14MayQCDPt_80to120/*.root"); // 311X DA & SV fix
    //   btagNtupReader xt80(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_80to120/standardPFNtuple_10*.root"); // 311X DA & SV fix
-   btagNtupReader xt80(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/14MayQCDPt_80to120/standardPFNtuple_90_1_CD3.root");
+   btagNtupReader xt80(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_80to120/standard*.root");
 
    xt80.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd80.root";
@@ -231,7 +229,7 @@ cout << " ----> MC : QCD 120-170 " << endl;
 //   btagNtupReader xt120(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCD_Pt_120to170/*.root"); // 311X DA & SV fix
 //   btagNtupReader xt120(3, "/user/fblekman/data/b-tagwork/QCD_Pt_120to170/*.root"); // 311X DA & SV fix
    //   btagNtupReader xt120(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/BTAG/V4_DA_SVfix/MC/QCD_Pt_120to170/standardPFNtuple_100*.root"); // 311X DA & SV fix
-   btagNtupReader xt120(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/QCD_Pt_120to170/standardPFNtuple_120_1_psX.root");
+   btagNtupReader xt120(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/BTAG/V4_DA_SVfix/MC/QCD_Pt_120to170/standard*.root");
 
    xt120.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd120.root";
@@ -245,7 +243,7 @@ cout << " ----> MC : QCD 170-300 " << endl;
 //   btagNtupReader xt170(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_170to300/*.root"); // 311X DA & SV fix
 //   btagNtupReader xt170(3, "/user/fblekman/data/b-tagwork/14MayQCDPt_170to300/*.root"); // 311X DA & SV fix
    //   btagNtupReader xt170(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_170to300/standardPFNtuple_10*.root"); // 311X DA & SV fix
-   btagNtupReader xt170(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/14MayQCDPt_170to300/standardPFNtuple_35_1_0wL.root");
+   btagNtupReader xt170(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_170to300/standard*.root");
 
    xt170.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd170.root";
@@ -259,7 +257,7 @@ cout << " ----> MC : QCD 300-470 " << endl;
 //   btagNtupReader xt300(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDPt_300to470/*.root"); // 311X DA & SV fix
 //   btagNtupReader xt300(3, "/user/fblekman/data/b-tagwork/14MayQCDPt_300to470/*.root"); // 311X DA & SV fix
    //   btagNtupReader xt300(3, "/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_300to470/standardPFNtuple_10*.root"); // 311X DA & SV fix
-   btagNtupReader xt300(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/14MayQCDPt_300to470/standardPFNtuple_64_1_toF.root");
+   btagNtupReader xt300(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDPt_300to470/standard*.root");
 
    xt300.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcd300.root";
@@ -277,7 +275,7 @@ cout << " ----> MC : QCD  MU 15-20 " << endl;
 //   btagNtupReader xmu15(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu15to20/*.root");
 //   btagNtupReader xmu15(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_15to20/*.root"); // 311X DA & SV fix
 //   btagNtupReader xmu15(3, "/user/fblekman/data/b-tagwork/14MayQCDMuEnrichedPt_15to20/standardPFNtuple_10*.root"); // 311X DA & SV fix
-   btagNtupReader xmu15(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/14MayQCDMuEnrichedPt_15to20/standardPFNtuple_11_0_ec0.root");
+   btagNtupReader xmu15(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDMuEnrichedPt_15to20/standard*.root");
    xmu15.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu15.root";
    system(action);
@@ -288,7 +286,7 @@ cout << " ----> MC : QCD  MU 20-30 " << endl;
 //   btagNtupReader xmu20(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu20to30/*.root"); //311X
 //   btagNtupReader xmu20(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_20to30/*.root"); // 311X DA & SV fix
 //   btagNtupReader xmu20(3, "/user/fblekman/data/b-tagwork/14MayQCDMuEnrichedPt_20to30/standardPFNtuple_11_1_POy.root"); // 311X DA & SV fix
-   btagNtupReader xmu20(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/14MayQCDMuEnrichedPt_20to30/standardPFNtuple_54_0_4Uf.root");
+   btagNtupReader xmu20(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDMuEnrichedPt_20to30/standard*.root");
    xmu20.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu20.root";
    system(action);
@@ -301,7 +299,7 @@ cout << " ----> MC : QCD  MU 30-50 " << endl;
 //   btagNtupReader xmu30(2, "/opt/sbg/cms/ui2_data1/ccollard/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu30to50/*.root"); //311X
 //   btagNtupReader xmu30(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCDMuEnriched_Pt-30to50/*.root"); // 311X DA & SV fix
 //   btagNtupReader xmu30(3, "/user/fblekman/data/b-tagwork/QCDMuEnriched_Pt-30to50/standardPFNtuple_10_1_BYV.root"); // 311X DA & SV fix
-   btagNtupReader xmu30(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/QCDMuEnriched_Pt-30to50/standardPFNtuple_80_0_Odp.root");
+   btagNtupReader xmu30(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/BTAG/V4_DA_SVfix/MC/QCDMuEnriched_Pt-30to50/standard*.root");
    xmu30.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu30.root";
    system(action);
@@ -313,7 +311,7 @@ cout << " ----> MC : QCD  MU 50-80 " << endl;
 //   btagNtupReader xmu50(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu50to80/QCDMu50to80/*.root"); //311X
 //   btagNtupReader xmu50(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCDMuEnriched_Pt-50to80/*.root"); // 311X DA & SV fix
 //   btagNtupReader xmu50(3, "/user/fblekman/data/b-tagwork/QCDMuEnriched_Pt-50to80/standardPFNtuple_10_1_tem.root"); // 311X DA & SV fix
-   btagNtupReader xmu50(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/QCDMuEnriched_Pt-50to80/standardPFNtuple_28_1_07D.root");
+   btagNtupReader xmu50(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/BTAG/V4_DA_SVfix/MC/QCDMuEnriched_Pt-50to80/standard*.root");
    xmu50.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu50.root";
    system(action);
@@ -324,7 +322,7 @@ cout << " ----> MC : QCD  MU 80-120 " << endl;
 //   btagNtupReader xmu80(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu80to120/QCDMu80to120/*.root"); //311X
 //   btagNtupReader xmu80(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/QCDMuEnriched_Pt-80to120/*.root"); // 311X DA & SV fix
 //   btagNtupReader xmu80(3, "/user/fblekman/data/b-tagwork/QCDMuEnriched_Pt-80to120/standardPFNtuple_10_0_nBN.root"); // 311X DA & SV fix
-   btagNtupReader xmu80(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/QCDMuEnriched_Pt-80to120/standardPFNtuple_17_0_2TC.root");
+   btagNtupReader xmu80(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/BTAG/V4_DA_SVfix/MC/QCDMuEnriched_Pt-80to120/standard*.root");
    xmu80.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu80.root";
    system(action);
@@ -335,7 +333,7 @@ cout << " ----> MC : QCD  MU 120-150 " << endl;
 //   btagNtupReader xmu120(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu120to150/QCDMu120to150/*.root"); //311X
 //   btagNtupReader xmu120(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_120to150/*.root"); // 311X DA & SV fix
 //   btagNtupReader xmu120(3, "/user/fblekman/data/b-tagwork/14MayQCDMuEnrichedPt_120to150/standardPFNtuple_15_1_M5f.root"); // 311X DA & SV fix
-   btagNtupReader xmu120(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/14MayQCDMuEnrichedPt_120to150/standardPFNtuple_15_1_M5f.root");
+   btagNtupReader xmu120(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDMuEnrichedPt_120to150/standard*.root");
    xmu120.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu120.root";
    system(action);
@@ -347,7 +345,7 @@ cout << " ----> MC : QCD  MU 150 " << endl;
 //   btagNtupReader xmu150(2, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu150/QCDMu150/*.root"); //311X
 //   btagNtupReader xmu150(3, "/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_150/*.root"); // 311X DA & SV fix   
 //   btagNtupReader xmu150(3, "/user/fblekman/data/b-tagwork/14MayQCDMuEnrichedPt_150/*.root"); // 311X DA & SV fix
-   btagNtupReader xmu150(3,"/mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/user/dknowlto/14MayQCDMuEnrichedPt_150/standardPFNtuple_10_0_d5c.root");
+   btagNtupReader xmu150(3,"/nfs/data4/alschmid/btagCommisioning/CaroNtuples/May14_MC_btagNtuples/14MayQCDMuEnrichedPt_150/standard*.root");
    xmu150.Loop(1, weight);
    action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_qcdmu150.root";
    system(action);
@@ -612,111 +610,111 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
  
      // muon-enriched (ptrel>0) standard track-based properties:
 
-     AddHisto(HistoBtag, "sv_mass_muenriched",    j,"SV mass",50,0.,8.); //163, similar to 60
-     AddHisto(HistoBtag, "IP3d2sigsorted_muenriched",j,"2nd track 3D IP significance (sorted)",100,-35.,35.); //164, similar to 51
-     AddHisto(HistoBtag, "IP3d2sigzsorted_muenriched",j,"2nd track 3D IP significance (sorted)",100,-2.,2.); //165, similar to 52
-     AddHisto(HistoBtag, "sv_flightsig2d_muenriched", j,"Flight significance 2D",50,0.,80.); //166, similar to 67
-     AddHisto(HistoBtag, "sv_flightsig3d_muenriched", j,"Flight significance 3D",50,0.,80.); //167, similar to 68
+     AddHisto(HistoBtag, "sv_mass_muenriched",              j,"SV mass",50,0.,8.); //163, similar to 60
+     AddHisto(HistoBtag, "IP3d2sigsorted_muenriched",       j,"2nd track 3D IP significance (sorted)",100,-35.,35.); //164, similar to 51
+     AddHisto(HistoBtag, "IP3d2sigzsorted_muenriched",       j,"2nd track 3D IP significance (sorted)",100,-2.,2.); //165, similar to 52
+     AddHisto(HistoBtag, "sv_flightsig2d_muenriched",        j,"Flight significance 2D",50,0.,80.); //166, similar to 67
+     AddHisto(HistoBtag, "sv_flightsig3d_muenriched",        j,"Flight significance 3D",50,0.,80.); //167, similar to 68
      // the following are filled just after the 'normal' discriminants (#4-10)
-     AddHisto(HistoBtag, "discri_tche_muenriched",   j,"TCHE Discriminator",50,0.,30.);  // 168 
-     AddHisto(HistoBtag, "discri_tchp_muenriched",   j,"TCHP Discriminator",50,0.,30.);  // 169
-     AddHisto(HistoBtag, "discri_ssche_muenriched",   j,"SSVHE Discriminator",50,0.,7.);   // 170
-     AddHisto(HistoBtag, "discri_sschp_muenriched",   j,"SSVHP Discriminator",50,0.,7.);  //171
-     AddHisto(HistoBtag, "muenriched_discrim",j,"muon pTrel cut on for b-enrichment",50,-5,10);// 172, for reference 
-     AddHisto(HistoBtag, "discri_jetprob_muenriched",   j,"JetProb Discriminator",50,0.,2.5); //173
-     AddHisto(HistoBtag, "discri_jetbprob_muenriched",   j,"JetBProb Discriminator",50,0.,8.); //174
+     AddHisto(HistoBtag, "discri_tche_muenriched",           j,"TCHE Discriminator",50,0.,30.);  // 168 
+     AddHisto(HistoBtag, "discri_tchp_muenriched",           j,"TCHP Discriminator",50,0.,30.);  // 169
+     AddHisto(HistoBtag, "discri_ssche_muenriched",          j,"SSVHE Discriminator",50,0.,7.);   // 170
+     AddHisto(HistoBtag, "discri_sschp_muenriched",          j,"SSVHP Discriminator",50,0.,7.);  //171
+     AddHisto(HistoBtag, "muenriched_discrim",               j,"muon pTrel cut on for b-enrichment",50,-5,10);// 172, for reference 
+     AddHisto(HistoBtag, "discri_jetprob_muenriched",        j,"JetProb Discriminator",50,0.,2.5); //173
+     AddHisto(HistoBtag, "discri_jetbprob_muenriched",       j,"JetBProb Discriminator",50,0.,8.); //174
 
      // Key variables with coarse jet pt bins (50-80 80-120 120+)
 
      // IP variables (sorted)
-     AddHisto(HistoBtag, "trackIP3d_jetptbin1",  j,"Track 3D IP value (sorted)",100,-0.1,0.1);  //175
-     AddHisto(HistoBtag, "trackIP3d_jetptbin2",  j,"Track 3D IP value (sorted)",100,-0.1,0.1);
-     AddHisto(HistoBtag, "trackIP3d_jetptbin3",  j,"Track 3D IP value (sorted)",100,-0.1,0.1);
+     AddHisto(HistoBtag, "trackIP3d_jetptbin1",          j,"Track 3D IP value (sorted)",100,-0.1,0.1);  //175
+     AddHisto(HistoBtag, "trackIP3d_jetptbin2",          j,"Track 3D IP value (sorted)",100,-0.1,0.1);
+     AddHisto(HistoBtag, "trackIP3d_jetptbin3",          j,"Track 3D IP value (sorted)",100,-0.1,0.1);
+						         
+     AddHisto(HistoBtag, "IP3d1_jetptbin1",              j,"1st track 3D IP value (sorted)",100,-0.1,0.1);  
+     AddHisto(HistoBtag, "IP3d1_jetptbin2",              j,"1st track 3D IP value (sorted)",100,-0.1,0.1);
+     AddHisto(HistoBtag, "IP3d1_jetptbin3",              j,"1st track 3D IP value (sorted)",100,-0.1,0.1);  //180
+						         
+     AddHisto(HistoBtag, "IP3d2_jetptbin1",              j,"2nd track 3D IP value (sorted)",100,-0.1,0.1);
+     AddHisto(HistoBtag, "IP3d2_jetptbin2",              j,"2nd track 3D IP value (sorted)",100,-0.1,0.1);
+     AddHisto(HistoBtag, "IP3d2_jetptbin3",              j,"2nd track 3D IP value (sorted)",100,-0.1,0.1);  
+						         
+     AddHisto(HistoBtag, "IP3d3_jetptbin1",              j,"3rd track 3D IP value (sorted)",100,-0.1,0.1);
+     AddHisto(HistoBtag, "IP3d3_jetptbin2",              j,"3rd track 3D IP value (sorted)",100,-0.1,0.1);  //185
+     AddHisto(HistoBtag, "IP3d3_jetptbin3",              j,"3rd track 3D IP value (sorted)",100,-0.1,0.1);
+     						         
+     AddHisto(HistoBtag, "IP3dsigsorted_jetptbin1",      j,"Track 3D IP significance (sorted)",200,-35.,35.); 
+     AddHisto(HistoBtag, "IP3dsigsorted_jetptbin2",      j,"Track 3D IP significance (sorted)",200,-35.,35.);  
+     AddHisto(HistoBtag, "IP3dsigsorted_jetptbin3",      j,"Track 3D IP significance (sorted)",200,-35.,35.);
+						         
+     AddHisto(HistoBtag, "IP3d1sigsorted_jetptbin1",     j,"1st track 3D IP significance (sorted)",100,-35.,35.);  //190  
+     AddHisto(HistoBtag, "IP3d1sigsorted_jetptbin2",     j,"1st track 3D IP significance (sorted)",100,-35.,35.); 
+     AddHisto(HistoBtag, "IP3d1sigsorted_jetptbin3",     j,"1st track 3D IP significance (sorted)",100,-35.,35.);
+						         
+     AddHisto(HistoBtag, "IP3d2sigsorted_jetptbin1",     j,"2nd track 3D IP significance (sorted)",100,-35.,35.);  
+     AddHisto(HistoBtag, "IP3d2sigsorted_jetptbin2",     j,"2nd track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d2sigsorted_jetptbin3",     j,"2nd track 3D IP significance (sorted)",100,-35.,35.);  //195
+						         
+     AddHisto(HistoBtag, "IP3d3sigsorted_jetptbin1",     j,"3rd track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d3sigsorted_jetptbin2",     j,"3rd track 3D IP significance (sorted)",100,-35.,35.);
+     AddHisto(HistoBtag, "IP3d3sigsorted_jetptbin3",     j,"3rd track 3D IP significance (sorted)",100,-35.,35.);  
+						        
+     AddHisto(HistoBtag, "IP3dErrorsorted_jetptbin1",    j,"Track 3D IP Error (sorted)",100,0.,0.1);
+     AddHisto(HistoBtag, "IP3dErrorsorted_jetptbin2",    j,"Track 3D IP Error (sorted)",100,0.,0.1);  //200
+     AddHisto(HistoBtag, "IP3dErrorsorted_jetptbin3",    j,"Track 3D IP Error (sorted)",100,0.,0.1);
 
-     AddHisto(HistoBtag, "IP3d1_jetptbin1",j,"1st track 3D IP value (sorted)",100,-0.1,0.1);  
-     AddHisto(HistoBtag, "IP3d1_jetptbin2",j,"1st track 3D IP value (sorted)",100,-0.1,0.1);
-     AddHisto(HistoBtag, "IP3d1_jetptbin3",j,"1st track 3D IP value (sorted)",100,-0.1,0.1);  //180
-
-     AddHisto(HistoBtag, "IP3d2_jetptbin1",j,"2nd track 3D IP value (sorted)",100,-0.1,0.1);
-     AddHisto(HistoBtag, "IP3d2_jetptbin2",j,"2nd track 3D IP value (sorted)",100,-0.1,0.1);
-     AddHisto(HistoBtag, "IP3d2_jetptbin3",j,"2nd track 3D IP value (sorted)",100,-0.1,0.1);  
-
-     AddHisto(HistoBtag, "IP3d3_jetptbin1",j,"3rd track 3D IP value (sorted)",100,-0.1,0.1);
-     AddHisto(HistoBtag, "IP3d3_jetptbin2",j,"3rd track 3D IP value (sorted)",100,-0.1,0.1);  //185
-     AddHisto(HistoBtag, "IP3d3_jetptbin3",j,"3rd track 3D IP value (sorted)",100,-0.1,0.1);
-     
-     AddHisto(HistoBtag, "IP3dsigsorted_jetptbin1", j,"Track 3D IP significance (sorted)",200,-35.,35.); 
-     AddHisto(HistoBtag, "IP3dsigsorted_jetptbin2", j,"Track 3D IP significance (sorted)",200,-35.,35.);  
-     AddHisto(HistoBtag, "IP3dsigsorted_jetptbin3", j,"Track 3D IP significance (sorted)",200,-35.,35.);
-
-     AddHisto(HistoBtag, "IP3d1sigsorted_jetptbin1", j,"1st track 3D IP significance (sorted)",100,-35.,35.);  //190  
-     AddHisto(HistoBtag, "IP3d1sigsorted_jetptbin2", j,"1st track 3D IP significance (sorted)",100,-35.,35.); 
-     AddHisto(HistoBtag, "IP3d1sigsorted_jetptbin3", j,"1st track 3D IP significance (sorted)",100,-35.,35.);
-
-     AddHisto(HistoBtag, "IP3d2sigsorted_jetptbin1", j,"2nd track 3D IP significance (sorted)",100,-35.,35.);  
-     AddHisto(HistoBtag, "IP3d2sigsorted_jetptbin2", j,"2nd track 3D IP significance (sorted)",100,-35.,35.);
-     AddHisto(HistoBtag, "IP3d2sigsorted_jetptbin3", j,"2nd track 3D IP significance (sorted)",100,-35.,35.);  //195
-
-     AddHisto(HistoBtag, "IP3d3sigsorted_jetptbin1", j,"3rd track 3D IP significance (sorted)",100,-35.,35.);
-     AddHisto(HistoBtag, "IP3d3sigsorted_jetptbin2", j,"3rd track 3D IP significance (sorted)",100,-35.,35.);
-     AddHisto(HistoBtag, "IP3d3sigsorted_jetptbin3", j,"3rd track 3D IP significance (sorted)",100,-35.,35.);  
-
-     AddHisto(HistoBtag, "IP3dErrorsorted_jetptbin1",  j,"Track 3D IP Error (sorted)",100,0.,0.1);
-     AddHisto(HistoBtag, "IP3dErrorsorted_jetptbin2",  j,"Track 3D IP Error (sorted)",100,0.,0.1);  //200
-     AddHisto(HistoBtag, "IP3dErrorsorted_jetptbin3",  j,"Track 3D IP Error (sorted)",100,0.,0.1);
-
-     AddHisto(HistoBtag, "IP3d1Errorsorted_jetptbin1",  j,"1st track 3D IP Error (sorted)",100,0.,0.1);
-     AddHisto(HistoBtag, "IP3d1Errorsorted_jetptbin2",  j,"1st track 3D IP Error (sorted)",100,0.,0.1);  
-     AddHisto(HistoBtag, "IP3d1Errorsorted_jetptbin3",  j,"1st track 3D IP Error (sorted)",100,0.,0.1); 
-
-     AddHisto(HistoBtag, "IP3d2Errorsorted_jetptbin1",  j,"2nd track 3D IP Error (sorted)",100,0.,0.1);  //205
-     AddHisto(HistoBtag, "IP3d2Errorsorted_jetptbin2",  j,"2nd track 3D IP Error (sorted)",100,0.,0.1); 
-     AddHisto(HistoBtag, "IP3d2Errorsorted_jetptbin3",  j,"2nd track 3D IP Error (sorted)",100,0.,0.1); 
-     
-     AddHisto(HistoBtag, "IP3d3Errorsorted_jetptbin1",  j,"3rd track 3D IP Error (sorted)",100,0.,0.1);  
-     AddHisto(HistoBtag, "IP3d3Errorsorted_jetptbin2",  j,"3rd track 3D IP Error (sorted)",100,0.,0.1); 
-     AddHisto(HistoBtag, "IP3d3Errorsorted_jetptbin3",  j,"3rd track 3D IP Error (sorted)",100,0.,0.1);  //210
+     AddHisto(HistoBtag, "IP3d1Errorsorted_jetptbin1",    j,"1st track 3D IP Error (sorted)",100,0.,0.1);
+     AddHisto(HistoBtag, "IP3d1Errorsorted_jetptbin2",    j,"1st track 3D IP Error (sorted)",100,0.,0.1);  
+     AddHisto(HistoBtag, "IP3d1Errorsorted_jetptbin3",    j,"1st track 3D IP Error (sorted)",100,0.,0.1); 
+						         
+     AddHisto(HistoBtag, "IP3d2Errorsorted_jetptbin1",    j,"2nd track 3D IP Error (sorted)",100,0.,0.1);  //205
+     AddHisto(HistoBtag, "IP3d2Errorsorted_jetptbin2",    j,"2nd track 3D IP Error (sorted)",100,0.,0.1); 
+     AddHisto(HistoBtag, "IP3d2Errorsorted_jetptbin3",    j,"2nd track 3D IP Error (sorted)",100,0.,0.1); 
+     						         
+     AddHisto(HistoBtag, "IP3d3Errorsorted_jetptbin1",    j,"3rd track 3D IP Error (sorted)",100,0.,0.1);  
+     AddHisto(HistoBtag, "IP3d3Errorsorted_jetptbin2",    j,"3rd track 3D IP Error (sorted)",100,0.,0.1); 
+     AddHisto(HistoBtag, "IP3d3Errorsorted_jetptbin3",    j,"3rd track 3D IP Error (sorted)",100,0.,0.1);  //210
 
      // Vertex variables (sorted)
-     AddHisto(HistoBtag, "sv_mass_jetptbin1", j,"SV mass (sorted)",50,0.,8.);
-     AddHisto(HistoBtag, "sv_mass_jetptbin2", j,"SV mass (sorted)",50,0.,8.);
-     AddHisto(HistoBtag, "sv_mass_jetptbin3", j,"SV mass (sorted)",50,0.,8.);  
+     AddHisto(HistoBtag, "sv_mass_jetptbin1",            j,"SV mass (sorted)",50,0.,8.);
+     AddHisto(HistoBtag, "sv_mass_jetptbin2",            j,"SV mass (sorted)",50,0.,8.);
+     AddHisto(HistoBtag, "sv_mass_jetptbin3",            j,"SV mass (sorted)",50,0.,8.);  
 
-     AddHisto(HistoBtag, "sv_mass_3tr_jetptbin1", j,"SV mass for >=3tracks (sorted)",50,0.,8.);
-     AddHisto(HistoBtag, "sv_mass_3tr_jetptbin2", j,"SV mass for >=3tracks (sorted)",50,0.,8.);  //215
-     AddHisto(HistoBtag, "sv_mass_3tr_jetptbin3", j,"SV mass for >=3tracks (sorted)",50,0.,8.);
+     AddHisto(HistoBtag, "sv_mass_3tr_jetptbin1",        j,"SV mass for >=3tracks (sorted)",50,0.,8.);
+     AddHisto(HistoBtag, "sv_mass_3tr_jetptbin2",        j,"SV mass for >=3tracks (sorted)",50,0.,8.);  //215
+     AddHisto(HistoBtag, "sv_mass_3tr_jetptbin3",        j,"SV mass for >=3tracks (sorted)",50,0.,8.);
 
-     AddHisto(HistoBtag, "sv_ipsigcharm_jetptbin1",  j,"IP significance 2D charm (sorted)",50,-35.,35.);
-     AddHisto(HistoBtag, "sv_ipsigcharm_jetptbin2",  j,"IP significance 2D charm (sorted)",50,-35.,35.);  
-     AddHisto(HistoBtag, "sv_ipsigcharm_jetptbin3",  j,"IP significance 2D charm (sorted)",50,-35.,35.);
+     AddHisto(HistoBtag, "sv_ipsigcharm_jetptbin1",      j,"IP significance 2D charm (sorted)",50,-35.,35.);
+     AddHisto(HistoBtag, "sv_ipsigcharm_jetptbin2",      j,"IP significance 2D charm (sorted)",50,-35.,35.);  
+     AddHisto(HistoBtag, "sv_ipsigcharm_jetptbin3",      j,"IP significance 2D charm (sorted)",50,-35.,35.);
 
-     AddHisto(HistoBtag, "sv_eratio_jetptbin1",    j,"Fractional energy (sorted)",50,0.,1.);  //220
-     AddHisto(HistoBtag, "sv_eratio_jetptbin2",    j,"Fractional energy (sorted)",50,0.,1.);
-     AddHisto(HistoBtag, "sv_eratio_jetptbin3",    j,"Fractional energy (sorted)",50,0.,1.);
+     AddHisto(HistoBtag, "sv_eratio_jetptbin1",          j,"Fractional energy (sorted)",50,0.,1.);  //220
+     AddHisto(HistoBtag, "sv_eratio_jetptbin2",          j,"Fractional energy (sorted)",50,0.,1.);
+     AddHisto(HistoBtag, "sv_eratio_jetptbin3",          j,"Fractional energy (sorted)",50,0.,1.);
 
-     AddHisto(HistoBtag, "sv_flightsig2d_jetptbin1", j,"Flight significance 2D (sorted)",50,0.,80.);  
-     AddHisto(HistoBtag, "sv_flightsig2d_jetptbin2", j,"Flight significance 2D (sorted)",50,0.,80.);
-     AddHisto(HistoBtag, "sv_flightsig2d_jetptbin3", j,"Flight significance 2D (sorted)",50,0.,80.);  //225  
+     AddHisto(HistoBtag, "sv_flightsig2d_jetptbin1",      j,"Flight significance 2D (sorted)",50,0.,80.);  
+     AddHisto(HistoBtag, "sv_flightsig2d_jetptbin2",      j,"Flight significance 2D (sorted)",50,0.,80.);
+     AddHisto(HistoBtag, "sv_flightsig2d_jetptbin3",      j,"Flight significance 2D (sorted)",50,0.,80.);  //225  
+						          
+     AddHisto(HistoBtag, "sv_flightsig3d_jetptbin1",      j,"Flight significance 3D (sorted)",50,0.,80.);
+     AddHisto(HistoBtag, "sv_flightsig3d_jetptbin2",      j,"Flight significance 3D (sorted)",50,0.,80.);
+     AddHisto(HistoBtag, "sv_flightsig3d_jetptbin3",      j,"Flight significance 3D (sorted)",50,0.,80.);  
+						          
+     AddHisto(HistoBtag, "sv_flightdis2d_jetptbin1",      j,"Flight distance 2D (sorted)",50,0.,2.5);
+     AddHisto(HistoBtag, "sv_flightdis2d_jetptbin2",      j,"Flight distance 2D (sorted)",50,0.,2.5);  //230
+     AddHisto(HistoBtag, "sv_flightdis2d_jetptbin3",      j,"Flight distance 2D (sorted)",50,0.,2.5);
+						          
+     AddHisto(HistoBtag, "sv_flightdis3d_jetptbin1",      j,"Flight distance 3D (sorted)",50,0.,15.);
+     AddHisto(HistoBtag, "sv_flightdis3d_jetptbin2",      j,"Flight distance 3D (sorted)",50,0.,15.);  
+     AddHisto(HistoBtag, "sv_flightdis3d_jetptbin3",      j,"Flight distance 3D (sorted)",50,0.,15.);
 
-     AddHisto(HistoBtag, "sv_flightsig3d_jetptbin1", j,"Flight significance 3D (sorted)",50,0.,80.);
-     AddHisto(HistoBtag, "sv_flightsig3d_jetptbin2", j,"Flight significance 3D (sorted)",50,0.,80.);
-     AddHisto(HistoBtag, "sv_flightsig3d_jetptbin3", j,"Flight significance 3D (sorted)",50,0.,80.);  
+     AddHisto(HistoBtag, "sv_flightsig3d_3tr_jetptbin1",  j,"Flight significance 3D for >=3tracks (sorted)",50,0.,80.);  //235
+     AddHisto(HistoBtag, "sv_flightsig3d_3tr_jetptbin2",  j,"Flight significance 3D for >=3tracks (sorted)",50,0.,80.);
+     AddHisto(HistoBtag, "sv_flightsig3d_3tr_jetptbin3",  j,"Flight significance 3D for >=3tracks (sorted)",50,0.,80.);
 
-     AddHisto(HistoBtag, "sv_flightdis2d_jetptbin1", j,"Flight distance 2D (sorted)",50,0.,2.5);
-     AddHisto(HistoBtag, "sv_flightdis2d_jetptbin2", j,"Flight distance 2D (sorted)",50,0.,2.5);  //230
-     AddHisto(HistoBtag, "sv_flightdis2d_jetptbin3", j,"Flight distance 2D (sorted)",50,0.,2.5);
-
-     AddHisto(HistoBtag, "sv_flightdis3d_jetptbin1", j,"Flight distance 3D (sorted)",50,0.,15.);
-     AddHisto(HistoBtag, "sv_flightdis3d_jetptbin2", j,"Flight distance 3D (sorted)",50,0.,15.);  
-     AddHisto(HistoBtag, "sv_flightdis3d_jetptbin3", j,"Flight distance 3D (sorted)",50,0.,15.);
-
-     AddHisto(HistoBtag, "sv_flightsig3d_3tr_jetptbin1", j,"Flight significance 3D for >=3tracks (sorted)",50,0.,80.);  //235
-     AddHisto(HistoBtag, "sv_flightsig3d_3tr_jetptbin2", j,"Flight significance 3D for >=3tracks (sorted)",50,0.,80.);
-     AddHisto(HistoBtag, "sv_flightsig3d_3tr_jetptbin3", j,"Flight significance 3D for >=3tracks (sorted)",50,0.,80.);
-
-     AddHisto(HistoBtag, "sv_deltar_jet_jetptbin1",    j,"SVjetDeltaR (sorted)",50,0.,0.5);  
-     AddHisto(HistoBtag, "sv_deltar_jet_jetptbin2",    j,"SVjetDeltaR (sorted)",50,0.,0.5);
-     AddHisto(HistoBtag, "sv_deltar_jet_jetptbin3",    j,"SVjetDeltaR (sorted)",50,0.,0.5);  //240
+     AddHisto(HistoBtag, "sv_deltar_jet_jetptbin1",        j,"SVjetDeltaR (sorted)",50,0.,0.5);  
+     AddHisto(HistoBtag, "sv_deltar_jet_jetptbin2",        j,"SVjetDeltaR (sorted)",50,0.,0.5);
+     AddHisto(HistoBtag, "sv_deltar_jet_jetptbin3",        j,"SVjetDeltaR (sorted)",50,0.,0.5);  //240
 
      AddHisto(HistoBtag, "sv_deltar_sum_jet_jetptbin1",    j,"SVvtxSumJetDeltaR (sorted)",50,0.,0.5);
      AddHisto(HistoBtag, "sv_deltar_sum_jet_jetptbin2",    j,"SVvtxSumJetDeltaR (sorted)",50,0.,0.5);
@@ -727,48 +725,104 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "sv_deltar_sum_dir_jetptbin3",    j,"SVvtxSumVtxDirDeltaR (sorted)",50,0.,0.5);
 
      // Discriminators (sorted)
-     AddHisto(HistoBtag, "discri_tche_jetptbin1",   j,"TCHE Discriminator (sorted)",50,0.,30.);
-     AddHisto(HistoBtag, "discri_tche_jetptbin2",   j,"TCHE Discriminator (sorted)",50,0.,30.);  
-     AddHisto(HistoBtag, "discri_tche_jetptbin3",   j,"TCHE Discriminator (sorted)",50,0.,30.);
+     AddHisto(HistoBtag, "discri_tche_jetptbin1",          j,"TCHE Discriminator (sorted)",50,0.,30.);
+     AddHisto(HistoBtag, "discri_tche_jetptbin2",          j,"TCHE Discriminator (sorted)",50,0.,30.);  
+     AddHisto(HistoBtag, "discri_tche_jetptbin3",          j,"TCHE Discriminator (sorted)",50,0.,30.);
 
-     AddHisto(HistoBtag, "discri_tchp_jetptbin1",   j,"TCHP Discriminator (sorted)",50,0.,30.);  //250
-     AddHisto(HistoBtag, "discri_tchp_jetptbin2",   j,"TCHP Discriminator (sorted)",50,0.,30.);
-     AddHisto(HistoBtag, "discri_tchp_jetptbin3",   j,"TCHP Discriminator (sorted)",50,0.,30.);
+     AddHisto(HistoBtag, "discri_tchp_jetptbin1",          j,"TCHP Discriminator (sorted)",50,0.,30.);  //250
+     AddHisto(HistoBtag, "discri_tchp_jetptbin2",          j,"TCHP Discriminator (sorted)",50,0.,30.);
+     AddHisto(HistoBtag, "discri_tchp_jetptbin3",          j,"TCHP Discriminator (sorted)",50,0.,30.);
      
-     AddHisto(HistoBtag, "discri_ssche0_jetptbin1",   j,"SSVHE Discriminator (sorted)",80,-1.,7.);  
-     AddHisto(HistoBtag, "discri_ssche0_jetptbin2",   j,"SSVHE Discriminator (sorted)",80,-1.,7.);
-     AddHisto(HistoBtag, "discri_ssche0_jetptbin3",   j,"SSVHE Discriminator (sorted)",80,-1.,7.);  //255
+     AddHisto(HistoBtag, "discri_ssche0_jetptbin1",        j,"SSVHE Discriminator (sorted)",80,-1.,7.);  
+     AddHisto(HistoBtag, "discri_ssche0_jetptbin2",        j,"SSVHE Discriminator (sorted)",80,-1.,7.);
+     AddHisto(HistoBtag, "discri_ssche0_jetptbin3",        j,"SSVHE Discriminator (sorted)",80,-1.,7.);  //255
 
-     AddHisto(HistoBtag, "discri_ssche_jetptbin1",   j,"SSVHE Discriminator (sorted)",50,0.,7.);
-     AddHisto(HistoBtag, "discri_ssche_jetptbin2",   j,"SSVHE Discriminator (sorted)",50,0.,7.);
-     AddHisto(HistoBtag, "discri_ssche_jetptbin3",   j,"SSVHE Discriminator (sorted)",50,0.,7.);  
+     AddHisto(HistoBtag, "discri_ssche_jetptbin1",         j,"SSVHE Discriminator (sorted)",50,0.,7.);
+     AddHisto(HistoBtag, "discri_ssche_jetptbin2",         j,"SSVHE Discriminator (sorted)",50,0.,7.);
+     AddHisto(HistoBtag, "discri_ssche_jetptbin3",         j,"SSVHE Discriminator (sorted)",50,0.,7.);  
 
-     AddHisto(HistoBtag, "discri_sschp0_jetptbin1",   j,"SSVHP Discriminator (sorted)",80,-1.,7.);
-     AddHisto(HistoBtag, "discri_sschp0_jetptbin2",   j,"SSVHP Discriminator (sorted)",80,-1.,7.);  //260
-     AddHisto(HistoBtag, "discri_sschp0_jetptbin3",   j,"SSVHP Discriminator (sorted)",80,-1.,7.);
+     AddHisto(HistoBtag, "discri_sschp0_jetptbin1",        j,"SSVHP Discriminator (sorted)",80,-1.,7.);
+     AddHisto(HistoBtag, "discri_sschp0_jetptbin2",        j,"SSVHP Discriminator (sorted)",80,-1.,7.);  //260
+     AddHisto(HistoBtag, "discri_sschp0_jetptbin3",        j,"SSVHP Discriminator (sorted)",80,-1.,7.);
 
-     AddHisto(HistoBtag, "discri_sschp_jetptbin1",   j,"SSVHP Discriminator (sorted)",50,0.,7.);   
-     AddHisto(HistoBtag, "discri_sschp_jetptbin2",   j,"SSVHP Discriminator (sorted)",50,0.,7.);  
-     AddHisto(HistoBtag, "discri_sschp_jetptbin3",   j,"SSVHP Discriminator (sorted)",50,0.,7.);
+     AddHisto(HistoBtag, "discri_sschp_jetptbin1",         j,"SSVHP Discriminator (sorted)",50,0.,7.);   
+     AddHisto(HistoBtag, "discri_sschp_jetptbin2",         j,"SSVHP Discriminator (sorted)",50,0.,7.);  
+     AddHisto(HistoBtag, "discri_sschp_jetptbin3",         j,"SSVHP Discriminator (sorted)",50,0.,7.);
      
-     AddHisto(HistoBtag, "discri_jetprob_jetptbin1",   j,"JetProb Discriminator (sorted)",50,0.,2.5);  //265
-     AddHisto(HistoBtag, "discri_jetprob_jetptbin2",   j,"JetProb Discriminator (sorted)",50,0.,2.5);
-     AddHisto(HistoBtag, "discri_jetprob_jetptbin3",   j,"JetProb Discriminator (sorted)",50,0.,2.5);
+     AddHisto(HistoBtag, "discri_jetprob_jetptbin1",       j,"JetProb Discriminator (sorted)",50,0.,2.5);  //265
+     AddHisto(HistoBtag, "discri_jetprob_jetptbin2",       j,"JetProb Discriminator (sorted)",50,0.,2.5);
+     AddHisto(HistoBtag, "discri_jetprob_jetptbin3",       j,"JetProb Discriminator (sorted)",50,0.,2.5);
 
-     AddHisto(HistoBtag, "discri_jetbprob_jetptbin1",   j,"JetBProb Discriminator (sorted)",50,0.,8.);  
-     AddHisto(HistoBtag, "discri_jetbprob_jetptbin2",   j,"JetBProb Discriminator (sorted)",50,0.,8.);
-     AddHisto(HistoBtag, "discri_jetbprob_jetptbin3",   j,"JetBProb Discriminator (sorted)",50,0.,8.);  //270
+     AddHisto(HistoBtag, "discri_jetbprob_jetptbin1",      j,"JetBProb Discriminator (sorted)",50,0.,8.);  
+     AddHisto(HistoBtag, "discri_jetbprob_jetptbin2",      j,"JetBProb Discriminator (sorted)",50,0.,8.);
+     AddHisto(HistoBtag, "discri_jetbprob_jetptbin3",      j,"JetBProb Discriminator (sorted)",50,0.,8.);  //270
 
      // Vertex variables for 3 track vertices
-     AddHisto(HistoBtag, "sv_ipsigcharm_3tr", j,"IP significance 2D charm >=3tracks",50,-35.,35.);
-     AddHisto(HistoBtag, "sv_eratio_3tr", j,"Fractional energy >=3tracks",50,0.,1.);
-     AddHisto(HistoBtag, "sv_vtx_pt_3tr", j,"PT of vtx >=3tracks",50,0.,100.);
+     AddHisto(HistoBtag, "sv_ipsigcharm_3tr",              j,"IP significance 2D charm >=3tracks",50,-35.,35.);
+     AddHisto(HistoBtag, "sv_eratio_3tr",                  j,"Fractional energy >=3tracks",50,0.,1.);
+     AddHisto(HistoBtag, "sv_vtx_pt_3tr",                  j,"PT of vtx >=3tracks",50,0.,100.);
 
      // Center integer binning for multiplicity plots
-     AddHisto(HistoBtag, "sv_trackmul_centered",  j,"Track multiplicity : SVnVertexTracks (centered)",13,-0.5,12.5);
-     AddHisto(HistoBtag, "sv_trackmul1_centered",  j,"Track multiplicity : SVnFirstVertexTracks (centered)",11,-0.5,10.5);  //275
-     AddHisto(HistoBtag, "sv_tracksel_centered",  j,"Track multiplicity : SVnSelectedTracks (centered)",21,-0.5,20.5);
-     AddHisto(HistoBtag, "muons_multiplicity_centered", j,"# of muons in jet (centered)",11,-0.5,10.5);
+     AddHisto(HistoBtag, "sv_trackmul_centered",           j,"Track multiplicity : SVnVertexTracks (centered)",13,-0.5,12.5);
+     AddHisto(HistoBtag, "sv_trackmul1_centered",          j,"Track multiplicity : SVnFirstVertexTracks (centered)",11,-0.5,10.5);  //275
+     AddHisto(HistoBtag, "sv_tracksel_centered",           j,"Track multiplicity : SVnSelectedTracks (centered)",21,-0.5,20.5);
+     AddHisto(HistoBtag, "muons_multiplicity_centered",    j,"# of muons in jet (centered)",11,-0.5,10.5);
+
+
+     AddHisto(HistoBtag, "npv1_sveratio",        j,"SV eratio (#PV:1-3)",                       50,0.,1.);          //278
+     AddHisto(HistoBtag, "npv1_deltar_jet",      j,"SV deltaR jet (#PV:1-3)",                 50,0.,0.5);
+     AddHisto(HistoBtag, "npv1_deltar_sum_jet",      j,"SV deltaR sum jet (#PV:1-3)",                 50,0.,0.5);   //280
+     AddHisto(HistoBtag, "npv1_deltar_sum_dir",      j,"SV deltaR sum dir (#PV:1-3)",                 50,0.,0.5);   
+     AddHisto(HistoBtag, "npv1_vtxpt",      j,"SV vtx pt (#PV:1-3)",                 50,0.,100);   
+     AddHisto(HistoBtag, "npv1_discri_tche",      j,"TCHE discriminator (#PV:1-3)",                 50,0.,30);   
+     AddHisto(HistoBtag, "npv1_discri_tchp",      j,"TCHP discriminator (#PV:1-3)",                 50,0.,30);   
+     AddHisto(HistoBtag, "npv1_discri_jetprob",      j,"JP discriminator (#PV:1-3)",                 50,0.,2.5);   //285
+     AddHisto(HistoBtag, "npv1_discri_jetbprob",      j,"JBP discriminator (#PV:1-3)",                 50,0.,8);   
+
+     AddHisto(HistoBtag, "npv1_discri_ssche0",       j,"SSVHE Discriminator (#PV:1-3)",80,-1.,7.); 
+     AddHisto(HistoBtag, "npv1_discri_ssche",   j,"SSVHE Discriminator (#PV:1-3)",50,0.,7.);   
+     AddHisto(HistoBtag, "npv1_discri_sschp0",   j,"SSVHP Discriminator (#PV:1-3)",80,-1.,7.); 
+     AddHisto(HistoBtag, "npv1_discri_sschp",   j,"SSVHP Discriminator (#PV:1-3)",50,0.,7.);                     //290
+     AddHisto(HistoBtag, "npv1_muon_Pt", j,       "Muon p_{T} (#PV:1-3)",200,0,100);
+     AddHisto(HistoBtag, "npv1_muon_ptrel", j ,   "Muon p_{T}^{rel} (#PV:1-3)",50,0,5); 
+     AddHisto(HistoBtag, "npv1_muon_DeltaR", j,        "Muon1 deltaR (#PV:1-3)",50,0,0.5); 
+
+     AddHisto(HistoBtag, "npv2_sveratio",        j,"SV eratio (#PV:4-7)",                       50,0.,1.);
+     AddHisto(HistoBtag, "npv2_deltar_jet",      j,"SV deltaR jet (#PV:4-7)",                 50,0.,0.5);           //295
+     AddHisto(HistoBtag, "npv2_deltar_sum_jet",      j,"SV deltaR sum jet (#PV:4-7)",                 50,0.,0.5);   
+     AddHisto(HistoBtag, "npv2_deltar_sum_dir",      j,"SV deltaR sum dir (#PV:4-7)",                 50,0.,0.5);   
+     AddHisto(HistoBtag, "npv2_vtxpt",      j,"SV vtx pt (#PV:4-7)",                 50,0., 100);   
+     AddHisto(HistoBtag, "npv2_discri_tche",      j,"TCHE discriminator (#PV:4-7)",                 50,0.,30);   
+     AddHisto(HistoBtag, "npv2_discri_tchp",      j,"TCHP discriminator (#PV:4-7)",                 50,0.,30);   //300
+     AddHisto(HistoBtag, "npv2_discri_jetprob",      j,"JP discriminator (#PV:4-7)",                 50,0.,2.5);   
+     AddHisto(HistoBtag, "npv2_discri_jetbprob",      j,"JBP discriminator (#PV:4-7)",                 50,0.,8);   
+
+     AddHisto(HistoBtag, "npv2_discri_ssche0",       j,"SSVHE Discriminator (#PV:4-7)",80,-1.,7.); 
+     AddHisto(HistoBtag, "npv2_discri_ssche",   j,"SSVHE Discriminator (#PV:4-7)",50,0.,7.);   
+     AddHisto(HistoBtag, "npv2_discri_sschp0",   j,"SSVHP Discriminator (#PV:4-7)",80,-1.,7.); //305
+     AddHisto(HistoBtag, "npv2_discri_sschp",   j,"SSVHP Discriminator (#PV:4-7)",50,0.,7.);   
+     AddHisto(HistoBtag, "npv2_muon_Pt", j,       "Muon p_{T} (#PV:4-7)",200,0,100);
+     AddHisto(HistoBtag, "npv2_muon_ptrel", j ,   "Muon p_{T}^{rel} (#PV:4-7)",50,0,5); 
+     AddHisto(HistoBtag, "npv2_muon_DeltaR", j,        "Muon1 deltaR (#PV:4-7)",50,0,0.5); 
+
+     
+     AddHisto(HistoBtag, "npv3_sveratio",        j,"SV eratio (#PV:>7)",                       50,0.,1.);     //310
+     AddHisto(HistoBtag, "npv3_deltar_jet",      j,"SV deltaR jet (#PV:>7)",                 50,0.,0.5);
+     AddHisto(HistoBtag, "npv3_deltar_sum_jet",      j,"SV deltaR sum jet (#PV:>7)",                 50,0.,0.5);   
+     AddHisto(HistoBtag, "npv3_deltar_sum_dir",      j,"SV deltaR sum dir (#PV:>7)",                 50,0.,0.5);   
+     AddHisto(HistoBtag, "npv3_vtxpt",      j,"SV vtx pt (#PV:>7)",                 50,0., 100);   
+     AddHisto(HistoBtag, "npv3_discri_tche",      j,"TCHE discriminator (#PV:>7)",                 50,0.,30);      //315
+     AddHisto(HistoBtag, "npv3_discri_tchp",      j,"TCHP discriminator (#PV:>7)",                 50,0.,30);   
+     AddHisto(HistoBtag, "npv3_discri_jetprob",      j,"JP discriminator (#PV:>7)",                 50,0.,2.5);   
+     AddHisto(HistoBtag, "npv3_discri_jetbprob",      j,"JBP discriminator (#PV:>7)",                 50,0.,8);   
+
+     AddHisto(HistoBtag, "npv3_discri_ssche0",       j,"SSVHE Discriminator (#PV:>7)",80,-1.,7.); 
+     AddHisto(HistoBtag, "npv3_discri_ssche",   j,"SSVHE Discriminator (#PV:>7)",50,0.,7.);      //320
+     AddHisto(HistoBtag, "npv3_discri_sschp0",   j,"SSVHP Discriminator (#PV:>7)",80,-1.,7.); 
+     AddHisto(HistoBtag, "npv3_discri_sschp",   j,"SSVHP Discriminator (#PV:>7)",50,0.,7.);   
+     AddHisto(HistoBtag, "npv3_muon_Pt", j,       "Muon p_{T} (#PV:>7)",200,0,100);
+     AddHisto(HistoBtag, "npv3_muon_ptrel", j ,   "Muon p_{T}^{rel} (#PV:>7)",50,0,5); 
+     AddHisto(HistoBtag, "npv3_muon_DeltaR", j,        "Muon1 deltaR (#PV:>7)",50,0,0.5);       //325
 
 
     // ====> ADD HERE NEW HISTO AT 1D FOR WHICH QUARK CONTENT INFO NEEDED
@@ -798,6 +852,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto2D(Histo2DB, "muon_ptrel_vs_jetpt", j,"Muon_p{T}^{rel} vs jet pt",80,0,400, 50,0,5);  //10
      AddHisto2D(Histo2DB, "muon_DeltaR_vs_jetpt", j,"Muon1 DeltaR vs jet pt",80,0,400, 50,0,0.5);
      
+     AddHisto2D(Histo2DB, "sv_eratio_vs_jetpt", j,"SV eratio vs jet pt",80,0,400, 50,0,1);
+     AddHisto2D(Histo2DB, "sv_vtx_pt_vs_jetpt", j,"SV vtx pt vs jet pt",80,0,400, 50,0,100); //13
+
 
     // ====> ADD HERE NEW HISTO AT 2D FOR WHICH QUARK CONTENT INFO IS NEEDED
 
@@ -1211,6 +1268,45 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                        HistoBtag[7+j*nhisto_to_clone]->Fill(standardJetProbabilityPFBJetTags[i], weight);
                        HistoBtag[8+j*nhisto_to_clone]->Fill(standardJetBProbabilityPFBJetTags[i], weight);
 
+
+		       if (numberOfPrimaryVertices<=3) {          
+			 HistoBtag[283+j*nhisto_to_clone]->Fill(standardTrackCountingHighEffPFBJetTags[i], weight);
+			 HistoBtag[284+j*nhisto_to_clone]->Fill(standardTrackCountingHighPurPFBJetTags[i], weight);
+			 
+			 HistoBtag[287+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighEffPFBJetTags[i], weight);
+			 HistoBtag[288+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighEffPFBJetTags[i], weight);
+			 HistoBtag[289+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighPurPFBJetTags[i], weight);
+			 HistoBtag[290+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighPurPFBJetTags[i], weight);
+			 
+			 HistoBtag[285+j*nhisto_to_clone]->Fill(standardJetProbabilityPFBJetTags[i], weight);
+			 HistoBtag[286+j*nhisto_to_clone]->Fill(standardJetBProbabilityPFBJetTags[i], weight);
+		       }
+		       else if (numberOfPrimaryVertices>=4 && numberOfPrimaryVertices<=7) {
+			 HistoBtag[299+j*nhisto_to_clone]->Fill(standardTrackCountingHighEffPFBJetTags[i], weight);
+			 HistoBtag[300+j*nhisto_to_clone]->Fill(standardTrackCountingHighPurPFBJetTags[i], weight);
+			 
+			 HistoBtag[303+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighEffPFBJetTags[i], weight);
+			 HistoBtag[304+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighEffPFBJetTags[i], weight);
+			 HistoBtag[305+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighPurPFBJetTags[i], weight);
+			 HistoBtag[306+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighPurPFBJetTags[i], weight);
+			 
+			 HistoBtag[301+j*nhisto_to_clone]->Fill(standardJetProbabilityPFBJetTags[i], weight);
+			 HistoBtag[302+j*nhisto_to_clone]->Fill(standardJetBProbabilityPFBJetTags[i], weight);
+		       }
+		       else {
+			 HistoBtag[315+j*nhisto_to_clone]->Fill(standardTrackCountingHighEffPFBJetTags[i], weight);
+			 HistoBtag[316+j*nhisto_to_clone]->Fill(standardTrackCountingHighPurPFBJetTags[i], weight);
+			 
+			 HistoBtag[319+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighEffPFBJetTags[i], weight);
+			 HistoBtag[320+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighEffPFBJetTags[i], weight);
+			 HistoBtag[321+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighPurPFBJetTags[i], weight);
+			 HistoBtag[322+j*nhisto_to_clone]->Fill(standardSimpleSecondaryVertexHighPurPFBJetTags[i], weight);
+			 
+			 HistoBtag[317+j*nhisto_to_clone]->Fill(standardJetProbabilityPFBJetTags[i], weight);
+			 HistoBtag[318+j*nhisto_to_clone]->Fill(standardJetBProbabilityPFBJetTags[i], weight);
+		       }
+
+
 		       // Sort by jetPt (50-80 80-120 120+)
 		       if (50<jetPt[i] && jetPt[i]<80){
 			 HistoBtag[247+j*nhisto_to_clone]->Fill(standardTrackCountingHighEffPFBJetTags[i], weight);
@@ -1443,8 +1539,10 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                        // tracks sorted by ip
 
                        if (n1_ip>-1)  {
-                          HistoBtag[47+j*nhisto_to_clone]->Fill(trackIP3d[n1_ip], weight);
-                          HistoBtag[136+j*nhisto_to_clone]->Fill(trackIP3dError[n1_ip], weight);
+			 HistoBtag[47+j*nhisto_to_clone]->Fill(trackIP3d[n1_ip], weight);
+			 HistoBtag[48+j*nhisto_to_clone]->Fill(sig1_ip, weight);
+			 HistoBtag[49+j*nhisto_to_clone]->Fill(sig1_ip, weight);
+			 HistoBtag[136+j*nhisto_to_clone]->Fill(trackIP3dError[n1_ip], weight);
 
 			  if (1<trackTransverseMomentum[n1_ip] && trackTransverseMomentum[n1_ip]<=2)HistoBtag[151+j*nhisto_to_clone]->Fill(sig1_ip, weight);
 			  if (2<trackTransverseMomentum[n1_ip] && trackTransverseMomentum[n1_ip]<=5)HistoBtag[152+j*nhisto_to_clone]->Fill(sig1_ip, weight);
@@ -1473,11 +1571,12 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 			  // add sorted
 			  //  std::cout<<"trackIP3d[n1_ip]/trackIP3dError[n1_ip] - sig1_ip = " << trackIP3d[n1_ip]/trackIP3dError[n1_ip] - sig1_ip << std::endl;
                        }
-                       HistoBtag[48+j*nhisto_to_clone]->Fill(sig1_ip, weight);
-                       HistoBtag[49+j*nhisto_to_clone]->Fill(sig1_ip, weight);
+                     
 
                        if (n2_ip>-1) {
-                          HistoBtag[50+j*nhisto_to_clone]->Fill(trackIP3d[n2_ip], weight);
+		 	  HistoBtag[50+j*nhisto_to_clone]->Fill(trackIP3d[n2_ip], weight);
+			  HistoBtag[51+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+			  HistoBtag[52+j*nhisto_to_clone]->Fill(sig2_ip, weight);
                           HistoBtag[137+j*nhisto_to_clone]->Fill(trackIP3dError[n2_ip], weight);
 
 			  if (1<trackTransverseMomentum[n2_ip] && trackTransverseMomentum[n2_ip]<=2)HistoBtag[157+j*nhisto_to_clone]->Fill(sig2_ip, weight);
@@ -1504,16 +1603,18 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 			    HistoBtag[207+j*nhisto_to_clone]->Fill(trackIP3dError[n2_ip], weight);
 			  }
 			  
+			  if(muon1PtRel[i]>bEnrichCutSal && n2_ip>-1){
+			    HistoBtag[164+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+			    HistoBtag[165+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+			  }
                        }
-                       HistoBtag[51+j*nhisto_to_clone]->Fill(sig2_ip, weight);
-                       HistoBtag[52+j*nhisto_to_clone]->Fill(sig2_ip, weight);
-		       if(muon1PtRel[i]>bEnrichCutSal && n2_ip>-1){
-			 HistoBtag[164+j*nhisto_to_clone]->Fill(sig2_ip, weight);
-			 HistoBtag[165+j*nhisto_to_clone]->Fill(sig2_ip, weight);
-		       }
+                
+		  
 
                        if (n3_ip>-1) {
                           HistoBtag[53+j*nhisto_to_clone]->Fill(trackIP3d[n3_ip], weight);
+			  HistoBtag[54+j*nhisto_to_clone]->Fill(sig3_ip, weight);
+			  HistoBtag[55+j*nhisto_to_clone]->Fill(sig3_ip, weight);
                           HistoBtag[138+j*nhisto_to_clone]->Fill(trackIP3dError[n3_ip], weight);
 
 			  // Sort by jetPt
@@ -1533,17 +1634,17 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 			    HistoBtag[210+j*nhisto_to_clone]->Fill(trackIP3dError[n3_ip], weight);
 			  }
 			  
+			  if(muon1PtRel[i]>bEnrichCutSal){
+			    HistoBtag[166+j*nhisto_to_clone]->Fill(sig3_ip, weight);
+			    HistoBtag[167+j*nhisto_to_clone]->Fill(sig3_ip, weight);
+			  }
                        }
-                       HistoBtag[54+j*nhisto_to_clone]->Fill(sig3_ip, weight);
-                       HistoBtag[55+j*nhisto_to_clone]->Fill(sig3_ip, weight);
+                    
                        Histo2DB[3+j*nhisto_to_clone2D]->Fill(jetPt[i],ntrack_jet, weight);
                        Histo2DB[4+j*nhisto_to_clone2D]->Fill(jetPt[i],nseltrack_jet, weight);
                        Histo2DB[5+j*nhisto_to_clone2D]->Fill(jetPt[i],ncutseltrack_jet, weight);
 
-		       if(muon1PtRel[i]>bEnrichCutSal){
-			 HistoBtag[166+j*nhisto_to_clone]->Fill(sig3_ip, weight);
-			 HistoBtag[167+j*nhisto_to_clone]->Fill(sig3_ip, weight);
-		       }
+		    
 
                        // SV
                        Histo2DB[0+j*nhisto_to_clone2D]->Fill(jetPt[i],SVnVertexTracks[i], weight);
@@ -1579,6 +1680,30 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
                         HistoBtag[69+j*nhisto_to_clone]->Fill(SV2dDistance[i], weight);
                         HistoBtag[70+j*nhisto_to_clone]->Fill(SV3dDistance[i], weight);
+
+			if (numberOfPrimaryVertices<=3) {          
+			  HistoBtag[278+j*nhisto_to_clone]->Fill(SVEnergyRatio[i], weight);
+			  HistoBtag[279+j*nhisto_to_clone]->Fill(SVjetDeltaR[i], weight);
+			  HistoBtag[280+j*nhisto_to_clone]->Fill(SVvtxSumJetDeltaR[i], weight);
+			  HistoBtag[281+j*nhisto_to_clone]->Fill(SVvtxSumVtxDirDeltaR[i], weight);
+			  HistoBtag[282+j*nhisto_to_clone]->Fill(SVvtxPt[i], weight);
+			}
+			else if (numberOfPrimaryVertices>=4 && numberOfPrimaryVertices<=7) {
+			  HistoBtag[294+j*nhisto_to_clone]->Fill(SVEnergyRatio[i], weight);
+			  HistoBtag[295+j*nhisto_to_clone]->Fill(SVjetDeltaR[i], weight);
+			  HistoBtag[296+j*nhisto_to_clone]->Fill(SVvtxSumJetDeltaR[i], weight);
+			  HistoBtag[297+j*nhisto_to_clone]->Fill(SVvtxSumVtxDirDeltaR[i], weight);
+			  HistoBtag[298+j*nhisto_to_clone]->Fill(SVvtxPt[i], weight);
+			}
+			else {
+			  HistoBtag[310+j*nhisto_to_clone]->Fill(SVEnergyRatio[i], weight);
+			  HistoBtag[311+j*nhisto_to_clone]->Fill(SVjetDeltaR[i], weight); 
+			  HistoBtag[312+j*nhisto_to_clone]->Fill(SVvtxSumJetDeltaR[i], weight);
+			  HistoBtag[313+j*nhisto_to_clone]->Fill(SVvtxSumVtxDirDeltaR[i], weight);
+			  HistoBtag[314+j*nhisto_to_clone]->Fill(SVvtxPt[i], weight);
+			}
+
+
                         if (SVnVertexTracks[i]>=3) {
 
 			     // 3-track vertex variables
@@ -1625,6 +1750,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
                         Histo2DB[1+j*nhisto_to_clone2D]->Fill(SV3dDistance[i]/SV3dDistanceError[i], SVMass[i], weight);
                         Histo2DB[2+j*nhisto_to_clone2D]->Fill(SV3dDistance[i], SVMass[i], weight);
+
+			Histo2DB[12+j*nhisto_to_clone2D]->Fill(jetPt[i], SVEnergyRatio[i] , weight);
+			Histo2DB[13+j*nhisto_to_clone2D]->Fill(jetPt[i], SVvtxPt[i] , weight);
 
 			// Sort by jetPt (50-80 80-120 120+)
 			if (50<jetPt[i] && jetPt[i]<80){
@@ -1684,6 +1812,24 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                 HistoBtag[90+j*nhisto_to_clone]->Fill(muon1DeltaR[i], weight);
                 HistoBtag[91+j*nhisto_to_clone]->Fill(muon1Ratio[i], weight);
 
+
+		if (numberOfPrimaryVertices<=3) {          
+		  HistoBtag[291+j*nhisto_to_clone]->Fill(muon1Pt[i], weight);
+		  HistoBtag[292+j*nhisto_to_clone]->Fill(muon1PtRel[i], weight);
+		  HistoBtag[293+j*nhisto_to_clone]->Fill(muon1DeltaR[i], weight);
+		}
+		else if (numberOfPrimaryVertices>=4 && numberOfPrimaryVertices<=7) {
+		  HistoBtag[307+j*nhisto_to_clone]->Fill(muon1Pt[i], weight);
+		  HistoBtag[308+j*nhisto_to_clone]->Fill(muon1PtRel[i], weight);
+		  HistoBtag[309+j*nhisto_to_clone]->Fill(muon1DeltaR[i], weight);
+		}
+		else {
+		  HistoBtag[323+j*nhisto_to_clone]->Fill(muon1Pt[i], weight);
+		  HistoBtag[324+j*nhisto_to_clone]->Fill(muon1PtRel[i], weight);
+		  HistoBtag[325+j*nhisto_to_clone]->Fill(muon1DeltaR[i], weight);
+		}
+
+
 		//muon deltaR,ptrel vs jet pt (do -ProfileX once created)
 		Histo2DB[10+j*nhisto_to_clone2D]->Fill(jetPt[i], muon1PtRel[i], weight);
 		Histo2DB[11+j*nhisto_to_clone2D]->Fill(jetPt[i], muon1DeltaR[i], weight);
@@ -1691,8 +1837,8 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                 HistoBtag[134+j*nhisto_to_clone]->Fill(ncutseltrack_jet, weight); // nseltracks_jet
                 // depending on #PV
                 if (numberOfPrimaryVertices<=3) {          
-                 HistoBtag[92+j*nhisto_to_clone]->Fill(sig2_ip, weight);
-                 HistoBtag[93+j*nhisto_to_clone]->Fill(sig3_ip, weight);
+		 if(sig2_ip> -9000) HistoBtag[92+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+                 if(sig3_ip> -9000) HistoBtag[93+j*nhisto_to_clone]->Fill(sig3_ip, weight);
                  HistoBtag[94+j*nhisto_to_clone]->Fill(ntrack_jet, weight);  // ntracks_jet
                  HistoBtag[95+j*nhisto_to_clone]->Fill(nseltrack_jet, weight); // nseltracks_jet
                  HistoBtag[96+j*nhisto_to_clone]->Fill(ncutseltrack_jet, weight); // nseltracks_jet
@@ -1715,8 +1861,8 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                  }
                 }
                 else if (numberOfPrimaryVertices>=4 && numberOfPrimaryVertices<=7) {
-                 HistoBtag[106+j*nhisto_to_clone]->Fill(sig2_ip, weight);
-                 HistoBtag[107+j*nhisto_to_clone]->Fill(sig3_ip, weight);
+                 if(sig2_ip> -9000) HistoBtag[106+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+                 if(sig3_ip> -9000) HistoBtag[107+j*nhisto_to_clone]->Fill(sig3_ip, weight);
                  HistoBtag[108+j*nhisto_to_clone]->Fill(ntrack_jet, weight);  // ntracks_jet
                  HistoBtag[109+j*nhisto_to_clone]->Fill(nseltrack_jet, weight); // nseltracks_jet
                  HistoBtag[110+j*nhisto_to_clone]->Fill(ncutseltrack_jet, weight); // nseltracks_jet
@@ -1739,8 +1885,8 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                  }
                 }
                 else {
-                 HistoBtag[120+j*nhisto_to_clone]->Fill(sig2_ip, weight);
-                 HistoBtag[121+j*nhisto_to_clone]->Fill(sig3_ip, weight);
+                 if(sig2_ip> -9000) HistoBtag[120+j*nhisto_to_clone]->Fill(sig2_ip, weight);
+                 if(sig3_ip> -9000) HistoBtag[121+j*nhisto_to_clone]->Fill(sig3_ip, weight);
                  HistoBtag[122+j*nhisto_to_clone]->Fill(ntrack_jet, weight);  // ntracks_jet
                  HistoBtag[123+j*nhisto_to_clone]->Fill(nseltrack_jet, weight); // nseltracks_jet
                  HistoBtag[124+j*nhisto_to_clone]->Fill(ncutseltrack_jet, weight); // nseltracks_jet
