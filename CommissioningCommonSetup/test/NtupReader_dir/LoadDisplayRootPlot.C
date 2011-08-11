@@ -7,7 +7,7 @@
 
 string ptval_jet="60";
 string ptval_btag="20";
-TString format="pdf"; // png
+TString format="png"; // png
 
 void OverFlowBinFix(TH1F* histo){
 
@@ -1221,7 +1221,7 @@ PlotData(TString selection, TString label, int date, bool down=false, bool logy=
 
 #include <vector>
 
-PlotStack2D(TString selection, bool logy=false, bool mu=false){
+PlotStack2D(TString selection, TString label, TString labely, bool logy=false, bool mu=false){
   
  
   const int maxmax=10;
@@ -1354,8 +1354,8 @@ PlotStack2D(TString selection, bool logy=false, bool mu=false){
   // SET COSMETICS
   pro_data->SetMarkerStyle(20);
   pro_data->SetMarkerSize(0.75);
-  pro_mc_gspl->GetXaxis()->SetTitle(histo0_MC->GetName());  
-
+  pro_mc_gspl->GetXaxis()->SetTitle(label);  
+  pro_mc_gspl->GetYaxis()->SetTitle(labely);  
 
   // CREATE CANVAS
   TCanvas *canvas = new TCanvas("c1", "c1",10,32,782,552);
@@ -1379,42 +1379,42 @@ PlotStack2D(TString selection, bool logy=false, bool mu=false){
 
   if (mu==false) {
       if (ptval=="30") {
-       qw->SetHeader("2011 effective lumi : 0.0053  pb^{-1}"); // 30
-       qw->AddEntry(pro_data,        "HLT_JET30",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 0.0053  pb^{-1}"); // 30
+       qw->AddEntry(pro_data,        "data (HLT_JET30)",           "p"); 
       }
       else if (ptval=="60") { 
-       qw->SetHeader("2011 effective lumi : 0.11  pb^{-1}"); // 60
-       qw->AddEntry(pro_data,        "HLT_JET60",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 0.11  pb^{-1}"); // 60
+       qw->AddEntry(pro_data,        "data (HLT_JET60)",           "p"); 
       }
       else if (ptval=="80") {
-       qw->SetHeader("2011 effective lumi : 0.52  pb^{-1}"); // 80
-       qw->AddEntry(pro_data,        "HLT_JET80",           "p"); 
+	//      qw->SetHeader("2011 effective lumi : 0.52  pb^{-1}"); // 80
+       qw->AddEntry(pro_data,        "data (HLT_JET80)",           "p"); 
       }
       else if (ptval=="110") {
-       qw->SetHeader("2011 effective lumi : 2.5  pb^{-1}"); // 110
-       qw->AddEntry(pro_data,        "HLT_JET110",           "p"); 
+	//      qw->SetHeader("2011 effective lumi : 2.5  pb^{-1}"); // 110
+       qw->AddEntry(pro_data,        "data (HLT_JET110)",           "p"); 
       }
   }
   else  { 
       if (ptval=="20") {
-       qw->SetHeader("2011 effective lumi : 1.9  pb^{-1}"); // 20
-       qw->AddEntry(pro_data,        "HLT_BTagMu_DiJet20_Mu5",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 1.9  pb^{-1}"); // 20
+       qw->AddEntry(pro_data,        "data (HLT_BTagMu_DiJet20_Mu5)",           "p"); 
       }
       else if (ptval=="60") { 
-       qw->SetHeader("2011 effective lumi : 24.3  pb^{-1}"); // 60
-       qw->AddEntry(pro_data,        "HLT_BTagMu_DiJet60_Mu7",           "p"); 
+	//       qw->SetHeader("2011 effective lumi : 24.3  pb^{-1}"); // 60
+       qw->AddEntry(pro_data,        "data (HLT_BTagMu_DiJet60_Mu7)",           "p"); 
       }
       else if (ptval=="40") { 
-       qw->SetHeader("2011 effective lumi : 6.0  pb^{-1}"); // 40
-       qw->AddEntry(pro_data,        "HLT_BTagMu_DiJet40_Mu5",           "p"); 
+	//      qw->SetHeader("2011 effective lumi : 6.0  pb^{-1}"); // 40
+       qw->AddEntry(pro_data,        "data (HLT_BTagMu_DiJet40_Mu5)",           "p"); 
       }
       else if (ptval=="70") { 
-       qw->SetHeader("2011 effective lumi : 34.3  pb^{-1}"); // 70
-       qw->AddEntry(pro_data,        "HLT_BTagMu_DiJet70_Mu5",           "p"); 
+	//      qw->SetHeader("2011 effective lumi : 34.3  pb^{-1}"); // 70
+       qw->AddEntry(pro_data,        "data (HLT_BTagMu_DiJet70_Mu5)",           "p"); 
       }
       else if (ptval=="110") { 
-       qw->SetHeader("2011 effective lumi : 212  pb^{-1}"); // 110
-       qw->AddEntry(pro_data,        "HLT_BTagMu_DiJet110_Mu5",           "p"); 
+	//      qw->SetHeader("2011 effective lumi : 212  pb^{-1}"); // 110
+       qw->AddEntry(pro_data,        "data (HLT_BTagMu_DiJet110_Mu5)",           "p"); 
       }
 
  }
