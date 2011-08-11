@@ -42,7 +42,7 @@ void OverFlowBinFix(TH1F* histo){
 
 }
 
-PlotStack(TString selection, TString label, int date, bool down=false, bool logy=false, bool mu=false ){
+PlotStack(TString selection, TString label, int date, bool down=false, bool logy=false, bool mu=false, TString labely="jets" ){
   
  
   const int maxmax=10;
@@ -187,6 +187,25 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
   OverFlowBinFix(histo0_2010);
   //
 
+
+
+  // equivalent for ratio plot around line 490
+
+  Double_t titleoffsetx=0.13;
+  Double_t titleoffsety=0.2;
+  Double_t titlesizex=0.17;
+  Double_t titlesizey=0.2;
+  Double_t labelsizex=0.14;
+  Double_t labelsizey=0.12;
+
+  histo0_Data->GetYaxis()->SetLabelSize(labelsizey);
+  histo0_Data->GetYaxis()->SetTitleSize(titlesizey);
+  histo0_Data->GetYaxis()->SetTitleOffset(titleoffsety);
+  histo0_MC->GetYaxis()->SetLabelSize(labelsizey);
+  histo0_MC->GetYaxis()->SetTitleSize(titlesizey);
+  histo0_MC->GetYaxis()->SetTitleOffset(titleoffsety);
+
+ 
   // SCALE MC TO DATA
   float scaleparam=histo0_Data->Integral()/histo0_MC->Integral();
   if (selection!="npv_no_scaled" && selection!="npu") {
@@ -261,6 +280,7 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
 
 
   // SET COLORS
+  histo0_Data->SetLineWidth(2);
   histo0_MC->SetLineColor(2);
   histo0_MC_b->SetFillColor(2);
   histo0_MC_c->SetFillColor(8);
@@ -286,7 +306,9 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
   histo0_Data->SetMarkerStyle(20);
   histo0_Data->SetMarkerSize(0.75);
   // histo0_Data->GetXaxis()->SetTitle(histo0_MC->GetName());  
-  histo0_Data->GetXaxis()->SetTitle(label);  
+  histo0_Data->GetXaxis()->SetTitle(label);
+  histo0_Data->GetYaxis()->SetTitle(labely);
+
   //  if (selection=="npv" || selection=="npv_no_scaled") histo0_Data->GetXaxis()->SetTitle(histo0_MC->GetTitle());  
 
   histo0_2010->SetMarkerStyle(21);
@@ -318,7 +340,6 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
      histo0_Data->SetMaximum(histo0_Data->GetMaximum()*1.5);
   }
 
-
   gStyle->SetOptTitle(0);
 
   // CREATE CANVAS
@@ -332,7 +353,6 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
   TPad *canvas_1 = new TPad("canvas_1", "canvas_1",0,0.25,1.0,0.98);
   canvas_1->Draw();
   canvas_1->cd();
-
 
 
   if (histo0_Data->GetMaximum() > hs->GetMaximum() ) {
@@ -465,7 +485,7 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
   canvas_2->cd();
   gPad->SetBottomMargin(0.375);
   gPad->SetGridy();
-  gPad->SetGridx();
+  //  gPad->SetGridx();
   histo0_ratio->SetMarkerStyle(20);
   histo0_ratio->SetMarkerSize(0.75);
   histo0_ratio->SetLineWidth(2);
@@ -473,12 +493,13 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
   //  histo0_ratio->GetXaxis()->SetTitle(histo0_Data->GetName());  
   histo0_ratio->GetXaxis()->SetTitle(label);  
 
-  histo0_ratio->GetYaxis()->SetTitleOffset( 0.4 );
-  histo0_ratio->GetYaxis()->SetTitleSize( 0.1 );
-  histo0_ratio->GetYaxis()->SetLabelSize(0.1);
+   // equivalent for main plot around line 205
+  // histo0_ratio->GetYaxis()->SetTitleOffset( titleoffsety );
+  //  histo0_ratio->GetYaxis()->SetTitleSize( titlesizey);
+  //  histo0_ratio->GetYaxis()->SetLabelSize( labelsizey );
   histo0_ratio->GetYaxis()->SetNdivisions( 505 );
-  histo0_ratio->GetXaxis()->SetLabelSize(0.1);
-  histo0_ratio->GetXaxis()->SetTitleSize( 0.15 );
+  histo0_ratio->GetXaxis()->SetLabelSize( labelsizex);
+  histo0_ratio->GetXaxis()->SetTitleSize( titlesizex );
 
   histo0_ratio->SetMinimum(0.4);
   histo0_ratio->SetMaximum(1.6);
@@ -776,6 +797,12 @@ TagRate(TString selection, TString label, bool down=false, bool logy=false, bool
     hs->SetMaximum(TagRate_Data->GetMaximum() );
   }
   hs->Draw("hist");
+  // can only be done after drawing...
+  //  hs->GetYaxis()->SetTitleSize(titlesizey);
+  //  hs->GetYaxis()->SetTitleOffset(titleoffsety);
+  hs->GetHistogram()->GetYaxis()->SetTitle(labely);
+  //  hs->GetHistogram()->GetYaxis()->SetTitleColor(kBlack);
+
   TagRate_Data->Draw("e same");
 
   // ADD LEGEND
