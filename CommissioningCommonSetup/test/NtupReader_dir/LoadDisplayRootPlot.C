@@ -42,7 +42,7 @@ void OverFlowBinFix(TH1F* histo){
 
 }
 
-PlotStack(TString selection, TString label, int date, bool down=false, bool logy=false, bool mu=false, TString labely="jets" ){
+PlotStack(TString selection, TString label, int date, bool down=false, bool logy=false, bool bOverflow, bool mu=false, TString labely="jets" ){
   
  
   const int maxmax=10;
@@ -177,15 +177,16 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
   }
   // fix overflow bins:
  
-  
-  OverFlowBinFix(histo0_MC);
-  OverFlowBinFix(histo0_MC_b);
-  OverFlowBinFix(histo0_MC_c);
-  OverFlowBinFix(histo0_MC_udsg);
-  OverFlowBinFix(histo0_MC_gspl);
-  OverFlowBinFix(histo0_Data);
-  OverFlowBinFix(histo0_2010);
+  if(bOverflow){
+    OverFlowBinFix(histo0_MC);
+    OverFlowBinFix(histo0_MC_b);
+    OverFlowBinFix(histo0_MC_c);
+    OverFlowBinFix(histo0_MC_udsg);
+    OverFlowBinFix(histo0_MC_gspl);
+    OverFlowBinFix(histo0_Data);
+    OverFlowBinFix(histo0_2010);
   //
+  }
 
 
 
@@ -570,7 +571,7 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
 
 }
 
-TagRate(TString selection, TString label, bool down=false, bool logy=false, bool mu=false){
+TagRate(TString selection, TString label, bool down=false, bool logy=false, bool mu=false,  TString labely="tag rate"){
   
  
   const int maxmax=10;
@@ -966,7 +967,7 @@ TagRate(TString selection, TString label, bool down=false, bool logy=false, bool
 
 #include <vector>
 
-PlotData(TString selection, TString label, int date, bool down=false, bool logy=false, bool mu=false){
+PlotData(TString selection, TString label, int date, bool down=false, bool logy=false, bool bOverflow,  bool mu=false){
   
  
   const int maxmax=10;
@@ -1047,6 +1048,16 @@ PlotData(TString selection, TString label, int date, bool down=false, bool logy=
   histo0_Data1 = (TH1F*)data->Get(npv1);
   histo0_Data2 = (TH1F*)data->Get(npv2);
   histo0_Data3 = (TH1F*)data->Get(npv3);
+
+  // fix overflow bins:
+ 
+  if(bOverflow){
+    OverFlowBinFix( histo0_Data1);
+    OverFlowBinFix( histo0_Data2);
+    OverFlowBinFix( histo0_Data3);
+  }
+
+
 
   // SCALE MC TO DATA
   float scaleparam=1.;
