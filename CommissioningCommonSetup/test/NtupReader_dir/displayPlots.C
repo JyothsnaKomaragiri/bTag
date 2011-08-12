@@ -100,9 +100,9 @@
   PlotStack("sv_vtxdir_eta", "vertex #eta", date, 1, 0, 1,0);
   PlotStack("sv_vtxdir_phi", "vertex #phi", date, 1, 0, 1,0);
  
-  PlotStack("sv_deltar_jet",    "#Delta R(vertex dir., jet)"            , date, 1, 1, 1,0);
-  PlotStack("sv_deltar_sum_jet","#Delta R(vertex {#vec p}, jet)"          ,date, 1, 1, 1,0);
-  PlotStack("sv_deltar_sum_dir","#Delta R(vertex {#vec p}, vertex dir.)"  ,date, 1, 1, 1,0);
+  PlotStack("sv_deltar_jet",    "#Delta R(vertex dir., jet)"            , date, 1, 0, 1,0);
+  PlotStack("sv_deltar_sum_jet","#Delta R(vertex {#vec p}, jet)"          ,date, 1, 0, 1,0);
+  PlotStack("sv_deltar_sum_dir","#Delta R(vertex {#vec p}, vertex dir.)"  ,date, 1, 0, 1,0);
 
   PlotStack("n_cutseltracks_jet", "nr. of tracks", date, 1, 0, 1,0);
   PlotStack("pt_cutseltracks", "track p_{t}", date, 1, 1, 1,0);
@@ -147,22 +147,22 @@
   PlotData("nsv_3tr", "nr. of 3-track SV", date, 1, 1, 1,0);
   PlotData("nsv0_3tr", "nr. of 3-track SV", date, 1, 1, 1,0);
 
-  PlotData("sveratio",          "SV energy ratio",               date, 1, 1, 0,0);
-  PlotData("deltar_jet",       "SV deltaR jet (#PV:1-3)",        date, 1, 1, 1,0);
-  PlotData("deltar_sum_jet",     "SV deltaR sum jet (#PV:1-3)",  date, 1, 1, 1,0);
-  PlotData("deltar_sum_dir",     "SV deltaR sum dir (#PV:1-3)",  date, 1, 1, 1,0);
+  PlotData("sveratio",          "SV energy ratio",               date, 1, 0, 0,0);
+  PlotData("deltar_jet",       "SV deltaR jet (#PV:1-3)",        date, 1, 0, 1,0);
+  PlotData("deltar_sum_jet",     "SV deltaR sum jet (#PV:1-3)",  date, 1, 0, 1,0);
+  PlotData("deltar_sum_dir",     "SV deltaR sum dir (#PV:1-3)",  date, 1, 0, 1,0);
   PlotData("vtxpt",              "SV vtx pt (#PV:1-3)",          date, 1, 1, 1,0);
   PlotData("discri_tche",       "TCHE discriminator (#PV:1-3)",  date, 1, 1, 1,0);
   PlotData("discri_tchp",       "TCHP discriminator (#PV:1-3)",  date, 1, 1, 1,0);
   PlotData("discri_jetprob",    "JP discriminator (#PV:1-3)",    date, 1, 1, 1,0);
   PlotData("discri_jetbprob",   "JBP discriminator (#PV:1-3)",   date, 1, 1, 1,0);
   PlotData("discri_ssche0",    "SSVHE Discriminator (#PV:1-3)",  date, 1, 1, 1,0);
-  PlotData("discri_ssche",     "SSVHE Discriminator (#PV:1-3)",  date, 1, 1, 0,0);
+  PlotData("discri_ssche",     "SSVHE Discriminator (#PV:1-3)",  date, 1, 0, 0,0);
   PlotData("discri_sschp0",   "SSVHP Discriminator (#PV:1-3)",   date, 1, 1, 1,0);
-  PlotData("discri_sschp",    "SSVHP Discriminator (#PV:1-3)",   date, 1, 1, 0,0);
+  PlotData("discri_sschp",    "SSVHP Discriminator (#PV:1-3)",   date, 1, 0, 0,0);
   PlotData("muon_Pt",         "Muon p_{T} (#PV:1-3)",            date, 1, 1, 1,0);
-  PlotData("muon_ptrel",      "Muon p_{T}^{rel} (#PV:1-3)",      date, 1, 1, 1,0);
-  PlotData("muon_DeltaR",     "Muon deltaR (#PV:1-3)",           date, 1, 1, 1,0);
+  PlotData("muon_ptrel",      "Muon p_{T}^{rel} (#PV:1-3)",      date, 1, 0, 1,0);
+  PlotData("muon_DeltaR",     "Muon deltaR (#PV:1-3)",           date, 1, 0, 1,0);
 
 
 
@@ -228,21 +228,21 @@
   PlotStack("IP3d3Errorsorted_jetptbin2",   "3rd track 3D IP err. (jet bin2)",    date, 1, 1, 1,0);     
   PlotStack("IP3d3Errorsorted_jetptbin3",   "3rd track 3D IP err. (jet bin3)",    date, 1, 1, 1,0);     
           
-  PlotStack("sv_mass_jetptbin1",   "2-track SV mass (jet bin1)",    date, 1, 1, 1,0);            
-  PlotStack("sv_mass_jetptbin2",   "2-track SV mass (jet bin2)",    date, 1, 1, 1,0);            
-  PlotStack("sv_mass_jetptbin3",   "2-track SV mass (jet bin3)",    date, 1, 1, 1,0);            
+  PlotStack("sv_mass_jetptbin1",   "2-track SV mass (jet bin1)",    date, 1, 0, 1,0);            
+  PlotStack("sv_mass_jetptbin2",   "2-track SV mass (jet bin2)",    date, 1, 0, 1,0);            
+  PlotStack("sv_mass_jetptbin3",   "2-track SV mass (jet bin3)",    date, 1, 0, 1,0);            
                             
-  PlotStack("sv_mass_3tr_jetptbin1",   "3-track SV mass (jet bin1)",    date, 1, 1, 1,0);        
-  PlotStack("sv_mass_3tr_jetptbin2",   "3-track SV mass (jet bin2)",    date, 1, 1, 1,0);        
-  PlotStack("sv_mass_3tr_jetptbin3",   "3-track SV mass (jet bin3)",    date, 1, 1, 1,0);        
+  PlotStack("sv_mass_3tr_jetptbin1",   "3-track SV mass (jet bin1)",    date, 1, 0, 1,0);        
+  PlotStack("sv_mass_3tr_jetptbin2",   "3-track SV mass (jet bin2)",    date, 1, 0, 1,0);        
+  PlotStack("sv_mass_3tr_jetptbin3",   "3-track SV mass (jet bin3)",    date, 1, 0, 1,0);        
                              
   //  PlotStack("sv_ipsigcharm_jetptbin1",   "",    date, 1, 1, 1,0);      
   //  PlotStack("sv_ipsigcharm_jetptbin2",   "",    date, 1, 1, 1,0);      
   //  PlotStack("sv_ipsigcharm_jetptbin3",   "",    date, 1, 1, 1,0);      
                            
-  PlotStack("sv_eratio_jetptbin1",   "SV energy ratio (jet bin1)",    date, 1, 1, 0,0);          
-  PlotStack("sv_eratio_jetptbin2",   "SV energy ratio (jet bin2)",    date, 1, 1, 0,0);          
-  PlotStack("sv_eratio_jetptbin3",   "SV energy ratio (jet bin3)",    date, 1, 1, 0,0);          
+  PlotStack("sv_eratio_jetptbin1",   "SV energy ratio (jet bin1)",    date, 1, 0, 0,0);          
+  PlotStack("sv_eratio_jetptbin2",   "SV energy ratio (jet bin2)",    date, 1, 0, 0,0);          
+  PlotStack("sv_eratio_jetptbin3",   "SV energy ratio (jet bin3)",    date, 1, 0, 0,0);          
                                 
   PlotStack("sv_flightsig2d_jetptbin1",   "2D flight sig. (jet bin1)",    date, 1, 1, 1,0);       
   PlotStack("sv_flightsig2d_jetptbin2",   "2D flight sig. (jet bin2)",    date, 1, 1, 1,0);       
@@ -266,17 +266,17 @@
                                
 
 
-  PlotStack("sv_deltar_jet_jetptbin1",   "#Delta R(vertex dir., jet) (jet bin1)",    date, 1, 1, 1,0);        
-  PlotStack("sv_deltar_jet_jetptbin2",   "#Delta R(vertex dir., jet) (jet bin2)",    date, 1, 1, 1,0);        
-  PlotStack("sv_deltar_jet_jetptbin3",   "#Delta R(vertex dir., jet) (jet bin3)",    date, 1, 1, 1,0);        
+  PlotStack("sv_deltar_jet_jetptbin1",   "#Delta R(vertex dir., jet) (jet bin1)",    date, 1, 0, 1,0);        
+  PlotStack("sv_deltar_jet_jetptbin2",   "#Delta R(vertex dir., jet) (jet bin2)",    date, 1, 0, 1,0);        
+  PlotStack("sv_deltar_jet_jetptbin3",   "#Delta R(vertex dir., jet) (jet bin3)",    date, 1, 0, 1,0);        
                                 
-  PlotStack("sv_deltar_sum_jet_jetptbin1",   "#Delta R(vertex {#vec p}, jet) (jet bin1)",    date, 1, 1, 1,0);    
-  PlotStack("sv_deltar_sum_jet_jetptbin2",   "#Delta R(vertex {#vec p}, jet) (jet bin2)",    date, 1, 1, 1,0);    
-  PlotStack("sv_deltar_sum_jet_jetptbin3",   "#Delta R(vertex {#vec p}, jet) (jet bin3)",    date, 1, 1, 1,0);    
+  PlotStack("sv_deltar_sum_jet_jetptbin1",   "#Delta R(vertex {#vec p}, jet) (jet bin1)",    date, 1, 0, 1,0);    
+  PlotStack("sv_deltar_sum_jet_jetptbin2",   "#Delta R(vertex {#vec p}, jet) (jet bin2)",    date, 1, 0, 1,0);    
+  PlotStack("sv_deltar_sum_jet_jetptbin3",   "#Delta R(vertex {#vec p}, jet) (jet bin3)",    date, 1, 0, 1,0);    
                                
-  PlotStack("sv_deltar_sum_dir_jetptbin1",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin1)",    date, 1, 1, 1,0);    
-  PlotStack("sv_deltar_sum_dir_jetptbin2",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin2)",    date, 1, 1, 1,0);    
-  PlotStack("sv_deltar_sum_dir_jetptbin3",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin3)",    date, 1, 1, 1,0);    
+  PlotStack("sv_deltar_sum_dir_jetptbin1",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin1)",    date, 1, 0, 1,0);    
+  PlotStack("sv_deltar_sum_dir_jetptbin2",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin2)",    date, 1, 0, 1,0);    
+  PlotStack("sv_deltar_sum_dir_jetptbin3",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin3)",    date, 1, 0, 1,0);    
             
   PlotStack("discri_tche_jetptbin1",   "TCHE discriminator (jet bin1)",    date, 1, 1, 1,0);          
   PlotStack("discri_tche_jetptbin2",   "TCHE discriminator (jet bin2)",    date, 1, 1, 1,0);          
@@ -290,17 +290,17 @@
   PlotStack("discri_ssche0_jetptbin2",   "SSVHE discriminator (jet bin2)",    date, 1, 1, 1,0);        
   PlotStack("discri_ssche0_jetptbin3",   "SSVHE discriminator (jet bin3)",    date, 1, 1, 1,0);        
                            
-  PlotStack("discri_ssche_jetptbin1",   "SSVHE discriminator (jet bin1)",    date, 1, 1, 0,0);         
-  PlotStack("discri_ssche_jetptbin2",   "SSVHE discriminator (jet bin2)",    date, 1, 1, 0,0);         
-  PlotStack("discri_ssche_jetptbin3",   "SSVHE discriminator (jet bin3)",    date, 1, 1, 0,0);         
+  PlotStack("discri_ssche_jetptbin1",   "SSVHE discriminator (jet bin1)",    date, 1, 0, 0,0);         
+  PlotStack("discri_ssche_jetptbin2",   "SSVHE discriminator (jet bin2)",    date, 1, 0, 0,0);         
+  PlotStack("discri_ssche_jetptbin3",   "SSVHE discriminator (jet bin3)",    date, 1, 0, 0,0);         
                          
   PlotStack("discri_sschp0_jetptbin1",   "SSVHP discriminator (jet bin1)",    date, 1, 1, 1,0);        
   PlotStack("discri_sschp0_jetptbin2",   "SSVHP discriminator (jet bin2)",    date, 1, 1, 1,0);        
   PlotStack("discri_sschp0_jetptbin3",   "SSVHP discriminator (jet bin3)",    date, 1, 1, 1,0);        
                                 
-  PlotStack("discri_sschp_jetptbin1",   "SSVHP discriminator (jet bin1)",    date, 1, 1, 0,0);         
-  PlotStack("discri_sschp_jetptbin2",   "SSVHP discriminator (jet bin2)",    date, 1, 1, 0,0);         
-  PlotStack("discri_sschp_jetptbin3",   "SSVHP discriminator (jet bin3)",    date, 1, 1, 0,0);         
+  PlotStack("discri_sschp_jetptbin1",   "SSVHP discriminator (jet bin1)",    date, 1, 0, 0,0);         
+  PlotStack("discri_sschp_jetptbin2",   "SSVHP discriminator (jet bin2)",    date, 1, 0, 0,0);         
+  PlotStack("discri_sschp_jetptbin3",   "SSVHP discriminator (jet bin3)",    date, 1, 0, 0,0);         
                             
   PlotStack("discri_jetprob_jetptbin1",   "JP discriminator (jet bin1)",    date, 1, 1, 1,0);       
   PlotStack("discri_jetprob_jetptbin2",   "JP discriminator (jet bin2)",    date, 1, 1, 1,0);       
@@ -311,7 +311,7 @@
   PlotStack("discri_jetbprob_jetptbin3",   "JBP discriminator (jet bin3)",    date, 1, 1, 1,0);      
 
   PlotStack("sv_ipsigcharm_3tr",   "",    date, 1, 1, 1,0);              
-  PlotStack("sv_eratio_3tr",   "3-track SV energy ratio",    date, 1, 1, 0,0);                  
+  PlotStack("sv_eratio_3tr",   "3-track SV energy ratio",    date, 1, 0, 0,0);                  
   PlotStack("sv_vtx_pt_3tr",   "3-track SV vtx p_{t}",    date, 1, 1, 1,0);                  
 
   PlotStack("sv_trackmul_centered",   "SV track multiplicity",    date, 1, 1, 1,0);           
@@ -331,26 +331,26 @@
   PlotStack( "npv1_nsv",              "# of secondary vertices (#PV:1-3)",              date, 1, 1, 1,0);  
   PlotStack( "npv1_flightsig3d",      "Flight Significance 3D (#PV:1-3)",               date, 1, 1, 1,0);  
   PlotStack( "npv1_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV:1-3)", date, 1, 1, 1,0);  
-  PlotStack( "npv1_svmass",           "SV mass (#PV:1-3)",                              date, 1, 1, 1,0);  
-  PlotStack( "npv1_svmass_3tr",       "SV mass for >=3tracks (#PV:1-3)",                date, 1, 1, 1,0);  
+  PlotStack( "npv1_svmass",           "SV mass (#PV:1-3)",                              date, 1, 0, 1,0);  
+  PlotStack( "npv1_svmass_3tr",       "SV mass for >=3tracks (#PV:1-3)",                date, 1, 0, 1,0);  
   PlotStack( "npv1_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV:1-3)",      date, 1, 1, 1,0);
  
-  PlotStack("npv1_sveratio",        "SV eratio (#PV:1-3)",                  date, 1, 1, 0,0);
-  PlotStack("npv1_deltar_jet",      "SV deltaR jet (#PV:1-3)",              date, 1, 1, 1,0);
-  PlotStack("npv1_deltar_sum_jet",      "SV deltaR sum jet (#PV:1-3)",      date, 1, 1, 1,0);
-  PlotStack("npv1_deltar_sum_dir",      "SV deltaR sum dir (#PV:1-3)",      date, 1, 1, 1,0);
+  PlotStack("npv1_sveratio",        "SV eratio (#PV:1-3)",                  date, 1, 0, 0,0);
+  PlotStack("npv1_deltar_jet",      "SV deltaR jet (#PV:1-3)",              date, 1, 0, 1,0);
+  PlotStack("npv1_deltar_sum_jet",      "SV deltaR sum jet (#PV:1-3)",      date, 1, 0, 1,0);
+  PlotStack("npv1_deltar_sum_dir",      "SV deltaR sum dir (#PV:1-3)",      date, 1, 0, 1,0);
   PlotStack("npv1_vtxpt",      "SV vtx pt (#PV:1-3)",                       date, 1, 1, 1,0);
   PlotStack("npv1_discri_tche",      "TCHE discriminator (#PV:1-3)",        date, 1, 1, 1,0);
   PlotStack("npv1_discri_tchp",      "TCHP discriminator (#PV:1-3)",        date, 1, 1, 1,0);
   PlotStack("npv1_discri_jetprob",      "JP discriminator (#PV:1-3)",       date, 1, 1, 1,0);
   PlotStack("npv1_discri_jetbprob",      "JBP discriminator (#PV:1-3)",     date, 1, 1, 1,0);
   PlotStack("npv1_discri_ssche0",       "SSVHE Discriminator (#PV:1-3)",    date, 1, 1, 1,0);
-  PlotStack("npv1_discri_ssche",   "SSVHE Discriminator (#PV:1-3)",         date, 1, 1, 0,0);
+  PlotStack("npv1_discri_ssche",   "SSVHE Discriminator (#PV:1-3)",         date, 1, 0, 0,0);
   PlotStack("npv1_discri_sschp0",   "SSVHP Discriminator (#PV:1-3)",        date, 1, 1, 1,0);
-  PlotStack("npv1_discri_sschp",   "SSVHP Discriminator (#PV:1-3)",         date, 1, 1, 0,0);
+  PlotStack("npv1_discri_sschp",   "SSVHP Discriminator (#PV:1-3)",         date, 1, 0, 0,0);
   PlotStack("npv1_muon_Pt",        "Muon p_{T} (#PV:1-3)",                  date, 1, 1, 1,0);
-  PlotStack("npv1_muon_ptrel",    "Muon p_{T}^{rel} (#PV:1-3)",             date, 1, 1, 1,0);
-  PlotStack("npv1_muon_DeltaR",         "Muon1 deltaR (#PV:1-3)",           date, 1, 1, 1,0);
+  PlotStack("npv1_muon_ptrel",    "Muon p_{T}^{rel} (#PV:1-3)",             date, 1, 0, 1,0);
+  PlotStack("npv1_muon_DeltaR",         "Muon1 deltaR (#PV:1-3)",           date, 1, 0, 1,0);
 
 
   PlotStack("npv2_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV:3-7)",   date, 1, 1, 1,0);  
@@ -365,26 +365,26 @@
   PlotStack( "npv2_nsv",              "# of secondary vertices (#PV:3-7)",              date, 1, 1, 1,0);  
   PlotStack( "npv2_flightsig3d",      "Flight Significance 3D (#PV:3-7)",               date, 1, 1, 1,0);  
   PlotStack( "npv2_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV:3-7)", date, 1, 1, 1,0);  
-  PlotStack( "npv2_svmass",           "SV mass (#PV:3-7)",                              date, 1, 1, 1,0);  
-  PlotStack( "npv2_svmass_3tr",       "SV mass for >=3tracks (#PV:3-7)",                date, 1, 1, 1,0);  
+  PlotStack( "npv2_svmass",           "SV mass (#PV:3-7)",                              date, 1, 0, 1,0);  
+  PlotStack( "npv2_svmass_3tr",       "SV mass for >=3tracks (#PV:3-7)",                date, 1, 0, 1,0);  
   PlotStack( "npv2_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV:3-7)",      date, 1, 1, 1,0);
  
-  PlotStack("npv2_sveratio",        "SV eratio (#PV:3-7)",                  date, 1, 1, 0,0);
-  PlotStack("npv2_deltar_jet",      "SV deltaR jet (#PV:3-7)",              date, 1, 1, 1,0);
-  PlotStack("npv2_deltar_sum_jet",      "SV deltaR sum jet (#PV:3-7)",      date, 1, 1, 1,0);
-  PlotStack("npv2_deltar_sum_dir",      "SV deltaR sum dir (#PV:3-7)",      date, 1, 1, 1,0);
+  PlotStack("npv2_sveratio",        "SV eratio (#PV:3-7)",                  date, 1, 0, 0,0);
+  PlotStack("npv2_deltar_jet",      "SV deltaR jet (#PV:3-7)",              date, 1, 0, 1,0);
+  PlotStack("npv2_deltar_sum_jet",      "SV deltaR sum jet (#PV:3-7)",      date, 1, 0, 1,0);
+  PlotStack("npv2_deltar_sum_dir",      "SV deltaR sum dir (#PV:3-7)",      date, 1, 0, 1,0);
   PlotStack("npv2_vtxpt",      "SV vtx pt (#PV:3-7)",                       date, 1, 1, 1,0);
   PlotStack("npv2_discri_tche",      "TCHE discriminator (#PV:3-7)",        date, 1, 1, 1,0);
   PlotStack("npv2_discri_tchp",      "TCHP discriminator (#PV:3-7)",        date, 1, 1, 1,0);
   PlotStack("npv2_discri_jetprob",      "JP discriminator (#PV:3-7)",       date, 1, 1, 1,0);
   PlotStack("npv2_discri_jetbprob",      "JBP discriminator (#PV:3-7)",     date, 1, 1, 1,0);
   PlotStack("npv2_discri_ssche0",       "SSVHE Discriminator (#PV:3-7)",    date, 1, 1, 1,0);
-  PlotStack("npv2_discri_ssche",   "SSVHE Discriminator (#PV:3-7)",         date, 1, 1, 0,0);
+  PlotStack("npv2_discri_ssche",   "SSVHE Discriminator (#PV:3-7)",         date, 1, 0, 0,0);
   PlotStack("npv2_discri_sschp0",   "SSVHP Discriminator (#PV:3-7)",        date, 1, 1, 1,0);
-  PlotStack("npv2_discri_sschp",   "SSVHP Discriminator (#PV:3-7)",         date, 1, 1, 0,0);
+  PlotStack("npv2_discri_sschp",   "SSVHP Discriminator (#PV:3-7)",         date, 1, 0, 0,0);
   PlotStack("npv2_muon_Pt",        "Muon p_{T} (#PV:3-7)",                  date, 1, 1, 1,0);
-  PlotStack("npv2_muon_ptrel",    "Muon p_{T}^{rel} (#PV:3-7)",             date, 1, 1, 1,0);
-  PlotStack("npv2_muon_DeltaR",         "Muon1 deltaR (#PV:3-7)",           date, 1, 1, 1,0);
+  PlotStack("npv2_muon_ptrel",    "Muon p_{T}^{rel} (#PV:3-7)",             date, 1, 0, 1,0);
+  PlotStack("npv2_muon_DeltaR",         "Muon1 deltaR (#PV:3-7)",           date, 1, 0, 1,0);
 
 
   PlotStack("npv3_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV:>7)",   date, 1, 1, 1,0);  
@@ -399,26 +399,26 @@
   PlotStack( "npv3_nsv",              "# of secondary vertices (#PV:>7)",              date, 1, 1, 1,0);  
   PlotStack( "npv3_flightsig3d",      "Flight Significance 3D (#PV:>7)",               date, 1, 1, 1,0);  
   PlotStack( "npv3_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV:>7)", date, 1, 1, 1,0);  
-  PlotStack( "npv3_svmass",           "SV mass (#PV:>7)",                              date, 1, 1, 1,0);  
-  PlotStack( "npv3_svmass_3tr",       "SV mass for >=3tracks (#PV:>7)",                date, 1, 1, 1,0);  
+  PlotStack( "npv3_svmass",           "SV mass (#PV:>7)",                              date, 1, 0, 1,0);  
+  PlotStack( "npv3_svmass_3tr",       "SV mass for >=3tracks (#PV:>7)",                date, 1, 0, 1,0);  
   PlotStack( "npv3_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV:>7)",      date, 1, 1, 1,0);
  
-  PlotStack("npv3_sveratio",        "SV eratio (#PV:>7)",                  date, 1, 1, 0,0);
-  PlotStack("npv3_deltar_jet",      "SV deltaR jet (#PV:>7)",              date, 1, 1, 1,0);
-  PlotStack("npv3_deltar_sum_jet",      "SV deltaR sum jet (#PV:>7)",      date, 1, 1, 1,0);
-  PlotStack("npv3_deltar_sum_dir",      "SV deltaR sum dir (#PV:>7)",      date, 1, 1, 1,0);
+  PlotStack("npv3_sveratio",        "SV eratio (#PV:>7)",                  date, 1, 0, 0,0);
+  PlotStack("npv3_deltar_jet",      "SV deltaR jet (#PV:>7)",              date, 1, 0, 1,0);
+  PlotStack("npv3_deltar_sum_jet",      "SV deltaR sum jet (#PV:>7)",      date, 1, 0, 1,0);
+  PlotStack("npv3_deltar_sum_dir",      "SV deltaR sum dir (#PV:>7)",      date, 1, 0, 1,0);
   PlotStack("npv3_vtxpt",      "SV vtx pt (#PV:>7)",                       date, 1, 1, 1,0);
   PlotStack("npv3_discri_tche",      "TCHE discriminator (#PV:>7)",        date, 1, 1, 1,0);
   PlotStack("npv3_discri_tchp",      "TCHP discriminator (#PV:>7)",        date, 1, 1, 1,0);
   PlotStack("npv3_discri_jetprob",      "JP discriminator (#PV:>7)",       date, 1, 1, 1,0);
   PlotStack("npv3_discri_jetbprob",      "JBP discriminator (#PV:>7)",     date, 1, 1, 1,0);
   PlotStack("npv3_discri_ssche0",       "SSVHE Discriminator (#PV:>7)",    date, 1, 1, 1,0);
-  PlotStack("npv3_discri_ssche",   "SSVHE Discriminator (#PV:>7)",         date, 1, 1, 0,0);
+  PlotStack("npv3_discri_ssche",   "SSVHE Discriminator (#PV:>7)",         date, 1, 0, 0,0);
   PlotStack("npv3_discri_sschp0",   "SSVHP Discriminator (#PV:>7)",        date, 1, 1, 1,0);
-  PlotStack("npv3_discri_sschp",   "SSVHP Discriminator (#PV:>7)",         date, 1, 1, 0,0);
+  PlotStack("npv3_discri_sschp",   "SSVHP Discriminator (#PV:>7)",         date, 1, 0, 0,0);
   PlotStack("npv3_muon_Pt",        "Muon p_{T} (#PV:>7)",                  date, 1, 1, 1,0);
-  PlotStack("npv3_muon_ptrel",    "Muon p_{T}^{rel} (#PV:>7)",             date, 1, 1, 1,0);
-  PlotStack("npv3_muon_DeltaR",         "Muon1 deltaR (#PV:>7)",           date, 1, 1, 1,0);
+  PlotStack("npv3_muon_ptrel",    "Muon p_{T}^{rel} (#PV:>7)",             date, 1, 0, 1,0);
+  PlotStack("npv3_muon_DeltaR",         "Muon1 deltaR (#PV:>7)",           date, 1, 0, 1,0);
 
 
 
@@ -460,10 +460,20 @@
  PlotStack("muon_DeltaR", "muon delta R", date, 1, 0, 1,1);
  // PlotStack("muon_Ratio", date, 0, 0, 1,1);
 
+ PlotStack("sv_mass_muenriched",            "sv_mass_muenriched",               date, 1, 0, 1, 1);      
+ PlotStack("IP3d2sigsorted_muenriched",     "IP3d2sigsorted_muenriched",        date, 1, 1, 1);      
+ PlotStack("IP3d2sigzsorted_muenriched",    "IP3d2sigzsorted_muenriched",       date, 1, 1, 1);      
+ PlotStack("sv_flightsig2d_muenriched",     "sv_flightsig2d_muenriched",        date, 1, 1, 1);      
+ PlotStack("sv_flightsig3d_muenriched",     "sv_flightsig3d_muenriched",        date, 1, 1, 1);      
+ PlotStack("discri_tche_muenriched",        "discri_tche_muenriched",           date, 1, 1, 1);      
+ PlotStack("discri_tchp_muenriched",        "discri_tchp_muenriched",           date, 1, 1, 1);      
+ PlotStack("discri_ssche_muenriched",       "discri_ssche_muenriched",          date, 1, 0,0, 1);      
+ PlotStack("discri_sschp_muenriched",       "discri_sschp_muenriched",          date, 1, 0,0, 1);      
+ PlotStack("muenriched_discrim",            "muenriched_discrim",               date, 1, 1, 1);      
+ PlotStack("discri_jetprob_muenriched",     "discri_jetprob_muenriched",        date, 1, 1, 1);      
+ PlotStack("discri_jetbprob_muenriched",    "discri_jetbprob_muenriched",       date, 1, 1, 1);      
 
-   PlotStack("npv","number of PV", date, 1, 0,1,0);
-   PlotStack("npv_no_scaled","number of PV", date, 1, 0,1,0);
-   PlotStack("all_jetpt","jet p_{t}",date, 1, 1, 1,0);
+
 
    PlotStack("discri_tche","TCHE discriminator",date, 1, 1, 1,1);
    PlotStack("discri_tchp","TCHP discriminator",date, 1, 1, 1,1);
@@ -545,9 +555,9 @@
   PlotStack("sv_vtxdir_eta", "vertex #eta", date, 1, 0, 1,1);
   PlotStack("sv_vtxdir_phi", "vertex #phi", date, 1, 0, 1,1);
  
-  PlotStack("sv_deltar_jet",    "#Delta R(vertex dir., jet)"            , date, 1, 1, 1,1);
-  PlotStack("sv_deltar_sum_jet","#Delta R(vertex {#vec p}, jet)"          ,date, 1, 1, 1,1);
-  PlotStack("sv_deltar_sum_dir","#Delta R(vertex {#vec p}, vertex dir.)"  ,date, 1, 1, 1,1);
+  PlotStack("sv_deltar_jet",    "#Delta R(vertex dir., jet)"            , date, 1, 0, 1,1);
+  PlotStack("sv_deltar_sum_jet","#Delta R(vertex {#vec p}, jet)"          ,date, 1, 0, 1,1);
+  PlotStack("sv_deltar_sum_dir","#Delta R(vertex {#vec p}, vertex dir.)"  ,date, 1, 0, 1,1);
 
   PlotStack("n_cutseltracks_jet", "nr. of tracks", date, 1, 0, 1,1);
   PlotStack("pt_cutseltracks", "track p_{t}", date, 1, 1, 1,1);
@@ -592,22 +602,22 @@
   PlotData("nsv_3tr", "nr. of 3-track SV", date, 1, 1, 1,1);
   PlotData("nsv0_3tr", "nr. of 3-track SV", date, 1, 1, 1,1);
 
-  PlotData("sveratio",          "SV energy ratio",               date, 1, 1, 0,1);
-  PlotData("deltar_jet",       "SV deltaR jet (#PV:1-3)",        date, 1, 1, 1,1);
-  PlotData("deltar_sum_jet",     "SV deltaR sum jet (#PV:1-3)",  date, 1, 1, 1,1);
-  PlotData("deltar_sum_dir",     "SV deltaR sum dir (#PV:1-3)",  date, 1, 1, 1,1);
+  PlotData("sveratio",          "SV energy ratio",               date, 1, 0, 0,1);
+  PlotData("deltar_jet",       "SV deltaR jet (#PV:1-3)",        date, 1, 0, 1,1);
+  PlotData("deltar_sum_jet",     "SV deltaR sum jet (#PV:1-3)",  date, 1, 0, 1,1);
+  PlotData("deltar_sum_dir",     "SV deltaR sum dir (#PV:1-3)",  date, 1, 0, 1,1);
   PlotData("vtxpt",              "SV vtx pt (#PV:1-3)",          date, 1, 1, 1,1);
   PlotData("discri_tche",       "TCHE discriminator (#PV:1-3)",  date, 1, 1, 1,1);
   PlotData("discri_tchp",       "TCHP discriminator (#PV:1-3)",  date, 1, 1, 1,1);
   PlotData("discri_jetprob",    "JP discriminator (#PV:1-3)",    date, 1, 1, 1,1);
   PlotData("discri_jetbprob",   "JBP discriminator (#PV:1-3)",   date, 1, 1, 1,1);
   PlotData("discri_ssche0",    "SSVHE Discriminator (#PV:1-3)",  date, 1, 1, 1,1);
-  PlotData("discri_ssche",     "SSVHE Discriminator (#PV:1-3)",  date, 1, 1, 0,1);
+  PlotData("discri_ssche",     "SSVHE Discriminator (#PV:1-3)",  date, 1, 0, 0,1);
   PlotData("discri_sschp0",   "SSVHP Discriminator (#PV:1-3)",   date, 1, 1, 1,1);
-  PlotData("discri_sschp",    "SSVHP Discriminator (#PV:1-3)",   date, 1, 1, 0,1);
+  PlotData("discri_sschp",    "SSVHP Discriminator (#PV:1-3)",   date, 1, 0, 0,1);
   PlotData("muon_Pt",         "Muon p_{T} (#PV:1-3)",            date, 1, 1, 1,1);
-  PlotData("muon_ptrel",      "Muon p_{T}^{rel} (#PV:1-3)",      date, 1, 1, 1,1);
-  PlotData("muon_DeltaR",     "Muon deltaR (#PV:1-3)",           date, 1, 1, 1,1);
+  PlotData("muon_ptrel",      "Muon p_{T}^{rel} (#PV:1-3)",      date, 1, 0, 1,1);
+  PlotData("muon_DeltaR",     "Muon deltaR (#PV:1-3)",           date, 1, 0, 1,1);
 
 
 
@@ -673,21 +683,21 @@
   PlotStack("IP3d3Errorsorted_jetptbin2",   "3rd track 3D IP err. (jet bin2)",    date, 1, 1, 1,1);     
   PlotStack("IP3d3Errorsorted_jetptbin3",   "3rd track 3D IP err. (jet bin3)",    date, 1, 1, 1,1);     
           
-  PlotStack("sv_mass_jetptbin1",   "2-track SV mass (jet bin1)",    date, 1, 1, 1,1);            
-  PlotStack("sv_mass_jetptbin2",   "2-track SV mass (jet bin2)",    date, 1, 1, 1,1);            
-  PlotStack("sv_mass_jetptbin3",   "2-track SV mass (jet bin3)",    date, 1, 1, 1,1);            
+  PlotStack("sv_mass_jetptbin1",   "2-track SV mass (jet bin1)",    date, 1, 0, 1,1);            
+  PlotStack("sv_mass_jetptbin2",   "2-track SV mass (jet bin2)",    date, 1, 0, 1,1);            
+  PlotStack("sv_mass_jetptbin3",   "2-track SV mass (jet bin3)",    date, 1, 0, 1,1);            
                             
-  PlotStack("sv_mass_3tr_jetptbin1",   "3-track SV mass (jet bin1)",    date, 1, 1, 1,1);        
-  PlotStack("sv_mass_3tr_jetptbin2",   "3-track SV mass (jet bin2)",    date, 1, 1, 1,1);        
-  PlotStack("sv_mass_3tr_jetptbin3",   "3-track SV mass (jet bin3)",    date, 1, 1, 1,1);        
+  PlotStack("sv_mass_3tr_jetptbin1",   "3-track SV mass (jet bin1)",    date, 1, 0, 1,1);        
+  PlotStack("sv_mass_3tr_jetptbin2",   "3-track SV mass (jet bin2)",    date, 1, 0, 1,1);        
+  PlotStack("sv_mass_3tr_jetptbin3",   "3-track SV mass (jet bin3)",    date, 1, 0, 1,1);        
                              
   //  PlotStack("sv_ipsigcharm_jetptbin1",   "",    date, 1, 1, 1,1);      
   //  PlotStack("sv_ipsigcharm_jetptbin2",   "",    date, 1, 1, 1,1);      
   //  PlotStack("sv_ipsigcharm_jetptbin3",   "",    date, 1, 1, 1,1);      
                            
-  PlotStack("sv_eratio_jetptbin1",   "SV energy ratio (jet bin1)",    date, 1, 1, 0,1);          
-  PlotStack("sv_eratio_jetptbin2",   "SV energy ratio (jet bin2)",    date, 1, 1, 0,1);          
-  PlotStack("sv_eratio_jetptbin3",   "SV energy ratio (jet bin3)",    date, 1, 1, 0,1);          
+  PlotStack("sv_eratio_jetptbin1",   "SV energy ratio (jet bin1)",    date, 1, 0, 0,1);          
+  PlotStack("sv_eratio_jetptbin2",   "SV energy ratio (jet bin2)",    date, 1, 0, 0,1);          
+  PlotStack("sv_eratio_jetptbin3",   "SV energy ratio (jet bin3)",    date, 1, 0, 0,1);          
                                 
   PlotStack("sv_flightsig2d_jetptbin1",   "2D flight sig. (jet bin1)",    date, 1, 1, 1,1);       
   PlotStack("sv_flightsig2d_jetptbin2",   "2D flight sig. (jet bin2)",    date, 1, 1, 1,1);       
@@ -711,17 +721,17 @@
                                
 
 
-  PlotStack("sv_deltar_jet_jetptbin1",   "#Delta R(vertex dir., jet) (jet bin1)",    date, 1, 1, 1,1);        
-  PlotStack("sv_deltar_jet_jetptbin2",   "#Delta R(vertex dir., jet) (jet bin2)",    date, 1, 1, 1,1);        
-  PlotStack("sv_deltar_jet_jetptbin3",   "#Delta R(vertex dir., jet) (jet bin3)",    date, 1, 1, 1,1);        
+  PlotStack("sv_deltar_jet_jetptbin1",   "#Delta R(vertex dir., jet) (jet bin1)",    date, 1, 0, 1,1);        
+  PlotStack("sv_deltar_jet_jetptbin2",   "#Delta R(vertex dir., jet) (jet bin2)",    date, 1, 0, 1,1);        
+  PlotStack("sv_deltar_jet_jetptbin3",   "#Delta R(vertex dir., jet) (jet bin3)",    date, 1, 0, 1,1);        
                                 
-  PlotStack("sv_deltar_sum_jet_jetptbin1",   "#Delta R(vertex {#vec p}, jet) (jet bin1)",    date, 1, 1, 1,1);    
-  PlotStack("sv_deltar_sum_jet_jetptbin2",   "#Delta R(vertex {#vec p}, jet) (jet bin2)",    date, 1, 1, 1,1);    
-  PlotStack("sv_deltar_sum_jet_jetptbin3",   "#Delta R(vertex {#vec p}, jet) (jet bin3)",    date, 1, 1, 1,1);    
+  PlotStack("sv_deltar_sum_jet_jetptbin1",   "#Delta R(vertex {#vec p}, jet) (jet bin1)",    date, 1, 0, 1,1);    
+  PlotStack("sv_deltar_sum_jet_jetptbin2",   "#Delta R(vertex {#vec p}, jet) (jet bin2)",    date, 1, 0, 1,1);    
+  PlotStack("sv_deltar_sum_jet_jetptbin3",   "#Delta R(vertex {#vec p}, jet) (jet bin3)",    date, 1, 0, 1,1);    
                                
-  PlotStack("sv_deltar_sum_dir_jetptbin1",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin1)",    date, 1, 1, 1,1);    
-  PlotStack("sv_deltar_sum_dir_jetptbin2",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin2)",    date, 1, 1, 1,1);    
-  PlotStack("sv_deltar_sum_dir_jetptbin3",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin3)",    date, 1, 1, 1,1);    
+  PlotStack("sv_deltar_sum_dir_jetptbin1",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin1)",    date, 1, 0, 1,1);    
+  PlotStack("sv_deltar_sum_dir_jetptbin2",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin2)",    date, 1, 0, 1,1);    
+  PlotStack("sv_deltar_sum_dir_jetptbin3",   "#Delta R(vertex {#vec p}, vertex dir.) (jet bin3)",    date, 1, 0, 1,1);    
             
   PlotStack("discri_tche_jetptbin1",   "TCHE discriminator (jet bin1)",    date, 1, 1, 1,1);          
   PlotStack("discri_tche_jetptbin2",   "TCHE discriminator (jet bin2)",    date, 1, 1, 1,1);          
@@ -735,17 +745,17 @@
   PlotStack("discri_ssche0_jetptbin2",   "SSVHE discriminator (jet bin2)",    date, 1, 1, 1,1);        
   PlotStack("discri_ssche0_jetptbin3",   "SSVHE discriminator (jet bin3)",    date, 1, 1, 1,1);        
                            
-  PlotStack("discri_ssche_jetptbin1",   "SSVHE discriminator (jet bin1)",    date, 1, 1, 0,1);         
-  PlotStack("discri_ssche_jetptbin2",   "SSVHE discriminator (jet bin2)",    date, 1, 1, 0,1);         
-  PlotStack("discri_ssche_jetptbin3",   "SSVHE discriminator (jet bin3)",    date, 1, 1, 0,1);         
+  PlotStack("discri_ssche_jetptbin1",   "SSVHE discriminator (jet bin1)",    date, 1, 0, 0,1);         
+  PlotStack("discri_ssche_jetptbin2",   "SSVHE discriminator (jet bin2)",    date, 1, 0, 0,1);         
+  PlotStack("discri_ssche_jetptbin3",   "SSVHE discriminator (jet bin3)",    date, 1, 0, 0,1);         
                          
   PlotStack("discri_sschp0_jetptbin1",   "SSVHP discriminator (jet bin1)",    date, 1, 1, 1,1);        
   PlotStack("discri_sschp0_jetptbin2",   "SSVHP discriminator (jet bin2)",    date, 1, 1, 1,1);        
   PlotStack("discri_sschp0_jetptbin3",   "SSVHP discriminator (jet bin3)",    date, 1, 1, 1,1);        
                                 
-  PlotStack("discri_sschp_jetptbin1",   "SSVHP discriminator (jet bin1)",    date, 1, 1, 0,1);         
-  PlotStack("discri_sschp_jetptbin2",   "SSVHP discriminator (jet bin2)",    date, 1, 1, 0,1);         
-  PlotStack("discri_sschp_jetptbin3",   "SSVHP discriminator (jet bin3)",    date, 1, 1, 0,1);         
+  PlotStack("discri_sschp_jetptbin1",   "SSVHP discriminator (jet bin1)",    date, 1, 0, 0,1);         
+  PlotStack("discri_sschp_jetptbin2",   "SSVHP discriminator (jet bin2)",    date, 1, 0, 0,1);         
+  PlotStack("discri_sschp_jetptbin3",   "SSVHP discriminator (jet bin3)",    date, 1, 0, 0,1);         
                             
   PlotStack("discri_jetprob_jetptbin1",   "JP discriminator (jet bin1)",    date, 1, 1, 1,1);       
   PlotStack("discri_jetprob_jetptbin2",   "JP discriminator (jet bin2)",    date, 1, 1, 1,1);       
@@ -756,7 +766,7 @@
   PlotStack("discri_jetbprob_jetptbin3",   "JBP discriminator (jet bin3)",    date, 1, 1, 1,1);      
 
   PlotStack("sv_ipsigcharm_3tr",   "",    date, 1, 1, 1,1);              
-  PlotStack("sv_eratio_3tr",   "3-track SV energy ratio",    date, 1, 1, 0,1);                  
+  PlotStack("sv_eratio_3tr",   "3-track SV energy ratio",    date, 1, 0, 0,1);                  
   PlotStack("sv_vtx_pt_3tr",   "3-track SV vtx p_{t}",    date, 1, 1, 1,1);                  
 
   PlotStack("sv_trackmul_centered",   "SV track multiplicity",    date, 1, 1, 1,1);           
@@ -776,26 +786,26 @@
   PlotStack( "npv1_nsv",              "# of secondary vertices (#PV:1-3)",              date, 1, 1, 1,1);  
   PlotStack( "npv1_flightsig3d",      "Flight Significance 3D (#PV:1-3)",               date, 1, 1, 1,1);  
   PlotStack( "npv1_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV:1-3)", date, 1, 1, 1,1);  
-  PlotStack( "npv1_svmass",           "SV mass (#PV:1-3)",                              date, 1, 1, 1,1);  
-  PlotStack( "npv1_svmass_3tr",       "SV mass for >=3tracks (#PV:1-3)",                date, 1, 1, 1,1);  
+  PlotStack( "npv1_svmass",           "SV mass (#PV:1-3)",                              date, 1, 0, 1,1);  
+  PlotStack( "npv1_svmass_3tr",       "SV mass for >=3tracks (#PV:1-3)",                date, 1, 0, 1,1);  
   PlotStack( "npv1_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV:1-3)",      date, 1, 1, 1,1);
  
-  PlotStack("npv1_sveratio",        "SV eratio (#PV:1-3)",                  date, 1, 1, 0,1);
-  PlotStack("npv1_deltar_jet",      "SV deltaR jet (#PV:1-3)",              date, 1, 1, 1,1);
-  PlotStack("npv1_deltar_sum_jet",      "SV deltaR sum jet (#PV:1-3)",      date, 1, 1, 1,1);
-  PlotStack("npv1_deltar_sum_dir",      "SV deltaR sum dir (#PV:1-3)",      date, 1, 1, 1,1);
+  PlotStack("npv1_sveratio",        "SV eratio (#PV:1-3)",                  date, 1, 0, 0,1);
+  PlotStack("npv1_deltar_jet",      "SV deltaR jet (#PV:1-3)",              date, 1, 0, 1,1);
+  PlotStack("npv1_deltar_sum_jet",      "SV deltaR sum jet (#PV:1-3)",      date, 1, 0, 1,1);
+  PlotStack("npv1_deltar_sum_dir",      "SV deltaR sum dir (#PV:1-3)",      date, 1, 0, 1,1);
   PlotStack("npv1_vtxpt",      "SV vtx pt (#PV:1-3)",                       date, 1, 1, 1,1);
   PlotStack("npv1_discri_tche",      "TCHE discriminator (#PV:1-3)",        date, 1, 1, 1,1);
   PlotStack("npv1_discri_tchp",      "TCHP discriminator (#PV:1-3)",        date, 1, 1, 1,1);
   PlotStack("npv1_discri_jetprob",      "JP discriminator (#PV:1-3)",       date, 1, 1, 1,1);
   PlotStack("npv1_discri_jetbprob",      "JBP discriminator (#PV:1-3)",     date, 1, 1, 1,1);
   PlotStack("npv1_discri_ssche0",       "SSVHE Discriminator (#PV:1-3)",    date, 1, 1, 1,1);
-  PlotStack("npv1_discri_ssche",   "SSVHE Discriminator (#PV:1-3)",         date, 1, 1, 0,1);
+  PlotStack("npv1_discri_ssche",   "SSVHE Discriminator (#PV:1-3)",         date, 1, 0, 0,1);
   PlotStack("npv1_discri_sschp0",   "SSVHP Discriminator (#PV:1-3)",        date, 1, 1, 1,1);
-  PlotStack("npv1_discri_sschp",   "SSVHP Discriminator (#PV:1-3)",         date, 1, 1, 0,1);
+  PlotStack("npv1_discri_sschp",   "SSVHP Discriminator (#PV:1-3)",         date, 1, 0, 0,1);
   PlotStack("npv1_muon_Pt",        "Muon p_{T} (#PV:1-3)",                  date, 1, 1, 1,1);
-  PlotStack("npv1_muon_ptrel",    "Muon p_{T}^{rel} (#PV:1-3)",             date, 1, 1, 1,1);
-  PlotStack("npv1_muon_DeltaR",         "Muon1 deltaR (#PV:1-3)",           date, 1, 1, 1,1);
+  PlotStack("npv1_muon_ptrel",    "Muon p_{T}^{rel} (#PV:1-3)",             date, 1, 0, 1,1);
+  PlotStack("npv1_muon_DeltaR",         "Muon1 deltaR (#PV:1-3)",           date, 1, 0, 1,1);
 
 
   PlotStack("npv2_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV:3-7)",   date, 1, 1, 1,1);  
@@ -810,26 +820,26 @@
   PlotStack( "npv2_nsv",              "# of secondary vertices (#PV:3-7)",              date, 1, 1, 1,1);  
   PlotStack( "npv2_flightsig3d",      "Flight Significance 3D (#PV:3-7)",               date, 1, 1, 1,1);  
   PlotStack( "npv2_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV:3-7)", date, 1, 1, 1,1);  
-  PlotStack( "npv2_svmass",           "SV mass (#PV:3-7)",                              date, 1, 1, 1,1);  
-  PlotStack( "npv2_svmass_3tr",       "SV mass for >=3tracks (#PV:3-7)",                date, 1, 1, 1,1);  
+  PlotStack( "npv2_svmass",           "SV mass (#PV:3-7)",                              date, 1, 0, 1,1);  
+  PlotStack( "npv2_svmass_3tr",       "SV mass for >=3tracks (#PV:3-7)",                date, 1, 0, 1,1);  
   PlotStack( "npv2_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV:3-7)",      date, 1, 1, 1,1);
  
-  PlotStack("npv2_sveratio",        "SV eratio (#PV:3-7)",                  date, 1, 1, 0,1);
-  PlotStack("npv2_deltar_jet",      "SV deltaR jet (#PV:3-7)",              date, 1, 1, 1,1);
-  PlotStack("npv2_deltar_sum_jet",      "SV deltaR sum jet (#PV:3-7)",      date, 1, 1, 1,1);
-  PlotStack("npv2_deltar_sum_dir",      "SV deltaR sum dir (#PV:3-7)",      date, 1, 1, 1,1);
+  PlotStack("npv2_sveratio",        "SV eratio (#PV:3-7)",                  date, 1, 0, 0,1);
+  PlotStack("npv2_deltar_jet",      "SV deltaR jet (#PV:3-7)",              date, 1, 0, 1,1);
+  PlotStack("npv2_deltar_sum_jet",      "SV deltaR sum jet (#PV:3-7)",      date, 1, 0, 1,1);
+  PlotStack("npv2_deltar_sum_dir",      "SV deltaR sum dir (#PV:3-7)",      date, 1, 0, 1,1);
   PlotStack("npv2_vtxpt",      "SV vtx pt (#PV:3-7)",                       date, 1, 1, 1,1);
   PlotStack("npv2_discri_tche",      "TCHE discriminator (#PV:3-7)",        date, 1, 1, 1,1);
   PlotStack("npv2_discri_tchp",      "TCHP discriminator (#PV:3-7)",        date, 1, 1, 1,1);
   PlotStack("npv2_discri_jetprob",      "JP discriminator (#PV:3-7)",       date, 1, 1, 1,1);
   PlotStack("npv2_discri_jetbprob",      "JBP discriminator (#PV:3-7)",     date, 1, 1, 1,1);
   PlotStack("npv2_discri_ssche0",       "SSVHE Discriminator (#PV:3-7)",    date, 1, 1, 1,1);
-  PlotStack("npv2_discri_ssche",   "SSVHE Discriminator (#PV:3-7)",         date, 1, 1, 0,1);
+  PlotStack("npv2_discri_ssche",   "SSVHE Discriminator (#PV:3-7)",         date, 1, 0, 0,1);
   PlotStack("npv2_discri_sschp0",   "SSVHP Discriminator (#PV:3-7)",        date, 1, 1, 1,1);
-  PlotStack("npv2_discri_sschp",   "SSVHP Discriminator (#PV:3-7)",         date, 1, 1, 0,1);
+  PlotStack("npv2_discri_sschp",   "SSVHP Discriminator (#PV:3-7)",         date, 1, 0, 0,1);
   PlotStack("npv2_muon_Pt",        "Muon p_{T} (#PV:3-7)",                  date, 1, 1, 1,1);
-  PlotStack("npv2_muon_ptrel",    "Muon p_{T}^{rel} (#PV:3-7)",             date, 1, 1, 1,1);
-  PlotStack("npv2_muon_DeltaR",         "Muon1 deltaR (#PV:3-7)",           date, 1, 1, 1,1);
+  PlotStack("npv2_muon_ptrel",    "Muon p_{T}^{rel} (#PV:3-7)",             date, 1, 0, 1,1);
+  PlotStack("npv2_muon_DeltaR",         "Muon1 deltaR (#PV:3-7)",           date, 1, 0, 1,1);
 
 
   PlotStack("npv3_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV:>7)",   date, 1, 1, 1,1);  
@@ -844,26 +854,26 @@
   PlotStack( "npv3_nsv",              "# of secondary vertices (#PV:>7)",              date, 1, 1, 1,1);  
   PlotStack( "npv3_flightsig3d",      "Flight Significance 3D (#PV:>7)",               date, 1, 1, 1,1);  
   PlotStack( "npv3_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV:>7)", date, 1, 1, 1,1);  
-  PlotStack( "npv3_svmass",           "SV mass (#PV:>7)",                              date, 1, 1, 1,1);  
-  PlotStack( "npv3_svmass_3tr",       "SV mass for >=3tracks (#PV:>7)",                date, 1, 1, 1,1);  
+  PlotStack( "npv3_svmass",           "SV mass (#PV:>7)",                              date, 1, 0, 1,1);  
+  PlotStack( "npv3_svmass_3tr",       "SV mass for >=3tracks (#PV:>7)",                date, 1, 0, 1,1);  
   PlotStack( "npv3_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV:>7)",      date, 1, 1, 1,1);
  
-  PlotStack("npv3_sveratio",        "SV eratio (#PV:>7)",                  date, 1, 1, 0,1);
-  PlotStack("npv3_deltar_jet",      "SV deltaR jet (#PV:>7)",              date, 1, 1, 1,1);
-  PlotStack("npv3_deltar_sum_jet",      "SV deltaR sum jet (#PV:>7)",      date, 1, 1, 1,1);
-  PlotStack("npv3_deltar_sum_dir",      "SV deltaR sum dir (#PV:>7)",      date, 1, 1, 1,1);
+  PlotStack("npv3_sveratio",        "SV eratio (#PV:>7)",                  date, 1, 0, 0,1);
+  PlotStack("npv3_deltar_jet",      "SV deltaR jet (#PV:>7)",              date, 1, 0, 1,1);
+  PlotStack("npv3_deltar_sum_jet",      "SV deltaR sum jet (#PV:>7)",      date, 1, 0, 1,1);
+  PlotStack("npv3_deltar_sum_dir",      "SV deltaR sum dir (#PV:>7)",      date, 1, 0, 1,1);
   PlotStack("npv3_vtxpt",      "SV vtx pt (#PV:>7)",                       date, 1, 1, 1,1);
   PlotStack("npv3_discri_tche",      "TCHE discriminator (#PV:>7)",        date, 1, 1, 1,1);
   PlotStack("npv3_discri_tchp",      "TCHP discriminator (#PV:>7)",        date, 1, 1, 1,1);
   PlotStack("npv3_discri_jetprob",      "JP discriminator (#PV:>7)",       date, 1, 1, 1,1);
   PlotStack("npv3_discri_jetbprob",      "JBP discriminator (#PV:>7)",     date, 1, 1, 1,1);
   PlotStack("npv3_discri_ssche0",       "SSVHE Discriminator (#PV:>7)",    date, 1, 1, 1,1);
-  PlotStack("npv3_discri_ssche",   "SSVHE Discriminator (#PV:>7)",         date, 1, 1, 0,1);
+  PlotStack("npv3_discri_ssche",   "SSVHE Discriminator (#PV:>7)",         date, 1, 0, 0,1);
   PlotStack("npv3_discri_sschp0",   "SSVHP Discriminator (#PV:>7)",        date, 1, 1, 1,1);
-  PlotStack("npv3_discri_sschp",   "SSVHP Discriminator (#PV:>7)",         date, 1, 1, 0,1);
+  PlotStack("npv3_discri_sschp",   "SSVHP Discriminator (#PV:>7)",         date, 1, 0, 0,1);
   PlotStack("npv3_muon_Pt",        "Muon p_{T} (#PV:>7)",                  date, 1, 1, 1,1);
-  PlotStack("npv3_muon_ptrel",    "Muon p_{T}^{rel} (#PV:>7)",             date, 1, 1, 1,1);
-  PlotStack("npv3_muon_DeltaR",         "Muon1 deltaR (#PV:>7)",           date, 1, 1, 1,1);
+  PlotStack("npv3_muon_ptrel",    "Muon p_{T}^{rel} (#PV:>7)",             date, 1, 0, 1,1);
+  PlotStack("npv3_muon_DeltaR",         "Muon1 deltaR (#PV:>7)",           date, 1, 0, 1,1);
 
 
 
@@ -886,8 +896,6 @@
   
   PlotStack2D("sv_eratio_vs_jetpt","jet p_{t}","SV energy ratio",  0, 1);
   PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{t}","SV p_{t}",  0, 1);
-
-
 
 
 
