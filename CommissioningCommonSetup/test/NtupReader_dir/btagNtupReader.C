@@ -439,15 +439,15 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "trackDistJetAxis_cut",  j,"Track jet axis distance",100,0.,0.3);
      AddHisto(HistoBtag, "trackDecayLength_cut",  j,"Track decay length",100,0,25.);
 
-     AddHisto(HistoBtag, "trackIP3d",  j,"Track 3D IP value",100,-0.05,0.05);
+     AddHisto(HistoBtag, "trackIP3d",  j,"Track 3D IP value",100,-0.1,0.1);
      AddHisto(HistoBtag, "trackIP3dError",  j,"Track 3D IP Error",100,0.,0.1); //30
-     AddHisto(HistoBtag, "trackIP3dsig",  j,"Track 3D IP significance",200,-5.,5.);
-     AddHisto(HistoBtag, "trackIP3d_sel",  j,"Track 3D IP value",100,-0.05,0.05);
-     AddHisto(HistoBtag, "trackIP3dError_sel",  j,"Track 3D IP Error",100,0.,0.1);
-     AddHisto(HistoBtag, "trackIP3dsig_sel",  j,"Track 3D IP significance",200,-5.,5.);
-     AddHisto(HistoBtag, "trackIP3d_cutsel",  j,"Track 3D IP value",100,-0.05,0.05); //35
+     AddHisto(HistoBtag, "trackIP3dsig",  j,"Track 3D IP significance",100,-35.,35.);
+     AddHisto(HistoBtag, "trackIP3d_sel",  j,"Track 3D IP value",100,-0.1,0.1);
+     AddHisto(HistoBtag, "trackIP3dError_sel",  j,"Track 3D IP Error",100,0,0.1);
+     AddHisto(HistoBtag, "trackIP3dsig_sel",  j,"Track 3D IP significance",100,-35.,35.);
+     AddHisto(HistoBtag, "trackIP3d_cutsel",  j,"Track 3D IP value",100,-0.1,0.1); //35
      AddHisto(HistoBtag, "trackIP3dError_cutsel",  j,"Track 3D IP Error",100,0.,0.1);
-     AddHisto(HistoBtag, "trackIP3dsig_cutsel",  j,"Track 3D IP significance",200,-5.,5.);
+     AddHisto(HistoBtag, "trackIP3dsig_cutsel",  j,"Track 3D IP significance",100,-35.,35.);
 
 // IP  : first 3 tracks
      AddHisto(HistoBtag, "IP3d1",j,"1st track 3D IP value",100,-0.1,0.1);
@@ -509,7 +509,7 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
     
 
 // muon in jets : for all jets
-     AddHisto(HistoBtag, "muons_multiplicity", j,"# of muons in jet",10,-0.5,10.5);
+     AddHisto(HistoBtag, "muons_multiplicity", j,"# of muons in jet",7,-0.5,6.5);
      AddHisto(HistoBtag, "muon_Pt", j, "Muon p_{T}",200,0,100);
      AddHisto(HistoBtag, "muon_ptrel", j , "Muon p_{T}^{rel}",50,0,5); //85
      AddHisto(HistoBtag, "muon_Ip3d", j, "Muon 3D IP",50,-0.1,0.1);
@@ -575,7 +575,7 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
 
 // additional plots for AN-11-180 
-     AddHisto(HistoBtag, "n_cutseltracks_jet",   j,"# of sel tracks in jet",100,0.,40.);
+     AddHisto(HistoBtag, "n_cutseltracks_jet",   j,"# of sel tracks in jet",40,0.,40.);
      AddHisto(HistoBtag, "pt_cutseltracks",   j,"Pt of  sel tracks",80,0.,200.);  //135
      AddHisto(HistoBtag, "IP3d1Errorsorted",  j,"1st track 3D IP Error",100,0.,0.1); 
      AddHisto(HistoBtag, "IP3d2Errorsorted",  j,"2nd track 3D IP Error",100,0.,0.1); 
