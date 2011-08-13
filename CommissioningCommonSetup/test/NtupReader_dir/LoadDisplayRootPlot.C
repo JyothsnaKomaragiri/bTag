@@ -7,7 +7,7 @@
 
 string ptval_jet="60";
 string ptval_btag="20";
-TString format="png"; // png
+TString format="pdf"; // png
 
 void OverFlowBinFix(TH1F* histo){
 
@@ -1182,6 +1182,16 @@ PlotData(TString selection, TString label, int date, bool down=false, bool logy=
   qw->Draw();
 
 
+
+ TLatex *latex = new TLatex();
+  latex->SetNDC();
+  latex->SetTextSize(0.055);
+  latex->SetTextFont(42); //22
+
+  latex->SetTextAlign(13);
+  latex->DrawLatex(0.14, 0.96, "CMS Preliminary 2011,  #sqrt{s} = 7 TeV");
+
+
   canvas->cd();
 
 
@@ -1438,6 +1448,14 @@ PlotStack2D(TString selection, TString label, TString labely, bool logy=false, b
  
   qw->SetFillColor(0);
   qw->Draw();
+
+ TLatex *latex = new TLatex();
+  latex->SetNDC();
+  latex->SetTextSize(0.055);
+  latex->SetTextFont(42); //22
+
+  latex->SetTextAlign(13);
+  latex->DrawLatex(0.14, 0.96, "CMS Preliminary 2011,  #sqrt{s} = 7 TeV");
 
 
   canvas->cd();
