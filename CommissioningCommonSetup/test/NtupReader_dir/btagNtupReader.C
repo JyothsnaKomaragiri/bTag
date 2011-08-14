@@ -523,9 +523,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      // #PV: 1-3
      AddHisto(HistoBtag, "npv1_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:1-3)",100,-35.,35.);
      AddHisto(HistoBtag, "npv1_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:1-3)",100,-35.,35.);
-     AddHisto(HistoBtag, "npv1_ntracks_jet",      j,"# of tracks in jet (#PV:1-3)",                 100,0.,45.);
-     AddHisto(HistoBtag, "npv1_nseltracks_jet",   j,"# of sel tracks in jet (#PV:1-3)",              50,0.,45.); //95
-     AddHisto(HistoBtag, "npv1_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:1-3)",          50,0.,45.);
+     AddHisto(HistoBtag, "npv1_ntracks_jet",      j,"# of tracks in jet (#PV:1-3)",                 45,0.,45.);
+     AddHisto(HistoBtag, "npv1_nseltracks_jet",   j,"# of sel tracks in jet (#PV:1-3)",              45,0.,45.); //95
+     AddHisto(HistoBtag, "npv1_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:1-3)",          45,0.,45.);
      AddHisto(HistoBtag, "npv1_pt_tracks",        j,"Pt of tracks (#PV:1-3)",                        80,0.,200.);
      AddHisto(HistoBtag, "npv1_pt_seltracks",     j,"Pt of  sel tracks (#PV:1-3)",                   80,0.,200.);
      AddHisto(HistoBtag, "npv1_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:1-3)",               80,0.,200.);
@@ -540,9 +540,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      // #PV: 4-7
      AddHisto(HistoBtag, "npv2_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:4-7)",100,-35.,35.);
      AddHisto(HistoBtag, "npv2_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:4-7)",100,-35.,35.);
-     AddHisto(HistoBtag, "npv2_ntracks_jet",      j,"# of tracks in jet (#PV:4-7)",                 100,0.,45.);
-     AddHisto(HistoBtag, "npv2_nseltracks_jet",   j,"# of sel tracks in jet (#PV:4-7)",              50,0.,45.); 
-     AddHisto(HistoBtag, "npv2_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:4-7)",          50,0.,45.);//110
+     AddHisto(HistoBtag, "npv2_ntracks_jet",      j,"# of tracks in jet (#PV:4-7)",                 45,0.,45.);
+     AddHisto(HistoBtag, "npv2_nseltracks_jet",   j,"# of sel tracks in jet (#PV:4-7)",              45,0.,45.); 
+     AddHisto(HistoBtag, "npv2_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:4-7)",          45,0.,45.);//110
      AddHisto(HistoBtag, "npv2_pt_tracks",        j,"Pt of tracks (#PV:4-7)",                        80,0.,200.);
      AddHisto(HistoBtag, "npv2_pt_seltracks",     j,"Pt of  sel tracks (#PV:4-7)",                   80,0.,200.);
      AddHisto(HistoBtag, "npv2_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:4-7)",               80,0.,200.);
@@ -557,9 +557,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      // #PV: >7
      AddHisto(HistoBtag, "npv3_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:>7)",100,-35.,35.); //120
      AddHisto(HistoBtag, "npv3_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:>7)",100,-35.,35.);
-     AddHisto(HistoBtag, "npv3_ntracks_jet",      j,"# of tracks in jet (#PV:>7)",                 100,0.,45.);
-     AddHisto(HistoBtag, "npv3_nseltracks_jet",   j,"# of sel tracks in jet (#PV:>7)",              50,0.,45.);
-     AddHisto(HistoBtag, "npv3_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:>7)",          50,0.,45.); 
+     AddHisto(HistoBtag, "npv3_ntracks_jet",      j,"# of tracks in jet (#PV:>7)",                 45,0.,45.);
+     AddHisto(HistoBtag, "npv3_nseltracks_jet",   j,"# of sel tracks in jet (#PV:>7)",              45,0.,45.);
+     AddHisto(HistoBtag, "npv3_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:>7)",          45,0.,45.); 
      AddHisto(HistoBtag, "npv3_pt_tracks",        j,"Pt of tracks (#PV:>7)",                        80,0.,200.); //125
      AddHisto(HistoBtag, "npv3_pt_seltracks",     j,"Pt of  sel tracks (#PV:>7)",                   80,0.,200.);
      AddHisto(HistoBtag, "npv3_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:>7)",               80,0.,200.);

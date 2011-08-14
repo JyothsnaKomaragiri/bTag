@@ -378,11 +378,14 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
   // ADD LEGEND
   TLegend* qw = 0;
   if (mu==false) {
-    if (selection=="sv_eratio") {
-     qw = new TLegend(0.5,0.73,0.8,1.);
+    if (selection=="sv_eratio" || selection=="sv_eratio_3tr") {
+      qw = new TLegend(0.54,0.63,0.88,0.9);
     }
     else if (selection=="IP3d1" || selection=="IP3d1sorted" || selection=="trackIP3d" || selection=="trackIP3d_cutsel") {
      qw = new TLegend(0.12,0.63,0.42,0.9);
+    }
+    else if (selection == "sv_normchi2"){
+      qw = new TLegend(0.54,0.63,0.88,0.9);
     }
     else {
      qw = new TLegend(0.6,0.73,0.95,1.);
@@ -394,10 +397,13 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
     }
     else if (selection=="IP3d1" || selection=="IP3d1sorted" || selection=="IP3d1sig" || selection=="IP3d1sigsorted" || selection=="sv_ipsigcharm" ||
  	selection=="IP3d2" || selection=="IP3d2sorted" || selection=="IP3d2sig" || selection=="IP3d2sigsorted" || 
- 	selection=="IP3d3" || selection=="IP3d3sorted" || selection=="IP3d3sig" || selection=="IP3d3sigsorted" 
+ 	selection=="IP3d3" || selection=="IP3d3sorted" || selection=="IP3d3sig" || selection=="IP3d3sigsorted"  
 	) {
      qw = new TLegend(0.12,0.63,0.42,0.9);
     }
+        else if (selection=="sv_mass_muenriched" || selection=="sv_normchi2"){
+         qw = new TLegend(0.54,0.63,0.88,0.9);
+        }
     else {
      qw = new TLegend(0.6,0.73,0.95,1.);
     }
@@ -431,7 +437,7 @@ PlotStack(TString selection, TString label, int date, bool down=false, bool logy
    else  { 
       if (ptval=="20") {
 	//       qw->SetHeader("2011 effective lumi : 1.9  pb^{-1}"); // 20
-       qw->AddEntry(histo0_Data,        "data (HLT_BTagMu_DiJet20_Mu5)",           "p"); 
+       qw->AddEntry(histo0_Data,        "data (HLT_BTagMu)",           "p"); 
       }
       else if (ptval=="60") { 
 	//       qw->SetHeader("2011 effective lumi : 24.3  pb^{-1}"); // 60
@@ -1242,7 +1248,7 @@ PlotData(TString selection, TString label, int date, bool down=false, bool logy=
 
 #include <vector>
 
-PlotStack2D(TString selection, TString label, TString labely, bool logy=false, bool mu=false){
+PlotStack2D(TString selection, TString label, TString labely, bool logy, bool mu, float ymin, float ymax){
   
  
   const int maxmax=10;
@@ -1378,6 +1384,15 @@ PlotStack2D(TString selection, TString label, TString labely, bool logy=false, b
   pro_mc_gspl->GetXaxis()->SetTitle(label);  
   pro_mc_gspl->GetYaxis()->SetTitle(labely);  
 
+  pro_mc_gspl->GetYaxis()->SetRangeUser(ymin, ymax);
+  pro_mc->GetYaxis()->SetRangeUser(ymin, ymax);
+  pro_mc_b->GetYaxis()->SetRangeUser(ymin, ymax);
+  pro_data->GetYaxis()->SetRangeUser(ymin, ymax);
+  pro_mc_c->GetYaxis()->SetRangeUser(ymin, ymax);
+  pro_mc_udsg->GetYaxis()->SetRangeUser(ymin, ymax);
+
+  gStyle->SetOptTitle(0);
+
   // CREATE CANVAS
   TCanvas *canvas = new TCanvas("c1", "c1",10,32,782,552);
   canvas->cd();
@@ -1392,10 +1407,10 @@ PlotStack2D(TString selection, TString label, TString labely, bool logy=false, b
   // ADD LEGEND
   TLegend* qw = 0;
   if (mu==false) {
-     qw = new TLegend(0.6,0.20,0.95,0.45);
+     qw = new TLegend(0.6,0.11,0.9,0.33);
   } 
   else {
-     qw = new TLegend(0.6,0.20,0.95,0.45);
+     qw = new TLegend(0.6,0.11,0.9,0.33);
   }
 
   if (mu==false) {
