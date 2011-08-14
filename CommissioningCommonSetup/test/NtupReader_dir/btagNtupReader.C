@@ -845,9 +845,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
      // 2D plots for veretx deltaR and muon ptrel,deltaR vs jet pt
      
-     AddHisto2D(Histo2DB, "sv_deltar_jet_vs_jetpt", j,"SVJetDeltaR vs jet pt",30,60,350, 50,0.,0.5);  
-     AddHisto2D(Histo2DB, "sv_deltar_sum_jet_vs_jetpt", j,"SVvtxSumJetDeltaR vs jet pt",30,60,350, 50,0.,0.5);
-     AddHisto2D(Histo2DB, "sv_deltar_sum_dir_vs_jetpt", j,"SVvtxSumVtxDirDeltaR vs jet pt",30,60,350, 50,0.,0.5);
+     AddHisto2D(Histo2DB, "sv_deltar_jet_vs_jetpt", j,"SVJetDeltaR vs jet pt",25,60,300, 50,0.,0.5);  
+     AddHisto2D(Histo2DB, "sv_deltar_sum_jet_vs_jetpt", j,"SVvtxSumJetDeltaR vs jet pt",25,60,300, 50,0.,0.5);
+     AddHisto2D(Histo2DB, "sv_deltar_sum_dir_vs_jetpt", j,"SVvtxSumVtxDirDeltaR vs jet pt",25,60,300, 50,0.,0.5);
 
      AddHisto2D(Histo2DB, "muon_ptrel_vs_jetpt", j,"Muon_p{T}^{rel} vs jet pt",30,60,350, 50,0,5);  //10
      AddHisto2D(Histo2DB, "muon_DeltaR_vs_jetpt", j,"Muon1 DeltaR vs jet pt",30,60,350, 50,0,0.5);
