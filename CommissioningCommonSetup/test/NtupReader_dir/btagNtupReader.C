@@ -580,12 +580,12 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "IP3d1Errorsorted",  j,"1st track 3D IP Error",100,0.,0.1); 
      AddHisto(HistoBtag, "IP3d2Errorsorted",  j,"2nd track 3D IP Error",100,0.,0.1); 
      AddHisto(HistoBtag, "IP3d3Errorsorted",  j,"3rd track 3D IP Error",100,0.,0.1); 
-     AddHisto(HistoBtag, "trackIP3d_bin1_cutsel",  j,"Track 3D IP value (1<Pt<=2 GeV/c)",100,-0.05,0.05); 
-     AddHisto(HistoBtag, "trackIP3d_bin2_cutsel",  j,"Track 3D IP value (2<Pt<=5 GeV/c)",100,-0.05,0.05); //140
-     AddHisto(HistoBtag, "trackIP3d_bin3_cutsel",  j,"Track 3D IP value (5<Pt<=8 GeV/c)",100,-0.05,0.05); 
-     AddHisto(HistoBtag, "trackIP3d_bin4_cutsel",  j,"Track 3D IP value (8<Pt<=12 GeV/c)",100,-0.05,0.05); 
-     AddHisto(HistoBtag, "trackIP3d_bin5_cutsel",  j,"Track 3D IP value (12<Pt<=20 GeV/c)",100,-0.05,0.05); 
-     AddHisto(HistoBtag, "trackIP3d_bin6_cutsel",  j,"Track 3D IP value (20<Pt<=50 GeV/c)",100,-0.05,0.05); 
+     AddHisto(HistoBtag, "trackIP3d_bin1_cutsel",  j,"Track 3D IP value (1<Pt<=2 GeV/c)",100,-0.1,0.1); 
+     AddHisto(HistoBtag, "trackIP3d_bin2_cutsel",  j,"Track 3D IP value (2<Pt<=5 GeV/c)",100,-0.1,0.1); //140
+     AddHisto(HistoBtag, "trackIP3d_bin3_cutsel",  j,"Track 3D IP value (5<Pt<=8 GeV/c)",100,-0.1,0.1); 
+     AddHisto(HistoBtag, "trackIP3d_bin4_cutsel",  j,"Track 3D IP value (8<Pt<=12 GeV/c)",100,-0.1,0.1); 
+     AddHisto(HistoBtag, "trackIP3d_bin5_cutsel",  j,"Track 3D IP value (12<Pt<=20 GeV/c)",100,-0.1,0.1); 
+     AddHisto(HistoBtag, "trackIP3d_bin6_cutsel",  j,"Track 3D IP value (20<Pt<=50 GeV/c)",100,-0.1,0.1); 
      AddHisto(HistoBtag, "npv1_nsv_3tr",              j,"# of secondary vertices (>=3tr) (#PV:1-3)",              5,0,5); //145
      AddHisto(HistoBtag, "npv2_nsv_3tr",              j,"# of secondary vertices (>=3tr) (#PV:4-7)",              5,0,5); 
      AddHisto(HistoBtag, "npv3_nsv_3tr",              j,"# of secondary vertices (>=3tr) (#PV:>7)",              5,0,5);
