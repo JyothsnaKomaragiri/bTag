@@ -416,9 +416,9 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "discri_jetbprob",   j,"JetBProb Discriminator",50,0.,8.);
 
 // track info : 
-     AddHisto(HistoBtag, "n_tracks_jet",   j,"# of tracks in jet",100,0.,40.);
+     AddHisto(HistoBtag, "n_tracks_jet",   j,"# of tracks in jet",40,0.,40.);
      AddHisto(HistoBtag, "pt_tracks",   j,"Pt of tracks",80,0.,200.);    // 10
-     AddHisto(HistoBtag, "n_seltracks_jet",   j,"# of sel tracks in jet",100,0.,40.);
+     AddHisto(HistoBtag, "n_seltracks_jet",   j,"# of sel tracks in jet",40,0.,40.);
      AddHisto(HistoBtag, "pt_seltracks",   j,"Pt of  sel tracks",80,0.,200.);
 
      AddHisto(HistoBtag, "trackNHits",  j,"Number of hits",35,-0.5, 34.5);
@@ -824,6 +824,18 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
      AddHisto(HistoBtag, "npv3_muon_ptrel", j ,   "Muon p_{T}^{rel} (#PV:>7)",50,0,5); 
      AddHisto(HistoBtag, "npv3_muon_DeltaR", j,        "Muon1 deltaR (#PV:>7)",50,0,0.5);       //325
 
+
+     AddHisto(HistoBtag, "npv1_jetpt",               j,"PT of all jets",80,50,400.);   //326
+     AddHisto(HistoBtag, "npv1_jetpt_220_300",       j,"PT of all jets",80,200,400.);   //327
+     AddHisto(HistoBtag, "npv1_jetpt_300_400",       j,"PT of all jets",80,200,400.);   //328
+
+     AddHisto(HistoBtag, "npv2_jetpt",               j,"PT of all jets",80,50,400.);   //329
+     AddHisto(HistoBtag, "npv2_jetpt_220_300",       j,"PT of all jets",80,200,400.);   //330
+     AddHisto(HistoBtag, "npv2_jetpt_300_400",       j,"PT of all jets",80,200,400.);   //331
+     
+     AddHisto(HistoBtag, "npv3_jetpt",               j,"PT of all jets",80,50,400.);   //332
+     AddHisto(HistoBtag, "npv3_jetpt_220_300",       j,"PT of all jets",80,200,400.);   //333
+     AddHisto(HistoBtag, "npv3_jetpt_300_400",       j,"PT of all jets",80,200,400.);   //334
 
     // ====> ADD HERE NEW HISTO AT 1D FOR WHICH QUARK CONTENT INFO NEEDED
     // example :
@@ -1255,6 +1267,22 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
                // HERE WE FILL THE HISTOGRAMS
 
                        HistoBtag[0+j*nhisto_to_clone]->Fill(jetPt[i], weight);      // alljetpt
+
+		       if (numberOfPrimaryVertices<=3) {          
+			 HistoBtag[326+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			 if( 220<jetPt[i] < 300)   HistoBtag[327+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			 if( 300<jetPt[i] < 400)   HistoBtag[328+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+		       }
+		       else if (numberOfPrimaryVertices>=4 && numberOfPrimaryVertices<=7) {
+			 HistoBtag[329+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			 if( 220<jetPt[i] < 300)   HistoBtag[330+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			 if( 300<jetPt[i] < 400)   HistoBtag[331+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+		       }
+		       else {
+			 HistoBtag[332+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			 if( 220<jetPt[i] < 300)   HistoBtag[333+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			 if( 300<jetPt[i] < 400)   HistoBtag[334+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+		       }
 
                        //discri
                        HistoBtag[1+j*nhisto_to_clone]->Fill(standardTrackCountingHighEffPFBJetTags[i], weight);
