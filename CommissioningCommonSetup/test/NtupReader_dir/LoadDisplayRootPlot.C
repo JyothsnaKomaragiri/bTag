@@ -1064,6 +1064,20 @@ PlotData(TString selection, TString label, int date, bool down=false, bool logy=
   }
 
 
+  Double_t titleoffsetx=0.13;
+  Double_t titleoffsety=0.2;
+  Double_t titlesizex=0.17;
+  Double_t titlesizey=0.2;
+  Double_t labelsizex=0.14;
+  Double_t labelsizey=0.12;
+
+//   histo0_Data->GetYaxis()->SetLabelSize(labelsizey);
+//   histo0_Data->GetYaxis()->SetTitleSize(titlesizey);
+//   histo0_Data->GetYaxis()->SetTitleOffset(titleoffsety);
+//   histo0_MC->GetYaxis()->SetLabelSize(labelsizey);
+//   histo0_MC->GetYaxis()->SetTitleSize(titlesizey);
+//   histo0_MC->GetYaxis()->SetTitleOffset(titleoffsety);
+
 
   // SCALE MC TO DATA
   float scaleparam=1.;
@@ -1150,38 +1164,38 @@ PlotData(TString selection, TString label, int date, bool down=false, bool logy=
   
    if (mu==false) {
       if (ptval=="30") {
-       qw->SetHeader("2011 JET30 L=0.0053 pb^{-1}"); // 30
+	//       qw->SetHeader("2011 JET30 L=0.0053 pb^{-1}"); // 30
       }
       else if (ptval=="60") { 
-       qw->SetHeader("2011 JET60 L=0.11 pb^{-1}"); // 60
+	//       qw->SetHeader("2011 JET60 L=0.11 pb^{-1}"); // 60
       }
       else if (ptval=="80") {
-       qw->SetHeader("2011 JET80 L=0.52 pb^{-1}"); // 80
+	//       qw->SetHeader("2011 JET80 L=0.52 pb^{-1}"); // 80
       }
       else if (ptval=="110") {
-       qw->SetHeader("2011 JET110 L=2.5 pb^{-1}"); // 110
+	//       qw->SetHeader("2011 JET110 L=2.5 pb^{-1}"); // 110
       }
    }
    else  { 
       if (ptval=="20") {
-       qw->SetHeader("2011 BTagMu_DiJet20_Mu5 L=1.9 pb^{-1}"); // 20
+	//       qw->SetHeader("2011 BTagMu_DiJet20_Mu5 L=1.9 pb^{-1}"); // 20
       }
       else if (ptval=="60") { 
-       qw->SetHeader("2011 BTagMu_DiJet60_Mu7 L=24.3 pb^{-1}"); // 60
+	//       qw->SetHeader("2011 BTagMu_DiJet60_Mu7 L=24.3 pb^{-1}"); // 60
       }
       else if (ptval=="40") { 
-       qw->SetHeader("2011 BTagMu_DiJet40_Mu5 L=6.0 pb^{-1}"); // 60
+	//       qw->SetHeader("2011 BTagMu_DiJet40_Mu5 L=6.0 pb^{-1}"); // 60
       }
       else if (ptval=="70") { 
-       qw->SetHeader("2011 BTagMu_DiJet70_Mu5 L=34.3 pb^{-1}"); // 60
+	//       qw->SetHeader("2011 BTagMu_DiJet70_Mu5 L=34.3 pb^{-1}"); // 60
       }
       else if (ptval=="110") { 
-       qw->SetHeader("2011 BTagMu_DiJet110_Mu5 L=212 pb^{-1}"); // 60
+	//      qw->SetHeader("2011 BTagMu_DiJet110_Mu5 L=212 pb^{-1}"); // 60
       }
    }
-       qw->AddEntry(histo0_Data1,        "#PV: 1-3",           "p"); 
-       qw->AddEntry(histo0_Data2,        "#PV: 4-7",           "p"); 
-       qw->AddEntry(histo0_Data3,        "#PV: >7",           "p"); 
+       qw->AddEntry(histo0_Data1,        "data (#PV: 1-3)",           "p"); 
+       qw->AddEntry(histo0_Data2,        "data (#PV: 4-7)",           "p"); 
+       qw->AddEntry(histo0_Data3,        "data (#PV: >7)",           "p"); 
 
  
   qw->SetFillColor(0);
@@ -1218,8 +1232,12 @@ PlotData(TString selection, TString label, int date, bool down=false, bool logy=
   histo0_ratio->GetYaxis()->SetTitleSize( 0.1 );
   histo0_ratio->GetYaxis()->SetLabelSize(0.1);
   histo0_ratio->GetYaxis()->SetNdivisions( 505 );
-  histo0_ratio->GetXaxis()->SetLabelSize(0.1);
-  histo0_ratio->GetXaxis()->SetTitleSize( 0.1 );
+  //  histo0_ratio->GetXaxis()->SetLabelSize(0.1);
+  //  histo0_ratio->GetXaxis()->SetTitleSize( 0.1 );
+
+  histo0_ratio->GetXaxis()->SetLabelSize( labelsizex);
+  histo0_ratio->GetXaxis()->SetTitleSize( titlesizex );
+
 
   histo0_ratio->SetMinimum(0.4);
   histo0_ratio->SetMaximum(1.6);
@@ -1393,6 +1411,59 @@ PlotStack2D(TString selection, TString label, TString labely, bool logy, bool mu
 
   gStyle->SetOptTitle(0);
 
+
+  Double_t titleoffsetx=0.8;
+  Double_t titleoffsety=0.8;
+  Double_t titlesizex=0.05;
+  Double_t titlesizey=0.05;
+  Double_t labelsizex=0.035;
+  Double_t labelsizey=0.035;
+
+  pro_data->GetYaxis()->SetLabelSize(labelsizey);
+  pro_data->GetYaxis()->SetTitleSize(titlesizey);
+  pro_data->GetYaxis()->SetTitleOffset(titleoffsety);
+  pro_mc->GetYaxis()->SetLabelSize(labelsizey);
+  pro_mc->GetYaxis()->SetTitleSize(titlesizey);
+  pro_mc->GetYaxis()->SetTitleOffset(titleoffsety);
+  pro_mc_b->GetYaxis()->SetLabelSize(labelsizey);
+  pro_mc_b->GetYaxis()->SetTitleSize(titlesizey);
+  pro_mc_b->GetYaxis()->SetTitleOffset(titleoffsety);
+  pro_mc_c->GetYaxis()->SetLabelSize(labelsizey);
+  pro_mc_c->GetYaxis()->SetTitleSize(titlesizey);
+  pro_mc_c->GetYaxis()->SetTitleOffset(titleoffsety);
+
+  pro_mc_gspl->GetYaxis()->SetLabelSize(labelsizey);
+  pro_mc_gspl->GetYaxis()->SetTitleSize(titlesizey);
+  pro_mc_gspl->GetYaxis()->SetTitleOffset(titleoffsety);
+
+  pro_mc_udsg->GetYaxis()->SetLabelSize(labelsizey);
+  pro_mc_udsg->GetYaxis()->SetTitleSize(titlesizey);
+  pro_mc_udsg->GetYaxis()->SetTitleOffset(titleoffsety);
+
+
+
+ pro_data->GetXaxis()->SetLabelSize(labelsizex);
+  pro_data->GetXaxis()->SetTitleSize(titlesizex);
+  pro_data->GetXaxis()->SetTitleOffset(titleoffsetx);
+  pro_mc->GetXaxis()->SetLabelSize(labelsizex);
+  pro_mc->GetXaxis()->SetTitleSize(titlesizex);
+  pro_mc->GetXaxis()->SetTitleOffset(titleoffsetx);
+  pro_mc_b->GetXaxis()->SetLabelSize(labelsizex);
+  pro_mc_b->GetXaxis()->SetTitleSize(titlesizex);
+  pro_mc_b->GetXaxis()->SetTitleOffset(titleoffsetx);
+  pro_mc_c->GetXaxis()->SetLabelSize(labelsizex);
+  pro_mc_c->GetXaxis()->SetTitleSize(titlesizex);
+  pro_mc_c->GetXaxis()->SetTitleOffset(titleoffsetx);
+
+  pro_mc_gspl->GetXaxis()->SetLabelSize(labelsizex);
+  pro_mc_gspl->GetXaxis()->SetTitleSize(titlesizex);
+  pro_mc_gspl->GetXaxis()->SetTitleOffset(titleoffsetx);
+
+  pro_mc_udsg->GetXaxis()->SetLabelSize(labelsizex);
+  pro_mc_udsg->GetXaxis()->SetTitleSize(titlesizex);
+  pro_mc_udsg->GetXaxis()->SetTitleOffset(titleoffsetx);
+
+
   // CREATE CANVAS
   TCanvas *canvas = new TCanvas("c1", "c1",10,32,782,552);
   canvas->cd();
@@ -1434,7 +1505,7 @@ PlotStack2D(TString selection, TString label, TString labely, bool logy, bool mu
   else  { 
       if (ptval=="20") {
 	//       qw->SetHeader("2011 effective lumi : 1.9  pb^{-1}"); // 20
-       qw->AddEntry(pro_data,        "data (HLT_BTagMu_DiJet20_Mu5)",           "p"); 
+       qw->AddEntry(pro_data,        "data (HLT_BTagMu)",           "p"); 
       }
       else if (ptval=="60") { 
 	//       qw->SetHeader("2011 effective lumi : 24.3  pb^{-1}"); // 60
