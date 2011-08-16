@@ -1270,18 +1270,18 @@ void btagNtupReader::Loop(int cutgen, float weightsave)
 
 		       if (numberOfPrimaryVertices<=3) {          
 			 HistoBtag[326+j*nhisto_to_clone]->Fill(jetPt[i], weight);
-			 if( 220<jetPt[i] < 300)   HistoBtag[327+j*nhisto_to_clone]->Fill(jetPt[i], weight);
-			 if( 300<jetPt[i] < 400)   HistoBtag[328+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			 if( (220<jetPt[i]) && (jetPt[i] < 300) )   HistoBtag[327+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			 if( (300<jetPt[i]) && (jetPt[i]< 400) )   HistoBtag[328+j*nhisto_to_clone]->Fill(jetPt[i], weight);
 		       }
 		       else if (numberOfPrimaryVertices>=4 && numberOfPrimaryVertices<=7) {
 			 HistoBtag[329+j*nhisto_to_clone]->Fill(jetPt[i], weight);
-			 if( 220<jetPt[i] < 300)   HistoBtag[330+j*nhisto_to_clone]->Fill(jetPt[i], weight);
-			 if( 300<jetPt[i] < 400)   HistoBtag[331+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			  if( (220<jetPt[i]) && (jetPt[i] < 300) )   HistoBtag[330+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			  if( (300<jetPt[i]) && (jetPt[i]< 400) )   HistoBtag[331+j*nhisto_to_clone]->Fill(jetPt[i], weight);
 		       }
 		       else {
 			 HistoBtag[332+j*nhisto_to_clone]->Fill(jetPt[i], weight);
-			 if( 220<jetPt[i] < 300)   HistoBtag[333+j*nhisto_to_clone]->Fill(jetPt[i], weight);
-			 if( 300<jetPt[i] < 400)   HistoBtag[334+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			  if( (220<jetPt[i]) && (jetPt[i] < 300) )   HistoBtag[333+j*nhisto_to_clone]->Fill(jetPt[i], weight);
+			  if( (300<jetPt[i]) && (jetPt[i]< 400) )    HistoBtag[334+j*nhisto_to_clone]->Fill(jetPt[i], weight);
 		       }
 
                        //discri
