@@ -21,9 +21,7 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 //#include "FWCore/Framework/interface/TriggerNames.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-// added by Caroline
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-// end add
 
 #include "DataFormats/BTauReco/interface/SoftLeptonTagInfo.h"
 #include "DataFormats/BTauReco/interface/SecondaryVertexTagInfo.h"
@@ -51,20 +49,29 @@
 #include "DataFormats/GeometryVector/interface/VectorUtil.h"
 
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackReco/interface/TrackBase.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
-
+//Generation Information Headers
 #include "SimDataFormats/JetMatching/interface/JetFlavour.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
+//Simulation Information Headers
+#include "SimDataFormats/Track/interface/SimTrack.h"
+#include "SimDataFormats/Track/interface/SimTrackContainer.h"
+#include "SimDataFormats/Vertex/interface/SimVertex.h"
+#include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
 #include <DataFormats/GsfTrackReco/interface/GsfTrack.h>
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "TrackingTools/PatternTools/interface/TSCBLBuilderNoMaterial.h"
 
 #include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputer.h"
 #include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputerWrapper.h"
@@ -76,19 +83,19 @@
 #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
 #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
 #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
-
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
 //added by Caroline
 #include "DataFormats/GeometrySurface/interface/Line.h"
 //end add
 
 #include <TTree.h>
 #include <TFile.h>
+#include <utility>
 
 // maximum array size (the arrays are stored with variable size in the root tree)
-const unsigned int MAXJETS = 40;
-const unsigned int MAXTRACKS = 300;
+const UInt_t MAXJETS = 40;
+const UInt_t MAXTRACKS = 300;
 
 
 class TagNtupleProducer : public edm::EDAnalyzer {
@@ -103,19 +110,28 @@ public:
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endRun(const edm::Run&, const edm::EventSetup&);
   virtual void endJob() ;
-  
-  void getSharedHitsInfo(unsigned int layer, const reco::TrackRefVector & tracks, int &nSharedHits, int &nTotalHits);
-  int  hasSharedHit(unsigned int layer, size_t location, const reco::TrackRefVector & tracks);      
+  std::pair<Bool_t,reco::TrackBase::ParameterVector> parametersAtClosestApproach(Basic3DVector<Double_t> vertex,
+									       Basic3DVector<Double_t> momAtVtx,
+									       Float_t charge,
+									       const reco::BeamSpot& bs) const;
+  void getSharedHitsInfo(UInt_t layer, const reco::TrackRefVector & tracks, Int_t &nSharedHits, Int_t &nTotalHits);
+  Int_t  hasSharedHit(UInt_t layer, size_t location, const reco::TrackRefVector & tracks);      
   // ----------member data ---------------------------
   
   //Input from python config
-  bool getMCTruth_;
-  bool getMCPUInfo_;
-  bool getSharedHitInfo_;  
+  Bool_t getMCTruth_;
+  Bool_t getSimTruth_;
+  Bool_t getMCPUInfo_;
+  Bool_t getSharedHitInfo_;
+  Bool_t firstEvent_;
+  edm::InputTag HepMCTag_;
+  edm::InputTag simTruthTag_;
+  edm::InputTag BeamSpotTag_;
   edm::InputTag jet_src_;
   edm::InputTag SVComputer_;
   edm::InputTag triggerTag_;
   edm::InputTag jet_MC_src_;
+  edm::InputTag GenJet_Matcher_;
   edm::InputTag jet_tracks_;
   edm::InputTag primaryVertexProducer_;
   edm::InputTag SV_tag_infos_;
@@ -125,528 +141,488 @@ public:
   std::string label_;
   std::string filename_;
   std::vector< edm::ParameterSet > bTag_Config_;
+  Double_t chi2cut_;
   
   // data formats
-  TTree *tree;
+  TTree *EventInfo,*RunInfo;
   TFile *file;
-  
-  std::vector<std::string> trigNames_;
-  std::deque<bool> triggers_;
-  std::vector<int> prescales_;
-  
-  bool triggerHLTL1Jet6U, triggerHLTL1Jet10U, triggerHLTJet15U;
-  bool triggerHLTJet30U, triggerHLTJet50U, triggerHLTJet70U, triggerHLTJet100U ;
-  bool triggerHLTBTagIPJet50U, triggerHLTBTagMuJet10U, triggerHLTBTagMuJet20U;
-  bool triggerHLTBTagMuDiJet10U, triggerHLTBTagMuDiJet20U, triggerHLTBTagMuDiJet20UMu5, triggerHLTBTagMuDiJet30U, triggerHLTBTagMuDiJet30UMu5;
 
-  // added by Caroline
-  int prescaleHLTL1Jet6U, prescaleHLTL1Jet10U, prescaleHLTJet15U;
-  int prescaleHLTJet30U, prescaleHLTJet50U, prescaleHLTJet70U, prescaleHLTJet100U ;
-  int prescaleHLTBTagIPJet50U, prescaleHLTBTagMuJet10U, prescaleHLTBTagMuJet20U;
-  int prescaleHLTBTagMuDiJet10U, prescaleHLTBTagMuDiJet20U, prescaleHLTBTagMuDiJet20UMu5, prescaleHLTBTagMuDiJet30U, prescaleHLTBTagMuDiJet30UMu5;
-  // end add
+  UInt_t eventNumber ;
+  UInt_t runNumber ;
+  UInt_t lumiBlockNumber ;
 
-  //added by Caroline (4_1_2_patch1)
-  bool triggerHLT_L1SingleJet36, triggerHLT_Jet30, triggerHLT_Jet60, triggerHLT_Jet80, triggerHLT_Jet110, triggerHLT_Jet150;
-  bool triggerHLT_Jet190, triggerHLT_Jet240, triggerHLT_Jet370, triggerHLT_Jet370_NoJetID;
-  int prescaleHLT_L1SingleJet36, prescaleHLT_Jet30, prescaleHLT_Jet60, prescaleHLT_Jet80, prescaleHLT_Jet110, prescaleHLT_Jet150;
-  int prescaleHLT_Jet190, prescaleHLT_Jet240, prescaleHLT_Jet370, prescaleHLT_Jet370_NoJetID;
+  //added by Caroline,Jinzhong for TriggerNames and prescales
+  HLTConfigProvider  hltConfigProvider_;
+  //Basic Trigger Information
+  std::vector<std::string> TriggerNames_,*HLTNamesSet;
+  std::vector<Int_t> HLTTableBitMatch_;
+  std::string *HLTTableName;
+  std::vector<UInt_t> *HLTPrescaleFactors;
+  std::vector<Bool_t> *HLTriggerResults;
 
+  UInt_t numberOfPUVertices;   // at BC=0
+  UInt_t numberOfPUVerticesTot;  // all PU : BC=0 and out-of-time PU
+  UInt_t numberOfPrimaryVertices ;
+  UInt_t numberOfTracksAtPV;
+  Float_t PVx;
+  Float_t PVy;
+  Float_t PVz;
+  Float_t PVChi2;
+  Float_t PVndof;
+  Float_t PVNormalizedChi2;
 
-  bool triggerHLT_DiJetAve15U_v4           ;
-  bool triggerHLT_DiJetAve30U_v4           ;
-  bool triggerHLT_DiJetAve50U_v4           ;
-  bool triggerHLT_DiJetAve70U_v4           ;
-  bool triggerHLT_DiJetAve100U_v4          ;
-  bool triggerHLT_DiJetAve140U_v4          ;
-  bool triggerHLT_DiJetAve180U_v4          ;
-  bool triggerHLT_DiJetAve300U_v4          ;
-  bool triggerHLT_BTagMu_DiJet20_Mu5       ;
-  bool triggerHLT_BTagMu_DiJet40_Mu5       ;
-  bool triggerHLT_BTagMu_DiJet70_Mu5       ;
-  bool triggerHLT_BTagMu_DiJet110_Mu5      ;
-  bool triggerHLT_BTagMu_DiJet60_Mu7_v2    ;
-  bool triggerHLT_BTagMu_DiJet80_Mu9_v2    ;
-  bool triggerHLT_BTagMu_DiJet100_Mu9_v2   ;
-  
-  int prescaleHLT_DiJetAve15U_v4           ;
-  int prescaleHLT_DiJetAve30U_v4           ;
-  int prescaleHLT_DiJetAve50U_v4           ;
-  int prescaleHLT_DiJetAve70U_v4           ;
-  int prescaleHLT_DiJetAve100U_v4          ;
-  int prescaleHLT_DiJetAve140U_v4          ;
-  int prescaleHLT_DiJetAve180U_v4          ;
-  int prescaleHLT_DiJetAve300U_v4          ;
-  int prescaleHLT_BTagMu_DiJet20_Mu5       ;
-  int prescaleHLT_BTagMu_DiJet40_Mu5       ;
-  int prescaleHLT_BTagMu_DiJet70_Mu5       ;
-  int prescaleHLT_BTagMu_DiJet110_Mu5      ;
-  int prescaleHLT_BTagMu_DiJet60_Mu7_v2    ;
-  int prescaleHLT_BTagMu_DiJet80_Mu9_v2    ;
-  int prescaleHLT_BTagMu_DiJet100_Mu9_v2   ;
-
-  unsigned int eventNumber ;
-  unsigned int runNumber ;
-  unsigned int lumiBlockNumber ;
-
-  unsigned int numberOfPUVertices;   // at BC=0
-  unsigned int numberOfPUVerticesTot;  // all PU : BC=0 and out-of-time PU
-  unsigned int numberOfPrimaryVertices ;
-  unsigned int numberOfTracksAtPV;
-  float PVx;
-  float PVy;
-  float PVz;
-  float PVChi2;
-  float PVndof;
-  float PVNormalizedChi2;
-
-  float pthat;
-  float mcweight;
-  bool isBGluonSplitting;
-  bool isCGluonSplitting;
+  Float_t pthat;
+  Float_t mcweight;
+  Bool_t isBGluonSplitting;
+  Bool_t isCGluonSplitting;
 
   //Basic Jet Information
-  int nJets;
+  Int_t nJets;
 
-  math::XYZTLorentzVector jetP4[MAXJETS];               
-  float jetPt[MAXJETS];                                 
-  float jetEta[MAXJETS];                                
-  float jetPhi[MAXJETS];                                
-  float jetEMFraction[MAXJETS];        
-  float jetChargedEmEnergyFraction[MAXJETS];
-  float jetNeutralEmEnergyFraction[MAXJETS];
-  float jetChargedHadronEnergyFraction[MAXJETS];
-  float jetNeutralHadronEnergyFraction[MAXJETS];
-  float jetChargedMultiplicity[MAXJETS];
-  float jetMass[MAXJETS];                               
-  int jetnConstituents[MAXJETS];  
-  int jetnTracks[MAXJETS];                           
-  //  int jetnElectrons[MAXJETS];                              
-  //  int jetnMuons[MAXJETS];                                  
+  math::XYZTLorentzVector jetP4[MAXJETS];
+  Float_t jetPt[MAXJETS];                                 
+  Float_t jetEta[MAXJETS];                                
+  Float_t jetPhi[MAXJETS];                                
+  Float_t jetEMFraction[MAXJETS];        
+  Float_t jetChargedEmEnergyFraction[MAXJETS];
+  Float_t jetNeutralEmEnergyFraction[MAXJETS];
+  Float_t jetChargedHadronEnergyFraction[MAXJETS];
+  Float_t jetNeutralHadronEnergyFraction[MAXJETS];
+  Float_t jetChargedMultiplicity[MAXJETS];
+  Float_t jetMass[MAXJETS];                               
+  Int_t jetnConstituents[MAXJETS];  
+  Int_t jetnTracks[MAXJETS];                           
+  //  Int_t jetnElectrons[MAXJETS];                              
+  //  Int_t jetnMuons[MAXJETS];                                  
   math::XYZVector jetVertex[MAXJETS];                   
-  float jetVertexChi2[MAXJETS];               
-  float jetVertexChi2Ndof[MAXJETS];           
-  float jetVertexNormalizedChi2[MAXJETS];    
+  Float_t jetVertexChi2[MAXJETS];               
+  Float_t jetVertexChi2Ndof[MAXJETS];           
+  Float_t jetVertexNormalizedChi2[MAXJETS];    
 
   //Track Information
-  int nTracks;
+  Int_t nTracks;
 
-  int trackJetIndex[MAXTRACKS];
-  bool trackSelected[MAXTRACKS];
+  Int_t trackJetIndex[MAXTRACKS];
+  Bool_t trackSelected[MAXTRACKS];
   math::XYZVector track3Momentum[MAXTRACKS];
-  float trackTransverseMomentum[MAXTRACKS];
-  float trackEta[MAXTRACKS];
-  float trackPhi[MAXTRACKS];
-  float trackMomentum[MAXTRACKS];
-  int trackNHits[MAXTRACKS];
-  int trackNPixelHits[MAXTRACKS];
-  float trackChi2[MAXTRACKS];
-  float trackNormChi2[MAXTRACKS];
-  int trackQuality[MAXTRACKS];
-  float trackLongitudinalImpactParameter[MAXTRACKS];
-  float trackIP[MAXTRACKS];
-  float trackDecayLength[MAXTRACKS];
-  float trackDistJetAxis[MAXTRACKS];
-  float trackDeltaR[MAXTRACKS];
-  float trackIP3d[MAXTRACKS];
-  float trackIP2d[MAXTRACKS];
-  float trackIP3dError[MAXTRACKS];
-  float trackIP2dError[MAXTRACKS];
-  int trackHasSharedPix1[MAXTRACKS];
-  int trackHasSharedPix2[MAXTRACKS];
-  int trackHasSharedPix3[MAXTRACKS];
-  int trackHasSharedPixAll[MAXTRACKS];
-  bool trackIsVertexTrack[MAXTRACKS];
+  Float_t trackTransverseMomentum[MAXTRACKS];
+  Float_t trackEta[MAXTRACKS];
+  Float_t trackPhi[MAXTRACKS];
+  Float_t trackMomentum[MAXTRACKS];
+  Int_t trackNHits[MAXTRACKS];
+  Int_t trackNPixelHits[MAXTRACKS];
+  Float_t trackChi2[MAXTRACKS];
+  Float_t trackNormChi2[MAXTRACKS];
+  Int_t trackQuality[MAXTRACKS];
+  Float_t trackLongitudinalImpactParameter[MAXTRACKS];
+  Float_t trackIP[MAXTRACKS];
+  Float_t trackDecayLength[MAXTRACKS];
+  Float_t trackDistJetAxis[MAXTRACKS];
+  Float_t trackDeltaR[MAXTRACKS];
+  Float_t trackIP3d[MAXTRACKS];
+  Float_t trackIP2d[MAXTRACKS];
+  Float_t trackIP3dError[MAXTRACKS];
+  Float_t trackIP2dError[MAXTRACKS];
+  Int_t trackHasSharedPix1[MAXTRACKS];
+  Int_t trackHasSharedPix2[MAXTRACKS];
+  Int_t trackHasSharedPix3[MAXTRACKS];
+  Int_t trackHasSharedPixAll[MAXTRACKS];
+  Bool_t trackIsVertexTrack[MAXTRACKS];
 
   //MC Truth Information
-  int MCTrueFlavor[MAXJETS];                          
+  Int_t PartonFlavor[MAXJETS];//PartonFlavor==0 means that the jet matches no GEN level parton.It could be a piled-up jet or bad reconstructed jet.One see the algorithms in: http://cmslxr.fnal.gov/lxr/source/PhysicsTools/JetMCAlgos/plugins/JetFlavourIdentifier.cc and http://cmslxr.fnal.gov/lxr/source/PhysicsTools/JetMCAlgos/plugins/JetPartonMatcher.cc                
+  Float_t PartonPt[MAXJETS];
+  Float_t PartonEta[MAXJETS];
+  Float_t PartonPhi[MAXJETS];
+  Float_t GenJetPt[MAXJETS];
+  Float_t GenJetEta[MAXJETS];
+  Float_t GenJetPhi[MAXJETS];
  				       
   //secondaryVertexTagInfos:			       
   math::XYZVector SecondaryVertex[MAXJETS];             
-  float SV3dDistance[MAXJETS];                          
-  float SV3dDistanceError[MAXJETS];                     
-  float SV2dDistance[MAXJETS];                          
-  float SV2dDistanceError[MAXJETS];                     
-  float SVChi2[MAXJETS];                
-  float SVIPFirstAboveCharm[MAXJETS];                                
-  float SVDegreesOfFreedom[MAXJETS];                    
-  float SVNormChi2[MAXJETS];                            
-  int SVnSelectedTracks[MAXJETS];                               
-  float SVMass[MAXJETS];                                
-  float SVEnergyRatio[MAXJETS];                                
-  int SVnVertices[MAXJETS];                             
-  int   SVnVertexTracks[MAXJETS];         
-  int   SVnVertexTracksAll[MAXJETS];         
-  int   SVnFirstVertexTracks[MAXJETS];         
-  int   SVnFirstVertexTracksAll[MAXJETS];         
-  float SVjetDeltaR[MAXJETS];
-  float SVvtxSumVtxDirDeltaR[MAXJETS];
-  float SVvtxSumJetDeltaR[MAXJETS];
-  float SVvtxPt[MAXJETS];
-  float SVvtxSumDirEta[MAXJETS];
-  float SVvtxSumDirPhi[MAXJETS];
-  float SVvtxDirEta[MAXJETS];
-  float SVvtxDirPhi[MAXJETS];
+  Float_t SV3dDistance[MAXJETS];                          
+  Float_t SV3dDistanceError[MAXJETS];                     
+  Float_t SV2dDistance[MAXJETS];                          
+  Float_t SV2dDistanceError[MAXJETS];                     
+  Float_t SVChi2[MAXJETS];                
+  Float_t SVIPFirstAboveCharm[MAXJETS];                                
+  Float_t SVDegreesOfFreedom[MAXJETS];                    
+  Float_t SVNormChi2[MAXJETS];                            
+  Int_t SVnSelectedTracks[MAXJETS];                               
+  Float_t SVMass[MAXJETS];                                
+  Float_t SVEnergyRatio[MAXJETS];                                
+  Int_t SVnVertices[MAXJETS];                             
+  Int_t   SVnVertexTracks[MAXJETS];         
+  Int_t   SVnVertexTracksAll[MAXJETS];         
+  Int_t   SVnFirstVertexTracks[MAXJETS];         
+  Int_t   SVnFirstVertexTracksAll[MAXJETS];         
+  Float_t SVjetDeltaR[MAXJETS];
+  Float_t SVvtxSumVtxDirDeltaR[MAXJETS];
+  Float_t SVvtxSumJetDeltaR[MAXJETS];
+  Float_t SVvtxPt[MAXJETS];
+  Float_t SVvtxSumDirEta[MAXJETS];
+  Float_t SVvtxSumDirPhi[MAXJETS];
+  Float_t SVvtxDirEta[MAXJETS];
+  Float_t SVvtxDirPhi[MAXJETS];
   // added by Caroline
-  float SVvtxSumPTrel[MAXJETS];
-  float SVvtxDirPTrel[MAXJETS];
-  float SVvtxDistJetAxis[MAXJETS];
-  int   SVtotCharge[MAXJETS];
+  Float_t SVvtxSumPTrel[MAXJETS];
+  Float_t SVvtxDirPTrel[MAXJETS];
+  Float_t SVvtxDistJetAxis[MAXJETS];
+  Int_t   SVtotCharge[MAXJETS];
   // end add
                
   //impactParameterTagInfos
-  int IPnSelectedTracks[MAXJETS];                       
+  Int_t IPnSelectedTracks[MAXJETS];                       
+  Int_t IPnSelectedPUTracks[MAXJETS];
+  Int_t IPnSelectedAndDecayLengthAndJetAsixTracks[MAXJETS];
+  Int_t IPnSelectedAndDecayLengthAndJetAsixPUTracks[MAXJETS];
   math::XYZVector IPghostTrackP3[MAXJETS];      
-  float IPghostTrackPt[MAXJETS];                        
-  float IPghostTrackPtRel[MAXJETS];                        
-  float IPghostTrackEta[MAXJETS];                       
-  float IPghostTrackPhi[MAXJETS];                       
-  float IPghostTrackDeltaR[MAXJETS];        
-  int   IPPix1SharedHits[MAXJETS];
-  int   IPPix1TotalHits[MAXJETS];
-  int   IPPix2SharedHits[MAXJETS];
-  int   IPPix2TotalHits[MAXJETS];
-  int   IPPix3SharedHits[MAXJETS];
-  int   IPPix3TotalHits[MAXJETS];
-  int   IPPixAllSharedHits[MAXJETS];
-  int   IPPixAllTotalHits[MAXJETS];
+  Float_t IPghostTrackPt[MAXJETS];                        
+  Float_t IPghostTrackPtRel[MAXJETS];                        
+  Float_t IPghostTrackEta[MAXJETS];                       
+  Float_t IPghostTrackPhi[MAXJETS];                       
+  Float_t IPghostTrackDeltaR[MAXJETS];        
+  Int_t   IPPix1SharedHits[MAXJETS];
+  Int_t   IPPix1TotalHits[MAXJETS];
+  Int_t   IPPix2SharedHits[MAXJETS];
+  Int_t   IPPix2TotalHits[MAXJETS];
+  Int_t   IPPix3SharedHits[MAXJETS];
+  Int_t   IPPix3TotalHits[MAXJETS];
+  Int_t   IPPixAllSharedHits[MAXJETS];
+  Int_t   IPPixAllTotalHits[MAXJETS];
 
-  std::vector< int* > IP3dTrackQuality;    
-  std::vector< int* > IP3dHasSharedPix1;
-  std::vector< int* > IP3dHasSharedPix2;
-  std::vector< int* > IP3dHasSharedPix3;
-  std::vector< int* > IP3dHasSharedPixAll;
-  std::vector< float* > IP3d;
-  std::vector< float* > IP3dError;
-  std::vector< float* > IP3dProbability;
-  std::vector< float* > IP3dTrackPtRel;
-  std::vector< float* > IP3dDistJetAxis;
-  std::vector< float* > IP3dDecayLength;
-  std::vector< float* > IP3dDeltaR;
-  std::vector< float* > IP3dMomentum;
-  std::vector< float* > IP3dTransverseMomentum;
-  std::vector< float* > IP3dEta;
-  std::vector< float* > IP3dPhi;
-  std::vector< int* >   IP3dNHits;
-  std::vector< int* >   IP3dNPixelHits;
-  std::vector< float* > IP3dNormChi2;
-  std::vector< int* >   IP2dTrackQuality;    
-  std::vector< float* > IP2d;
-  std::vector< float* > IP2dError;
-  std::vector< float* > IP2dProbability;
-  std::vector< float* > IP2dTrackPtRel;
+  std::vector< Int_t* > IP3dTrackQuality;    
+  std::vector< Int_t* > IP3dHasSharedPix1;
+  std::vector< Int_t* > IP3dHasSharedPix2;
+  std::vector< Int_t* > IP3dHasSharedPix3;
+  std::vector< Int_t* > IP3dHasSharedPixAll;
+  std::vector< Float_t* > IP3d;
+  std::vector< Float_t* > IP3dError;
+  std::vector< Float_t* > IP3dProbability;
+  std::vector< Float_t* > IP3dTrackPtRel;
+  std::vector< Float_t* > IP3dDistJetAxis;
+  std::vector< Float_t* > IP3dDecayLength;
+  std::vector< Float_t* > IP3dDeltaR;
+  std::vector< Float_t* > IP3dMomentum;
+  std::vector< Float_t* > IP3dTransverseMomentum;
+  std::vector< Float_t* > IP3dEta;
+  std::vector< Float_t* > IP3dPhi;
+  std::vector< Int_t* >   IP3dNHits;
+  std::vector< Int_t* >   IP3dNPixelHits;
+  std::vector< Float_t* > IP3dNormChi2;
+  std::vector< Int_t* >   IP2dTrackQuality;    
+  std::vector< Float_t* > IP2d;
+  std::vector< Float_t* > IP2dError;
+  std::vector< Float_t* > IP2dProbability;
+  std::vector< Float_t* > IP2dTrackPtRel;
 
   //softElectronTagInfos
-  int nElectrons[MAXJETS]; 
+  Int_t nElectrons[MAXJETS]; 
                            
-  float electron1Pt[MAXJETS];   			       
-  float electron1Eta[MAXJETS];  			       
-  float electron1Phi[MAXJETS];  			       
-  int electron1NHits[MAXJETS];   		     
-  int electron1NExpectedOuterHits[MAXJETS];   		       
-  int electron1NPixelHits[MAXJETS];   		       
-  float electron1NChi2[MAXJETS];			       
-  float electron1PtRel[MAXJETS];   		       
-  float electron1Sip2d[MAXJETS];   		       
-  float electron1Ip2d[MAXJETS];   		       
-  float electron1Ipe2d[MAXJETS];   		       
-  float electron1Sip3d[MAXJETS];
-  float electron1Ip3d[MAXJETS];
-  float electron1Ipe3d[MAXJETS];   		          		          		       
-  float electron1P0Par[MAXJETS];   		       
-  float electron1DeltaR[MAXJETS];  		       
-  float electron1EtaRel[MAXJETS];  		       
-  float electron1Ratio[MAXJETS];   		     
-  int electron1TrackQuality[MAXJETS];   		       
-  float electron1RatioRel[MAXJETS];  
-  float electron1eSuperClusterOverP[MAXJETS];
-  float electron1eSeedClusterOverP[MAXJETS];
-  float electron1eSeedClusterOverPout[MAXJETS];
-  float electron1eEleClusterOverPout[MAXJETS];
-  float electron1deltaEtaSuperClusterTrackAtVtx[MAXJETS];
-  float electron1deltaEtaSeedClusterTrackAtCalo[MAXJETS];
-  float electron1deltaEtaEleClusterTrackAtCalo[MAXJETS];
-  float electron1deltaPhiSuperClusterTrackAtVtx[MAXJETS];
-  float electron1deltaPhiSeedClusterTrackAtCalo[MAXJETS];
-  float electron1deltaPhiEleClusterTrackAtCalo[MAXJETS];                  
+  Float_t electron1Pt[MAXJETS];   			       
+  Float_t electron1Eta[MAXJETS];  			       
+  Float_t electron1Phi[MAXJETS];  			       
+  Int_t electron1NHits[MAXJETS];   		     
+  Int_t electron1NExpectedOuterHits[MAXJETS];   		       
+  Int_t electron1NPixelHits[MAXJETS];   		       
+  Float_t electron1NChi2[MAXJETS];			       
+  Float_t electron1PtRel[MAXJETS];   		       
+  Float_t electron1Sip2d[MAXJETS];   		       
+  Float_t electron1Ip2d[MAXJETS];   		       
+  Float_t electron1Ipe2d[MAXJETS];   		       
+  Float_t electron1Sip3d[MAXJETS];
+  Float_t electron1Ip3d[MAXJETS];
+  Float_t electron1Ipe3d[MAXJETS];   		          		          		       
+  Float_t electron1P0Par[MAXJETS];   		       
+  Float_t electron1DeltaR[MAXJETS];  		       
+  Float_t electron1EtaRel[MAXJETS];  		       
+  Float_t electron1Ratio[MAXJETS];   		     
+  Int_t electron1TrackQuality[MAXJETS];   		       
+  Float_t electron1RatioRel[MAXJETS];  
+  Float_t electron1eSuperClusterOverP[MAXJETS];
+  Float_t electron1eSeedClusterOverP[MAXJETS];
+  Float_t electron1eSeedClusterOverPout[MAXJETS];
+  Float_t electron1eEleClusterOverPout[MAXJETS];
+  Float_t electron1deltaEtaSuperClusterTrackAtVtx[MAXJETS];
+  Float_t electron1deltaEtaSeedClusterTrackAtCalo[MAXJETS];
+  Float_t electron1deltaEtaEleClusterTrackAtCalo[MAXJETS];
+  Float_t electron1deltaPhiSuperClusterTrackAtVtx[MAXJETS];
+  Float_t electron1deltaPhiSeedClusterTrackAtCalo[MAXJETS];
+  Float_t electron1deltaPhiEleClusterTrackAtCalo[MAXJETS];                  
 
-  float electron2Pt[MAXJETS];   			       
-  float electron2Eta[MAXJETS];  			       
-  float electron2Phi[MAXJETS];  			       
-  int electron2NHits[MAXJETS];   		     
-  int electron2NExpectedOuterHits[MAXJETS];   		       
-  int electron2NPixelHits[MAXJETS];   		       
-  float electron2NChi2[MAXJETS];			       
-  float electron2PtRel[MAXJETS];   		       
-  float electron2Sip2d[MAXJETS];   		       
-  float electron2Ip2d[MAXJETS];   		       
-  float electron2Ipe2d[MAXJETS];   		       
-  float electron2Sip3d[MAXJETS];
-  float electron2Ip3d[MAXJETS];
-  float electron2Ipe3d[MAXJETS];   		          		          		       
-  float electron2P0Par[MAXJETS];   		       
-  float electron2DeltaR[MAXJETS];  		       
-  float electron2EtaRel[MAXJETS];  		       
-  float electron2Ratio[MAXJETS];   		     
-  int electron2TrackQuality[MAXJETS];   		       
-  float electron2RatioRel[MAXJETS];
-  float electron2eSuperClusterOverP[MAXJETS];
-  float electron2eSeedClusterOverP[MAXJETS];
-  float electron2eSeedClusterOverPout[MAXJETS];
-  float electron2eEleClusterOverPout[MAXJETS];
-  float electron2deltaEtaSuperClusterTrackAtVtx[MAXJETS];
-  float electron2deltaEtaSeedClusterTrackAtCalo[MAXJETS];
-  float electron2deltaEtaEleClusterTrackAtCalo[MAXJETS];
-  float electron2deltaPhiSuperClusterTrackAtVtx[MAXJETS];
-  float electron2deltaPhiSeedClusterTrackAtCalo[MAXJETS];
-  float electron2deltaPhiEleClusterTrackAtCalo[MAXJETS];
+  Float_t electron2Pt[MAXJETS];   			       
+  Float_t electron2Eta[MAXJETS];  			       
+  Float_t electron2Phi[MAXJETS];  			       
+  Int_t electron2NHits[MAXJETS];   		     
+  Int_t electron2NExpectedOuterHits[MAXJETS];   		       
+  Int_t electron2NPixelHits[MAXJETS];   		       
+  Float_t electron2NChi2[MAXJETS];			       
+  Float_t electron2PtRel[MAXJETS];   		       
+  Float_t electron2Sip2d[MAXJETS];   		       
+  Float_t electron2Ip2d[MAXJETS];   		       
+  Float_t electron2Ipe2d[MAXJETS];   		       
+  Float_t electron2Sip3d[MAXJETS];
+  Float_t electron2Ip3d[MAXJETS];
+  Float_t electron2Ipe3d[MAXJETS];   		          		          		       
+  Float_t electron2P0Par[MAXJETS];   		       
+  Float_t electron2DeltaR[MAXJETS];  		       
+  Float_t electron2EtaRel[MAXJETS];  		       
+  Float_t electron2Ratio[MAXJETS];   		     
+  Int_t electron2TrackQuality[MAXJETS];   		       
+  Float_t electron2RatioRel[MAXJETS];
+  Float_t electron2eSuperClusterOverP[MAXJETS];
+  Float_t electron2eSeedClusterOverP[MAXJETS];
+  Float_t electron2eSeedClusterOverPout[MAXJETS];
+  Float_t electron2eEleClusterOverPout[MAXJETS];
+  Float_t electron2deltaEtaSuperClusterTrackAtVtx[MAXJETS];
+  Float_t electron2deltaEtaSeedClusterTrackAtCalo[MAXJETS];
+  Float_t electron2deltaEtaEleClusterTrackAtCalo[MAXJETS];
+  Float_t electron2deltaPhiSuperClusterTrackAtVtx[MAXJETS];
+  Float_t electron2deltaPhiSeedClusterTrackAtCalo[MAXJETS];
+  Float_t electron2deltaPhiEleClusterTrackAtCalo[MAXJETS];
 
-  float electron3Pt[MAXJETS];   			       
-  float electron3Eta[MAXJETS];  			       
-  float electron3Phi[MAXJETS];  			       
-  int electron3NHits[MAXJETS];   		     
-  int electron3NExpectedOuterHits[MAXJETS];   		       
-  int electron3NPixelHits[MAXJETS];   		       
-  float electron3NChi2[MAXJETS];			       
-  float electron3PtRel[MAXJETS];   		       
-  float electron3Sip2d[MAXJETS];   		       
-  float electron3Ip2d[MAXJETS];   		       
-  float electron3Ipe2d[MAXJETS];   		       
-  float electron3Sip3d[MAXJETS];
-  float electron3Ip3d[MAXJETS];
-  float electron3Ipe3d[MAXJETS];   		          		          		       
-  float electron3P0Par[MAXJETS];   		       
-  float electron3DeltaR[MAXJETS];  		       
-  float electron3EtaRel[MAXJETS];  		       
-  float electron3Ratio[MAXJETS];   		     
-  int electron3TrackQuality[MAXJETS];   		       
-  float electron3RatioRel[MAXJETS];
-  float electron3eSuperClusterOverP[MAXJETS];
-  float electron3eSeedClusterOverP[MAXJETS];
-  float electron3eSeedClusterOverPout[MAXJETS];
-  float electron3eEleClusterOverPout[MAXJETS];
-  float electron3deltaEtaSuperClusterTrackAtVtx[MAXJETS];
-  float electron3deltaEtaSeedClusterTrackAtCalo[MAXJETS];
-  float electron3deltaEtaEleClusterTrackAtCalo[MAXJETS];
-  float electron3deltaPhiSuperClusterTrackAtVtx[MAXJETS];
-  float electron3deltaPhiSeedClusterTrackAtCalo[MAXJETS];
-  float electron3deltaPhiEleClusterTrackAtCalo[MAXJETS];
+  Float_t electron3Pt[MAXJETS];   			       
+  Float_t electron3Eta[MAXJETS];  			       
+  Float_t electron3Phi[MAXJETS];  			       
+  Int_t electron3NHits[MAXJETS];   		     
+  Int_t electron3NExpectedOuterHits[MAXJETS];   		       
+  Int_t electron3NPixelHits[MAXJETS];   		       
+  Float_t electron3NChi2[MAXJETS];			       
+  Float_t electron3PtRel[MAXJETS];   		       
+  Float_t electron3Sip2d[MAXJETS];   		       
+  Float_t electron3Ip2d[MAXJETS];   		       
+  Float_t electron3Ipe2d[MAXJETS];   		       
+  Float_t electron3Sip3d[MAXJETS];
+  Float_t electron3Ip3d[MAXJETS];
+  Float_t electron3Ipe3d[MAXJETS];   		          		          		       
+  Float_t electron3P0Par[MAXJETS];   		       
+  Float_t electron3DeltaR[MAXJETS];  		       
+  Float_t electron3EtaRel[MAXJETS];  		       
+  Float_t electron3Ratio[MAXJETS];   		     
+  Int_t electron3TrackQuality[MAXJETS];   		       
+  Float_t electron3RatioRel[MAXJETS];
+  Float_t electron3eSuperClusterOverP[MAXJETS];
+  Float_t electron3eSeedClusterOverP[MAXJETS];
+  Float_t electron3eSeedClusterOverPout[MAXJETS];
+  Float_t electron3eEleClusterOverPout[MAXJETS];
+  Float_t electron3deltaEtaSuperClusterTrackAtVtx[MAXJETS];
+  Float_t electron3deltaEtaSeedClusterTrackAtCalo[MAXJETS];
+  Float_t electron3deltaEtaEleClusterTrackAtCalo[MAXJETS];
+  Float_t electron3deltaPhiSuperClusterTrackAtVtx[MAXJETS];
+  Float_t electron3deltaPhiSeedClusterTrackAtCalo[MAXJETS];
+  Float_t electron3deltaPhiEleClusterTrackAtCalo[MAXJETS];
 
-  float electron4Pt[MAXJETS];   			       
-  float electron4Eta[MAXJETS];  			       
-  float electron4Phi[MAXJETS];  			       
-  int electron4NHits[MAXJETS];   		     
-  int electron4NExpectedOuterHits[MAXJETS];   		       
-  int electron4NPixelHits[MAXJETS];   		       
-  float electron4NChi2[MAXJETS];			       
-  float electron4PtRel[MAXJETS];   		       
-  float electron4Sip2d[MAXJETS];   		       
-  float electron4Ip2d[MAXJETS];   		       
-  float electron4Ipe2d[MAXJETS];   		       
-  float electron4Sip3d[MAXJETS];
-  float electron4Ip3d[MAXJETS];
-  float electron4Ipe3d[MAXJETS];   		          		          		       
-  float electron4P0Par[MAXJETS];   		       
-  float electron4DeltaR[MAXJETS];  		       
-  float electron4EtaRel[MAXJETS];  		       
-  float electron4Ratio[MAXJETS];   		     
-  int electron4TrackQuality[MAXJETS];   		       
-  float electron4RatioRel[MAXJETS];
-  float electron4eSuperClusterOverP[MAXJETS];
-  float electron4eSeedClusterOverP[MAXJETS];
-  float electron4eSeedClusterOverPout[MAXJETS];
-  float electron4eEleClusterOverPout[MAXJETS];
-  float electron4deltaEtaSuperClusterTrackAtVtx[MAXJETS];
-  float electron4deltaEtaSeedClusterTrackAtCalo[MAXJETS];
-  float electron4deltaEtaEleClusterTrackAtCalo[MAXJETS];
-  float electron4deltaPhiSuperClusterTrackAtVtx[MAXJETS];
-  float electron4deltaPhiSeedClusterTrackAtCalo[MAXJETS];
-  float electron4deltaPhiEleClusterTrackAtCalo[MAXJETS];
+  Float_t electron4Pt[MAXJETS];   			       
+  Float_t electron4Eta[MAXJETS];  			       
+  Float_t electron4Phi[MAXJETS];  			       
+  Int_t electron4NHits[MAXJETS];   		     
+  Int_t electron4NExpectedOuterHits[MAXJETS];   		       
+  Int_t electron4NPixelHits[MAXJETS];   		       
+  Float_t electron4NChi2[MAXJETS];			       
+  Float_t electron4PtRel[MAXJETS];   		       
+  Float_t electron4Sip2d[MAXJETS];   		       
+  Float_t electron4Ip2d[MAXJETS];   		       
+  Float_t electron4Ipe2d[MAXJETS];   		       
+  Float_t electron4Sip3d[MAXJETS];
+  Float_t electron4Ip3d[MAXJETS];
+  Float_t electron4Ipe3d[MAXJETS];   		          		          		       
+  Float_t electron4P0Par[MAXJETS];   		       
+  Float_t electron4DeltaR[MAXJETS];  		       
+  Float_t electron4EtaRel[MAXJETS];  		       
+  Float_t electron4Ratio[MAXJETS];   		     
+  Int_t electron4TrackQuality[MAXJETS];   		       
+  Float_t electron4RatioRel[MAXJETS];
+  Float_t electron4eSuperClusterOverP[MAXJETS];
+  Float_t electron4eSeedClusterOverP[MAXJETS];
+  Float_t electron4eSeedClusterOverPout[MAXJETS];
+  Float_t electron4eEleClusterOverPout[MAXJETS];
+  Float_t electron4deltaEtaSuperClusterTrackAtVtx[MAXJETS];
+  Float_t electron4deltaEtaSeedClusterTrackAtCalo[MAXJETS];
+  Float_t electron4deltaEtaEleClusterTrackAtCalo[MAXJETS];
+  Float_t electron4deltaPhiSuperClusterTrackAtVtx[MAXJETS];
+  Float_t electron4deltaPhiSeedClusterTrackAtCalo[MAXJETS];
+  Float_t electron4deltaPhiEleClusterTrackAtCalo[MAXJETS];
 
-  std::vector<float*> electronPt;   			       
-  std::vector<float*> electronEta;  			       
-  std::vector<float*> electronPhi;  			       
-  std::vector<int*> electronNHits;   		     
-  std::vector<int*> electronNExpectedOuterHits;   		       
-  std::vector<int*> electronNPixelHits;   		       
-  std::vector<float*> electronNChi2;			       
-  std::vector<float*> electronPtRel;   		       
-  std::vector<float*> electronSip2d;   		       
-  std::vector<float*> electronIp2d;   		       
-  std::vector<float*> electronIpe2d;   		       
-  std::vector<float*> electronSip3d;
-  std::vector<float*> electronIp3d;
-  std::vector<float*> electronIpe3d;   		          		          		       
-  std::vector<float*> electronP0Par;   		       
-  std::vector<float*> electronDeltaR;  		       
-  std::vector<float*> electronEtaRel;  		       
-  std::vector<float*> electronRatio;   		     
-  std::vector<int*> electronTrackQuality;   		       
-  std::vector<float*> electronRatioRel;
-  std::vector<float*> electroneSuperClusterOverP;
-  std::vector<float*> electroneSeedClusterOverP;
-  std::vector<float*> electroneSeedClusterOverPout;
-  std::vector<float*> electroneEleClusterOverPout;
-  std::vector<float*> electrondeltaEtaSuperClusterTrackAtVtx;
-  std::vector<float*> electrondeltaEtaSeedClusterTrackAtCalo;
-  std::vector<float*> electrondeltaEtaEleClusterTrackAtCalo;
-  std::vector<float*> electrondeltaPhiSuperClusterTrackAtVtx;
-  std::vector<float*> electrondeltaPhiSeedClusterTrackAtCalo;
-  std::vector<float*> electrondeltaPhiEleClusterTrackAtCalo;
+  std::vector<Float_t*> electronPt;   			       
+  std::vector<Float_t*> electronEta;  			       
+  std::vector<Float_t*> electronPhi;  			       
+  std::vector<Int_t*> electronNHits;   		     
+  std::vector<Int_t*> electronNExpectedOuterHits;   		       
+  std::vector<Int_t*> electronNPixelHits;   		       
+  std::vector<Float_t*> electronNChi2;			       
+  std::vector<Float_t*> electronPtRel;   		       
+  std::vector<Float_t*> electronSip2d;   		       
+  std::vector<Float_t*> electronIp2d;   		       
+  std::vector<Float_t*> electronIpe2d;   		       
+  std::vector<Float_t*> electronSip3d;
+  std::vector<Float_t*> electronIp3d;
+  std::vector<Float_t*> electronIpe3d;   		          		          		       
+  std::vector<Float_t*> electronP0Par;   		       
+  std::vector<Float_t*> electronDeltaR;  		       
+  std::vector<Float_t*> electronEtaRel;  		       
+  std::vector<Float_t*> electronRatio;   		     
+  std::vector<Int_t*> electronTrackQuality;   		       
+  std::vector<Float_t*> electronRatioRel;
+  std::vector<Float_t*> electroneSuperClusterOverP;
+  std::vector<Float_t*> electroneSeedClusterOverP;
+  std::vector<Float_t*> electroneSeedClusterOverPout;
+  std::vector<Float_t*> electroneEleClusterOverPout;
+  std::vector<Float_t*> electrondeltaEtaSuperClusterTrackAtVtx;
+  std::vector<Float_t*> electrondeltaEtaSeedClusterTrackAtCalo;
+  std::vector<Float_t*> electrondeltaEtaEleClusterTrackAtCalo;
+  std::vector<Float_t*> electrondeltaPhiSuperClusterTrackAtVtx;
+  std::vector<Float_t*> electrondeltaPhiSeedClusterTrackAtCalo;
+  std::vector<Float_t*> electrondeltaPhiEleClusterTrackAtCalo;
 						       
   //softMuonTagInfos	
-  int nMuons[MAXJETS];                                
+  Int_t nMuons[MAXJETS];                                
 
-  bool  muon1IsGlobal[MAXJETS];
-  bool  muon1IsTracker[MAXJETS];
-  bool  muon1IsStandalone[MAXJETS];
-  float muon1Pt[MAXJETS];   			       
-  float muon1Eta[MAXJETS];  			       
-  float muon1Phi[MAXJETS];  	
-  int   muon1NumberOfMatches[MAXJETS];
-  int   muon1GlobalMuonHits[MAXJETS];
-  int   muon1InnerValidHits[MAXJETS];
-  int   muon1NExpectedOuterHits[MAXJETS];   			       
-  int   muon1NPixelHits[MAXJETS];
-  float muon1InnerNChi2[MAXJETS];
-  float muon1GlobalNChi2[MAXJETS];
-  float muon1VzPVDist[MAXJETS];
-  float muon1PtRel[MAXJETS];   
-  float muon1Sip2d[MAXJETS];   		       
-  float muon1Ip2d[MAXJETS];   		       
-  float muon1Ipe2d[MAXJETS];   		       
-  float muon1Sip3d[MAXJETS];
-  float muon1Ip3d[MAXJETS];
-  float muon1Ipe3d[MAXJETS];   	
-  float muon1P0Par[MAXJETS];   			       
-  float muon1DeltaR[MAXJETS];  			       
-  float muon1EtaRel[MAXJETS];  			       
-  float muon1Ratio[MAXJETS];   			    
-  int   muon1TrackQuality[MAXJETS];   			       
-  float muon1RatioRel[MAXJETS];                          
+  Bool_t  muon1IsGlobal[MAXJETS];
+  Bool_t  muon1IsTracker[MAXJETS];
+  Bool_t  muon1IsStandalone[MAXJETS];
+  Float_t muon1Pt[MAXJETS];   			       
+  Float_t muon1Eta[MAXJETS];  			       
+  Float_t muon1Phi[MAXJETS];  	
+  Int_t   muon1NumberOfMatches[MAXJETS];
+  Int_t   muon1GlobalMuonHits[MAXJETS];
+  Int_t   muon1InnerValidHits[MAXJETS];
+  Int_t   muon1NExpectedOuterHits[MAXJETS];   			       
+  Int_t   muon1NPixelHits[MAXJETS];
+  Float_t muon1InnerNChi2[MAXJETS];
+  Float_t muon1GlobalNChi2[MAXJETS];
+  Float_t muon1VzPVDist[MAXJETS];
+  Float_t muon1PtRel[MAXJETS];   
+  Float_t muon1Sip2d[MAXJETS];   		       
+  Float_t muon1Ip2d[MAXJETS];   		       
+  Float_t muon1Ipe2d[MAXJETS];   		       
+  Float_t muon1Sip3d[MAXJETS];
+  Float_t muon1Ip3d[MAXJETS];
+  Float_t muon1Ipe3d[MAXJETS];   	
+  Float_t muon1P0Par[MAXJETS];   			       
+  Float_t muon1DeltaR[MAXJETS];  			       
+  Float_t muon1EtaRel[MAXJETS];  			       
+  Float_t muon1Ratio[MAXJETS];   			    
+  Int_t   muon1TrackQuality[MAXJETS];   			       
+  Float_t muon1RatioRel[MAXJETS];                          
 
-  bool  muon2IsGlobal[MAXJETS];
-  bool  muon2IsTracker[MAXJETS];
-  bool  muon2IsStandalone[MAXJETS];
-  float muon2Pt[MAXJETS];   			       
-  float muon2Eta[MAXJETS];  			       
-  float muon2Phi[MAXJETS];  	
-  int   muon2NumberOfMatches[MAXJETS];
-  int   muon2GlobalMuonHits[MAXJETS];
-  int   muon2InnerValidHits[MAXJETS];
-  int   muon2NExpectedOuterHits[MAXJETS];   			       
-  int   muon2NPixelHits[MAXJETS];
-  float muon2InnerNChi2[MAXJETS];
-  float muon2GlobalNChi2[MAXJETS];
-  float muon2VzPVDist[MAXJETS];
-  float muon2PtRel[MAXJETS];   
-  float muon2Sip2d[MAXJETS];   		       
-  float muon2Ip2d[MAXJETS];   		       
-  float muon2Ipe2d[MAXJETS];   		       
-  float muon2Sip3d[MAXJETS];
-  float muon2Ip3d[MAXJETS];
-  float muon2Ipe3d[MAXJETS];   	
-  float muon2P0Par[MAXJETS];   			       
-  float muon2DeltaR[MAXJETS];  			       
-  float muon2EtaRel[MAXJETS];  			       
-  float muon2Ratio[MAXJETS];   			    
-  int   muon2TrackQuality[MAXJETS];   			       
-  float muon2RatioRel[MAXJETS];                          
+  Bool_t  muon2IsGlobal[MAXJETS];
+  Bool_t  muon2IsTracker[MAXJETS];
+  Bool_t  muon2IsStandalone[MAXJETS];
+  Float_t muon2Pt[MAXJETS];   			       
+  Float_t muon2Eta[MAXJETS];  			       
+  Float_t muon2Phi[MAXJETS];  	
+  Int_t   muon2NumberOfMatches[MAXJETS];
+  Int_t   muon2GlobalMuonHits[MAXJETS];
+  Int_t   muon2InnerValidHits[MAXJETS];
+  Int_t   muon2NExpectedOuterHits[MAXJETS];   			       
+  Int_t   muon2NPixelHits[MAXJETS];
+  Float_t muon2InnerNChi2[MAXJETS];
+  Float_t muon2GlobalNChi2[MAXJETS];
+  Float_t muon2VzPVDist[MAXJETS];
+  Float_t muon2PtRel[MAXJETS];   
+  Float_t muon2Sip2d[MAXJETS];   		       
+  Float_t muon2Ip2d[MAXJETS];   		       
+  Float_t muon2Ipe2d[MAXJETS];   		       
+  Float_t muon2Sip3d[MAXJETS];
+  Float_t muon2Ip3d[MAXJETS];
+  Float_t muon2Ipe3d[MAXJETS];   	
+  Float_t muon2P0Par[MAXJETS];   			       
+  Float_t muon2DeltaR[MAXJETS];  			       
+  Float_t muon2EtaRel[MAXJETS];  			       
+  Float_t muon2Ratio[MAXJETS];   			    
+  Int_t   muon2TrackQuality[MAXJETS];   			       
+  Float_t muon2RatioRel[MAXJETS];                          
 
-  bool  muon3IsGlobal[MAXJETS];
-  bool  muon3IsTracker[MAXJETS];
-  bool  muon3IsStandalone[MAXJETS];
-  float muon3Pt[MAXJETS];   			       
-  float muon3Eta[MAXJETS];  			       
-  float muon3Phi[MAXJETS];  	
-  int   muon3NumberOfMatches[MAXJETS];
-  int   muon3GlobalMuonHits[MAXJETS];
-  int   muon3InnerValidHits[MAXJETS];
-  int   muon3NExpectedOuterHits[MAXJETS];   			       
-  int   muon3NPixelHits[MAXJETS];
-  float muon3InnerNChi2[MAXJETS];
-  float muon3GlobalNChi2[MAXJETS];
-  float muon3VzPVDist[MAXJETS];
-  float muon3PtRel[MAXJETS];   
-  float muon3Sip2d[MAXJETS];   		       
-  float muon3Ip2d[MAXJETS];   		       
-  float muon3Ipe2d[MAXJETS];   		       
-  float muon3Sip3d[MAXJETS];
-  float muon3Ip3d[MAXJETS];
-  float muon3Ipe3d[MAXJETS];   	
-  float muon3P0Par[MAXJETS];   			       
-  float muon3DeltaR[MAXJETS];  			       
-  float muon3EtaRel[MAXJETS];  			       
-  float muon3Ratio[MAXJETS];   			    
-  int   muon3TrackQuality[MAXJETS];   			       
-  float muon3RatioRel[MAXJETS];                          
+  Bool_t  muon3IsGlobal[MAXJETS];
+  Bool_t  muon3IsTracker[MAXJETS];
+  Bool_t  muon3IsStandalone[MAXJETS];
+  Float_t muon3Pt[MAXJETS];   			       
+  Float_t muon3Eta[MAXJETS];  			       
+  Float_t muon3Phi[MAXJETS];  	
+  Int_t   muon3NumberOfMatches[MAXJETS];
+  Int_t   muon3GlobalMuonHits[MAXJETS];
+  Int_t   muon3InnerValidHits[MAXJETS];
+  Int_t   muon3NExpectedOuterHits[MAXJETS];   			       
+  Int_t   muon3NPixelHits[MAXJETS];
+  Float_t muon3InnerNChi2[MAXJETS];
+  Float_t muon3GlobalNChi2[MAXJETS];
+  Float_t muon3VzPVDist[MAXJETS];
+  Float_t muon3PtRel[MAXJETS];   
+  Float_t muon3Sip2d[MAXJETS];   		       
+  Float_t muon3Ip2d[MAXJETS];   		       
+  Float_t muon3Ipe2d[MAXJETS];   		       
+  Float_t muon3Sip3d[MAXJETS];
+  Float_t muon3Ip3d[MAXJETS];
+  Float_t muon3Ipe3d[MAXJETS];   	
+  Float_t muon3P0Par[MAXJETS];   			       
+  Float_t muon3DeltaR[MAXJETS];  			       
+  Float_t muon3EtaRel[MAXJETS];  			       
+  Float_t muon3Ratio[MAXJETS];   			    
+  Int_t   muon3TrackQuality[MAXJETS];   			       
+  Float_t muon3RatioRel[MAXJETS];                          
 
-  bool  muon4IsGlobal[MAXJETS];
-  bool  muon4IsTracker[MAXJETS];
-  bool  muon4IsStandalone[MAXJETS];
-  float muon4Pt[MAXJETS];   			       
-  float muon4Eta[MAXJETS];  			       
-  float muon4Phi[MAXJETS];  	
-  int   muon4NumberOfMatches[MAXJETS];
-  int   muon4GlobalMuonHits[MAXJETS];
-  int   muon4InnerValidHits[MAXJETS];
-  int   muon4NExpectedOuterHits[MAXJETS];   			       
-  int   muon4NPixelHits[MAXJETS];
-  float muon4InnerNChi2[MAXJETS];
-  float muon4GlobalNChi2[MAXJETS];
-  float muon4VzPVDist[MAXJETS];
-  float muon4PtRel[MAXJETS];   
-  float muon4Sip2d[MAXJETS];   		       
-  float muon4Ip2d[MAXJETS];   		       
-  float muon4Ipe2d[MAXJETS];   		       
-  float muon4Sip3d[MAXJETS];
-  float muon4Ip3d[MAXJETS];
-  float muon4Ipe3d[MAXJETS];   	
-  float muon4P0Par[MAXJETS];   			       
-  float muon4DeltaR[MAXJETS];  			       
-  float muon4EtaRel[MAXJETS];  			       
-  float muon4Ratio[MAXJETS];   			    
-  int   muon4TrackQuality[MAXJETS];   			       
-  float muon4RatioRel[MAXJETS];                          
-
-
-
-  std::vector< bool* > muonIsGlobal;
-  std::vector< bool* >  muonIsTracker;
-  std::vector<bool*>  muonIsStandalone;
-  std::vector<float*> muonPt;   			       
-  std::vector<float*> muonEta;  			       
-  std::vector<float*> muonPhi;  	
-  std::vector<int*>   muonNumberOfMatches;
-  std::vector<int*>   muonGlobalMuonHits;
-  std::vector<int*>   muonInnerValidHits;
-  std::vector<int*>   muonNExpectedOuterHits;   			       
-  std::vector<int*>   muonNPixelHits;
-  std::vector<float*> muonInnerNChi2;
-  std::vector<float*> muonGlobalNChi2;
-  std::vector<float*> muonVzPVDist;
-  std::vector<float*> muonPtRel;   
-  std::vector<float*> muonSip2d;   		       
-  std::vector<float*> muonIp2d;   		       
-  std::vector<float*> muonIpe2d;   		       
-  std::vector<float*> muonSip3d;
-  std::vector<float*> muonIp3d;
-  std::vector<float*> muonIpe3d;   	
-  std::vector<float*> muonP0Par;   			       
-  std::vector<float*> muonDeltaR;  			       
-  std::vector<float*> muonEtaRel;  			       
-  std::vector<float*> muonRatio;   			    
-  std::vector<int*>   muonTrackQuality;   			       
-  std::vector<float*> muonRatioRel; 
+  Bool_t  muon4IsGlobal[MAXJETS];
+  Bool_t  muon4IsTracker[MAXJETS];
+  Bool_t  muon4IsStandalone[MAXJETS];
+  Float_t muon4Pt[MAXJETS];   			       
+  Float_t muon4Eta[MAXJETS];  			       
+  Float_t muon4Phi[MAXJETS];  	
+  Int_t   muon4NumberOfMatches[MAXJETS];
+  Int_t   muon4GlobalMuonHits[MAXJETS];
+  Int_t   muon4InnerValidHits[MAXJETS];
+  Int_t   muon4NExpectedOuterHits[MAXJETS];   			       
+  Int_t   muon4NPixelHits[MAXJETS];
+  Float_t muon4InnerNChi2[MAXJETS];
+  Float_t muon4GlobalNChi2[MAXJETS];
+  Float_t muon4VzPVDist[MAXJETS];
+  Float_t muon4PtRel[MAXJETS];   
+  Float_t muon4Sip2d[MAXJETS];   		       
+  Float_t muon4Ip2d[MAXJETS];   		       
+  Float_t muon4Ipe2d[MAXJETS];   		       
+  Float_t muon4Sip3d[MAXJETS];
+  Float_t muon4Ip3d[MAXJETS];
+  Float_t muon4Ipe3d[MAXJETS];   	
+  Float_t muon4P0Par[MAXJETS];   			       
+  Float_t muon4DeltaR[MAXJETS];  			       
+  Float_t muon4EtaRel[MAXJETS];  			       
+  Float_t muon4Ratio[MAXJETS];   			    
+  Int_t   muon4TrackQuality[MAXJETS];   			       
+  Float_t muon4RatioRel[MAXJETS];                          
 
 
 
-  std::map< std::string, float* > bTagArrays;
+  std::vector< Bool_t* > muonIsGlobal;
+  std::vector< Bool_t* >  muonIsTracker;
+  std::vector<Bool_t*>  muonIsStandalone;
+  std::vector<Float_t*> muonPt;   			       
+  std::vector<Float_t*> muonEta;  			       
+  std::vector<Float_t*> muonPhi;  	
+  std::vector<Int_t*>   muonNumberOfMatches;
+  std::vector<Int_t*>   muonGlobalMuonHits;
+  std::vector<Int_t*>   muonInnerValidHits;
+  std::vector<Int_t*>   muonNExpectedOuterHits;   			       
+  std::vector<Int_t*>   muonNPixelHits;
+  std::vector<Float_t*> muonInnerNChi2;
+  std::vector<Float_t*> muonGlobalNChi2;
+  std::vector<Float_t*> muonVzPVDist;
+  std::vector<Float_t*> muonPtRel;   
+  std::vector<Float_t*> muonSip2d;   		       
+  std::vector<Float_t*> muonIp2d;   		       
+  std::vector<Float_t*> muonIpe2d;   		       
+  std::vector<Float_t*> muonSip3d;
+  std::vector<Float_t*> muonIp3d;
+  std::vector<Float_t*> muonIpe3d;   	
+  std::vector<Float_t*> muonP0Par;   			       
+  std::vector<Float_t*> muonDeltaR;  			       
+  std::vector<Float_t*> muonEtaRel;  			       
+  std::vector<Float_t*> muonRatio;   			    
+  std::vector<Int_t*>   muonTrackQuality;   			       
+  std::vector<Float_t*> muonRatioRel; 
 
+  std::map< std::string, Float_t* > bTagArrays;
 
-  //added by Caroline for prescale
-  bool isValidHltConfig_;
-  HLTConfigProvider  hltConfigProvider_;
+  edm::ESHandle<MagneticField> theMF;
+
   //end add
 
 };
@@ -669,21 +645,22 @@ using namespace reco;
 using namespace ROOT::Math::VectorUtil;
 
 namespace{
-  struct JetRefCompare : public binary_function<RefToBase<Jet>, RefToBase<Jet>, bool> {
-    inline bool operator () (const RefToBase<Jet> &j1,
+  struct JetRefCompare : public binary_function<RefToBase<Jet>, RefToBase<Jet>, Bool_t> {
+    inline Bool_t operator () (const RefToBase<Jet> &j1,
 			     const RefToBase<Jet> &j2) const
     { return j1.id() < j2.id() || (j1.id() == j2.id() && j1.key() < j2.key()); }
   };
 }
-
 TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
-  getMCTruth_ (iConfig.getParameter<bool>( "getMCTruth" )),
-  getMCPUInfo_ (iConfig.getParameter<bool>( "getMCPUInfo" )),
-  getSharedHitInfo_(iConfig.getParameter<bool>( "getSharedHitInfo" )),
+  getSharedHitInfo_(iConfig.getParameter<Bool_t>( "getSharedHitInfo" )),
+  HepMCTag_( iConfig.getUntrackedParameter<edm::InputTag>("HepMCTag",edm::InputTag("generator")) ),
+  simTruthTag_( iConfig.getUntrackedParameter<edm::InputTag>("SimTruthTag",edm::InputTag("N/A")) ),//default is Not Appilcable
+  BeamSpotTag_(iConfig.getParameter<edm::InputTag>( "BSTag" )),
   jet_src_(iConfig.getParameter<edm::InputTag>( "jetSrc" )),
   SVComputer_ (iConfig.getParameter<edm::InputTag>( "svComputer")),
   triggerTag_(iConfig.getParameter<edm::InputTag>("TriggerTag")),
   jet_MC_src_(iConfig.getParameter<edm::InputTag>( "jetMCSrc" )),
+  GenJet_Matcher_(iConfig.getParameter<edm::InputTag>( "GenJetMatcher" )),
   jet_tracks_(iConfig.getParameter<edm::InputTag>( "jetTracks" )),
   primaryVertexProducer_  (iConfig.getParameter<InputTag>("primaryVertex")),
   SV_tag_infos_(iConfig.getParameter<edm::InputTag>( "SVTagInfos" )),
@@ -692,89 +669,47 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   muon_tag_infos_(iConfig.getParameter<edm::InputTag>( "MuonTagInfos" )),
   label_(iConfig.getParameter<string>( "Label" )),
   filename_(iConfig.getParameter<string>( "filename" )),
-  bTag_Config_(iConfig.getParameter< vector<edm::ParameterSet> >("bTagConfig"))  //b tagger outputs configured in python file
+  bTag_Config_(iConfig.getParameter< vector<edm::ParameterSet> >("bTagConfig")),  //b tagger outputs configured in python file
+  chi2cut_(iConfig.getParameter<Double_t>("TrackMCTruthMatchChi2Cut")),
+  TriggerNames_(iConfig.getParameter< vector<string> >("TriggerSelection"))
 {
   string alias;
   
   file = new TFile (filename_.c_str(), "RECREATE" );
   // create tree structure
-  tree = new TTree("t","t");
-
-  trigNames_.push_back("HLT_L1Jet6U");
-  trigNames_.push_back("HLT_L1Jet10U");
-  trigNames_.push_back("HLT_Jet15U");
-  trigNames_.push_back("HLT_Jet30U");
-  trigNames_.push_back("HLT_Jet50U");
-  trigNames_.push_back("HLT_Jet70U");
-  trigNames_.push_back("HLT_Jet100U");
-  trigNames_.push_back("HLT_BTagIP_Jet50U");
-  trigNames_.push_back("HLT_BTagMu_Jet10U");
-  trigNames_.push_back("HLT_BTagMu_Jet20U");
-  trigNames_.push_back("HLT_BTagMu_DiJet10U");
-  trigNames_.push_back("HLT_BTagMu_DiJet20U");
-  trigNames_.push_back("HLT_BTagMu_DiJet20U_Mu5");
-  trigNames_.push_back("HLT_BTagMu_DiJet30U");
-  trigNames_.push_back("HLT_BTagMu_DiJet30U_Mu5");
-  trigNames_.push_back("HLT_L1SingleJet36");
-  trigNames_.push_back("HLT_Jet30");
-  trigNames_.push_back("HLT_Jet60");
-  trigNames_.push_back("HLT_Jet80");
-  trigNames_.push_back("HLT_Jet110");
-  trigNames_.push_back("HLT_Jet150");
-  trigNames_.push_back("HLT_Jet190");
-  trigNames_.push_back("HLT_Jet240");
-  trigNames_.push_back("HLT_Jet370");
-  trigNames_.push_back("HLT_Jet370_NoJetID");
-  trigNames_.push_back("HLT_DiJetAve15U");
-  trigNames_.push_back("HLT_DiJetAve30U");
-  trigNames_.push_back("HLT_DiJetAve50U");
-  trigNames_.push_back("HLT_DiJetAve70U");
-  trigNames_.push_back("HLT_DiJetAve100U");
-  trigNames_.push_back("HLT_DiJetAve140U");
-  trigNames_.push_back("HLT_DiJetAve180U");
-  trigNames_.push_back("HLT_DiJetAve300U");
-  trigNames_.push_back("HLT_BTagMu_DiJet20_Mu5");
-  trigNames_.push_back("HLT_BTagMu_DiJet40_Mu5");
-  trigNames_.push_back("HLT_BTagMu_DiJet70_Mu5");
-  trigNames_.push_back("HLT_BTagMu_DiJet110_Mu5");
-  trigNames_.push_back("HLT_BTagMu_DiJet60_Mu7");
-  trigNames_.push_back("HLT_BTagMu_DiJet80_Mu9");
-  trigNames_.push_back("HLT_BTagMu_DiJet100_Mu9");
-
-  triggers_.resize(trigNames_.size(), false);
-  prescales_.resize(trigNames_.size(), 0);
-    
+  EventInfo = new TTree("t","t");
+  RunInfo = new TTree("RunInfo","RunInfo");
   
   for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
     {
-      bTagArrays[ibTag->getParameter<string>("alias")] = new float[MAXJETS];
+      bTagArrays[ibTag->getParameter<string>("alias")] = new Float_t[MAXJETS];
     }
   
-  for(int i=0; i<4; i++){
-    IP3dTrackQuality.push_back( new int[MAXJETS]);    
-    IP3dHasSharedPix1.push_back(  new int[MAXJETS]);
-    IP3dHasSharedPix2.push_back( new int[MAXJETS]);
-    IP3dHasSharedPix3.push_back( new int[MAXJETS]);
-    IP3dHasSharedPixAll.push_back( new int[MAXJETS]);
-    IP3d.push_back( new float[MAXJETS]);
-    IP3dError.push_back( new float[MAXJETS]);
-    IP3dProbability.push_back( new float[MAXJETS]);
-    IP3dTrackPtRel.push_back( new float[MAXJETS]);
-    IP3dDistJetAxis.push_back( new float[MAXJETS]);
-    IP3dDecayLength.push_back(new float[MAXJETS] );
-    IP3dDeltaR.push_back( new float[MAXJETS]);
-    IP3dMomentum.push_back( new float[MAXJETS]);
-    IP3dTransverseMomentum.push_back( new float[MAXJETS]);
-    IP3dEta.push_back( new float[MAXJETS]);
-    IP3dPhi.push_back( new float[MAXJETS]);
-    IP3dNHits.push_back( new int[MAXJETS]);
-    IP3dNPixelHits.push_back( new int[MAXJETS]);
-    IP3dNormChi2.push_back( new float[MAXJETS]);
-    IP2dTrackQuality.push_back( new int[MAXJETS]);    
-    IP2d.push_back( new float[MAXJETS]);
-    IP2dError.push_back( new float[MAXJETS]);
-    IP2dProbability.push_back( new float[MAXJETS]);
-    IP2dTrackPtRel.push_back( new float[MAXJETS]);
+  for(Int_t i=0; i<4; i++){
+    IP3dTrackQuality.push_back( new Int_t[MAXJETS]);    
+    IP3dHasSharedPix1.push_back(  new Int_t[MAXJETS]);
+    IP3dHasSharedPix2.push_back( new Int_t[MAXJETS]);
+    IP3dHasSharedPix3.push_back( new Int_t[MAXJETS]);
+    IP3dHasSharedPixAll.push_back( new Int_t[MAXJETS]);
+    IP3d.push_back( new Float_t[MAXJETS]);
+    IP3dError.push_back( new Float_t[MAXJETS]);
+    IP3dProbability.push_back( new Float_t[MAXJETS]);
+    IP3dTrackPtRel.push_back( new Float_t[MAXJETS]);
+    IP3dDistJetAxis.push_back( new Float_t[MAXJETS]);
+    IP3dDecayLength.push_back(new Float_t[MAXJETS] );
+    IP3dDeltaR.push_back( new Float_t[MAXJETS]);
+    IP3dMomentum.push_back( new Float_t[MAXJETS]);
+    IP3dTransverseMomentum.push_back( new Float_t[MAXJETS]);
+    IP3dEta.push_back( new Float_t[MAXJETS]);
+    IP3dPhi.push_back( new Float_t[MAXJETS]);
+    IP3dNHits.push_back( new Int_t[MAXJETS]);
+    IP3dNPixelHits.push_back( new Int_t[MAXJETS]);
+    IP3dNormChi2.push_back( new Float_t[MAXJETS]);
+    IP2dTrackQuality.push_back( new Int_t[MAXJETS]);    
+    IP2d.push_back( new Float_t[MAXJETS]);
+    IP2dError.push_back( new Float_t[MAXJETS]);
+    IP2dProbability.push_back( new Float_t[MAXJETS]);
+    IP2dTrackPtRel.push_back( new Float_t[MAXJETS]);
   }
   
   muonIsGlobal            .push_back(muon1IsGlobal           ); muonIsGlobal            .push_back(muon2IsGlobal);
@@ -921,537 +856,457 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   electrondeltaPhiSeedClusterTrackAtCalo.push_back(electron4deltaPhiSeedClusterTrackAtCalo);
   electrondeltaPhiEleClusterTrackAtCalo. push_back(electron4deltaPhiEleClusterTrackAtCalo);
 
-  /*tree->Branch(  "triggerHLTL1Jet6U", &triggerHLTL1Jet6U, "triggerHLTL1Jet6U/O"); 
-  tree->Branch(  "triggerHLTL1Jet10U", &triggerHLTL1Jet10U, "triggerHLTL1Jet10U/O"); 
-  tree->Branch(  "triggerHLTJet15U",  &triggerHLTJet15U, "triggerHLTJet15U/O");
-  tree->Branch(  "triggerHLTJet30U",  &triggerHLTJet30U, "triggerHLTJet30U/O");
-  tree->Branch(  "triggerHLTJet50U",  &triggerHLTJet50U, "triggerHLTJet50U/O");
-  tree->Branch(  "triggerHLTJet70U",  &triggerHLTJet70U, "triggerHLTJet70U/O");
-  tree->Branch(  "triggerHLTJet100U",  &triggerHLTJet100U, "triggerHLTJet100U/O");
-  tree->Branch(  "triggerHLTBTagIPJet50U", &triggerHLTBTagIPJet50U, "triggerHLTBTagIPJet50U/O");
-  tree->Branch(  "triggerHLTBTagMuJet10U", &triggerHLTBTagMuJet10U, "triggerHLTBTagMuJet10U/O");
-  tree->Branch(  "triggerHLTBTagMuJet20U", &triggerHLTBTagMuJet20U, "triggerHLTBTagMuJet20U/O");
-  tree->Branch(  "triggerHLTBTagMuDiJet10U", &triggerHLTBTagMuDiJet10U, "triggerHLTBTagMuDiJet10U/O");
-  tree->Branch(  "triggerHLTBTagMuDiJet20U", &triggerHLTBTagMuDiJet20U, "triggerHLTBTagMuDiJet20U/O");
-  tree->Branch(  "triggerHLTBTagMuDiJet20UMu5", &triggerHLTBTagMuDiJet20UMu5, "triggerHLTBTagMuDiJet20UMu5/O");
-  tree->Branch(  "triggerHLTBTagMuDiJet30U", &triggerHLTBTagMuDiJet30U, "triggerHLTBTagMuDiJet30U/O");
-  tree->Branch(  "triggerHLTBTagMuDiJet30UMu5", &triggerHLTBTagMuDiJet30UMu5, "triggerHLTBTagMuDiJet30UMu5/O");
+  EventInfo->Branch(  "eventNumber"             , &eventNumber             , "eventNumber/i"            );
+  EventInfo->Branch(  "runNumber"		    , &runNumber               , "runNumber/i"   	    );
+  EventInfo->Branch(  "lumiBlockNumber" 	    , &lumiBlockNumber         , "lumiBlockNumber/i" 	    );
+  HLTPrescaleFactors = new vector<UInt_t>();
+  EventInfo->Branch(  "HLTPrescaleFactors",  &HLTPrescaleFactors);
+  HLTriggerResults = new vector<Bool_t>();
+  EventInfo->Branch(  "HLTriggerResults",  &HLTriggerResults);
 
-  tree->Branch(  "prescaleHLTL1Jet6U", &prescaleHLTL1Jet6U, "prescaleHLTL1Jet6U/I"); 
-  tree->Branch(  "prescaleHLTL1Jet10U", &prescaleHLTL1Jet10U, "prescaleHLTL1Jet10U/I"); 
-  tree->Branch(  "prescaleHLTJet15U",  &prescaleHLTJet15U, "prescaleHLTJet15U/I");
-  tree->Branch(  "prescaleHLTJet30U",  &prescaleHLTJet30U, "prescaleHLTJet30U/I");
-  tree->Branch(  "prescaleHLTJet50U",  &prescaleHLTJet50U, "prescaleHLTJet50U/I");
-  tree->Branch(  "prescaleHLTJet70U",  &prescaleHLTJet70U, "prescaleHLTJet70U/I");
-  tree->Branch(  "prescaleHLTJet100U",  &prescaleHLTJet100U, "prescaleHLTJet100U/I");
-  tree->Branch(  "prescaleHLTBTagIPJet50U", &prescaleHLTBTagIPJet50U, "prescaleHLTBTagIPJet50U/I");
-  tree->Branch(  "prescaleHLTBTagMuJet10U", &prescaleHLTBTagMuJet10U, "prescaleHLTBTagMuJet10U/I");
-  tree->Branch(  "prescaleHLTBTagMuJet20U", &prescaleHLTBTagMuJet20U, "prescaleHLTBTagMuJet20U/I");
-  tree->Branch(  "prescaleHLTBTagMuDiJet10U", &prescaleHLTBTagMuDiJet10U, "prescaleHLTBTagMuDiJet10U/I");
-  tree->Branch(  "prescaleHLTBTagMuDiJet20U", &prescaleHLTBTagMuDiJet20U, "prescaleHLTBTagMuDiJet20U/I");
-  tree->Branch(  "prescaleHLTBTagMuDiJet20UMu5", &prescaleHLTBTagMuDiJet20UMu5, "prescaleHLTBTagMuDiJet20UMu5/I");
-  tree->Branch(  "prescaleHLTBTagMuDiJet30U", &prescaleHLTBTagMuDiJet30U, "prescaleHLTBTagMuDiJet30U/I");
-  tree->Branch(  "prescaleHLTBTagMuDiJet30UMu5", &prescaleHLTBTagMuDiJet30UMu5, "prescaleHLTBTagMuDiJet30UMu5/I");
+  EventInfo->Branch(  "numberOfPUVertices",       &numberOfPUVertices, "numberOfPUVertices/i");
+  EventInfo->Branch(  "numberOfPUVerticesTot",       &numberOfPUVerticesTot, "numberOfPUVerticesTot/i");
+  EventInfo->Branch(  "numberOfPrimaryVertices" , &numberOfPrimaryVertices , "numberOfPrimaryVertices/i"); 
+  EventInfo->Branch(  "numberOfTracksAtPV" , &numberOfTracksAtPV , "numberOfTracksAtPV/i"); 
+  EventInfo->Branch(  "PVx" , &PVx , "PVx/F"); 
+  EventInfo->Branch(  "PVy" , &PVy , "PVy/F"); 
+  EventInfo->Branch(  "PVz" , &PVz , "PVz/F"); 
+  EventInfo->Branch(  "PVChi2" , &PVChi2 , "PVChi2/F"); 
+  EventInfo->Branch(  "PVndof" , &PVndof , "PVndof/F"); 
+  EventInfo->Branch(  "PVNormalizedChi2" , &PVNormalizedChi2 , "PVNormalizedChi2/F"); 
 
-
-// added (4_1_2_patch1)
-  tree->Branch(  "triggerHLT_L1SingleJet36", &triggerHLT_L1SingleJet36, "triggerHLT_L1SingleJet36/O");
-  tree->Branch(  "triggerHLT_Jet30", &triggerHLT_Jet30, "triggerHLT_Jet30/O");
-  tree->Branch(  "triggerHLT_Jet60", &triggerHLT_Jet60, "triggerHLT_Jet50/O");
-  tree->Branch(  "triggerHLT_Jet80", &triggerHLT_Jet80, "triggerHLT_Jet80/O");
-  tree->Branch(  "triggerHLT_Jet110", &triggerHLT_Jet110, "triggerHLT_Jet110/O");
-  tree->Branch(  "triggerHLT_Jet150", &triggerHLT_Jet150, "triggerHLT_Jet150/O");
-  tree->Branch(  "triggerHLT_Jet190", &triggerHLT_Jet190, "triggerHLT_Jet190/O");
-  tree->Branch(  "triggerHLT_Jet240", &triggerHLT_Jet240, "triggerHLT_Jet240/O");
-  tree->Branch(  "triggerHLT_Jet370", &triggerHLT_Jet370, "triggerHLT_Jet370/O");
-  tree->Branch(  "triggerHLT_Jet370_NoJetID", &triggerHLT_Jet370_NoJetID, "triggerHLT_Je370_NoJetID/O");
-
-  tree->Branch(  "prescaleHLT_L1SingleJet36", &prescaleHLT_L1SingleJet36, "prescaleHLT_L1SingleJet36/I");
-  tree->Branch(  "prescaleHLT_Jet30", &prescaleHLT_Jet30, "prescaleHLT_Jet30/I");
-  tree->Branch(  "prescaleHLT_Jet60", &prescaleHLT_Jet60, "prescaleHLT_Jet50/I");
-  tree->Branch(  "prescaleHLT_Jet80", &prescaleHLT_Jet80, "prescaleHLT_Jet80/I");
-  tree->Branch(  "prescaleHLT_Jet110", &prescaleHLT_Jet110, "prescaleHLT_Jet110/I");
-  tree->Branch(  "prescaleHLT_Jet150", &prescaleHLT_Jet150, "prescaleHLT_Jet150/I");
-  tree->Branch(  "prescaleHLT_Jet190", &prescaleHLT_Jet190, "prescaleHLT_Jet190/I");
-  tree->Branch(  "prescaleHLT_Jet240", &prescaleHLT_Jet240, "prescaleHLT_Jet240/I");
-  tree->Branch(  "prescaleHLT_Jet370", &prescaleHLT_Jet370, "prescaleHLT_Jet370/I");
-  tree->Branch(  "prescaleHLT_Jet370_NoJetID", &prescaleHLT_Jet370_NoJetID, "prescaleHLT_Je370_NoJetID/I");
-
- 
-  tree->Branch( "triggerHLT_DiJetAve15U_v4",                  &triggerHLT_DiJetAve15U_v4                , "triggerHLT_DiJetAve15U_v4/O");             ;
-  tree->Branch( "triggerHLT_DiJetAve30U_v4",                  &triggerHLT_DiJetAve30U_v4                , "triggerHLT_DiJetAve30U_v4/O");            
-  tree->Branch( "triggerHLT_DiJetAve50U_v4",                  &triggerHLT_DiJetAve50U_v4                , "triggerHLT_DiJetAve50U_v4/O");            
-  tree->Branch( "triggerHLT_DiJetAve70U_v4",                  &triggerHLT_DiJetAve70U_v4                , "triggerHLT_DiJetAve70U_v4/O");            
-  tree->Branch( "triggerHLT_DiJetAve100U_v4",                 &triggerHLT_DiJetAve100U_v4               , "triggerHLT_DiJetAve100U_v4/O");           
-  tree->Branch( "triggerHLT_DiJetAve140U_v4",                 &triggerHLT_DiJetAve140U_v4               , "triggerHLT_DiJetAve140U_v4/O");           
-  tree->Branch( "triggerHLT_DiJetAve180U_v4",                 &triggerHLT_DiJetAve180U_v4               , "triggerHLT_DiJetAve180U_v4/O");           
-  tree->Branch( "triggerHLT_DiJetAve300U_v4",                 &triggerHLT_DiJetAve300U_v4               , "triggerHLT_DiJetAve300U_v4/O");           
-  tree->Branch( "triggerHLT_BTagMu_DiJet20_Mu5",              &triggerHLT_BTagMu_DiJet20_Mu5            , "triggerHLT_BTagMu_DiJet20_Mu5/O");     
-  tree->Branch( "triggerHLT_BTagMu_DiJet110_Mu5",             &triggerHLT_BTagMu_DiJet110_Mu5           , "triggerHLT_BTagMu_DiJet110_Mu5/O");     
-  tree->Branch( "triggerHLT_BTagMu_DiJet40_Mu5",              &triggerHLT_BTagMu_DiJet40_Mu5            , "triggerHLT_BTagMu_DiJet40_Mu5/O");     
-  tree->Branch( "triggerHLT_BTagMu_DiJet70_Mu5",              &triggerHLT_BTagMu_DiJet70_Mu5            , "triggerHLT_BTagMu_DiJet70_Mu5/O");     
-  tree->Branch( "triggerHLT_BTagMu_DiJet60_Mu7_v2",           &triggerHLT_BTagMu_DiJet60_Mu7_v2         , "triggerHLT_BTagMu_DiJet60_Mu7_v2/O");     
-  tree->Branch( "triggerHLT_BTagMu_DiJet80_Mu9_v2",           &triggerHLT_BTagMu_DiJet80_Mu9_v2         , "triggerHLT_BTagMu_DiJet80_Mu9_v2/O");     
-  tree->Branch( "triggerHLT_BTagMu_DiJet100_Mu9_v2",          &triggerHLT_BTagMu_DiJet100_Mu9_v2        , "triggerHLT_BTagMu_DiJet100_Mu9_v2/O");    
-  tree->Branch( "prescaleHLT_DiJetAve15U_v4",          &prescaleHLT_DiJetAve15U_v4        , "prescaleHLT_DiJetAve15U_v4/I");          
-  tree->Branch( "prescaleHLT_DiJetAve30U_v4",          &prescaleHLT_DiJetAve30U_v4        , "prescaleHLT_DiJetAve30U_v4/I");          
-  tree->Branch( "prescaleHLT_DiJetAve50U_v4",          &prescaleHLT_DiJetAve50U_v4        , "prescaleHLT_DiJetAve50U_v4/I");          
-  tree->Branch( "prescaleHLT_DiJetAve70U_v4",          &prescaleHLT_DiJetAve70U_v4        , "prescaleHLT_DiJetAve70U_v4/I");          
-  tree->Branch( "prescaleHLT_DiJetAve100U_v4",         &prescaleHLT_DiJetAve100U_v4       , "prescaleHLT_DiJetAve100U_v4/I");         
-  tree->Branch( "prescaleHLT_DiJetAve140U_v4",         &prescaleHLT_DiJetAve140U_v4       , "prescaleHLT_DiJetAve140U_v4/I");         
-  tree->Branch( "prescaleHLT_DiJetAve180U_v4",         &prescaleHLT_DiJetAve180U_v4       , "prescaleHLT_DiJetAve180U_v4/I");         
-  tree->Branch( "prescaleHLT_DiJetAve300U_v4",         &prescaleHLT_DiJetAve300U_v4       , "prescaleHLT_DiJetAve300U_v4/I");         
-  tree->Branch( "prescaleHLT_BTagMu_DiJet20_Mu5",      &prescaleHLT_BTagMu_DiJet20_Mu5    , "prescaleHLT_BTagMu_DiJet20_Mu5/I");   
-  tree->Branch( "prescaleHLT_BTagMu_DiJet40_Mu5",      &prescaleHLT_BTagMu_DiJet40_Mu5    , "prescaleHLT_BTagMu_DiJet40_Mu5/I");   
-  tree->Branch( "prescaleHLT_BTagMu_DiJet70_Mu5",      &prescaleHLT_BTagMu_DiJet70_Mu5    , "prescaleHLT_BTagMu_DiJet70_Mu5/I");   
-  tree->Branch( "prescaleHLT_BTagMu_DiJet110_Mu5",     &prescaleHLT_BTagMu_DiJet110_Mu5   , "prescaleHLT_BTagMu_DiJet110_Mu5/I");   
-  tree->Branch( "prescaleHLT_BTagMu_DiJet60_Mu7_v2",   &prescaleHLT_BTagMu_DiJet60_Mu7_v2 , "prescaleHLT_BTagMu_DiJet60_Mu7_v2/I");   
-  tree->Branch( "prescaleHLT_BTagMu_DiJet80_Mu9_v2",   &prescaleHLT_BTagMu_DiJet80_Mu9_v2 , "prescaleHLT_BTagMu_DiJet80_Mu9_v2/I");   
-  tree->Branch( "prescaleHLT_BTagMu_DiJet100_Mu9_v2",  &prescaleHLT_BTagMu_DiJet100_Mu9_v2, "prescaleHLT_BTagMu_DiJet100_Mu9_v2/I"); */
-  for(unsigned int i = 0; i != trigNames_.size(); ++i)
-  {
-    tree->Branch(("trigger" + trigNames_[i]).c_str(), &triggers_[i], ("trigger" + trigNames_[i] + "/O").c_str());
-    tree->Branch(("prescale" + trigNames_[i]).c_str(), &prescales_[i], ("prescales" + trigNames_[i] + "/I").c_str());
-  }
-
-
-
-  tree->Branch(  "eventNumber"             , &eventNumber             , "eventNumber/i"            );
-  tree->Branch(  "runNumber"		    , &runNumber               , "runNumber/i"   	    );
-  tree->Branch(  "lumiBlockNumber" 	    , &lumiBlockNumber         , "lumiBlockNumber/i" 	    );
-
-  tree->Branch(  "numberOfPUVertices",       &numberOfPUVertices, "numberOfPUVertices/i");
-  tree->Branch(  "numberOfPUVerticesTot",       &numberOfPUVerticesTot, "numberOfPUVerticesTot/i");
-  tree->Branch(  "numberOfPrimaryVertices" , &numberOfPrimaryVertices , "numberOfPrimaryVertices/i"); 
-  tree->Branch(  "numberOfTracksAtPV" , &numberOfTracksAtPV , "numberOfTracksAtPV/i"); 
-  tree->Branch(  "PVx" , &PVx , "PVx/F"); 
-  tree->Branch(  "PVy" , &PVy , "PVy/F"); 
-  tree->Branch(  "PVz" , &PVz , "PVz/F"); 
-  tree->Branch(  "PVChi2" , &PVChi2 , "PVChi2/F"); 
-  tree->Branch(  "PVndof" , &PVndof , "PVndof/F"); 
-  tree->Branch(  "PVNormalizedChi2" , &PVNormalizedChi2 , "PVNormalizedChi2/F"); 
-
-  tree->Branch(  "pthat" , &pthat, "pthat/F");
-  tree->Branch(  "mcweight" , &mcweight, "mcweight/F");
-  tree->Branch(  "isBGluonSplitting" , &isBGluonSplitting, "isBGluonSplitting/O");
-  tree->Branch(  "isCGluonSplitting" , &isCGluonSplitting, "isCGluonSplitting/O");
+  EventInfo->Branch(  "pthat" , &pthat, "pthat/F");
+  EventInfo->Branch(  "mcweight" , &mcweight, "mcweight/F");
+  EventInfo->Branch(  "isBGluonSplitting" , &isBGluonSplitting, "isBGluonSplitting/O");
+  EventInfo->Branch(  "isCGluonSplitting" , &isCGluonSplitting, "isCGluonSplitting/O");
 
 
   //Basic Jet Information
-  //  math::XYZTLorentzVector jetP4[nJets];    
-  tree->Branch(  "nJets", &nJets, "nJets/I");
+  EventInfo->Branch(  "nJets", &nJets, "nJets/I");
            
-  tree->Branch(  "jetPt", jetPt , "jetPt[nJets]/F");                                 
-  tree->Branch(  "jetEta", jetEta, "jetEta[nJets]/F");                                
-  tree->Branch(  "jetPhi", jetPhi, "jetPhi[nJets]/F");                                
-  tree->Branch(  "jetEMFraction", jetEMFraction, "jetEMFraction[nJets]/F");        
-  tree->Branch(  "jetChargedEmEnergyFraction", jetChargedEmEnergyFraction, "jetChargedEmEnergyFraction[nJets]/F");
-  tree->Branch(  "jetNeutralEmEnergyFraction",  jetNeutralEmEnergyFraction, "jetNeutralEmEnergyFraction[nJets]/F");
-  tree->Branch(  "jetChargedHadronEnergyFraction", jetChargedHadronEnergyFraction, "jetChargedHadronEnergyFraction[nJets]/F");
-  tree->Branch(  "jetNeutralHadronEnergyFraction", jetNeutralHadronEnergyFraction, "jetNeutralHadronEnergyFraction[nJets]/F");
-  tree->Branch(  "jetChargedMultiplicity", jetChargedMultiplicity , "jetChargedMultiplicity[nJets]/F");
-  tree->Branch(  "jetMass", jetMass , "jetMass[nJets]/F");                               
-  tree->Branch(  "jetnConstituents", jetnConstituents ,"jetnConstituents[nJets]/I");  
-  tree->Branch(  "jetnTracks", jetnTracks, "jetnTracks[nJets]/I");                           
-  //   tree->Branch(  "jetnElectrons", jetnElectrons   [nJets];                              
-  //   tree->Branch(  "jetnMuons", jetnMuons   [nJets];                                  
+  EventInfo->Branch(  "jetPt", jetPt , "jetPt[nJets]/F");                                 
+  EventInfo->Branch(  "jetEta", jetEta, "jetEta[nJets]/F");                                
+  EventInfo->Branch(  "jetPhi", jetPhi, "jetPhi[nJets]/F");                                
+  EventInfo->Branch(  "jetEMFraction", jetEMFraction, "jetEMFraction[nJets]/F");        
+  EventInfo->Branch(  "jetChargedEmEnergyFraction", jetChargedEmEnergyFraction, "jetChargedEmEnergyFraction[nJets]/F");
+  EventInfo->Branch(  "jetNeutralEmEnergyFraction",  jetNeutralEmEnergyFraction, "jetNeutralEmEnergyFraction[nJets]/F");
+  EventInfo->Branch(  "jetChargedHadronEnergyFraction", jetChargedHadronEnergyFraction, "jetChargedHadronEnergyFraction[nJets]/F");
+  EventInfo->Branch(  "jetNeutralHadronEnergyFraction", jetNeutralHadronEnergyFraction, "jetNeutralHadronEnergyFraction[nJets]/F");
+  EventInfo->Branch(  "jetChargedMultiplicity", jetChargedMultiplicity , "jetChargedMultiplicity[nJets]/F");
+  EventInfo->Branch(  "jetMass", jetMass , "jetMass[nJets]/F");                               
+  EventInfo->Branch(  "jetnConstituents", jetnConstituents ,"jetnConstituents[nJets]/I");  
+  EventInfo->Branch(  "jetnTracks", jetnTracks, "jetnTracks[nJets]/I");                           
+  //   EventInfo->Branch(  "jetnElectrons", jetnElectrons   [nJets];                              
+  //   EventInfo->Branch(  "jetnMuons", jetnMuons   [nJets];                                  
   //   math::XYZVector "jetVertex", jetVertex , "jetVertex[nJets]/F");                   
-  tree->Branch(  "jetVertexChi2", jetVertexChi2 , "jetVertexChi2[nJets]/F");               
-  tree->Branch(  "jetVertexChi2Ndof", jetVertexChi2Ndof , "jetVertexChi2Ndof[nJets]/F");           
-  tree->Branch(  "jetVertexNormalizedChi2", jetVertexNormalizedChi2 , "jetVertexNormalizedChi2[nJets]/F");    
+  EventInfo->Branch(  "jetVertexChi2", jetVertexChi2 , "jetVertexChi2[nJets]/F");               
+  EventInfo->Branch(  "jetVertexChi2Ndof", jetVertexChi2Ndof , "jetVertexChi2Ndof[nJets]/F");           
+  EventInfo->Branch(  "jetVertexNormalizedChi2", jetVertexNormalizedChi2 , "jetVertexNormalizedChi2[nJets]/F");    
 
   //Track Information
-  tree->Branch(  "nTracks", &nTracks, "nTracks/I");
+  EventInfo->Branch(  "nTracks", &nTracks, "nTracks/I");
 
-  tree->Branch(  "trackJetIndex", trackJetIndex, "trackJetIndex[nTracks]/I");
-  tree->Branch( "trackSelected", trackSelected, "trackSelected[nTracks]/O") ;
+  EventInfo->Branch(  "trackJetIndex", trackJetIndex, "trackJetIndex[nTracks]/I");
+  EventInfo->Branch( "trackSelected", trackSelected, "trackSelected[nTracks]/O") ;
   //				 math::XYZVector "track3Momentum", track3Momentum,   [nTracks];
-  tree->Branch(  "trackTransverseMomentum", trackTransverseMomentum,  "trackTransverseMomentum[nTracks]/F");
-  tree->Branch(  "trackEta", trackEta, "trackEta[nTracks]/F");
-  tree->Branch(  "trackPhi", trackPhi, "trackPhi[nTracks]/F");
-  tree->Branch(  "trackMomentum",  trackMomentum, "trackMomentum[nTracks]/F");
-  tree->Branch(  "trackNHits", trackNHits, "trackNHits[nTracks]/I");
-  tree->Branch(  "trackNPixelHits",  trackNPixelHits, "trackNPixelHits[nTracks]/I");
-  tree->Branch(  "trackChi2",  trackChi2, "trackChi2[nTracks]/F");
-  tree->Branch(  "trackNormChi2", trackNormChi2, "trackNormChi2[nTracks]/F");
-  tree->Branch(  "trackQuality",  trackQuality, "trackQuality[nTracks]/I");
-  tree->Branch(  "trackLongitudinalImpactParameter",  trackLongitudinalImpactParameter, "trackLongitudinalImpactParameter[nTracks]/F");
-  tree->Branch(  "trackIP", trackIP, "trackIP[nTracks]/F");
-  tree->Branch(  "trackDecayLength", trackDecayLength, "trackDecayLength[nTracks]/F");
-  tree->Branch(  "trackDistJetAxis",  trackDistJetAxis, "trackDistJetAxis[nTracks]/F");
-  tree->Branch(  "trackDeltaR", trackDeltaR, "trackDeltaR[nTracks]/F");
-  tree->Branch(  "trackIP3d", trackIP3d, "trackIP3d[nTracks]/F");
-  tree->Branch(  "trackIP2d",  trackIP2d, "trackIP2d[nTracks]/F");
-  tree->Branch(  "trackIP3dError",  trackIP3dError, "trackIP3dError[nTracks]/F");
-  tree->Branch(  "trackIP2dError",  trackIP2dError, "trackIP2dError[nTracks]/F");
-  tree->Branch(  "trackHasSharedPix1",  trackHasSharedPix1, "trackHasSharedPix1[nTracks]/I");
-  tree->Branch(  "trackHasSharedPix2",  trackHasSharedPix2, "trackHasSharedPix2[nTracks]/I");
-  tree->Branch(  "trackHasSharedPix3",  trackHasSharedPix3, "trackHasSharedPix3[nTracks]/I");
-  tree->Branch(  "trackHasSharedPixAll",  trackHasSharedPixAll, "trackHasSharedPixAll[nTracks]/I");
-  tree->Branch( "trackIsVertexTrack", trackIsVertexTrack, "trackIsVertexTrack[nTracks]/O") ;
+  EventInfo->Branch(  "trackTransverseMomentum", trackTransverseMomentum,  "trackTransverseMomentum[nTracks]/F");
+  EventInfo->Branch(  "trackEta", trackEta, "trackEta[nTracks]/F");
+  EventInfo->Branch(  "trackPhi", trackPhi, "trackPhi[nTracks]/F");
+  EventInfo->Branch(  "trackMomentum",  trackMomentum, "trackMomentum[nTracks]/F");
+  EventInfo->Branch(  "trackNHits", trackNHits, "trackNHits[nTracks]/I");
+  EventInfo->Branch(  "trackNPixelHits",  trackNPixelHits, "trackNPixelHits[nTracks]/I");
+  EventInfo->Branch(  "trackChi2",  trackChi2, "trackChi2[nTracks]/F");
+  EventInfo->Branch(  "trackNormChi2", trackNormChi2, "trackNormChi2[nTracks]/F");
+  EventInfo->Branch(  "trackQuality",  trackQuality, "trackQuality[nTracks]/I");
+  EventInfo->Branch(  "trackLongitudinalImpactParameter",  trackLongitudinalImpactParameter, "trackLongitudinalImpactParameter[nTracks]/F");
+  EventInfo->Branch(  "trackIP", trackIP, "trackIP[nTracks]/F");
+  EventInfo->Branch(  "trackDecayLength", trackDecayLength, "trackDecayLength[nTracks]/F");
+  EventInfo->Branch(  "trackDistJetAxis",  trackDistJetAxis, "trackDistJetAxis[nTracks]/F");
+  EventInfo->Branch(  "trackDeltaR", trackDeltaR, "trackDeltaR[nTracks]/F");
+  EventInfo->Branch(  "trackIP3d", trackIP3d, "trackIP3d[nTracks]/F");
+  EventInfo->Branch(  "trackIP2d",  trackIP2d, "trackIP2d[nTracks]/F");
+  EventInfo->Branch(  "trackIP3dError",  trackIP3dError, "trackIP3dError[nTracks]/F");
+  EventInfo->Branch(  "trackIP2dError",  trackIP2dError, "trackIP2dError[nTracks]/F");
+  EventInfo->Branch(  "trackHasSharedPix1",  trackHasSharedPix1, "trackHasSharedPix1[nTracks]/I");
+  EventInfo->Branch(  "trackHasSharedPix2",  trackHasSharedPix2, "trackHasSharedPix2[nTracks]/I");
+  EventInfo->Branch(  "trackHasSharedPix3",  trackHasSharedPix3, "trackHasSharedPix3[nTracks]/I");
+  EventInfo->Branch(  "trackHasSharedPixAll",  trackHasSharedPixAll, "trackHasSharedPixAll[nTracks]/I");
+  EventInfo->Branch( "trackIsVertexTrack", trackIsVertexTrack, "trackIsVertexTrack[nTracks]/O") ;
 
   //MC Truth Information
-  tree->Branch(  "MCTrueFlavor", MCTrueFlavor, "MCTrueFlavor[nJets]/I");                          
+  EventInfo->Branch(  "MCTrueFlavor", PartonFlavor, "MCTrueFlavor[nJets]/I"); 
+  EventInfo->Branch(  "PartonPt",PartonPt, "PartonPt[nJets]/F"); 
+  EventInfo->Branch(  "PartonEta", PartonEta, "PartonEta[nJets]/F"); 
+  EventInfo->Branch(  "PartonPhi", PartonPhi, "PartonPhi[nJets]/F");                          
+  EventInfo->Branch(  "GenJetPt",GenJetPt, "GenJetPt[nJets]/F"); 
+  EventInfo->Branch(  "GenJetEta", GenJetEta, "GenJetEta[nJets]/F"); 
+  EventInfo->Branch(  "GenJetPhi", GenJetPhi, "GenJetPhi[nJets]/F");                          
  				       
   //secondaryVertexTagInfos:			       
   //  math::XYZVector "SecondaryVertex",    [nJets];             
-  tree->Branch(  "SV3dDistance", SV3dDistance, "SV3dDistance[nJets]/F");                          
-  tree->Branch(  "SV3dDistanceError",  SV3dDistanceError, "SV3dDistanceError[nJets]/F");                     
-  tree->Branch(  "SV2dDistance", SV2dDistance, "SV2dDistance[nJets]/F");                          
-  tree->Branch(  "SV2dDistanceError",  SV2dDistanceError, "SV2dDistanceError[nJets]/F");                     
-  tree->Branch(  "SVChi2",  SVChi2, "SVChi2[nJets]/F");                
-  tree->Branch(  "SVIPFirstAboveCharm",  SVIPFirstAboveCharm, "SVIPFirstAboveCharm[nJets]/F");                                
-  tree->Branch(  "SVDegreesOfFreedom",  SVDegreesOfFreedom, "SVDegreesOfFreedom[nJets]/F");                    
-  tree->Branch(  "SVNormChi2", SVNormChi2, "SVNormChi2[nJets]/F");                            
-  tree->Branch(  "SVnSelectedTracks",  SVnSelectedTracks, "SVnSelectedTracks[nJets]/I");                               
-  tree->Branch(  "SVMass",  SVMass, "SVMass[nJets]/F");                                
-  tree->Branch(  "SVEnergyRatio",  SVEnergyRatio, "SVEnergyRatio[nJets]/F");                                
-  tree->Branch(  "SVnVertices",  SVnVertices, "SVnVertices[nJets]/I");                             
-  tree->Branch(  "SVnVertexTracks", SVnVertexTracks, "SVnVertexTracks[nJets]/I");         
-  tree->Branch(  "SVnVertexTracksAll",  SVnVertexTracksAll, "SVnVertexTracksAll[nJets]/I");         
-  tree->Branch(  "SVnFirstVertexTracks", SVnFirstVertexTracks, "SVnFirstVertexTracks[nJets]/I");         
-  tree->Branch(  "SVnFirstVertexTracksAll",  SVnFirstVertexTracksAll, "SVnFirstVertexTracksAll[nJets]/I");         
-  tree->Branch(  "SVjetDeltaR",  SVjetDeltaR, "SVjetDeltaR[nJets]/F");
-  tree->Branch(  "SVvtxSumVtxDirDeltaR", SVvtxSumVtxDirDeltaR, "SVvtxSumVtxDirDeltaR[nJets]/F");
-  tree->Branch(  "SVvtxSumJetDeltaR",  SVvtxSumJetDeltaR, "SVvtxSumJetDeltaR[nJets]/F");
+  EventInfo->Branch(  "SV3dDistance", SV3dDistance, "SV3dDistance[nJets]/F");                          
+  EventInfo->Branch(  "SV3dDistanceError",  SV3dDistanceError, "SV3dDistanceError[nJets]/F");                     
+  EventInfo->Branch(  "SV2dDistance", SV2dDistance, "SV2dDistance[nJets]/F");                          
+  EventInfo->Branch(  "SV2dDistanceError",  SV2dDistanceError, "SV2dDistanceError[nJets]/F");                     
+  EventInfo->Branch(  "SVChi2",  SVChi2, "SVChi2[nJets]/F");                
+  EventInfo->Branch(  "SVIPFirstAboveCharm",  SVIPFirstAboveCharm, "SVIPFirstAboveCharm[nJets]/F");                                
+  EventInfo->Branch(  "SVDegreesOfFreedom",  SVDegreesOfFreedom, "SVDegreesOfFreedom[nJets]/F");                    
+  EventInfo->Branch(  "SVNormChi2", SVNormChi2, "SVNormChi2[nJets]/F");                            
+  EventInfo->Branch(  "SVnSelectedTracks",  SVnSelectedTracks, "SVnSelectedTracks[nJets]/I");                               
+  EventInfo->Branch(  "SVMass",  SVMass, "SVMass[nJets]/F");                                
+  EventInfo->Branch(  "SVEnergyRatio",  SVEnergyRatio, "SVEnergyRatio[nJets]/F");                                
+  EventInfo->Branch(  "SVnVertices",  SVnVertices, "SVnVertices[nJets]/I");                             
+  EventInfo->Branch(  "SVnVertexTracks", SVnVertexTracks, "SVnVertexTracks[nJets]/I");         
+  EventInfo->Branch(  "SVnVertexTracksAll",  SVnVertexTracksAll, "SVnVertexTracksAll[nJets]/I");         
+  EventInfo->Branch(  "SVnFirstVertexTracks", SVnFirstVertexTracks, "SVnFirstVertexTracks[nJets]/I");         
+  EventInfo->Branch(  "SVnFirstVertexTracksAll",  SVnFirstVertexTracksAll, "SVnFirstVertexTracksAll[nJets]/I");         
+  EventInfo->Branch(  "SVjetDeltaR",  SVjetDeltaR, "SVjetDeltaR[nJets]/F");
+  EventInfo->Branch(  "SVvtxSumVtxDirDeltaR", SVvtxSumVtxDirDeltaR, "SVvtxSumVtxDirDeltaR[nJets]/F");
+  EventInfo->Branch(  "SVvtxSumJetDeltaR",  SVvtxSumJetDeltaR, "SVvtxSumJetDeltaR[nJets]/F");
 
-  tree->Branch(  "SVvtxPt",  SVvtxPt, "SVvtxPt[nJets]/F");
-  tree->Branch(  "SVvtxSumDirEta",  SVvtxSumDirEta, "SVvtxSumDirEta[nJets]/F");
-  tree->Branch(  "SVvtxSumDirPhi",  SVvtxSumDirPhi, "SVvtxSumDirPhi[nJets]/F");
-  tree->Branch(  "SVvtxDirEta",  SVvtxDirEta, "SVvtxDirEta[nJets]/F");
-  tree->Branch(  "SVvtxDirPhi",  SVvtxDirPhi, "SVvtxDirPhi[nJets]/F");
+  EventInfo->Branch(  "SVvtxPt",  SVvtxPt, "SVvtxPt[nJets]/F");
+  EventInfo->Branch(  "SVvtxSumDirEta",  SVvtxSumDirEta, "SVvtxSumDirEta[nJets]/F");
+  EventInfo->Branch(  "SVvtxSumDirPhi",  SVvtxSumDirPhi, "SVvtxSumDirPhi[nJets]/F");
+  EventInfo->Branch(  "SVvtxDirEta",  SVvtxDirEta, "SVvtxDirEta[nJets]/F");
+  EventInfo->Branch(  "SVvtxDirPhi",  SVvtxDirPhi, "SVvtxDirPhi[nJets]/F");
 
   // added by Caroline
-   tree->Branch(  "SVvtxSumPTrel",  SVvtxSumPTrel, "SVvtxSumPTrel[nJets]/F");
-   tree->Branch(  "SVvtxDirPTrel",  SVvtxDirPTrel, "SVvtxDirPTrel[nJets]/F");
-   tree->Branch(  "SVvtxDistJetAxis",  SVvtxDistJetAxis, "SVvtxDistJetAxis[nJets]/F");
-   tree->Branch(  "SVtotCharge",  SVtotCharge, "SVtotCharge[nJets]/I");
+   EventInfo->Branch(  "SVvtxSumPTrel",  SVvtxSumPTrel, "SVvtxSumPTrel[nJets]/F");
+   EventInfo->Branch(  "SVvtxDirPTrel",  SVvtxDirPTrel, "SVvtxDirPTrel[nJets]/F");
+   EventInfo->Branch(  "SVvtxDistJetAxis",  SVvtxDistJetAxis, "SVvtxDistJetAxis[nJets]/F");
+   EventInfo->Branch(  "SVtotCharge",  SVtotCharge, "SVtotCharge[nJets]/I");
   // end add
                
   //impactParameterTagInfos
-  tree->Branch(  "IPnSelectedTracks",  IPnSelectedTracks, "IPnSelectedTracks[nJets]/I");                       
+  EventInfo->Branch(  "IPnSelectedTracks",  IPnSelectedTracks, "IPnSelectedTracks[nJets]/I"); 
+  EventInfo->Branch(  "IPnSelectedPUTracks",  IPnSelectedPUTracks, "IPnSelectedPUTracks[nJets]/I"); 
+  EventInfo->Branch(  "IPnSelectedAndDecayLengthAndJetAsixTracks",  IPnSelectedAndDecayLengthAndJetAsixTracks, "IPnSelectedAndDecayLengthAndJetAsixTracks[nJets]/I"); 
+  EventInfo->Branch(  "IPnSelectedAndDecayLengthAndJetAsixPUTracks",  IPnSelectedAndDecayLengthAndJetAsixPUTracks, "IPnSelectedAndDecayLengthAndJetAsixPUTracks[nJets]/I"); 
   //  math::XYZVector "IPghostTrackP3",    [nJets];      
-  tree->Branch(  "IPghostTrackPt",  IPghostTrackPt, "IPghostTrackPt[nJets]/F");                        
-  tree->Branch(  "IPghostTrackPtRel", IPghostTrackPtRel, "IPghostTrackPtRel[nJets]/F");                        
-  tree->Branch(  "IPghostTrackEta",  IPghostTrackEta, "IPghostTrackEta[nJets]/F");                       
-  tree->Branch(  "IPghostTrackPhi",  IPghostTrackPhi, "IPghostTrackPhi[nJets]/F");                       
-  tree->Branch(  "IPghostTrackDeltaR", IPghostTrackDeltaR, "IPghostTrackDeltaR[nJets]/F");
-  tree->Branch(  "IPPix1SharedHits",  IPPix1SharedHits, "IPPix1SharedHits[nJets]/I");
-  tree->Branch(  "IPPix1TotalHits",  IPPix1TotalHits, "IPPix1TotalHits[nJets]/I");
-  tree->Branch(  "IPPix2SharedHits", IPPix2SharedHits, "IPPix2SharedHits[nJets]/I");
-  tree->Branch(  "IPPix2TotalHits", IPPix2TotalHits, "IPPix2TotalHits[nJets]/I");
-  tree->Branch(  "IPPix3SharedHits",  IPPix3SharedHits, "IPPix3SharedHits[nJets]/I");
-  tree->Branch(  "IPPix3TotalHits", IPPix3TotalHits, "IPPix3TotalHits[nJets]/I");
-  tree->Branch(  "IPPixAllSharedHits", IPPixAllSharedHits, "IPPixAllSharedHits[nJets]/I");
-  tree->Branch(  "IPPixAllTotalHits", IPPixAllTotalHits, "IPPixAllTotalHits[nJets]/I");
+  EventInfo->Branch(  "IPghostTrackPt",  IPghostTrackPt, "IPghostTrackPt[nJets]/F");                        
+  EventInfo->Branch(  "IPghostTrackPtRel", IPghostTrackPtRel, "IPghostTrackPtRel[nJets]/F");                        
+  EventInfo->Branch(  "IPghostTrackEta",  IPghostTrackEta, "IPghostTrackEta[nJets]/F");                       
+  EventInfo->Branch(  "IPghostTrackPhi",  IPghostTrackPhi, "IPghostTrackPhi[nJets]/F");                       
+  EventInfo->Branch(  "IPghostTrackDeltaR", IPghostTrackDeltaR, "IPghostTrackDeltaR[nJets]/F");
+  EventInfo->Branch(  "IPPix1SharedHits",  IPPix1SharedHits, "IPPix1SharedHits[nJets]/I");
+  EventInfo->Branch(  "IPPix1TotalHits",  IPPix1TotalHits, "IPPix1TotalHits[nJets]/I");
+  EventInfo->Branch(  "IPPix2SharedHits", IPPix2SharedHits, "IPPix2SharedHits[nJets]/I");
+  EventInfo->Branch(  "IPPix2TotalHits", IPPix2TotalHits, "IPPix2TotalHits[nJets]/I");
+  EventInfo->Branch(  "IPPix3SharedHits",  IPPix3SharedHits, "IPPix3SharedHits[nJets]/I");
+  EventInfo->Branch(  "IPPix3TotalHits", IPPix3TotalHits, "IPPix3TotalHits[nJets]/I");
+  EventInfo->Branch(  "IPPixAllSharedHits", IPPixAllSharedHits, "IPPixAllSharedHits[nJets]/I");
+  EventInfo->Branch(  "IPPixAllTotalHits", IPPixAllTotalHits, "IPPixAllTotalHits[nJets]/I");
 
-  for(int i=0; i<4; i++){
+  for(Int_t i=0; i<4; i++){
     TString name = "IP3dTrackQuality"; name += (i+1);
-    tree->Branch( name, IP3dTrackQuality[i], name + "[nJets]/I");
+    EventInfo->Branch( name, IP3dTrackQuality[i], name + "[nJets]/I");
     name = "IP3dHasSharedPix1"; name += (i+1);
-    tree->Branch( name, IP3dHasSharedPix1[i], name + "[nJets]/I");
+    EventInfo->Branch( name, IP3dHasSharedPix1[i], name + "[nJets]/I");
     name = "IP3dHasSharedPix2"; name += (i+1);
-    tree->Branch( name, IP3dHasSharedPix2[i], name + "[nJets]/I");
+    EventInfo->Branch( name, IP3dHasSharedPix2[i], name + "[nJets]/I");
     name = "IP3dHasSharedPix3"; name += (i+1);
-    tree->Branch( name, IP3dHasSharedPix3[i], name + "[nJets]/I");
+    EventInfo->Branch( name, IP3dHasSharedPix3[i], name + "[nJets]/I");
     name = "IP3dHasSharedPixAll"; name += (i+1);
-    tree->Branch( name, IP3dHasSharedPixAll[i], name + "[nJets]/I");
+    EventInfo->Branch( name, IP3dHasSharedPixAll[i], name + "[nJets]/I");
     name = "IP3d"; name += (i+1);
-    tree->Branch( name, IP3d[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3d[i], name + "[nJets]/F");
     name = "IP3dError"; name += (i+1);
-    tree->Branch( name, IP3dError[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dError[i], name + "[nJets]/F");
     name = "IP3dProbability"; name += (i+1);
-    tree->Branch( name, IP3dProbability[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dProbability[i], name + "[nJets]/F");
     name = "IP3dTrackPtRel"; name += (i+1);
-    tree->Branch( name, IP3dTrackPtRel[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dTrackPtRel[i], name + "[nJets]/F");
     name = "IP3dDistJetAxis"; name += (i+1);
-    tree->Branch( name, IP3dDistJetAxis[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dDistJetAxis[i], name + "[nJets]/F");
     name = "IP3dDecayLength"; name += (i+1);
-    tree->Branch( name, IP3dDecayLength[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dDecayLength[i], name + "[nJets]/F");
     name = "IP3dDeltaR"; name += (i+1);
-    tree->Branch( name, IP3dDeltaR[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dDeltaR[i], name + "[nJets]/F");
     name = "IP3dMomentum"; name += (i+1);
-    tree->Branch( name, IP3dMomentum[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dMomentum[i], name + "[nJets]/F");
     name = "IP3dTransverseMomentum"; name += (i+1);
-    tree->Branch( name, IP3dTransverseMomentum[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dTransverseMomentum[i], name + "[nJets]/F");
     name = "IP3dEta"; name += (i+1);
-    tree->Branch( name, IP3dEta[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dEta[i], name + "[nJets]/F");
     name = "IP3dPhi"; name += (i+1);
-    tree->Branch( name, IP3dPhi[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dPhi[i], name + "[nJets]/F");
     name = "IP3dNHits"; name += (i+1);
-    tree->Branch( name, IP3dNHits[i], name + "[nJets]/I");
+    EventInfo->Branch( name, IP3dNHits[i], name + "[nJets]/I");
     name = "IP3dNPixelHits"; name += (i+1);
-    tree->Branch( name, IP3dNPixelHits[i], name + "[nJets]/I");
+    EventInfo->Branch( name, IP3dNPixelHits[i], name + "[nJets]/I");
     name = "IP3dNormChi2"; name += (i+1);
-    tree->Branch( name, IP3dNormChi2[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP3dNormChi2[i], name + "[nJets]/F");
     name = "IP2dTrackQuality"; name += (i+1);
-    tree->Branch( name, IP2dTrackQuality[i], name + "[nJets]/I");
+    EventInfo->Branch( name, IP2dTrackQuality[i], name + "[nJets]/I");
     name = "IP2d"; name += (i+1);
-    tree->Branch( name, IP2d[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP2d[i], name + "[nJets]/F");
     name = "IP2dError"; name += (i+1);
-    tree->Branch( name, IP2dError[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP2dError[i], name + "[nJets]/F");
     name = "IP2dProbability"; name += (i+1);
-    tree->Branch( name, IP2dProbability[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP2dProbability[i], name + "[nJets]/F");
     name = "IP2dTrackPtRel"; name += (i+1);
-    tree->Branch( name, IP2dTrackPtRel[i], name + "[nJets]/F");
+    EventInfo->Branch( name, IP2dTrackPtRel[i], name + "[nJets]/F");
 
   }
 
   //softElectronTagInfos
-  tree->Branch(  "nElectrons",  nElectrons, "nElectrons[nJets]/I");  
+  EventInfo->Branch(  "nElectrons",  nElectrons, "nElectrons[nJets]/I");  
                           
-  tree->Branch(  "electron1Pt",                  electron1Pt,                 "electron1Pt[nJets]/F");   			       
-  tree->Branch(  "electron1Eta",                 electron1Eta,                "electron1Eta[nJets]/F");  			       
-  tree->Branch(  "electron1Phi",                 electron1Phi,                "electron1Phi[nJets]/F");  			       
-  tree->Branch(  "electron1NHits",               electron1NHits,              "electron1NHits[nJets]/I");   		     
-  tree->Branch(  "electron1NExpectedOuterHits",  electron1NExpectedOuterHits, "electron1NExpectedOuterHits[nJets]/I");   		       
-  tree->Branch(  "electron1NPixelHits",          electron1NPixelHits,         "electron1NPixelHits[nJets]/I");   		       
-  tree->Branch(  "electron1NChi2",               electron1NChi2,              "electron1NChi2[nJets]/F");			       
-  tree->Branch(  "electron1PtRel",               electron1PtRel,              "electron1PtRel[nJets]/F");   		       
-  tree->Branch(  "electron1Sip2d",               electron1Sip2d,              "electron1Sip2d[nJets]/F");   		       
-  tree->Branch(  "electron1Ip2d",                electron1Ip2d,               "electron1Ip2d[nJets]/F");   		       
-  tree->Branch(  "electron1Ipe2d",               electron1Ipe2d,              "electron1Ipe2d[nJets]/F");   		       
-  tree->Branch(  "electron1Sip3d",               electron1Sip3d,              "electron1Sip3d[nJets]/F");
-  tree->Branch(  "electron1Ip3d",                electron1Ip3d,               "electron1Ip3d[nJets]/F");
-  tree->Branch(  "electron1Ipe3d",               electron1Ipe3d,              "electron1Ipe3d[nJets]/F");   		          		          		       
-  tree->Branch(  "electron1P0Par",               electron1P0Par,              "electron1P0Par[nJets]/F");   		       
-  tree->Branch(  "electron1DeltaR",              electron1DeltaR,             "electron1DeltaR[nJets]/F");  		       
-  tree->Branch(  "electron1EtaRel",              electron1EtaRel,             "electron1EtaRel[nJets]/F");  		       
-  tree->Branch(  "electron1Ratio",               electron1Ratio,              "electron1Ratio[nJets]/F");   		     
-  tree->Branch(  "electron1TrackQuality",        electron1TrackQuality,       "electron1TrackQuality[nJets]/I");   		       
-  tree->Branch(  "electron1RatioRel",            electron1RatioRel,           "electron1RatioRel[nJets]/F");                      
-  tree->Branch(  "electron1eSuperClusterOverP",             electron1eSuperClusterOverP,             "electron1eSuperClusterOverP[nJets]/F");
-  tree->Branch(  "electron1eSeedClusterOverP",              electron1eSeedClusterOverP,              "electron1eSeedClusterOverP[nJets]/F");
-  tree->Branch(  "electron1eSeedClusterOverPout",           electron1eSeedClusterOverPout,           "electron1eSeedClusterOverPout[nJets]/F");
-  tree->Branch(  "electron1eEleClusterOverPout",            electron1eEleClusterOverPout,            "electron1eEleClusterOverPout[nJets]/F");
-  tree->Branch(  "electron1deltaEtaSuperClusterTrackAtVtx", electron1deltaEtaSuperClusterTrackAtVtx, "electron1deltaEtaSuperClusterTrackAtVtx[nJets]/F");
-  tree->Branch(  "electron1deltaEtaSeedClusterTrackAtCalo", electron1deltaEtaSeedClusterTrackAtCalo, "electron1deltaEtaSeedClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron1deltaEtaEleClusterTrackAtCalo",  electron1deltaEtaEleClusterTrackAtCalo,  "electron1deltaEtaEleClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron1deltaPhiSuperClusterTrackAtVtx", electron1deltaPhiSuperClusterTrackAtVtx, "electron1deltaPhiSuperClusterTrackAtVtx[nJets]/F");
-  tree->Branch(  "electron1deltaPhiSeedClusterTrackAtCalo", electron1deltaPhiSeedClusterTrackAtCalo, "electron1deltaPhiSeedClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron1deltaPhiEleClusterTrackAtCalo",  electron1deltaPhiEleClusterTrackAtCalo,  "electron1deltaPhiEleClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron1Pt",                  electron1Pt,                 "electron1Pt[nJets]/F");   			       
+  EventInfo->Branch(  "electron1Eta",                 electron1Eta,                "electron1Eta[nJets]/F");  			       
+  EventInfo->Branch(  "electron1Phi",                 electron1Phi,                "electron1Phi[nJets]/F");  			       
+  EventInfo->Branch(  "electron1NHits",               electron1NHits,              "electron1NHits[nJets]/I");   		     
+  EventInfo->Branch(  "electron1NExpectedOuterHits",  electron1NExpectedOuterHits, "electron1NExpectedOuterHits[nJets]/I");   		       
+  EventInfo->Branch(  "electron1NPixelHits",          electron1NPixelHits,         "electron1NPixelHits[nJets]/I");   		       
+  EventInfo->Branch(  "electron1NChi2",               electron1NChi2,              "electron1NChi2[nJets]/F");			       
+  EventInfo->Branch(  "electron1PtRel",               electron1PtRel,              "electron1PtRel[nJets]/F");   		       
+  EventInfo->Branch(  "electron1Sip2d",               electron1Sip2d,              "electron1Sip2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron1Ip2d",                electron1Ip2d,               "electron1Ip2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron1Ipe2d",               electron1Ipe2d,              "electron1Ipe2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron1Sip3d",               electron1Sip3d,              "electron1Sip3d[nJets]/F");
+  EventInfo->Branch(  "electron1Ip3d",                electron1Ip3d,               "electron1Ip3d[nJets]/F");
+  EventInfo->Branch(  "electron1Ipe3d",               electron1Ipe3d,              "electron1Ipe3d[nJets]/F");   		          		          		       
+  EventInfo->Branch(  "electron1P0Par",               electron1P0Par,              "electron1P0Par[nJets]/F");   		       
+  EventInfo->Branch(  "electron1DeltaR",              electron1DeltaR,             "electron1DeltaR[nJets]/F");  		       
+  EventInfo->Branch(  "electron1EtaRel",              electron1EtaRel,             "electron1EtaRel[nJets]/F");  		       
+  EventInfo->Branch(  "electron1Ratio",               electron1Ratio,              "electron1Ratio[nJets]/F");   		     
+  EventInfo->Branch(  "electron1TrackQuality",        electron1TrackQuality,       "electron1TrackQuality[nJets]/I");   		       
+  EventInfo->Branch(  "electron1RatioRel",            electron1RatioRel,           "electron1RatioRel[nJets]/F");                      
+  EventInfo->Branch(  "electron1eSuperClusterOverP",             electron1eSuperClusterOverP,             "electron1eSuperClusterOverP[nJets]/F");
+  EventInfo->Branch(  "electron1eSeedClusterOverP",              electron1eSeedClusterOverP,              "electron1eSeedClusterOverP[nJets]/F");
+  EventInfo->Branch(  "electron1eSeedClusterOverPout",           electron1eSeedClusterOverPout,           "electron1eSeedClusterOverPout[nJets]/F");
+  EventInfo->Branch(  "electron1eEleClusterOverPout",            electron1eEleClusterOverPout,            "electron1eEleClusterOverPout[nJets]/F");
+  EventInfo->Branch(  "electron1deltaEtaSuperClusterTrackAtVtx", electron1deltaEtaSuperClusterTrackAtVtx, "electron1deltaEtaSuperClusterTrackAtVtx[nJets]/F");
+  EventInfo->Branch(  "electron1deltaEtaSeedClusterTrackAtCalo", electron1deltaEtaSeedClusterTrackAtCalo, "electron1deltaEtaSeedClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron1deltaEtaEleClusterTrackAtCalo",  electron1deltaEtaEleClusterTrackAtCalo,  "electron1deltaEtaEleClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron1deltaPhiSuperClusterTrackAtVtx", electron1deltaPhiSuperClusterTrackAtVtx, "electron1deltaPhiSuperClusterTrackAtVtx[nJets]/F");
+  EventInfo->Branch(  "electron1deltaPhiSeedClusterTrackAtCalo", electron1deltaPhiSeedClusterTrackAtCalo, "electron1deltaPhiSeedClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron1deltaPhiEleClusterTrackAtCalo",  electron1deltaPhiEleClusterTrackAtCalo,  "electron1deltaPhiEleClusterTrackAtCalo[nJets]/F");
             
-  tree->Branch(  "electron2Pt",                  electron2Pt,                 "electron2Pt[nJets]/F");   			       
-  tree->Branch(  "electron2Eta",                 electron2Eta,                "electron2Eta[nJets]/F");  			       
-  tree->Branch(  "electron2Phi",                 electron2Phi,                "electron2Phi[nJets]/F");  			       
-  tree->Branch(  "electron2NHits",               electron2NHits,              "electron2NHits[nJets]/I");   		     
-  tree->Branch(  "electron2NExpectedOuterHits",  electron2NExpectedOuterHits, "electron2NExpectedOuterHits[nJets]/I");   		       
-  tree->Branch(  "electron2NPixelHits",          electron2NPixelHits,         "electron2NPixelHits[nJets]/I");   		       
-  tree->Branch(  "electron2NChi2",               electron2NChi2,              "electron2NChi2[nJets]/F");			       
-  tree->Branch(  "electron2PtRel",               electron2PtRel,              "electron2PtRel[nJets]/F");   		       
-  tree->Branch(  "electron2Sip2d",               electron2Sip2d,              "electron2Sip2d[nJets]/F");   		       
-  tree->Branch(  "electron2Ip2d",                electron2Ip2d,               "electron2Ip2d[nJets]/F");   		       
-  tree->Branch(  "electron2Ipe2d",               electron2Ipe2d,              "electron2Ipe2d[nJets]/F");   		       
-  tree->Branch(  "electron2Sip3d",               electron2Sip3d,              "electron2Sip3d[nJets]/F");
-  tree->Branch(  "electron2Ip3d",                electron2Ip3d,               "electron2Ip3d[nJets]/F");
-  tree->Branch(  "electron2Ipe3d",               electron2Ipe3d,              "electron2Ipe3d[nJets]/F");   		          		          		       
-  tree->Branch(  "electron2P0Par",               electron2P0Par,              "electron2P0Par[nJets]/F");   		       
-  tree->Branch(  "electron2DeltaR",              electron2DeltaR,             "electron2DeltaR[nJets]/F");  		       
-  tree->Branch(  "electron2EtaRel",              electron2EtaRel,             "electron2EtaRel[nJets]/F");  		       
-  tree->Branch(  "electron2Ratio",               electron2Ratio,              "electron2Ratio[nJets]/F");   		     
-  tree->Branch(  "electron2TrackQuality",        electron2TrackQuality,       "electron2TrackQuality[nJets]/I");   		       
-  tree->Branch(  "electron2RatioRel",            electron2RatioRel,           "electron2RatioRel[nJets]/F"); 
-  tree->Branch(  "electron2eSuperClusterOverP",             electron2eSuperClusterOverP,             "electron2eSuperClusterOverP[nJets]/F");
-  tree->Branch(  "electron2eSeedClusterOverP",              electron2eSeedClusterOverP,              "electron2eSeedClusterOverP[nJets]/F");
-  tree->Branch(  "electron2eSeedClusterOverPout",           electron2eSeedClusterOverPout,           "electron2eSeedClusterOverPout[nJets]/F");
-  tree->Branch(  "electron2eEleClusterOverPout",            electron2eEleClusterOverPout,            "electron2eEleClusterOverPout[nJets]/F");
-  tree->Branch(  "electron2deltaEtaSuperClusterTrackAtVtx", electron2deltaEtaSuperClusterTrackAtVtx, "electron2deltaEtaSuperClusterTrackAtVtx[nJets]/F");
-  tree->Branch(  "electron2deltaEtaSeedClusterTrackAtCalo", electron2deltaEtaSeedClusterTrackAtCalo, "electron2deltaEtaSeedClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron2deltaEtaEleClusterTrackAtCalo",  electron2deltaEtaEleClusterTrackAtCalo,  "electron2deltaEtaEleClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron2deltaPhiSuperClusterTrackAtVtx", electron2deltaPhiSuperClusterTrackAtVtx, "electron2deltaPhiSuperClusterTrackAtVtx[nJets]/F");
-  tree->Branch(  "electron2deltaPhiSeedClusterTrackAtCalo", electron2deltaPhiSeedClusterTrackAtCalo, "electron2deltaPhiSeedClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron2deltaPhiEleClusterTrackAtCalo",  electron2deltaPhiEleClusterTrackAtCalo,  "electron2deltaPhiEleClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron2Pt",                  electron2Pt,                 "electron2Pt[nJets]/F");   			       
+  EventInfo->Branch(  "electron2Eta",                 electron2Eta,                "electron2Eta[nJets]/F");  			       
+  EventInfo->Branch(  "electron2Phi",                 electron2Phi,                "electron2Phi[nJets]/F");  			       
+  EventInfo->Branch(  "electron2NHits",               electron2NHits,              "electron2NHits[nJets]/I");   		     
+  EventInfo->Branch(  "electron2NExpectedOuterHits",  electron2NExpectedOuterHits, "electron2NExpectedOuterHits[nJets]/I");   		       
+  EventInfo->Branch(  "electron2NPixelHits",          electron2NPixelHits,         "electron2NPixelHits[nJets]/I");   		       
+  EventInfo->Branch(  "electron2NChi2",               electron2NChi2,              "electron2NChi2[nJets]/F");			       
+  EventInfo->Branch(  "electron2PtRel",               electron2PtRel,              "electron2PtRel[nJets]/F");   		       
+  EventInfo->Branch(  "electron2Sip2d",               electron2Sip2d,              "electron2Sip2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron2Ip2d",                electron2Ip2d,               "electron2Ip2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron2Ipe2d",               electron2Ipe2d,              "electron2Ipe2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron2Sip3d",               electron2Sip3d,              "electron2Sip3d[nJets]/F");
+  EventInfo->Branch(  "electron2Ip3d",                electron2Ip3d,               "electron2Ip3d[nJets]/F");
+  EventInfo->Branch(  "electron2Ipe3d",               electron2Ipe3d,              "electron2Ipe3d[nJets]/F");   		          		          		       
+  EventInfo->Branch(  "electron2P0Par",               electron2P0Par,              "electron2P0Par[nJets]/F");   		       
+  EventInfo->Branch(  "electron2DeltaR",              electron2DeltaR,             "electron2DeltaR[nJets]/F");  		       
+  EventInfo->Branch(  "electron2EtaRel",              electron2EtaRel,             "electron2EtaRel[nJets]/F");  		       
+  EventInfo->Branch(  "electron2Ratio",               electron2Ratio,              "electron2Ratio[nJets]/F");   		     
+  EventInfo->Branch(  "electron2TrackQuality",        electron2TrackQuality,       "electron2TrackQuality[nJets]/I");   		       
+  EventInfo->Branch(  "electron2RatioRel",            electron2RatioRel,           "electron2RatioRel[nJets]/F"); 
+  EventInfo->Branch(  "electron2eSuperClusterOverP",             electron2eSuperClusterOverP,             "electron2eSuperClusterOverP[nJets]/F");
+  EventInfo->Branch(  "electron2eSeedClusterOverP",              electron2eSeedClusterOverP,              "electron2eSeedClusterOverP[nJets]/F");
+  EventInfo->Branch(  "electron2eSeedClusterOverPout",           electron2eSeedClusterOverPout,           "electron2eSeedClusterOverPout[nJets]/F");
+  EventInfo->Branch(  "electron2eEleClusterOverPout",            electron2eEleClusterOverPout,            "electron2eEleClusterOverPout[nJets]/F");
+  EventInfo->Branch(  "electron2deltaEtaSuperClusterTrackAtVtx", electron2deltaEtaSuperClusterTrackAtVtx, "electron2deltaEtaSuperClusterTrackAtVtx[nJets]/F");
+  EventInfo->Branch(  "electron2deltaEtaSeedClusterTrackAtCalo", electron2deltaEtaSeedClusterTrackAtCalo, "electron2deltaEtaSeedClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron2deltaEtaEleClusterTrackAtCalo",  electron2deltaEtaEleClusterTrackAtCalo,  "electron2deltaEtaEleClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron2deltaPhiSuperClusterTrackAtVtx", electron2deltaPhiSuperClusterTrackAtVtx, "electron2deltaPhiSuperClusterTrackAtVtx[nJets]/F");
+  EventInfo->Branch(  "electron2deltaPhiSeedClusterTrackAtCalo", electron2deltaPhiSeedClusterTrackAtCalo, "electron2deltaPhiSeedClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron2deltaPhiEleClusterTrackAtCalo",  electron2deltaPhiEleClusterTrackAtCalo,  "electron2deltaPhiEleClusterTrackAtCalo[nJets]/F");
                           
-  tree->Branch(  "electron3Pt",                  electron3Pt,                 "electron3Pt[nJets]/F");   			       
-  tree->Branch(  "electron3Eta",                 electron3Eta,                "electron3Eta[nJets]/F");  			       
-  tree->Branch(  "electron3Phi",                 electron3Phi,                "electron3Phi[nJets]/F");  			       
-  tree->Branch(  "electron3NHits",               electron3NHits,              "electron3NHits[nJets]/I");   		     
-  tree->Branch(  "electron3NExpectedOuterHits",  electron3NExpectedOuterHits, "electron3NExpectedOuterHits[nJets]/I");   		       
-  tree->Branch(  "electron3NPixelHits",          electron3NPixelHits,         "electron3NPixelHits[nJets]/I");   		       
-  tree->Branch(  "electron3NChi2",               electron3NChi2,              "electron3NChi2[nJets]/F");			       
-  tree->Branch(  "electron3PtRel",               electron3PtRel,              "electron3PtRel[nJets]/F");   		       
-  tree->Branch(  "electron3Sip2d",               electron3Sip2d,              "electron3Sip2d[nJets]/F");   		       
-  tree->Branch(  "electron3Ip2d",                electron3Ip2d,               "electron3Ip2d[nJets]/F");   		       
-  tree->Branch(  "electron3Ipe2d",               electron3Ipe2d,              "electron3Ipe2d[nJets]/F");   		       
-  tree->Branch(  "electron3Sip3d",               electron3Sip3d,              "electron3Sip3d[nJets]/F");
-  tree->Branch(  "electron3Ip3d",                electron3Ip3d,               "electron3Ip3d[nJets]/F");
-  tree->Branch(  "electron3Ipe3d",               electron3Ipe3d,              "electron3Ipe3d[nJets]/F");   		          		          		       
-  tree->Branch(  "electron3P0Par",               electron3P0Par,              "electron3P0Par[nJets]/F");   		       
-  tree->Branch(  "electron3DeltaR",              electron3DeltaR,             "electron3DeltaR[nJets]/F");  		       
-  tree->Branch(  "electron3EtaRel",              electron3EtaRel,             "electron3EtaRel[nJets]/F");  		       
-  tree->Branch(  "electron3Ratio",               electron3Ratio,              "electron3Ratio[nJets]/F");   		     
-  tree->Branch(  "electron3TrackQuality",        electron3TrackQuality,       "electron3TrackQuality[nJets]/I");   		       
-  tree->Branch(  "electron3RatioRel",            electron3RatioRel,           "electron3RatioRel[nJets]/F");  
-  tree->Branch(  "electron3eSuperClusterOverP",             electron3eSuperClusterOverP,             "electron3eSuperClusterOverP[nJets]/F");
-  tree->Branch(  "electron3eSeedClusterOverP",              electron3eSeedClusterOverP,              "electron3eSeedClusterOverP[nJets]/F");
-  tree->Branch(  "electron3eSeedClusterOverPout",           electron3eSeedClusterOverPout,           "electron3eSeedClusterOverPout[nJets]/F");
-  tree->Branch(  "electron3eEleClusterOverPout",            electron3eEleClusterOverPout,            "electron3eEleClusterOverPout[nJets]/F");
-  tree->Branch(  "electron3deltaEtaSuperClusterTrackAtVtx", electron3deltaEtaSuperClusterTrackAtVtx, "electron3deltaEtaSuperClusterTrackAtVtx[nJets]/F");
-  tree->Branch(  "electron3deltaEtaSeedClusterTrackAtCalo", electron3deltaEtaSeedClusterTrackAtCalo, "electron3deltaEtaSeedClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron3deltaEtaEleClusterTrackAtCalo",  electron3deltaEtaEleClusterTrackAtCalo,  "electron3deltaEtaEleClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron3deltaPhiSuperClusterTrackAtVtx", electron3deltaPhiSuperClusterTrackAtVtx, "electron3deltaPhiSuperClusterTrackAtVtx[nJets]/F");
-  tree->Branch(  "electron3deltaPhiSeedClusterTrackAtCalo", electron3deltaPhiSeedClusterTrackAtCalo, "electron3deltaPhiSeedClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron3deltaPhiEleClusterTrackAtCalo",  electron3deltaPhiEleClusterTrackAtCalo,  "electron3deltaPhiEleClusterTrackAtCalo[nJets]/F"); 
+  EventInfo->Branch(  "electron3Pt",                  electron3Pt,                 "electron3Pt[nJets]/F");   			       
+  EventInfo->Branch(  "electron3Eta",                 electron3Eta,                "electron3Eta[nJets]/F");  			       
+  EventInfo->Branch(  "electron3Phi",                 electron3Phi,                "electron3Phi[nJets]/F");  			       
+  EventInfo->Branch(  "electron3NHits",               electron3NHits,              "electron3NHits[nJets]/I");   		     
+  EventInfo->Branch(  "electron3NExpectedOuterHits",  electron3NExpectedOuterHits, "electron3NExpectedOuterHits[nJets]/I");   		       
+  EventInfo->Branch(  "electron3NPixelHits",          electron3NPixelHits,         "electron3NPixelHits[nJets]/I");   		       
+  EventInfo->Branch(  "electron3NChi2",               electron3NChi2,              "electron3NChi2[nJets]/F");			       
+  EventInfo->Branch(  "electron3PtRel",               electron3PtRel,              "electron3PtRel[nJets]/F");   		       
+  EventInfo->Branch(  "electron3Sip2d",               electron3Sip2d,              "electron3Sip2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron3Ip2d",                electron3Ip2d,               "electron3Ip2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron3Ipe2d",               electron3Ipe2d,              "electron3Ipe2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron3Sip3d",               electron3Sip3d,              "electron3Sip3d[nJets]/F");
+  EventInfo->Branch(  "electron3Ip3d",                electron3Ip3d,               "electron3Ip3d[nJets]/F");
+  EventInfo->Branch(  "electron3Ipe3d",               electron3Ipe3d,              "electron3Ipe3d[nJets]/F");   		          		          		       
+  EventInfo->Branch(  "electron3P0Par",               electron3P0Par,              "electron3P0Par[nJets]/F");   		       
+  EventInfo->Branch(  "electron3DeltaR",              electron3DeltaR,             "electron3DeltaR[nJets]/F");  		       
+  EventInfo->Branch(  "electron3EtaRel",              electron3EtaRel,             "electron3EtaRel[nJets]/F");  		       
+  EventInfo->Branch(  "electron3Ratio",               electron3Ratio,              "electron3Ratio[nJets]/F");   		     
+  EventInfo->Branch(  "electron3TrackQuality",        electron3TrackQuality,       "electron3TrackQuality[nJets]/I");   		       
+  EventInfo->Branch(  "electron3RatioRel",            electron3RatioRel,           "electron3RatioRel[nJets]/F");  
+  EventInfo->Branch(  "electron3eSuperClusterOverP",             electron3eSuperClusterOverP,             "electron3eSuperClusterOverP[nJets]/F");
+  EventInfo->Branch(  "electron3eSeedClusterOverP",              electron3eSeedClusterOverP,              "electron3eSeedClusterOverP[nJets]/F");
+  EventInfo->Branch(  "electron3eSeedClusterOverPout",           electron3eSeedClusterOverPout,           "electron3eSeedClusterOverPout[nJets]/F");
+  EventInfo->Branch(  "electron3eEleClusterOverPout",            electron3eEleClusterOverPout,            "electron3eEleClusterOverPout[nJets]/F");
+  EventInfo->Branch(  "electron3deltaEtaSuperClusterTrackAtVtx", electron3deltaEtaSuperClusterTrackAtVtx, "electron3deltaEtaSuperClusterTrackAtVtx[nJets]/F");
+  EventInfo->Branch(  "electron3deltaEtaSeedClusterTrackAtCalo", electron3deltaEtaSeedClusterTrackAtCalo, "electron3deltaEtaSeedClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron3deltaEtaEleClusterTrackAtCalo",  electron3deltaEtaEleClusterTrackAtCalo,  "electron3deltaEtaEleClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron3deltaPhiSuperClusterTrackAtVtx", electron3deltaPhiSuperClusterTrackAtVtx, "electron3deltaPhiSuperClusterTrackAtVtx[nJets]/F");
+  EventInfo->Branch(  "electron3deltaPhiSeedClusterTrackAtCalo", electron3deltaPhiSeedClusterTrackAtCalo, "electron3deltaPhiSeedClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron3deltaPhiEleClusterTrackAtCalo",  electron3deltaPhiEleClusterTrackAtCalo,  "electron3deltaPhiEleClusterTrackAtCalo[nJets]/F"); 
                           
-  tree->Branch(  "electron4Pt",                  electron4Pt,                 "electron4Pt[nJets]/F");   			       
-  tree->Branch(  "electron4Eta",                 electron4Eta,                "electron4Eta[nJets]/F");  			       
-  tree->Branch(  "electron4Phi",                 electron4Phi,                "electron4Phi[nJets]/F");  			       
-  tree->Branch(  "electron4NHits",               electron4NHits,              "electron4NHits[nJets]/I");   		     
-  tree->Branch(  "electron4NExpectedOuterHits",  electron4NExpectedOuterHits, "electron4NExpectedOuterHits[nJets]/I");   		       
-  tree->Branch(  "electron4NPixelHits",          electron4NPixelHits,         "electron4NPixelHits[nJets]/I");   		       
-  tree->Branch(  "electron4NChi2",               electron4NChi2,              "electron4NChi2[nJets]/F");			       
-  tree->Branch(  "electron4PtRel",               electron4PtRel,              "electron4PtRel[nJets]/F");   		       
-  tree->Branch(  "electron4Sip2d",               electron4Sip2d,              "electron4Sip2d[nJets]/F");   		       
-  tree->Branch(  "electron4Ip2d",                electron4Ip2d,               "electron4Ip2d[nJets]/F");   		       
-  tree->Branch(  "electron4Ipe2d",               electron4Ipe2d,              "electron4Ipe2d[nJets]/F");   		       
-  tree->Branch(  "electron4Sip3d",               electron4Sip3d,              "electron4Sip3d[nJets]/F");
-  tree->Branch(  "electron4Ip3d",                electron4Ip3d,               "electron4Ip3d[nJets]/F");
-  tree->Branch(  "electron4Ipe3d",               electron4Ipe3d,              "electron4Ipe3d[nJets]/F");   		          		          		       
-  tree->Branch(  "electron4P0Par",               electron4P0Par,              "electron4P0Par[nJets]/F");   		       
-  tree->Branch(  "electron4DeltaR",              electron4DeltaR,             "electron4DeltaR[nJets]/F");  		       
-  tree->Branch(  "electron4EtaRel",              electron4EtaRel,             "electron4EtaRel[nJets]/F");  		       
-  tree->Branch(  "electron4Ratio",               electron4Ratio,              "electron4Ratio[nJets]/F");   		     
-  tree->Branch(  "electron4TrackQuality",        electron4TrackQuality,       "electron4TrackQuality[nJets]/I");   		       
-  tree->Branch(  "electron4RatioRel",            electron4RatioRel,           "electron4RatioRel[nJets]/F"); 
-  tree->Branch(  "electron4eSuperClusterOverP",             electron4eSuperClusterOverP,             "electron4eSuperClusterOverP[nJets]/F");
-  tree->Branch(  "electron4eSeedClusterOverP",              electron4eSeedClusterOverP,              "electron4eSeedClusterOverP[nJets]/F");
-  tree->Branch(  "electron4eSeedClusterOverPout",           electron4eSeedClusterOverPout,           "electron4eSeedClusterOverPout[nJets]/F");
-  tree->Branch(  "electron4eEleClusterOverPout",            electron4eEleClusterOverPout,            "electron4eEleClusterOverPout[nJets]/F");
-  tree->Branch(  "electron4deltaEtaSuperClusterTrackAtVtx", electron4deltaEtaSuperClusterTrackAtVtx, "electron4deltaEtaSuperClusterTrackAtVtx[nJets]/F");
-  tree->Branch(  "electron4deltaEtaSeedClusterTrackAtCalo", electron4deltaEtaSeedClusterTrackAtCalo, "electron4deltaEtaSeedClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron4deltaEtaEleClusterTrackAtCalo",  electron4deltaEtaEleClusterTrackAtCalo,  "electron4deltaEtaEleClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron4deltaPhiSuperClusterTrackAtVtx", electron4deltaPhiSuperClusterTrackAtVtx, "electron4deltaPhiSuperClusterTrackAtVtx[nJets]/F");
-  tree->Branch(  "electron4deltaPhiSeedClusterTrackAtCalo", electron4deltaPhiSeedClusterTrackAtCalo, "electron4deltaPhiSeedClusterTrackAtCalo[nJets]/F");
-  tree->Branch(  "electron4deltaPhiEleClusterTrackAtCalo",  electron4deltaPhiEleClusterTrackAtCalo,  "electron4deltaPhiEleClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron4Pt",                  electron4Pt,                 "electron4Pt[nJets]/F");   			       
+  EventInfo->Branch(  "electron4Eta",                 electron4Eta,                "electron4Eta[nJets]/F");  			       
+  EventInfo->Branch(  "electron4Phi",                 electron4Phi,                "electron4Phi[nJets]/F");  			       
+  EventInfo->Branch(  "electron4NHits",               electron4NHits,              "electron4NHits[nJets]/I");   		     
+  EventInfo->Branch(  "electron4NExpectedOuterHits",  electron4NExpectedOuterHits, "electron4NExpectedOuterHits[nJets]/I");   		       
+  EventInfo->Branch(  "electron4NPixelHits",          electron4NPixelHits,         "electron4NPixelHits[nJets]/I");   		       
+  EventInfo->Branch(  "electron4NChi2",               electron4NChi2,              "electron4NChi2[nJets]/F");			       
+  EventInfo->Branch(  "electron4PtRel",               electron4PtRel,              "electron4PtRel[nJets]/F");   		       
+  EventInfo->Branch(  "electron4Sip2d",               electron4Sip2d,              "electron4Sip2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron4Ip2d",                electron4Ip2d,               "electron4Ip2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron4Ipe2d",               electron4Ipe2d,              "electron4Ipe2d[nJets]/F");   		       
+  EventInfo->Branch(  "electron4Sip3d",               electron4Sip3d,              "electron4Sip3d[nJets]/F");
+  EventInfo->Branch(  "electron4Ip3d",                electron4Ip3d,               "electron4Ip3d[nJets]/F");
+  EventInfo->Branch(  "electron4Ipe3d",               electron4Ipe3d,              "electron4Ipe3d[nJets]/F");   		          		          		       
+  EventInfo->Branch(  "electron4P0Par",               electron4P0Par,              "electron4P0Par[nJets]/F");   		       
+  EventInfo->Branch(  "electron4DeltaR",              electron4DeltaR,             "electron4DeltaR[nJets]/F");  		       
+  EventInfo->Branch(  "electron4EtaRel",              electron4EtaRel,             "electron4EtaRel[nJets]/F");  		       
+  EventInfo->Branch(  "electron4Ratio",               electron4Ratio,              "electron4Ratio[nJets]/F");   		     
+  EventInfo->Branch(  "electron4TrackQuality",        electron4TrackQuality,       "electron4TrackQuality[nJets]/I");   		       
+  EventInfo->Branch(  "electron4RatioRel",            electron4RatioRel,           "electron4RatioRel[nJets]/F"); 
+  EventInfo->Branch(  "electron4eSuperClusterOverP",             electron4eSuperClusterOverP,             "electron4eSuperClusterOverP[nJets]/F");
+  EventInfo->Branch(  "electron4eSeedClusterOverP",              electron4eSeedClusterOverP,              "electron4eSeedClusterOverP[nJets]/F");
+  EventInfo->Branch(  "electron4eSeedClusterOverPout",           electron4eSeedClusterOverPout,           "electron4eSeedClusterOverPout[nJets]/F");
+  EventInfo->Branch(  "electron4eEleClusterOverPout",            electron4eEleClusterOverPout,            "electron4eEleClusterOverPout[nJets]/F");
+  EventInfo->Branch(  "electron4deltaEtaSuperClusterTrackAtVtx", electron4deltaEtaSuperClusterTrackAtVtx, "electron4deltaEtaSuperClusterTrackAtVtx[nJets]/F");
+  EventInfo->Branch(  "electron4deltaEtaSeedClusterTrackAtCalo", electron4deltaEtaSeedClusterTrackAtCalo, "electron4deltaEtaSeedClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron4deltaEtaEleClusterTrackAtCalo",  electron4deltaEtaEleClusterTrackAtCalo,  "electron4deltaEtaEleClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron4deltaPhiSuperClusterTrackAtVtx", electron4deltaPhiSuperClusterTrackAtVtx, "electron4deltaPhiSuperClusterTrackAtVtx[nJets]/F");
+  EventInfo->Branch(  "electron4deltaPhiSeedClusterTrackAtCalo", electron4deltaPhiSeedClusterTrackAtCalo, "electron4deltaPhiSeedClusterTrackAtCalo[nJets]/F");
+  EventInfo->Branch(  "electron4deltaPhiEleClusterTrackAtCalo",  electron4deltaPhiEleClusterTrackAtCalo,  "electron4deltaPhiEleClusterTrackAtCalo[nJets]/F");
 
   //softMuonTagInfos	
-  tree->Branch(  "nMuons", nMuons, "nMuons[nJets]/I");                                
+  EventInfo->Branch(  "nMuons", nMuons, "nMuons[nJets]/I");                                
   
-  tree->Branch(  "muon1IsGlobal",          muon1IsGlobal,            "muon1IsGlobal[nJets]/O");            
-  tree->Branch(  "muon1IsTracker", 	   muon1IsTracker,           "muon1IsTracker[nJets]/O");           
-  tree->Branch(  "muon1IsStandalone", 	   muon1IsStandalone,        "muon1IsStandalone[nJets]/O");        
-  tree->Branch(  "muon1Pt",    		   muon1Pt,                  "muon1Pt[nJets]/F");                     	       
-  tree->Branch(  "muon1Eta",   		   muon1Eta,                 "muon1Eta[nJets]/F");                    	       
-  tree->Branch(  "muon1Phi",   		   muon1Phi,                 "muon1Phi[nJets]/F");                 
-  tree->Branch(  "muon1NumberOfMatches",   muon1NumberOfMatches,     "muon1NumberOfMatches[nJets]/I");     
-  tree->Branch(  "muon1GlobalMuonHits",    muon1GlobalMuonHits,      "muon1GlobalMuonHits[nJets]/I");      
-  tree->Branch(  "muon1InnerValidHits",    muon1InnerValidHits,      "muon1InnerValidHits[nJets]/I");      
-  tree->Branch(  "muon1NExpectedOuterHits",muon1NExpectedOuterHits,  "muon1NExpectedOuterHits[nJets]/I");    			       
-  tree->Branch(  "muon1NPixelHits", 	   muon1NPixelHits,          "muon1NPixelHits[nJets]/I");          
-  tree->Branch(  "muon1InnerNChi2", 	   muon1InnerNChi2,          "muon1InnerNChi2[nJets]/F");          
-  tree->Branch(  "muon1GlobalNChi2", 	   muon1GlobalNChi2,         "muon1GlobalNChi2[nJets]/F");         
-  tree->Branch(  "muon1VzPVDist", 	   muon1VzPVDist,            "muon1VzPVDist[nJets]/F");            
-  tree->Branch(  "muon1PtRel",    	   muon1PtRel,               "muon1PtRel[nJets]/F");               
-  tree->Branch(  "muon1Sip2d",    	   muon1Sip2d,               "muon1Sip2d[nJets]/F");                  	       
-  tree->Branch(  "muon1Ip2d",    	   muon1Ip2d,                "muon1Ip2d[nJets]/F");                    
-  tree->Branch(  "muon1Ipe2d",    	   muon1Ipe2d,               "muon1Ipe2d[nJets]/F");                  	       
-  tree->Branch(  "muon1Sip3d", 		   muon1Sip3d,               "muon1Sip3d[nJets]/F");               
-  tree->Branch(  "muon1Ip3d", 		   muon1Ip3d,                "muon1Ip3d[nJets]/F");                
-  tree->Branch(  "muon1Ipe3d",    	   muon1Ipe3d,               "muon1Ipe3d[nJets]/F");               
-  tree->Branch(  "muon1P0Par",    	   muon1P0Par,               "muon1P0Par[nJets]/F");                  		       
-  tree->Branch(  "muon1DeltaR",   	   muon1DeltaR,              "muon1DeltaR[nJets]/F");                 		       
-  tree->Branch(  "muon1EtaRel",   	   muon1EtaRel,              "muon1EtaRel[nJets]/F");                 		       
-  tree->Branch(  "muon1Ratio",    	   muon1Ratio,               "muon1Ratio[nJets]/F");                  		    
-  tree->Branch(  "muon1TrackQuality",      muon1TrackQuality,        "muon1TrackQuality[nJets]/I");           		       
-  tree->Branch(  "muon1RatioRel",          muon1RatioRel,            "muon1RatioRel[nJets]/F");                           
+  EventInfo->Branch(  "muon1IsGlobal",          muon1IsGlobal,            "muon1IsGlobal[nJets]/O");            
+  EventInfo->Branch(  "muon1IsTracker", 	   muon1IsTracker,           "muon1IsTracker[nJets]/O");           
+  EventInfo->Branch(  "muon1IsStandalone", 	   muon1IsStandalone,        "muon1IsStandalone[nJets]/O");        
+  EventInfo->Branch(  "muon1Pt",    		   muon1Pt,                  "muon1Pt[nJets]/F");                     	       
+  EventInfo->Branch(  "muon1Eta",   		   muon1Eta,                 "muon1Eta[nJets]/F");                    	       
+  EventInfo->Branch(  "muon1Phi",   		   muon1Phi,                 "muon1Phi[nJets]/F");                 
+  EventInfo->Branch(  "muon1NumberOfMatches",   muon1NumberOfMatches,     "muon1NumberOfMatches[nJets]/I");     
+  EventInfo->Branch(  "muon1GlobalMuonHits",    muon1GlobalMuonHits,      "muon1GlobalMuonHits[nJets]/I");      
+  EventInfo->Branch(  "muon1InnerValidHits",    muon1InnerValidHits,      "muon1InnerValidHits[nJets]/I");      
+  EventInfo->Branch(  "muon1NExpectedOuterHits",muon1NExpectedOuterHits,  "muon1NExpectedOuterHits[nJets]/I");    			       
+  EventInfo->Branch(  "muon1NPixelHits", 	   muon1NPixelHits,          "muon1NPixelHits[nJets]/I");          
+  EventInfo->Branch(  "muon1InnerNChi2", 	   muon1InnerNChi2,          "muon1InnerNChi2[nJets]/F");          
+  EventInfo->Branch(  "muon1GlobalNChi2", 	   muon1GlobalNChi2,         "muon1GlobalNChi2[nJets]/F");         
+  EventInfo->Branch(  "muon1VzPVDist", 	   muon1VzPVDist,            "muon1VzPVDist[nJets]/F");            
+  EventInfo->Branch(  "muon1PtRel",    	   muon1PtRel,               "muon1PtRel[nJets]/F");               
+  EventInfo->Branch(  "muon1Sip2d",    	   muon1Sip2d,               "muon1Sip2d[nJets]/F");                  	       
+  EventInfo->Branch(  "muon1Ip2d",    	   muon1Ip2d,                "muon1Ip2d[nJets]/F");                    
+  EventInfo->Branch(  "muon1Ipe2d",    	   muon1Ipe2d,               "muon1Ipe2d[nJets]/F");                  	       
+  EventInfo->Branch(  "muon1Sip3d", 		   muon1Sip3d,               "muon1Sip3d[nJets]/F");               
+  EventInfo->Branch(  "muon1Ip3d", 		   muon1Ip3d,                "muon1Ip3d[nJets]/F");                
+  EventInfo->Branch(  "muon1Ipe3d",    	   muon1Ipe3d,               "muon1Ipe3d[nJets]/F");               
+  EventInfo->Branch(  "muon1P0Par",    	   muon1P0Par,               "muon1P0Par[nJets]/F");                  		       
+  EventInfo->Branch(  "muon1DeltaR",   	   muon1DeltaR,              "muon1DeltaR[nJets]/F");                 		       
+  EventInfo->Branch(  "muon1EtaRel",   	   muon1EtaRel,              "muon1EtaRel[nJets]/F");                 		       
+  EventInfo->Branch(  "muon1Ratio",    	   muon1Ratio,               "muon1Ratio[nJets]/F");                  		    
+  EventInfo->Branch(  "muon1TrackQuality",      muon1TrackQuality,        "muon1TrackQuality[nJets]/I");           		       
+  EventInfo->Branch(  "muon1RatioRel",          muon1RatioRel,            "muon1RatioRel[nJets]/F");                           
 
 
-  tree->Branch(  "muon2IsGlobal",          muon2IsGlobal,            "muon2IsGlobal[nJets]/O");            
-  tree->Branch(  "muon2IsTracker", 	   muon2IsTracker,           "muon2IsTracker[nJets]/O");           
-  tree->Branch(  "muon2IsStandalone", 	   muon2IsStandalone,        "muon2IsStandalone[nJets]/O");        
-  tree->Branch(  "muon2Pt",    		   muon2Pt,                  "muon2Pt[nJets]/F");                     	       
-  tree->Branch(  "muon2Eta",   		   muon2Eta,                 "muon2Eta[nJets]/F");                    	       
-  tree->Branch(  "muon2Phi",   		   muon2Phi,                 "muon2Phi[nJets]/F");                 
-  tree->Branch(  "muon2NumberOfMatches",   muon2NumberOfMatches,     "muon2NumberOfMatches[nJets]/I");     
-  tree->Branch(  "muon2GlobalMuonHits",    muon2GlobalMuonHits,      "muon2GlobalMuonHits[nJets]/I");      
-  tree->Branch(  "muon2InnerValidHits",    muon2InnerValidHits,      "muon2InnerValidHits[nJets]/I");      
-  tree->Branch(  "muon2NExpectedOuterHits",muon2NExpectedOuterHits,  "muon2NExpectedOuterHits[nJets]/I");    			       
-  tree->Branch(  "muon2NPixelHits", 	   muon2NPixelHits,          "muon2NPixelHits[nJets]/I");          
-  tree->Branch(  "muon2InnerNChi2", 	   muon2InnerNChi2,          "muon2InnerNChi2[nJets]/F");          
-  tree->Branch(  "muon2GlobalNChi2", 	   muon2GlobalNChi2,         "muon2GlobalNChi2[nJets]/F");         
-  tree->Branch(  "muon2VzPVDist", 	   muon2VzPVDist,            "muon2VzPVDist[nJets]/F");            
-  tree->Branch(  "muon2PtRel",    	   muon2PtRel,               "muon2PtRel[nJets]/F");               
-  tree->Branch(  "muon2Sip2d",    	   muon2Sip2d,               "muon2Sip2d[nJets]/F");                  	       
-  tree->Branch(  "muon2Ip2d",    	   muon2Ip2d,                "muon2Ip2d[nJets]/F");                    
-  tree->Branch(  "muon2Ipe2d",    	   muon2Ipe2d,               "muon2Ipe2d[nJets]/F");                  	       
-  tree->Branch(  "muon2Sip3d", 		   muon2Sip3d,               "muon2Sip3d[nJets]/F");               
-  tree->Branch(  "muon2Ip3d", 		   muon2Ip3d,                "muon2Ip3d[nJets]/F");                
-  tree->Branch(  "muon2Ipe3d",    	   muon2Ipe3d,               "muon2Ipe3d[nJets]/F");               
-  tree->Branch(  "muon2P0Par",    	   muon2P0Par,               "muon2P0Par[nJets]/F");                  		       
-  tree->Branch(  "muon2DeltaR",   	   muon2DeltaR,              "muon2DeltaR[nJets]/F");                 		       
-  tree->Branch(  "muon2EtaRel",   	   muon2EtaRel,              "muon2EtaRel[nJets]/F");                 		       
-  tree->Branch(  "muon2Ratio",    	   muon2Ratio,               "muon2Ratio[nJets]/F");                  		    
-  tree->Branch(  "muon2TrackQuality",      muon2TrackQuality,        "muon2TrackQuality[nJets]/I");           		       
-  tree->Branch(  "muon2RatioRel",          muon2RatioRel,            "muon2RatioRel[nJets]/F");                           
+  EventInfo->Branch(  "muon2IsGlobal",          muon2IsGlobal,            "muon2IsGlobal[nJets]/O");            
+  EventInfo->Branch(  "muon2IsTracker", 	   muon2IsTracker,           "muon2IsTracker[nJets]/O");           
+  EventInfo->Branch(  "muon2IsStandalone", 	   muon2IsStandalone,        "muon2IsStandalone[nJets]/O");        
+  EventInfo->Branch(  "muon2Pt",    		   muon2Pt,                  "muon2Pt[nJets]/F");                     	       
+  EventInfo->Branch(  "muon2Eta",   		   muon2Eta,                 "muon2Eta[nJets]/F");                    	       
+  EventInfo->Branch(  "muon2Phi",   		   muon2Phi,                 "muon2Phi[nJets]/F");                 
+  EventInfo->Branch(  "muon2NumberOfMatches",   muon2NumberOfMatches,     "muon2NumberOfMatches[nJets]/I");     
+  EventInfo->Branch(  "muon2GlobalMuonHits",    muon2GlobalMuonHits,      "muon2GlobalMuonHits[nJets]/I");      
+  EventInfo->Branch(  "muon2InnerValidHits",    muon2InnerValidHits,      "muon2InnerValidHits[nJets]/I");      
+  EventInfo->Branch(  "muon2NExpectedOuterHits",muon2NExpectedOuterHits,  "muon2NExpectedOuterHits[nJets]/I");    			       
+  EventInfo->Branch(  "muon2NPixelHits", 	   muon2NPixelHits,          "muon2NPixelHits[nJets]/I");          
+  EventInfo->Branch(  "muon2InnerNChi2", 	   muon2InnerNChi2,          "muon2InnerNChi2[nJets]/F");          
+  EventInfo->Branch(  "muon2GlobalNChi2", 	   muon2GlobalNChi2,         "muon2GlobalNChi2[nJets]/F");         
+  EventInfo->Branch(  "muon2VzPVDist", 	   muon2VzPVDist,            "muon2VzPVDist[nJets]/F");            
+  EventInfo->Branch(  "muon2PtRel",    	   muon2PtRel,               "muon2PtRel[nJets]/F");               
+  EventInfo->Branch(  "muon2Sip2d",    	   muon2Sip2d,               "muon2Sip2d[nJets]/F");                  	       
+  EventInfo->Branch(  "muon2Ip2d",    	   muon2Ip2d,                "muon2Ip2d[nJets]/F");                    
+  EventInfo->Branch(  "muon2Ipe2d",    	   muon2Ipe2d,               "muon2Ipe2d[nJets]/F");                  	       
+  EventInfo->Branch(  "muon2Sip3d", 		   muon2Sip3d,               "muon2Sip3d[nJets]/F");               
+  EventInfo->Branch(  "muon2Ip3d", 		   muon2Ip3d,                "muon2Ip3d[nJets]/F");                
+  EventInfo->Branch(  "muon2Ipe3d",    	   muon2Ipe3d,               "muon2Ipe3d[nJets]/F");               
+  EventInfo->Branch(  "muon2P0Par",    	   muon2P0Par,               "muon2P0Par[nJets]/F");                  		       
+  EventInfo->Branch(  "muon2DeltaR",   	   muon2DeltaR,              "muon2DeltaR[nJets]/F");                 		       
+  EventInfo->Branch(  "muon2EtaRel",   	   muon2EtaRel,              "muon2EtaRel[nJets]/F");                 		       
+  EventInfo->Branch(  "muon2Ratio",    	   muon2Ratio,               "muon2Ratio[nJets]/F");                  		    
+  EventInfo->Branch(  "muon2TrackQuality",      muon2TrackQuality,        "muon2TrackQuality[nJets]/I");           		       
+  EventInfo->Branch(  "muon2RatioRel",          muon2RatioRel,            "muon2RatioRel[nJets]/F");                           
 
 
-  tree->Branch(  "muon3IsGlobal",          muon3IsGlobal,            "muon3IsGlobal[nJets]/O");            
-  tree->Branch(  "muon3IsTracker", 	   muon3IsTracker,           "muon3IsTracker[nJets]/O");           
-  tree->Branch(  "muon3IsStandalone", 	   muon3IsStandalone,        "muon3IsStandalone[nJets]/O");        
-  tree->Branch(  "muon3Pt",    		   muon3Pt,                  "muon3Pt[nJets]/F");                     	       
-  tree->Branch(  "muon3Eta",   		   muon3Eta,                 "muon3Eta[nJets]/F");                    	       
-  tree->Branch(  "muon3Phi",   		   muon3Phi,                 "muon3Phi[nJets]/F");                 
-  tree->Branch(  "muon3NumberOfMatches",   muon3NumberOfMatches,     "muon3NumberOfMatches[nJets]/I");     
-  tree->Branch(  "muon3GlobalMuonHits",    muon3GlobalMuonHits,      "muon3GlobalMuonHits[nJets]/I");      
-  tree->Branch(  "muon3InnerValidHits",    muon3InnerValidHits,      "muon3InnerValidHits[nJets]/I");      
-  tree->Branch(  "muon3NExpectedOuterHits",muon3NExpectedOuterHits,  "muon3NExpectedOuterHits[nJets]/I");    			       
-  tree->Branch(  "muon3NPixelHits", 	   muon3NPixelHits,          "muon3NPixelHits[nJets]/I");          
-  tree->Branch(  "muon3InnerNChi2", 	   muon3InnerNChi2,          "muon3InnerNChi2[nJets]/F");          
-  tree->Branch(  "muon3GlobalNChi2", 	   muon3GlobalNChi2,         "muon3GlobalNChi2[nJets]/F");         
-  tree->Branch(  "muon3VzPVDist", 	   muon3VzPVDist,            "muon3VzPVDist[nJets]/F");            
-  tree->Branch(  "muon3PtRel",    	   muon3PtRel,               "muon3PtRel[nJets]/F");               
-  tree->Branch(  "muon3Sip2d",    	   muon3Sip2d,               "muon3Sip2d[nJets]/F");                  	       
-  tree->Branch(  "muon3Ip2d",    	   muon3Ip2d,                "muon3Ip2d[nJets]/F");                    
-  tree->Branch(  "muon3Ipe2d",    	   muon3Ipe2d,               "muon3Ipe2d[nJets]/F");                  	       
-  tree->Branch(  "muon3Sip3d", 		   muon3Sip3d,               "muon3Sip3d[nJets]/F");               
-  tree->Branch(  "muon3Ip3d", 		   muon3Ip3d,                "muon3Ip3d[nJets]/F");                
-  tree->Branch(  "muon3Ipe3d",    	   muon3Ipe3d,               "muon3Ipe3d[nJets]/F");               
-  tree->Branch(  "muon3P0Par",    	   muon3P0Par,               "muon3P0Par[nJets]/F");                  		       
-  tree->Branch(  "muon3DeltaR",   	   muon3DeltaR,              "muon3DeltaR[nJets]/F");                 		       
-  tree->Branch(  "muon3EtaRel",   	   muon3EtaRel,              "muon3EtaRel[nJets]/F");                 		       
-  tree->Branch(  "muon3Ratio",    	   muon3Ratio,               "muon3Ratio[nJets]/F");                  		    
-  tree->Branch(  "muon3TrackQuality",      muon3TrackQuality,        "muon3TrackQuality[nJets]/I");           		       
-  tree->Branch(  "muon3RatioRel",          muon3RatioRel,            "muon3RatioRel[nJets]/F");                           
+  EventInfo->Branch(  "muon3IsGlobal",          muon3IsGlobal,            "muon3IsGlobal[nJets]/O");            
+  EventInfo->Branch(  "muon3IsTracker", 	   muon3IsTracker,           "muon3IsTracker[nJets]/O");           
+  EventInfo->Branch(  "muon3IsStandalone", 	   muon3IsStandalone,        "muon3IsStandalone[nJets]/O");        
+  EventInfo->Branch(  "muon3Pt",    		   muon3Pt,                  "muon3Pt[nJets]/F");                     	       
+  EventInfo->Branch(  "muon3Eta",   		   muon3Eta,                 "muon3Eta[nJets]/F");                    	       
+  EventInfo->Branch(  "muon3Phi",   		   muon3Phi,                 "muon3Phi[nJets]/F");                 
+  EventInfo->Branch(  "muon3NumberOfMatches",   muon3NumberOfMatches,     "muon3NumberOfMatches[nJets]/I");     
+  EventInfo->Branch(  "muon3GlobalMuonHits",    muon3GlobalMuonHits,      "muon3GlobalMuonHits[nJets]/I");      
+  EventInfo->Branch(  "muon3InnerValidHits",    muon3InnerValidHits,      "muon3InnerValidHits[nJets]/I");      
+  EventInfo->Branch(  "muon3NExpectedOuterHits",muon3NExpectedOuterHits,  "muon3NExpectedOuterHits[nJets]/I");    			       
+  EventInfo->Branch(  "muon3NPixelHits", 	   muon3NPixelHits,          "muon3NPixelHits[nJets]/I");          
+  EventInfo->Branch(  "muon3InnerNChi2", 	   muon3InnerNChi2,          "muon3InnerNChi2[nJets]/F");          
+  EventInfo->Branch(  "muon3GlobalNChi2", 	   muon3GlobalNChi2,         "muon3GlobalNChi2[nJets]/F");         
+  EventInfo->Branch(  "muon3VzPVDist", 	   muon3VzPVDist,            "muon3VzPVDist[nJets]/F");            
+  EventInfo->Branch(  "muon3PtRel",    	   muon3PtRel,               "muon3PtRel[nJets]/F");               
+  EventInfo->Branch(  "muon3Sip2d",    	   muon3Sip2d,               "muon3Sip2d[nJets]/F");                  	       
+  EventInfo->Branch(  "muon3Ip2d",    	   muon3Ip2d,                "muon3Ip2d[nJets]/F");                    
+  EventInfo->Branch(  "muon3Ipe2d",    	   muon3Ipe2d,               "muon3Ipe2d[nJets]/F");                  	       
+  EventInfo->Branch(  "muon3Sip3d", 		   muon3Sip3d,               "muon3Sip3d[nJets]/F");               
+  EventInfo->Branch(  "muon3Ip3d", 		   muon3Ip3d,                "muon3Ip3d[nJets]/F");                
+  EventInfo->Branch(  "muon3Ipe3d",    	   muon3Ipe3d,               "muon3Ipe3d[nJets]/F");               
+  EventInfo->Branch(  "muon3P0Par",    	   muon3P0Par,               "muon3P0Par[nJets]/F");                  		       
+  EventInfo->Branch(  "muon3DeltaR",   	   muon3DeltaR,              "muon3DeltaR[nJets]/F");                 		       
+  EventInfo->Branch(  "muon3EtaRel",   	   muon3EtaRel,              "muon3EtaRel[nJets]/F");                 		       
+  EventInfo->Branch(  "muon3Ratio",    	   muon3Ratio,               "muon3Ratio[nJets]/F");                  		    
+  EventInfo->Branch(  "muon3TrackQuality",      muon3TrackQuality,        "muon3TrackQuality[nJets]/I");           		       
+  EventInfo->Branch(  "muon3RatioRel",          muon3RatioRel,            "muon3RatioRel[nJets]/F");                           
 
 
-  tree->Branch(  "muon4IsGlobal",          muon4IsGlobal,            "muon4IsGlobal[nJets]/O");            
-  tree->Branch(  "muon4IsTracker", 	   muon4IsTracker,           "muon4IsTracker[nJets]/O");           
-  tree->Branch(  "muon4IsStandalone", 	   muon4IsStandalone,        "muon4IsStandalone[nJets]/O");        
-  tree->Branch(  "muon4Pt",    		   muon4Pt,                  "muon4Pt[nJets]/F");                     	       
-  tree->Branch(  "muon4Eta",   		   muon4Eta,                 "muon4Eta[nJets]/F");                    	       
-  tree->Branch(  "muon4Phi",   		   muon4Phi,                 "muon4Phi[nJets]/F");                 
-  tree->Branch(  "muon4NumberOfMatches",   muon4NumberOfMatches,     "muon4NumberOfMatches[nJets]/I");     
-  tree->Branch(  "muon4GlobalMuonHits",    muon4GlobalMuonHits,      "muon4GlobalMuonHits[nJets]/I");      
-  tree->Branch(  "muon4InnerValidHits",    muon4InnerValidHits,      "muon4InnerValidHits[nJets]/I");      
-  tree->Branch(  "muon4NExpectedOuterHits",muon4NExpectedOuterHits,  "muon4NExpectedOuterHits[nJets]/I");    			       
-  tree->Branch(  "muon4NPixelHits", 	   muon4NPixelHits,          "muon4NPixelHits[nJets]/I");          
-  tree->Branch(  "muon4InnerNChi2", 	   muon4InnerNChi2,          "muon4InnerNChi2[nJets]/F");          
-  tree->Branch(  "muon4GlobalNChi2", 	   muon4GlobalNChi2,         "muon4GlobalNChi2[nJets]/F");         
-  tree->Branch(  "muon4VzPVDist", 	   muon4VzPVDist,            "muon4VzPVDist[nJets]/F");            
-  tree->Branch(  "muon4PtRel",    	   muon4PtRel,               "muon4PtRel[nJets]/F");               
-  tree->Branch(  "muon4Sip2d",    	   muon4Sip2d,               "muon4Sip2d[nJets]/F");                  	       
-  tree->Branch(  "muon4Ip2d",    	   muon4Ip2d,                "muon4Ip2d[nJets]/F");                    
-  tree->Branch(  "muon4Ipe2d",    	   muon4Ipe2d,               "muon4Ipe2d[nJets]/F");                  	       
-  tree->Branch(  "muon4Sip3d", 		   muon4Sip3d,               "muon4Sip3d[nJets]/F");               
-  tree->Branch(  "muon4Ip3d", 		   muon4Ip3d,                "muon4Ip3d[nJets]/F");                
-  tree->Branch(  "muon4Ipe3d",    	   muon4Ipe3d,               "muon4Ipe3d[nJets]/F");               
-  tree->Branch(  "muon4P0Par",    	   muon4P0Par,               "muon4P0Par[nJets]/F");                  		       
-  tree->Branch(  "muon4DeltaR",   	   muon4DeltaR,              "muon4DeltaR[nJets]/F");                 		       
-  tree->Branch(  "muon4EtaRel",   	   muon4EtaRel,              "muon4EtaRel[nJets]/F");                 		       
-  tree->Branch(  "muon4Ratio",    	   muon4Ratio,               "muon4Ratio[nJets]/F");                  		    
-  tree->Branch(  "muon4TrackQuality",      muon4TrackQuality,        "muon4TrackQuality[nJets]/I");           		       
-  tree->Branch(  "muon4RatioRel",          muon4RatioRel,            "muon4RatioRel[nJets]/F");                           
+  EventInfo->Branch(  "muon4IsGlobal",          muon4IsGlobal,            "muon4IsGlobal[nJets]/O");            
+  EventInfo->Branch(  "muon4IsTracker", 	   muon4IsTracker,           "muon4IsTracker[nJets]/O");           
+  EventInfo->Branch(  "muon4IsStandalone", 	   muon4IsStandalone,        "muon4IsStandalone[nJets]/O");        
+  EventInfo->Branch(  "muon4Pt",    		   muon4Pt,                  "muon4Pt[nJets]/F");                     	       
+  EventInfo->Branch(  "muon4Eta",   		   muon4Eta,                 "muon4Eta[nJets]/F");                    	       
+  EventInfo->Branch(  "muon4Phi",   		   muon4Phi,                 "muon4Phi[nJets]/F");                 
+  EventInfo->Branch(  "muon4NumberOfMatches",   muon4NumberOfMatches,     "muon4NumberOfMatches[nJets]/I");     
+  EventInfo->Branch(  "muon4GlobalMuonHits",    muon4GlobalMuonHits,      "muon4GlobalMuonHits[nJets]/I");      
+  EventInfo->Branch(  "muon4InnerValidHits",    muon4InnerValidHits,      "muon4InnerValidHits[nJets]/I");      
+  EventInfo->Branch(  "muon4NExpectedOuterHits",muon4NExpectedOuterHits,  "muon4NExpectedOuterHits[nJets]/I");    			       
+  EventInfo->Branch(  "muon4NPixelHits", 	   muon4NPixelHits,          "muon4NPixelHits[nJets]/I");          
+  EventInfo->Branch(  "muon4InnerNChi2", 	   muon4InnerNChi2,          "muon4InnerNChi2[nJets]/F");          
+  EventInfo->Branch(  "muon4GlobalNChi2", 	   muon4GlobalNChi2,         "muon4GlobalNChi2[nJets]/F");         
+  EventInfo->Branch(  "muon4VzPVDist", 	   muon4VzPVDist,            "muon4VzPVDist[nJets]/F");            
+  EventInfo->Branch(  "muon4PtRel",    	   muon4PtRel,               "muon4PtRel[nJets]/F");               
+  EventInfo->Branch(  "muon4Sip2d",    	   muon4Sip2d,               "muon4Sip2d[nJets]/F");                  	       
+  EventInfo->Branch(  "muon4Ip2d",    	   muon4Ip2d,                "muon4Ip2d[nJets]/F");                    
+  EventInfo->Branch(  "muon4Ipe2d",    	   muon4Ipe2d,               "muon4Ipe2d[nJets]/F");                  	       
+  EventInfo->Branch(  "muon4Sip3d", 		   muon4Sip3d,               "muon4Sip3d[nJets]/F");               
+  EventInfo->Branch(  "muon4Ip3d", 		   muon4Ip3d,                "muon4Ip3d[nJets]/F");                
+  EventInfo->Branch(  "muon4Ipe3d",    	   muon4Ipe3d,               "muon4Ipe3d[nJets]/F");               
+  EventInfo->Branch(  "muon4P0Par",    	   muon4P0Par,               "muon4P0Par[nJets]/F");                  		       
+  EventInfo->Branch(  "muon4DeltaR",   	   muon4DeltaR,              "muon4DeltaR[nJets]/F");                 		       
+  EventInfo->Branch(  "muon4EtaRel",   	   muon4EtaRel,              "muon4EtaRel[nJets]/F");                 		       
+  EventInfo->Branch(  "muon4Ratio",    	   muon4Ratio,               "muon4Ratio[nJets]/F");                  		    
+  EventInfo->Branch(  "muon4TrackQuality",      muon4TrackQuality,        "muon4TrackQuality[nJets]/I");           		       
+  EventInfo->Branch(  "muon4RatioRel",          muon4RatioRel,            "muon4RatioRel[nJets]/F");                           
 
-
-
-  for(map< string, float* >::iterator it = bTagArrays.begin(); it!= bTagArrays.end(); it++){
+  for(map< string, Float_t* >::iterator it = bTagArrays.begin(); it!= bTagArrays.end(); it++){
     TString name = it->first;
     TString nameExt = name;
     nameExt += "[nJets]/F";
-    tree->Branch(  name, it->second, nameExt ); 
+    EventInfo->Branch(  name, it->second, nameExt ); 
   }
-
-  isValidHltConfig_ = false;
+  //Build the run information TTree. It will be filled once per run.
+  HLTTableName = new string();
+  RunInfo->Branch("RunNumber",&runNumber,"RunNum/i");
+  RunInfo->Branch("TableName",&HLTTableName);
+  HLTNamesSet = new vector<string>();
+  RunInfo->Branch("HLTNamesSet",&HLTNamesSet);
+  firstEvent_=true;
 }
 
 
@@ -1471,258 +1326,57 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   using namespace edm;
   using namespace std;
   using namespace reco;
+
+  if (firstEvent_) {
+    if ( iEvent.isRealData() ) {
+      getMCPUInfo_=false;
+      getMCTruth_=false;
+      getSimTruth_=false;
+    }
+    else {
+      try{
+	Handle<std::vector< PileupSummaryInfo > >  puInfo;
+	getMCPUInfo_=iEvent.getByLabel( InputTag("addPileupInfo"), puInfo);
+      }
+      catch (cms::Exception) {
+	LogWarning("DataFormat")<< "MC Pileup information is not found.(BadTag?)";
+	getMCPUInfo_=false;
+      }
+      try{
+	Handle<JetFlavourMatchingCollection> jetMC;
+	Handle< GenEventInfoProduct   > genInfo;
+      	getMCTruth_=iEvent.getByLabel(jet_MC_src_,jetMC)&&iEvent.getByLabel("generator",genInfo);
+      }
+      catch (cms::Exception) {
+	LogWarning("DataFormat")<< "Generator level information is not found.(BadTag?)";
+	getMCTruth_=false;
+      }
+      try{
+	Handle<SimTrackContainer> STCollectionH;  Handle<SimVertexContainer> SVCollectionH;
+	getSimTruth_=iEvent.getByLabel(simTruthTag_, STCollectionH)&&iEvent.getByLabel(simTruthTag_, SVCollectionH);
+      }
+      catch (cms::Exception) {
+	LogWarning("DataFormat")<< "Simulation level information is not found.(BadTag? or AOD?)";
+	getSimTruth_=false;
+      }
+    }
+    firstEvent_=false;
+  }
+  HLTriggerResults->clear(); HLTPrescaleFactors->clear();
   
-  triggerHLTL1Jet6U= triggerHLTL1Jet10U= triggerHLTJet15U = 0;
-  triggerHLTJet30U = triggerHLTJet50U = triggerHLTJet70U= triggerHLTJet100U = 0;
-  triggerHLTBTagIPJet50U = triggerHLTBTagMuJet10U = triggerHLTBTagMuJet20U = 0;
-  //BTagMu paths in 6E31 and 2E32 menu
-  triggerHLTBTagMuDiJet10U = triggerHLTBTagMuDiJet20U = triggerHLTBTagMuDiJet20UMu5 = triggerHLTBTagMuDiJet30U = triggerHLTBTagMuDiJet30UMu5 = 0;
-
-  // added by Caroline
-  prescaleHLTL1Jet6U= prescaleHLTL1Jet10U= prescaleHLTJet15U = 0;
-  prescaleHLTJet30U = prescaleHLTJet50U = prescaleHLTJet70U= prescaleHLTJet100U = 0;
-  prescaleHLTBTagIPJet50U = prescaleHLTBTagMuJet10U = prescaleHLTBTagMuJet20U = 0;
-  prescaleHLTBTagMuDiJet10U = prescaleHLTBTagMuDiJet20U = prescaleHLTBTagMuDiJet20UMu5 = prescaleHLTBTagMuDiJet30U = prescaleHLTBTagMuDiJet30UMu5 = 0;
-
-  // 4_1_2_patch1
-  triggerHLT_L1SingleJet36= triggerHLT_Jet30= triggerHLT_Jet60= triggerHLT_Jet80= triggerHLT_Jet110= triggerHLT_Jet150=0;
-  triggerHLT_Jet190 = triggerHLT_Jet240 = triggerHLT_Jet370 = triggerHLT_Jet370_NoJetID =0;
-  prescaleHLT_L1SingleJet36= prescaleHLT_Jet30= prescaleHLT_Jet60= prescaleHLT_Jet80= prescaleHLT_Jet110= prescaleHLT_Jet150=0;
-  prescaleHLT_Jet190 = prescaleHLT_Jet240 = prescaleHLT_Jet370 = prescaleHLT_Jet370_NoJetID =0;
-  // end add
-   triggerHLT_DiJetAve15U_v4          =0 ;
-   triggerHLT_DiJetAve30U_v4          =0 ;
-   triggerHLT_DiJetAve50U_v4          =0 ;
-   triggerHLT_DiJetAve70U_v4          =0 ;
-   triggerHLT_DiJetAve100U_v4         =0 ;
-   triggerHLT_DiJetAve140U_v4         =0 ;
-   triggerHLT_DiJetAve180U_v4         =0 ;
-   triggerHLT_DiJetAve300U_v4         =0 ;
-   triggerHLT_BTagMu_DiJet20_Mu5      =0 ;
-   triggerHLT_BTagMu_DiJet40_Mu5      =0 ;
-   triggerHLT_BTagMu_DiJet70_Mu5      =0 ;
-   triggerHLT_BTagMu_DiJet110_Mu5      =0 ;
-   triggerHLT_BTagMu_DiJet60_Mu7_v2   =0 ;
-   triggerHLT_BTagMu_DiJet80_Mu9_v2   =0 ;
-   triggerHLT_BTagMu_DiJet100_Mu9_v2  =0 ;
-  
-   prescaleHLT_DiJetAve15U_v4          =0 ;
-   prescaleHLT_DiJetAve30U_v4          =0 ;
-   prescaleHLT_DiJetAve50U_v4          =0 ;
-   prescaleHLT_DiJetAve70U_v4          =0 ;
-   prescaleHLT_DiJetAve100U_v4         =0 ;
-   prescaleHLT_DiJetAve140U_v4         =0 ;
-   prescaleHLT_DiJetAve180U_v4         =0 ;
-   prescaleHLT_DiJetAve300U_v4         =0 ;
-   prescaleHLT_BTagMu_DiJet20_Mu5      =0 ;
-   prescaleHLT_BTagMu_DiJet40_Mu5      =0 ;
-   prescaleHLT_BTagMu_DiJet70_Mu5      =0 ;
-   prescaleHLT_BTagMu_DiJet110_Mu5     =0 ;
-   prescaleHLT_BTagMu_DiJet60_Mu7_v2   =0 ;
-   prescaleHLT_BTagMu_DiJet80_Mu9_v2   =0 ;
-   prescaleHLT_BTagMu_DiJet100_Mu9_v2  =0 ;
-
   //Get The Various collections defined in the configuration file
   edm::Handle<edm::TriggerResults>  hltresults;
   iEvent.getByLabel(triggerTag_, hltresults);
-  
-  const edm::TriggerNames & triggerNames_ = iEvent.triggerNames(*hltresults);  
 
-  int ntrigs = hltresults->size();
-
-
-  for (int itrig = 0; itrig != ntrigs; ++itrig){
-
-    string trigName=triggerNames_.triggerName(itrig);
-    for(unsigned int iter = 0; iter != trigNames_.size(); ++iter)
-    {
-      if(trigName.find(trigNames_[iter]) != std::string::npos)
-      {
-        triggers_[iter] = hltresults->accept(itrig);
-        prescales_[iter] = hltConfigProvider_.prescaleValue(iEvent, iSetup, trigName);
-        break;
-      }
-    }
-
-    /*if (trigName=="HLT_L1Jet6U")               triggerHLTL1Jet6U  = hltresults->accept(itrig) ;
-    if (trigName=="HLT_L1Jet10U")              triggerHLTL1Jet10U = hltresults->accept(itrig) ; 
-
-    //Take care of versioning even for the single jet triggers
-    if (trigName=="HLT_Jet15U" || trigName=="HLT_Jet15U_v1" || trigName=="HLT_Jet15U_v2" || trigName=="HLT_Jet15U_v3")
-      triggerHLTJet15U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet30U" || trigName=="HLT_Jet30U_v1" || trigName=="HLT_Jet30U_v2" || trigName=="HLT_Jet30U_v3")
-      triggerHLTJet30U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet50U" || trigName=="HLT_Jet50U_v1" || trigName=="HLT_Jet50U_v2" || trigName=="HLT_Jet50U_v3")
-      triggerHLTJet50U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet70U" || trigName=="HLT_Jet70U_v1" || trigName=="HLT_Jet70U_v2" || trigName=="HLT_Jet70U_v3")
-      triggerHLTJet70U   = hltresults->accept(itrig) ;
-    if (trigName=="HLT_Jet100U" || trigName=="HLT_Jet100U_v1" || trigName=="HLT_Jet100U_v2" || trigName=="HLT_Jet100U_v3")
-      triggerHLTJet100U   = hltresults->accept(itrig) ; 
-
-    //BTagIP path till 2E31 menu
-    if (trigName=="HLT_BTagIP_Jet50U")         triggerHLTBTagIPJet50U = hltresults->accept(itrig) ;
-    
-    //BTagMu paths till 2E31 menu
-    if (trigName=="HLT_BTagMu_Jet10U")         triggerHLTBTagMuJet10U = hltresults->accept(itrig) ;
-    if (trigName=="HLT_BTagMu_Jet20U")         triggerHLTBTagMuJet20U = hltresults->accept(itrig) ;
-
-    //BTagMu paths in 6E31 and 2E32 menu
-    if (trigName=="HLT_BTagMu_DiJet10U" || trigName=="HLT_BTagMu_DiJet10U_v1" || trigName=="HLT_BTagMu_DiJet10U_v2" || trigName=="HLT_BTagMu_DiJet10U_v3")
-      triggerHLTBTagMuDiJet10U = hltresults->accept(itrig) ;
-    if (trigName=="HLT_BTagMu_DiJet20U" || trigName=="HLT_BTagMu_DiJet20U_v1" || trigName=="HLT_BTagMu_DiJet20U_v2" || trigName=="HLT_BTagMu_DiJet20U_v3")
-      triggerHLTBTagMuDiJet20U = hltresults->accept(itrig) ;
-    if (trigName=="HLT_BTagMu_DiJet20U_Mu5" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v1" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v2" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v3")
-      triggerHLTBTagMuDiJet20UMu5 = hltresults->accept(itrig) ;
-    if (trigName=="HLT_BTagMu_DiJet30U" || trigName=="HLT_BTagMu_DiJet30U_v1" || trigName=="HLT_BTagMu_DiJet30U_v2" || trigName=="HLT_BTagMu_DiJet30U_v3")
-      triggerHLTBTagMuDiJet30U = hltresults->accept(itrig) ;
-    if (trigName=="HLT_BTagMu_DiJet30U_Mu5" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v1" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v2" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v3")
-      triggerHLTBTagMuDiJet30UMu5 = hltresults->accept(itrig) ;
-
-    // added by Caroline for prescale
-    int prescaleval=  hltConfigProvider_.prescaleValue(iEvent, iSetup, trigName);
-
-    if (trigName=="HLT_L1Jet6U")               prescaleHLTL1Jet6U  = prescaleval ;
-    if (trigName=="HLT_L1Jet10U")              prescaleHLTL1Jet10U = prescaleval ; 
-
-    //Take care of versioning even for the single jet prescales
-    if (trigName=="HLT_Jet15U" || trigName=="HLT_Jet15U_v1" || trigName=="HLT_Jet15U_v2" || trigName=="HLT_Jet15U_v3")
-      prescaleHLTJet15U   = prescaleval ;
-    if (trigName=="HLT_Jet30U" || trigName=="HLT_Jet30U_v1" || trigName=="HLT_Jet30U_v2" || trigName=="HLT_Jet30U_v3")
-      prescaleHLTJet30U   = prescaleval ;
-    if (trigName=="HLT_Jet50U" || trigName=="HLT_Jet50U_v1" || trigName=="HLT_Jet50U_v2" || trigName=="HLT_Jet50U_v3")
-      prescaleHLTJet50U   = prescaleval ;
-    if (trigName=="HLT_Jet70U" || trigName=="HLT_Jet70U_v1" || trigName=="HLT_Jet70U_v2" || trigName=="HLT_Jet70U_v3")
-      prescaleHLTJet70U   = prescaleval ;
-    if (trigName=="HLT_Jet100U" || trigName=="HLT_Jet100U_v1" || trigName=="HLT_Jet100U_v2" || trigName=="HLT_Jet100U_v3")
-      prescaleHLTJet100U   = prescaleval ; 
-
-    //BTagIP path till 2E31 menu
-    if (trigName=="HLT_BTagIP_Jet50U")         prescaleHLTBTagIPJet50U = prescaleval ;
-    
-    //BTagMu paths till 2E31 menu
-    if (trigName=="HLT_BTagMu_Jet10U")         prescaleHLTBTagMuJet10U = prescaleval ;
-    if (trigName=="HLT_BTagMu_Jet20U")         prescaleHLTBTagMuJet20U = prescaleval ;
-
-    //BTagMu paths in 6E31 and 2E32 menu
-    if (trigName=="HLT_BTagMu_DiJet10U" || trigName=="HLT_BTagMu_DiJet10U_v1" || trigName=="HLT_BTagMu_DiJet10U_v2" || trigName=="HLT_BTagMu_DiJet10U_v3")
-      prescaleHLTBTagMuDiJet10U = prescaleval ;
-    if (trigName=="HLT_BTagMu_DiJet20U" || trigName=="HLT_BTagMu_DiJet20U_v1" || trigName=="HLT_BTagMu_DiJet20U_v2" || trigName=="HLT_BTagMu_DiJet20U_v3")
-      prescaleHLTBTagMuDiJet20U = prescaleval ;
-    if (trigName=="HLT_BTagMu_DiJet20U_Mu5" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v1" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v2" || trigName=="HLT_BTagMu_DiJet20U_Mu5_v3")
-      prescaleHLTBTagMuDiJet20UMu5 = prescaleval ;
-    if (trigName=="HLT_BTagMu_DiJet30U" || trigName=="HLT_BTagMu_DiJet30U_v1" || trigName=="HLT_BTagMu_DiJet30U_v2" || trigName=="HLT_BTagMu_DiJet30U_v3")
-      prescaleHLTBTagMuDiJet30U = prescaleval ;
-    if (trigName=="HLT_BTagMu_DiJet30U_Mu5" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v1" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v2" || trigName=="HLT_BTagMu_DiJet30U_Mu5_v3")
-      prescaleHLTBTagMuDiJet30UMu5 = prescaleval ;
-    //end add
-
-    //Single Jet trigger in 4_1_2_patch1 and 42X
-    if (trigName=="HLT_L1SingleJet36_v1" || trigName=="HLT_L1SingleJet36_v2") {
-        triggerHLT_L1SingleJet36=hltresults->accept(itrig) ;
-        prescaleHLT_L1SingleJet36= prescaleval;
-    }
-    if (trigName=="HLT_Jet30_v1" || trigName=="HLT_Jet30_v2" || trigName=="HLT_Jet30_v3" || trigName=="HLT_Jet30_v4") {
-        triggerHLT_Jet30=hltresults->accept(itrig) ;
-        prescaleHLT_Jet30= prescaleval;
-    }
-    if (trigName=="HLT_Jet60_v1" || trigName=="HLT_Jet60_v2" ||  trigName=="HLT_Jet60_v3" || trigName=="HLT_Jet60_v4") {
-        triggerHLT_Jet60=hltresults->accept(itrig) ;
-        prescaleHLT_Jet60= prescaleval;
-    }
-    if (trigName=="HLT_Jet80_v1" || trigName=="HLT_Jet80_v2" || trigName=="HLT_Jet80_v3" ||  trigName=="HLT_Jet80_v4") {
-        triggerHLT_Jet80=hltresults->accept(itrig) ;
-        prescaleHLT_Jet80= prescaleval;
-    }
-    if (trigName=="HLT_Jet110_v1" || trigName=="HLT_Jet110_v2" || trigName=="HLT_Jet110_v3" || trigName=="HLT_Jet110_v4") {
-        triggerHLT_Jet110=hltresults->accept(itrig) ;
-        prescaleHLT_Jet110= prescaleval;
-    }
-    if (trigName=="HLT_Jet150_v1" || trigName=="HLT_Jet150_v2" || trigName=="HLT_Jet150_v3" || trigName=="HLT_Jet150_v4") {
-        triggerHLT_Jet150=hltresults->accept(itrig) ;
-        prescaleHLT_Jet150= prescaleval;
-    }
-    if (trigName=="HLT_Jet190_v1" || trigName=="HLT_Jet190_v2" || trigName=="HLT_Jet190_v3" || trigName=="HLT_Jet190_v4") {
-        triggerHLT_Jet190=hltresults->accept(itrig) ;
-        prescaleHLT_Jet190= prescaleval;
-    }
-    if (trigName=="HLT_Jet240_v1" || trigName=="HLT_Jet240_v2" || trigName=="HLT_Jet240_v3" || trigName=="HLT_Jet240_v4") {
-        triggerHLT_Jet240=hltresults->accept(itrig) ;
-        prescaleHLT_Jet240= prescaleval;
-    }
-    if (trigName=="HLT_Jet370_v1") {
-        triggerHLT_Jet370=hltresults->accept(itrig) ;
-        prescaleHLT_Jet370= prescaleval;
-    }
-    if (trigName=="HLT_Jet370_NoJetID_v1") {
-        triggerHLT_Jet370_NoJetID=hltresults->accept(itrig) ;
-        prescaleHLT_Jet370_NoJetID= prescaleval;
-    }
-    if(trigName=="HLT_DiJetAve15U_v4" ) { 
-      triggerHLT_DiJetAve15U_v4  = hltresults->accept(itrig) ;
-      prescaleHLT_DiJetAve15U_v4 = prescaleval;               
-    }
-    
-    if(trigName=="HLT_DiJetAve30U_v4" ) { 
-      triggerHLT_DiJetAve30U_v4  = hltresults->accept(itrig) ;
-      prescaleHLT_DiJetAve30U_v4 = prescaleval;               
-    }        
-    if(trigName=="HLT_DiJetAve50U_v4" ) { 
-      triggerHLT_DiJetAve50U_v4= hltresults->accept(itrig) ;
-      prescaleHLT_DiJetAve50U_v4= prescaleval;               
-    }
-    if(trigName=="HLT_DiJetAve70U_v4" ) { 
-      triggerHLT_DiJetAve70U_v4= hltresults->accept(itrig) ;
-      prescaleHLT_DiJetAve70U_v4= prescaleval;               
-    }        
-    if(trigName=="HLT_DiJetAve100U_v4") {
-      triggerHLT_DiJetAve100U_v4= hltresults->accept(itrig) ;
-      prescaleHLT_DiJetAve100U_v4= prescaleval;               
-    }         
-    if(trigName=="HLT_DiJetAve140U_v4") {
-      triggerHLT_DiJetAve140U_v4= hltresults->accept(itrig) ;
-      prescaleHLT_DiJetAve140U_v4= prescaleval;               
-    }         
-    if(trigName=="HLT_DiJetAve180U_v4") {
-      triggerHLT_DiJetAve180U_v4= hltresults->accept(itrig) ;
-      prescaleHLT_DiJetAve180U_v4= prescaleval;               
-    }         
-    if(trigName=="HLT_DiJetAve300U_v4") {  
-      triggerHLT_DiJetAve300U_v4= hltresults->accept(itrig) ;
-      prescaleHLT_DiJetAve300U_v4= prescaleval;               
-    }       
-    if(trigName=="HLT_BTagMu_DiJet20_Mu5_v2" || trigName=="HLT_BTagMu_DiJet20_Mu5_v3" || trigName=="HLT_BTagMu_DiJet20_Mu5_v4" ||trigName=="HLT_BTagMu_DiJet20_Mu5_v5") { 
-      triggerHLT_BTagMu_DiJet20_Mu5= hltresults->accept(itrig) ;
-      prescaleHLT_BTagMu_DiJet20_Mu5= prescaleval;               
-    }  
-    if(trigName=="HLT_BTagMu_DiJet40_Mu5_v3" || trigName=="HLT_BTagMu_DiJet40_Mu5_v4" || trigName=="HLT_BTagMu_DiJet40_Mu5_v5") { 
-      triggerHLT_BTagMu_DiJet40_Mu5= hltresults->accept(itrig) ;
-      prescaleHLT_BTagMu_DiJet40_Mu5= prescaleval;               
-    }  
-    if(trigName=="HLT_BTagMu_DiJet60_Mu7_v2") {
-      triggerHLT_BTagMu_DiJet60_Mu7_v2= hltresults->accept(itrig) ;
-      prescaleHLT_BTagMu_DiJet60_Mu7_v2= prescaleval;               
-    }   
-    if(trigName=="HLT_BTagMu_DiJet70_Mu5_v3" || trigName=="HLT_BTagMu_DiJet70_Mu5_v4" || trigName=="HLT_BTagMu_DiJet70_Mu5_v5") { 
-      triggerHLT_BTagMu_DiJet70_Mu5= hltresults->accept(itrig) ;
-      prescaleHLT_BTagMu_DiJet70_Mu5= prescaleval;               
-    }  
-    if(trigName=="HLT_BTagMu_DiJet80_Mu9_v2") { 
-      triggerHLT_BTagMu_DiJet80_Mu9_v2= hltresults->accept(itrig) ;
-      prescaleHLT_BTagMu_DiJet80_Mu9_v2= prescaleval;               
-    }  
-    if(trigName=="HLT_BTagMu_DiJet100_Mu9_v2") {
-      triggerHLT_BTagMu_DiJet100_Mu9_v2= hltresults->accept(itrig) ;
-      prescaleHLT_BTagMu_DiJet100_Mu9_v2= prescaleval;               
-    }  
-    if(trigName=="HLT_BTagMu_DiJet110_Mu5_v3" || trigName=="HLT_BTagMu_DiJet110_Mu5_v4" || trigName=="HLT_BTagMu_DiJet110_Mu5_v5") {
-      triggerHLT_BTagMu_DiJet110_Mu5= hltresults->accept(itrig) ;
-      prescaleHLT_BTagMu_DiJet110_Mu5= prescaleval;               
-    }*/
-  }  
-  
+  for ( vector<Int_t>::const_iterator iter=HLTTableBitMatch_.begin();iter!=HLTTableBitMatch_.end();iter++)
+    HLTriggerResults->push_back( hltresults->accept(*iter) );
+  //According to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideHighLevelTrigger#HLT_Prescales
+  //For MC, all prescale factors are ONE, so we just skip it to save the space. Do not try to access prescale factors in the MC ntuples.
+  if ( iEvent.isRealData() )
+    for ( vector<string>::const_iterator iter=HLTNamesSet->begin();iter!=HLTNamesSet->end();iter++)
+      HLTPrescaleFactors->push_back( hltConfigProvider_.prescaleValue(iEvent, iSetup, *iter) );
   
   eventNumber = iEvent.eventAuxiliary().event();
-  runNumber = iEvent.eventAuxiliary().run();
   lumiBlockNumber = iEvent.eventAuxiliary().luminosityBlock();
 
   Handle< View<Jet> > jets;
@@ -1738,44 +1392,35 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   // ndof > 4 && abs(z) <= 24 && position.Rho <= 2
   numberOfPrimaryVertices = primaryVertex->size();
   
-  if(getMCPUInfo_) {
+  if (getMCPUInfo_) {
     edm::InputTag PileupSrc_("addPileupInfo");
- 
 
-//  TO GET PU INFO IN 4_1_2 
+#ifdef GetPUFromEarlyThan_4_1_2
     Handle<std::vector< PileupSummaryInfo > >  puInfo;
-    bool bPuInfo=iEvent.getByLabel(PileupSrc_, puInfo);
-    
-    if (bPuInfo) {
+    if ( iEvent.getByLabel(PileupSrc_, puInfo) ) {
       numberOfPUVertices = (*puInfo)[0].getPU_NumInteractions();
-
-      //   std::cout<<" numberOfPUVertices = " << numberOfPUVertices << std::endl;
-
+      // std::cout<<" numberOfPUVertices = " << numberOfPUVertices << std::endl;
     }
     numberOfPUVerticesTot=numberOfPUVertices;
-//  END PU INFO IN 4_1_2
-
-/*  
-//   TO GET PU INFO IN 4_1_3 or later 
+#else
      Handle<std::vector< PileupSummaryInfo > >  PupInfo;
      iEvent.getByLabel(PileupSrc_, PupInfo);
-
      std::vector<PileupSummaryInfo>::const_iterator PVI;
-
      numberOfPUVertices=0;
      numberOfPUVerticesTot=0;
      for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
-       int n_bc=PVI->getBunchCrossing();
-       for (int ipu=0; ipu <PVI->getPU_NumInteractions(); ipu++) {
+       Int_t n_bc=PVI->getBunchCrossing();
+       for (Int_t ipu=0; ipu <PVI->getPU_NumInteractions(); ipu++) {
         if (n_bc==0) numberOfPUVertices++;
         numberOfPUVerticesTot++;
        }
     }
-//  END PU INFO IN 4_1_3 or later
-*/
-
+#endif
   }
   
+  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+  iEvent.getByLabel(BeamSpotTag_,recoBeamSpotHandle);
+
   edm::ESHandle<TransientTrackBuilder> builder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
 
@@ -1822,25 +1467,22 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       ipTagInfo[iTagInfo->jet()] = &*iTagInfo;
     }
     
-  //Get the MC Truth Matching (if requested) and define a map from RefToBase<Jet> to the flavor; if MC Truth not requested, fill with -1
-
-  typedef map<JetRef, int, JetRefCompare> FlavorMap;
-  FlavorMap flavor;
-
+  //Parton Container:Get the MC Truth Matching (if requested) and define a map from RefToBase<Jet> to the flavor; if MC Truth not requested, fill with -1
+  typedef map<JetRef, const reco::JetFlavour *, JetRefCompare> TruthMap;
   edm::Handle<JetFlavourMatchingCollection> jetMC;
+  TruthMap JetFlavor;
+  //GenJet Container
+  edm::Handle< edm::Association<reco::GenJetCollection> >GenJetMatch;
 
   if(getMCTruth_)
     {
+      //Get GenParton
       iEvent.getByLabel(jet_MC_src_, jetMC);      
       for (JetFlavourMatchingCollection::const_iterator iFlav = jetMC->begin(); iFlav != jetMC->end(); iFlav++) 
-	{
-	  int fl = std::abs(iFlav->second.getFlavour());
-	  flavor[iFlav->first] = fl;
-	}
-
+	JetFlavor[iFlav->first] = &iFlav->second;
       // fill pt hat
       pthat = -1;
-      mcweight=-1;
+      mcweight=1.;
       Handle< GenEventInfoProduct   > genInfo;
       iEvent.getByLabel("generator", genInfo  );      
       if (genInfo.isValid()) {
@@ -1850,39 +1492,64 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  }
         mcweight=genInfo->weight();
       }
+      //Get GenJet
+      iEvent.getByLabel( GenJet_Matcher_, GenJetMatch );
     } 
   else 
     {
-      int fl = -1;
-      for (unsigned int iJet = 0; iJet < jets->size(); iJet++)
-	{
-	  flavor[RefToBase<Jet>(jets, iJet)] = fl;
-	}
+      for (UInt_t iJet = 0; iJet < jets->size(); iJet++)
+	JetFlavor[RefToBase<Jet>(jets, iJet)] = NULL;
       pthat = -2;
-      mcweight=-2;
+      mcweight=1.;
     }
+  //SimTrack,SimVertex Container, we build a map from SimTrack to its TrackParameter Vector here
+  //if sample is AODSIM, getSimTruth_ must be false
+  Handle<SimTrackContainer> STCollectionH;
+  map< vector<SimTrack>::iterator,reco::TrackBase::ParameterVector > SimTrackParameterVectorMap;
+  SimTrackContainer STC;
+  Handle<SimVertexContainer> SVCollectionH;
+  SimVertexContainer SVC;
+  if (getSimTruth_) {
+    //SimTrack and SimVertex
+    iEvent.getByLabel(simTruthTag_, STCollectionH);
+    iEvent.getByLabel(simTruthTag_, SVCollectionH);
+    STC = *STCollectionH.product();
+    SVC = *SVCollectionH.product();
+    for (vector<SimTrack>::iterator Trk_iter = STC.begin(); Trk_iter != STC.end(); ++Trk_iter ) {
+      Basic3DVector<Double_t> momAtVtx( Trk_iter->momentum().x(),Trk_iter->momentum().y(), Trk_iter->momentum().z() );
+      Basic3DVector<Double_t> vert;
+      if ( !Trk_iter->noVertex() ) {
+	SimVertex *thisVtx=&SVC[Trk_iter->vertIndex()];
+	vert=Basic3DVector<Double_t>( thisVtx->position().x(),thisVtx->position().y(),thisVtx->position().z() );
+      }
+      else {
+	edm::LogWarning("SimBug")<<"SimTrack has no SimVertex. Consider the SimTrack is from (0,0,0)"<<endl;
+	vert=Basic3DVector<Double_t>( 0,0,0 );
+      }
+      std::pair<Bool_t,reco::TrackBase::ParameterVector> params = parametersAtClosestApproach(vert, momAtVtx, Trk_iter->charge(), *recoBeamSpotHandle);
+      if (params.first) SimTrackParameterVectorMap[Trk_iter]=params.second;
+    }
+  }
 
   // determine gluon splitting
   isBGluonSplitting = 0;
   isCGluonSplitting = 0;
   if(getMCTruth_) {
-    bool bFoundS3BQuark = false;
-    bool bFoundS2BQuark = false;
-    bool bFoundS3CQuark = false;
-    bool bFoundS2CQuark = false;
+    Bool_t bFoundS3BQuark = false;
+    Bool_t bFoundS2BQuark = false;
+    Bool_t bFoundS3CQuark = false;
+    Bool_t bFoundS2CQuark = false;
     edm::Handle<GenParticleCollection> genParticles;
     iEvent.getByLabel("genParticles" , genParticles );
     for( size_t i = 0; i < genParticles->size(); ++ i ) {
       const GenParticle & genCand = (*genParticles)[ i ];
-      int MC_particleID=abs(genCand.pdgId());
+      Int_t MC_particleID=abs(genCand.pdgId());
       if(genCand.status() == 3 && MC_particleID ==5){
 	bFoundS3BQuark = true;
       }
       if(genCand.status() == 2 && MC_particleID ==5){
 	bFoundS2BQuark = true;
       }
-
-
       if(genCand.status() == 3 && MC_particleID ==4){
 	bFoundS3CQuark = true;
       }
@@ -1920,12 +1587,12 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   }
   computer->passEventSetup(iSetup);
   
-  int iTotalTracksCounter = 0;
+  Int_t iTotalTracksCounter = 0;
   nJets = jets->size();
+  if(nJets > (Int_t)MAXJETS) return;
   //Begin Loop over Jets and record the various information
-  for (int iJet = 0; iJet<nJets; iJet++)
+  for (Int_t iJet = 0; iJet<nJets; iJet++)
     {
-      if(iJet >= (int)MAXJETS) return;
 
       JetRef thisJetRef = RefToBase<Jet>(jets, iJet);
  
@@ -2000,17 +1667,18 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       PVNormalizedChi2 = pv->normalizedChi2();
 
       //some counters
+      size_t counter=0;
       size_t nSelectedTracks=0;
       size_t nSelectedAndDecayLengthAndJetAsixTracks=0;
-
-      size_t counter=0;
+      size_t nSelectedPUTracks=0;
+      size_t nSelectedAndDecayLengthAndJetAsixPUTracks=0;
     
       for(track_iterator iTrack = (*jetTracks)[thisJetRef].begin(); iTrack != (*jetTracks)[thisJetRef].end(); iTrack++)
 	{ 
-	  if(iTotalTracksCounter >= (int)MAXTRACKS) return;
-
+	  if(iTotalTracksCounter >= (Int_t)MAXTRACKS) return;
+	  
 	  trackJetIndex[iTotalTracksCounter] = iJet;
-	  bool isSelected = false;
+	  Bool_t isSelected = false;
 	  for(track_iterator jTrack = ipTagInfo[thisJetRef]->selectedTracks().begin(); jTrack != ipTagInfo[thisJetRef]->selectedTracks().end(); jTrack++)
 	    {
 	      if((*iTrack)==(*jTrack)) {
@@ -2019,12 +1687,60 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	      }
 	    }
 	
-	  if(isSelected) nSelectedTracks++;
-
+	  Bool_t isSelectedPUTrack=false;
+	  if(isSelected) {
+	    nSelectedTracks++;
+	    if (getSimTruth_) {//start investigating if the track is from PU
+	      TrackBase::ParameterVector rParameters = (*iTrack)->parameters();
+	      TrackBase::CovarianceMatrix recoTrackCovMatrix = (*iTrack)->covariance();
+	      recoTrackCovMatrix.Invert();
+	      vector<SimTrack>::iterator BestMatchSimTrk=STC.end();
+	      Double_t BestChi2=1E30;
+	      for (vector<SimTrack>::iterator Trk_iter = STC.begin(); Trk_iter != STC.end(); ++Trk_iter ) {
+		reco::TrackBase::ParameterVector sParameters=SimTrackParameterVectorMap[Trk_iter];
+		reco::TrackBase::ParameterVector diffParameters = rParameters - sParameters;
+		diffParameters[2] = reco::deltaPhi(diffParameters[2],0.f);
+		Double_t chi2 = ROOT::Math::Dot(diffParameters * recoTrackCovMatrix, diffParameters);
+		if (chi2<chi2cut_&&chi2<BestChi2) {
+		  BestChi2=chi2;
+		  BestMatchSimTrk=Trk_iter;
+		}
+	      }
+	      if ( BestMatchSimTrk!=STC.end() ) {
+		vector<SimTrack>::iterator thisTrk=BestMatchSimTrk;
+		SimVertex *thisVtx=NULL;//the very beginning vertex of this track
+		do {
+		  if (thisTrk->noVertex()) break;
+		  thisVtx=&SVC[thisTrk->vertIndex()];
+		  if (thisVtx->noParent()) break;
+		  Int_t TrkID =Int_t( thisVtx->parentIndex() );
+		  thisTrk = STC.begin();
+		  for (; thisTrk != STC.end(); ++thisTrk )
+		    if ( (Int_t) thisTrk->trackId() == TrkID) break;
+		  if ( thisTrk==STC.end() ) {
+		    edm::LogError("SimBug")<<"parentIndex/trackId Error, considered as no parent track"<<endl;
+		    break;
+		  }
+		}while(true);
+		if (thisVtx==NULL) isSelectedPUTrack=true;
+		else if ( thisTrk==STC.end() ) isSelectedPUTrack=true;
+		else if ( thisTrk->noGenpart() ) isSelectedPUTrack=true;
+		if (isSelectedPUTrack&&numberOfPUVertices==0) {
+		  isSelectedPUTrack=false;
+		  edm::LogError("SimBug")<<"Found a PU track in PU0 event."<<endl;
+		}
+	      }
+	      else {
+		isSelectedPUTrack=false;
+		edm::LogWarning("MCMatching")<<"No matched SimTrack. Increase TrackMCTruthMatchChi2Cut??"<<endl;
+	      }
+	    }//end of getSimTruth
+	    if (isSelectedPUTrack) nSelectedPUTracks++;
+	  }
 
 	  // check if track is attached to a vertex
 	  trackIsVertexTrack[iTotalTracksCounter] = false;
-	  bool hasVertex = svTagInfo[thisJetRef]->nVertices() > 0;
+	  Bool_t hasVertex = svTagInfo[thisJetRef]->nVertices() > 0;
 	  if(hasVertex)
 	    {
 	      const Vertex &sv = svTagInfo[thisJetRef]->secondaryVertex(0);
@@ -2053,7 +1769,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  trackNormChi2[iTotalTracksCounter] = ((*iTrack)->normalizedChi2());
 	  //trackQuality[iTotalTracksCounter] = ((*iTrack)->qualityMask());
 	  //cout << (*iTrack)->qualityMask() << endl;
-	  for(int i = 2; i>-2; i--){
+	  for(Int_t i = 2; i>-2; i--){
 	    if((*iTrack)->quality(reco::TrackBase::TrackQuality(i))){
 	      trackQuality[iTotalTracksCounter] = (i);
 	      break;
@@ -2068,7 +1784,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   	  trackIP2d[iTotalTracksCounter] = (ip2d.value());
   	  trackIP3dError[iTotalTracksCounter] = (ip3d.error());
   	  trackIP2dError[iTotalTracksCounter] = (ip2d.error());
-	  double decayLength=-1;
+	  Double_t decayLength=-1;
 	  TrajectoryStateOnSurface closest =
 	    IPTools::closestApproachToJet(transientTrack.impactPointState(),
 					  *pv, direction,
@@ -2081,31 +1797,73 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  }
 	  trackDecayLength[iTotalTracksCounter] = (decayLength);
 
-	  double distJetAxis =  IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value();
+	  Double_t distJetAxis =  IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value();
 	  trackDistJetAxis[iTotalTracksCounter] = ( distJetAxis );
 	  trackDeltaR[iTotalTracksCounter] = ( ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),(*iTrack)->momentum()) );
 
+	  if (isSelected && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixTracks++;
+	  if (isSelectedPUTrack && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixPUTracks++;
+
 	  if(getSharedHitInfo_) {
-	    int tsharedP1, tsharedP2, tsharedP3;
+	    Int_t tsharedP1, tsharedP2, tsharedP3;
 	    trackHasSharedPix1[iTotalTracksCounter] = ( tsharedP1 = hasSharedHit(1, counter, (*jetTracks)[thisJetRef]));
 	    trackHasSharedPix2[iTotalTracksCounter] = ( tsharedP2 = hasSharedHit(2, counter, (*jetTracks)[thisJetRef]));
 	    trackHasSharedPix3[iTotalTracksCounter] = ( tsharedP3 = hasSharedHit(3, counter, (*jetTracks)[thisJetRef]));
 	    trackHasSharedPixAll[iTotalTracksCounter] = ( tsharedP1 || tsharedP2 || tsharedP3 );
 	  }
-	  
-	  if(isSelected && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixTracks++;   //cut is hardcoded for now
-
 	  counter++;
 	  iTotalTracksCounter++;
 	}       
 
-
       //MC Truth Information
-      MCTrueFlavor[iJet] = (flavor[thisJetRef]);                          
+      reco::GenJetRef GenJet;
+      if (getMCTruth_) {
+	PartonFlavor[iJet] = std::abs(JetFlavor[thisJetRef]->getFlavour());
+	GenJet = (*GenJetMatch)[thisJetRef];
+      }
+      if (GenJet.isNonnull() && GenJet.isAvailable()) {
+	GenJetPt[iJet] = GenJet->pt();
+	GenJetEta[iJet] = GenJet->eta();
+	GenJetPhi[iJet] = GenJet->phi();
+	/* This part is only for studying GenJet. It can be deleted in the later versions.
+	   A GenJet is not a jet generated by only one parton. It is formed by clustering all generated particles, like the reco jet. The difference is that the GenJet does not include particles from pileups since particles from pileups are not saved in the events.
+	cout<<"##### "<<GenJetPt[iJet]<<","<<GenJetEta[iJet]<<","<<GenJetPhi[iJet]<<" #####"<<endl;
+	std::vector <const GenParticle*> mcparts = GenJet->getGenConstituents();
+	for ( std::vector <const GenParticle*>::const_iterator mcpart=mcparts.begin();mcpart!=mcparts.end();mcpart++) 
+	  if ( (*mcpart)->numberOfMothers()>0 ) {
+	    Candidate * mother=const_cast<Candidate *>( (*mcpart)->mother() );
+	    while ( mother->numberOfMothers()>0 ) {
+	      Int_t flavour=abs( mother->pdgId() );
+	      if ( flavour == 1 || flavour == 2 || flavour == 3 || flavour == 4 || flavour == 5 || flavour == 21 ) break;//udscbg
+	      mother=const_cast<Candidate *>( mother->mother() );
+	    }
+	    Float_t diffeta=mother->eta()-GenJetEta[iJet],diffphi=mother->phi()-GenJetPhi[iJet];
+	    if ( mother->numberOfMothers()>0 && diffeta*diffeta+diffphi*diffphi<1.) cout<<mother->pdgId()<<":"<<mother->pt()<<","<<mother->eta()<<","<<mother->phi()<<endl;
+	  }*/
+      }
+      else {
+	GenJetPt[iJet] = -9999.;
+	GenJetEta[iJet] = -9999.;
+	GenJetPhi[iJet] =  -9999.;
+      }
+      //if flavor=0, that means no matched parton
+      if (getMCTruth_&&JetFlavor[thisJetRef]->getFlavour()!=0) {
+	math::XYZTLorentzVector partonMomentum = JetFlavor[thisJetRef]->getLorentzVector();
+	PartonPt[iJet] = partonMomentum.Pt();
+	PartonEta[iJet] = partonMomentum.Eta();
+	PartonPhi[iJet] = partonMomentum.phi();
+      }
+      else {
+	PartonFlavor[iJet] = -1;
+	PartonPt[iJet] = -9999.;
+	PartonEta[iJet] = -9999.;
+	PartonPhi[iJet] = -9999.;
+      }
+      
       //secondaryVertexTagInfos:
       
       SVnSelectedTracks[iJet] = (svTagInfo[thisJetRef]->nSelectedTracks());  
-      bool hasVertex = svTagInfo[thisJetRef]->nVertices() > 0;
+      Bool_t hasVertex = svTagInfo[thisJetRef]->nVertices() > 0;
       if(hasVertex)
 	{
 	  // Compute tagging variables
@@ -2131,8 +1889,8 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  SVnFirstVertexTracksAll[iJet] = (svTagInfo[thisJetRef]->secondaryVertex(0).tracksSize());
 	  SVnFirstVertexTracks[iJet] = ( svTagInfo[thisJetRef]->nVertexTracks(0)  );
 	  SVnVertexTracks[iJet] = ( svTagInfo[thisJetRef]->nVertexTracks()  );
-	  int nVertexTrackSize = 0;
-	  for(unsigned int i=0; i< svTagInfo[thisJetRef]->nVertices(); i++) nVertexTrackSize+= svTagInfo[thisJetRef]->secondaryVertex(i).tracksSize();
+	  Int_t nVertexTrackSize = 0;
+	  for(UInt_t i=0; i< svTagInfo[thisJetRef]->nVertices(); i++) nVertexTrackSize+= svTagInfo[thisJetRef]->secondaryVertex(i).tracksSize();
 	  SVnVertexTracksAll[iJet] = ( nVertexTrackSize );
 	  if(vars.checkTag(reco::btau::vertexMass)) SVMass[iJet] = ( vars.get( reco::btau::vertexMass));
 	  else  SVMass[iJet] = ( -9999 );
@@ -2146,16 +1904,16 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  else SVIPFirstAboveCharm[iJet] = (  -9999 );
 	  
 //        added by Caroline
-          int totcharge=0;
+          Int_t totcharge=0;
 //        end add
 
 	  TrackKinematics vertexKinematics;
 	  const Vertex &vertex = svTagInfo[thisJetRef]->secondaryVertex(0);
-	  bool hasRefittedTracks = vertex.hasRefittedTracks();
+	  Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
 	  TrackRefVector tracks = svTagInfo[thisJetRef]->vertexTracks(0);
 	  for(TrackRefVector::const_iterator track = tracks.begin();
 	      track != tracks.end(); track++) {
-	    double w = svTagInfo[thisJetRef]->trackWeight(0, *track);
+	    Double_t w = svTagInfo[thisJetRef]->trackWeight(0, *track);
 	    if (w < 0.5)
 	      continue;
 	    if (hasRefittedTracks) {
@@ -2175,7 +1933,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
               // end add
 	    }
 	  }
-	  bool useTrackWeights = true;
+	  Bool_t useTrackWeights = true;
 	  math::XYZTLorentzVector vertexSum = useTrackWeights
 	    ? vertexKinematics.weightedVectorSum()
 	    : vertexKinematics.vectorSum();
@@ -2263,7 +2021,10 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       const math::XYZVector ghostTrack(ipTagInfo[thisJetRef]->ghostTrack()->px(),ipTagInfo[thisJetRef]->ghostTrack()->py(),ipTagInfo[thisJetRef]->ghostTrack()->pz());
 
       //	  IPnSelectedTracks.push_back(ipTagInfo[thisJetRef]->selectedTracks().size());                       
-      IPnSelectedTracks[iJet] = ( nSelectedAndDecayLengthAndJetAsixTracks );                       
+      IPnSelectedTracks[iJet] = nSelectedTracks;                       
+      IPnSelectedPUTracks[iJet] = nSelectedPUTracks;                       
+      IPnSelectedAndDecayLengthAndJetAsixTracks[iJet] = nSelectedAndDecayLengthAndJetAsixTracks;                       
+      IPnSelectedAndDecayLengthAndJetAsixPUTracks[iJet] = nSelectedAndDecayLengthAndJetAsixPUTracks;                       
       IPghostTrackP3[iJet] = (ghostTrack);
       IPghostTrackPt[iJet] = (ipTagInfo[thisJetRef]->ghostTrack()->pt());                        
       IPghostTrackPtRel[iJet] = (Perp(ghostTrack,axis));
@@ -2272,9 +2033,9 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       IPghostTrackDeltaR[iJet] = (deltaR(thisJetRef->eta(), thisJetRef->phi(), ipTagInfo[thisJetRef]->ghostTrack()->eta(), ipTagInfo[thisJetRef]->ghostTrack()->phi()));                    
 
       if(getSharedHitInfo_) {
-	int nPix1Shared, nPix1Total;
-	int nPix2Shared, nPix2Total;
-	int nPix3Shared, nPix3Total;
+	Int_t nPix1Shared, nPix1Total;
+	Int_t nPix2Shared, nPix2Total;
+	Int_t nPix3Shared, nPix3Total;
 	getSharedHitsInfo(1, ipTagInfo[thisJetRef]->selectedTracks(), nPix1Shared, nPix1Total);
 	getSharedHitsInfo(2, ipTagInfo[thisJetRef]->selectedTracks(), nPix2Shared, nPix2Total);
 	getSharedHitsInfo(3, ipTagInfo[thisJetRef]->selectedTracks(), nPix3Shared, nPix3Total);
@@ -2285,12 +2046,12 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	IPPixAllTotalHits[iJet] = (nPix1Total + nPix2Total + nPix3Total); IPPixAllSharedHits[iJet] = (nPix1Shared + nPix2Shared + nPix3Shared);
       }
       
-      for(unsigned int iTrack = 0; iTrack < 4; iTrack++)
+      for(UInt_t iTrack = 0; iTrack < 4; iTrack++)
 	{
 	  if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
 	    {
 	      size_t location3D = ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig)[iTrack];
-	      for(int i = 2; i>-2; i--){
+	      for(Int_t i = 2; i>-2; i--){
 		if(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->quality(reco::TrackBase::TrackQuality(i))){
 		  IP3dTrackQuality[iTrack][iJet] = (i);
 		  break;
@@ -2298,7 +2059,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	      }
 
 	      if(getSharedHitInfo_) {
-		int sharedP1, sharedP2, sharedP3;
+		Int_t sharedP1, sharedP2, sharedP3;
 		IP3dHasSharedPix1[iTrack][iJet] = (sharedP1=hasSharedHit(1, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
 		IP3dHasSharedPix2[iTrack][iJet] = (sharedP2=hasSharedHit(2, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
 		IP3dHasSharedPix3[iTrack][iJet] = (sharedP3=hasSharedHit(3, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
@@ -2350,7 +2111,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
 	    {
 	      size_t location2D = ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP2DSig)[iTrack];
-	      for(int i = 2; i>-2; i--){
+	      for(Int_t i = 2; i>-2; i--){
 		if(ipTagInfo[thisJetRef]->selectedTracks()[location2D]->quality(reco::TrackBase::TrackQuality(i))){
 		  IP2dTrackQuality[iTrack][iJet] = (i);
 		  break;
@@ -2378,7 +2139,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
       //softElectronTagInfos
 
-      for(unsigned int i=0; i<4; i++){
+      for(UInt_t i=0; i<4; i++){
 	nElectrons[iJet] = ( 0 );
 	electronPt[i][iJet] = (-9999 );   			       
 	electronEta[i][iJet] = (-9999);  			       
@@ -2412,7 +2173,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	electrondeltaPhiEleClusterTrackAtCalo[i][iJet] = (-9999);
       } 
 
-      bool hasLeptons = softElectronTagInfo[thisJetRef]->leptons() > 0;
+      Bool_t hasLeptons = softElectronTagInfo[thisJetRef]->leptons() > 0;
       if(hasLeptons)
 	{
 	  nElectrons[iJet] = (softElectronTagInfo[thisJetRef]->leptons());
@@ -2422,14 +2183,14 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  iEvent.getByLabel("gsfElectrons",allelectrons);
 	  // loop over all electrons in tag info and match them to gsfelectron collection 
 	  // create pt sorted map of electrons
-	  std::map<double, const GsfElectron*> elMap;
-	  std::map<const GsfElectron*, unsigned int> tagInfoMap;
+	  std::map<Double_t, const GsfElectron*> elMap;
+	  std::map<const GsfElectron*, UInt_t> tagInfoMap;
 
-	  for(unsigned int iElectron = 0; iElectron < softElectronTagInfo[thisJetRef]->leptons(); iElectron++)
+	  for(UInt_t iElectron = 0; iElectron < softElectronTagInfo[thisJetRef]->leptons(); iElectron++)
 	    {
 	      //loop on electron collection
 	      //count electrons
-	      unsigned int iElCounter = 0;
+	      UInt_t iElCounter = 0;
 	      for(size_t i=0; i < allelectrons->size(); ++i){
 		const GsfElectron & el = (*allelectrons)[i];
 		GsfTrackRef gsftrack = el.gsfTrack();
@@ -2458,8 +2219,8 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  }
 
 	  // now loop over el map and fill info
-	  int iElMapCounter = 0;
-	  for(std::map<double, const GsfElectron*>::reverse_iterator it= elMap.rbegin(); it != elMap.rend(); it++){
+	  Int_t iElMapCounter = 0;
+	  for(std::map<Double_t, const GsfElectron*>::reverse_iterator it= elMap.rbegin(); it != elMap.rend(); it++){
 
 	    const GsfElectron * el =  it->second;
 
@@ -2500,7 +2261,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	    electrondeltaPhiSeedClusterTrackAtCalo[iElMapCounter][iJet] = el->deltaPhiSeedClusterTrackAtCalo();
 	    electrondeltaPhiEleClusterTrackAtCalo[iElMapCounter][iJet] = el->deltaPhiEleClusterTrackAtCalo();
 
-	    for(int i = 2; i>-2; i--){
+	    for(Int_t i = 2; i>-2; i--){
 	      if( (*softElectronTagInfo[thisJetRef]->lepton(tagInfoMap[el])).quality(reco::TrackBase::TrackQuality(i))){
 		electronTrackQuality[iElMapCounter][iJet] = (i);
 		break;
@@ -2511,7 +2272,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	
       
       //softMuonTagInfos
-      for(unsigned int i=0; i<4; i++){
+      for(UInt_t i=0; i<4; i++){
 	nMuons[iJet] = 0;
 	muonIsGlobal[i][iJet] = 0;             
 	muonIsTracker[i][iJet] = 0;            
@@ -2552,14 +2313,14 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  iEvent.getByLabel("muons",allmuons);
 	  // loop over all muons in tag info and match them to muon collection 
 	  // create pt sorted map of muons
-	  std::map<double, const Muon*> muMap;
-	  std::map<const Muon*, unsigned int> tagInfoMap;
+	  std::map<Double_t, const Muon*> muMap;
+	  std::map<const Muon*, UInt_t> tagInfoMap;
 
-	  for(unsigned int iMuon = 0; iMuon < softMuonTagInfo[thisJetRef]->leptons(); iMuon++)
+	  for(UInt_t iMuon = 0; iMuon < softMuonTagInfo[thisJetRef]->leptons(); iMuon++)
 	    {
 	      //loop on muon collection
 	      //count muons
-	      unsigned int iMuCounter = 0;
+	      UInt_t iMuCounter = 0;
 	      for(size_t i=0; i < allmuons->size(); ++i){
 		const Muon & mu = (*allmuons)[i];
 		TrackRef globTrack = mu.globalTrack();
@@ -2583,8 +2344,8 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  }
 
 	  // now loop over mu map and fill info
-	  int iMuMapCounter = 0;
-	  for(std::map<double, const Muon*>::reverse_iterator it= muMap.rbegin(); it != muMap.rend(); it++){
+	  Int_t iMuMapCounter = 0;
+	  for(std::map<Double_t, const Muon*>::reverse_iterator it= muMap.rbegin(); it != muMap.rend(); it++){
 
 	    const Muon * mu =  it->second;
 
@@ -2623,7 +2384,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	    muonRatioRel[iMuMapCounter][iJet] =  (softMuonTagInfo[thisJetRef]->properties(tagInfoMap[mu]).ratioRel);  
 		
 		
-	    for(int i = 2; i>-2; i--){
+	    for(Int_t i = 2; i>-2; i--){
 	      if( (*softMuonTagInfo[thisJetRef]->lepton(tagInfoMap[mu])).quality(reco::TrackBase::TrackQuality(i))){
 		muonTrackQuality[iMuMapCounter][iJet] = (i);
 		break;
@@ -2634,10 +2395,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  }
 	}
 
-       
-
-      
-      for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
+    for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
 	{
 	  bTagArrays[ibTag->getParameter<string>("alias")][iJet] = ((bTags[ibTag->getParameter<string>("alias")])[thisJetRef]);
 	}
@@ -2646,7 +2404,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   nTracks = iTotalTracksCounter;
 
   // fill the tree
-  tree->Fill();  
+  EventInfo->Fill();  
 
 }
 
@@ -2655,30 +2413,81 @@ void TagNtupleProducer::beginJob()
 {
 }
 
-//added by Caroline for prescale
+//copied and modified from http://www.codeproject.com/KB/string/wildcmp.aspx
+//It does not belong to any class
+Bool_t wildcmp(const char *wild, const char *string) {
+  // Written by Jack Handy - jakkhandy@hotmail.com
+  const char *cp = NULL, *mp = NULL;
+
+  while ((*string) && (*wild != '*')) {
+    if ((*wild != *string) && (*wild != '?')) {
+      return false;
+    }
+    wild++;
+    string++;
+  }
+
+  while (*string) {
+    if (*wild == '*') {
+      if (!*++wild) {
+        return true;
+      }
+      mp = wild;
+      cp = string+1;
+    } else if ((*wild == *string) || (*wild == '?')) {
+      wild++;
+      string++;
+    } else {
+      wild = mp;
+      string = cp++;
+    }
+  }
+
+  while (*wild == '*') {
+    wild++;
+  }
+  return !*wild;
+}
+
 // ------------ method called at the beginning of the run  ------------
 void TagNtupleProducer::beginRun(const Run& r, const EventSetup& iSet)
 {
-     // passed as parameter to HLTConfigProvider::init(), not yet used
-      bool isConfigChanged = false;
-      // isValidHltConfig_ used to short-circuit analyze() in case of problems
-      isValidHltConfig_ = hltConfigProvider_.init( r, iSet, "HLT", isConfigChanged );
-
-     if (isValidHltConfig_) {
-      // if init returns TRUE, initialisation has succeeded!
-      if (isConfigChanged) {
-       // The HLT config has actually changed wrt the previous Run, hence rebook your
-      // histograms or do anything else dependent on the revised HLT config
-      std::cout << "Initalizing HLTConfigProvider"  << std::endl;
+  iSet.get<IdealMagneticFieldRecord>().get(theMF);
+  runNumber = r.runAuxiliary().run();
+  // passed as parameter to HLTConfigProvider::init(), not yet used
+  Bool_t isConfigChanged = false;
+  if ( hltConfigProvider_.init( r, iSet, triggerTag_.process() , isConfigChanged ) ) {
+    // if init returns TRUE, initialisation has succeeded!
+    HLTTableName->assign(hltConfigProvider_.tableName());
+    HLTNamesSet->clear();
+    const vector<string> & HLTNamesSet_=hltConfigProvider_.triggerNames();
+    for ( vector<string>::const_iterator itertable=HLTNamesSet_.begin();itertable!=HLTNamesSet_.end();itertable++ ) {
+      Bool_t selected=false;
+      cout<<itertable-HLTNamesSet_.begin()<<":"<<*itertable<<" -------- ";
+      for ( vector<string>::const_iterator iter=TriggerNames_.begin();iter!=TriggerNames_.end();iter++ ) {
+	cout<<*iter<<",";
+	if ( wildcmp(iter->c_str(),itertable->c_str()) ) {
+	  selected=true;
+	  break;
+	}
       }
-     } else {
+      if (selected) {
+	HLTTableBitMatch_.push_back(itertable-HLTNamesSet_.begin());
+	HLTNamesSet->push_back(*itertable);
+	cout<<"   (:SAVE=:)"<<endl;
+      }
+      else 
+	cout<<"   ):DROP:("<<endl;
+    }
+    //    for ( vector<string>::const_iterator iter=HLTNamesSet->begin();iter!=HLTNamesSet->end();iter++ )
+    //      cout<<*iter<<":"<<HLTTableBitMatch_.at(iter-HLTNamesSet->begin())<<endl;
+    RunInfo->Fill();
+  } else {
       // if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
       // with the file and/or code and needs to be investigated!
-      std::cout << " HLT config extraction failure with process name HLT "  << std::endl;
-      // In this case, all access methods will return empty values!
-     }
-
-
+    LogWarning("DataLost") << " HLT config extraction failure with process name " <<triggerTag_.process();
+    // In this case, all access methods will return empty values!
+  }
 }
 
 
@@ -2692,12 +2501,12 @@ void TagNtupleProducer::endRun(const Run& r, const EventSetup& iSet)
 // ------------ method called once each job just after ending the event loop  ------------
 void TagNtupleProducer::endJob() {
 
-  file ->Write();
+  file->Write();
   file->Close();
 }
 
 
-void TagNtupleProducer::getSharedHitsInfo(unsigned int layer, const reco::TrackRefVector & tracks, int &nSharedHits, int &nTotalHits){
+void TagNtupleProducer::getSharedHitsInfo(UInt_t layer, const reco::TrackRefVector & tracks, Int_t &nSharedHits, Int_t &nTotalHits){
 
   nSharedHits=0;
   nTotalHits=0;
@@ -2708,9 +2517,9 @@ void TagNtupleProducer::getSharedHitsInfo(unsigned int layer, const reco::TrackR
     for(trackingRecHit_iterator hitIt = (*itTrack)->recHitsBegin(); hitIt != (*itTrack)->recHitsEnd(); hitIt++  ){
       if( !(*hitIt)->isValid() ) continue;
       DetId detid = (*hitIt)->geographicalId();
-      unsigned int subdet = detid.subdetId();
+      UInt_t subdet = detid.subdetId();
 
-      unsigned int thislayer = -1;
+      UInt_t thislayer = -1;
       if(subdet==PixelSubdetector::PixelBarrel){//PXB
 	PXBDetId pxbdet=(detid);
 	thislayer=pxbdet.layer();
@@ -2724,7 +2533,7 @@ void TagNtupleProducer::getSharedHitsInfo(unsigned int layer, const reco::TrackR
       // if they are on the desired layer
       if(layer == thislayer){
 	nTotalHits++;
-	//iterate over all other tracks avoiding double counting
+	//iterate over all other tracks avoiding Double_t counting
 	track_iterator itTrack2 = itTrack;
 	itTrack2++;
 	if(itTrack2 == tracks.end()) continue;
@@ -2744,10 +2553,40 @@ void TagNtupleProducer::getSharedHitsInfo(unsigned int layer, const reco::TrackR
   }
 }
 
+//take it from
+// http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/SimTracker/TrackAssociation/src/TrackAssociatorByChi2.cc?revision=1.41&view=markup
+std::pair<Bool_t,reco::TrackBase::ParameterVector> 
+TagNtupleProducer::parametersAtClosestApproach(Basic3DVector<Double_t> vertex,
+					       Basic3DVector<Double_t> momAtVtx,
+					       Float_t charge,
+					       const reco::BeamSpot& bs) const{
+  
+  TrackBase::ParameterVector sParameters;
+  try {
+    FreeTrajectoryState ftsAtProduction(GlobalPoint(vertex.x(),vertex.y(),vertex.z()),
+					GlobalVector(momAtVtx.x(),momAtVtx.y(),momAtVtx.z()),
+					TrackCharge(charge),
+					theMF.product());
+    TSCBLBuilderNoMaterial tscblBuilder;
+    TrajectoryStateClosestToBeamLine tsAtClosestApproach = tscblBuilder(ftsAtProduction,bs);//as in TrackProducerAlgorithm
+    
+    GlobalPoint v = tsAtClosestApproach.trackStateAtPCA().position();
+    GlobalVector p = tsAtClosestApproach.trackStateAtPCA().momentum();
+    sParameters[0] = tsAtClosestApproach.trackStateAtPCA().charge()/p.mag();
+    sParameters[1] = Geom::halfPi() - p.theta();
+    sParameters[2] = p.phi();
+    sParameters[3] = (-v.x()*sin(p.phi())+v.y()*cos(p.phi()));
+    sParameters[4] = v.z()*p.perp()/p.mag() - (v.x()*p.x()+v.y()*p.y())/p.perp() * p.z()/p.mag();
+    
+    return pair<Bool_t,TrackBase::ParameterVector>(true,sParameters);
+  } catch ( ... ) {
+    return pair<Bool_t,TrackBase::ParameterVector>(false,sParameters);
+  }
+}
 
-int TagNtupleProducer::hasSharedHit(unsigned int layer, size_t location, const reco::TrackRefVector & tracks){
+Int_t TagNtupleProducer::hasSharedHit(UInt_t layer, size_t location, const reco::TrackRefVector & tracks){
 
-  int bFoundHit=0;
+  Int_t bFoundHit=0;
 
   //iterate over hits of this track 
   for(trackingRecHit_iterator hitIt = tracks[location]->recHitsBegin(); hitIt != tracks[location]->recHitsEnd(); hitIt++  ){
@@ -2755,9 +2594,9 @@ int TagNtupleProducer::hasSharedHit(unsigned int layer, size_t location, const r
    
 
     DetId detid = (*hitIt)->geographicalId();
-    unsigned int subdet = detid.subdetId();
+    UInt_t subdet = detid.subdetId();
     
-    unsigned int thislayer = -1;
+    UInt_t thislayer = -1;
     if(subdet==PixelSubdetector::PixelBarrel){//PXB
       PXBDetId pxbdet=(detid);
       thislayer=pxbdet.layer();
@@ -2770,7 +2609,7 @@ int TagNtupleProducer::hasSharedHit(unsigned int layer, size_t location, const r
     
     // if they are on the desired layer
     if(layer == thislayer){
-      //iterate over all other tracks avoiding double counting
+      //iterate over all other tracks avoiding Double_t counting
       size_t counter = 0;
        
       for(track_iterator itTrack2 = tracks.begin(); itTrack2!=tracks.end(); itTrack2++){
