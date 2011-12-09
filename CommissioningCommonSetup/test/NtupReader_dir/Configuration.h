@@ -5,17 +5,6 @@
 //------------(I)Samples------------------------------
 #define bTagNtupleVersion 4
 //it stands for version of the commissioning ntuples
-//Version3=14May
-//Version4=29Nov
-//The samples are defined in the end of this file, classfied by versions.
-//Each version must contain at least five variables:
-//(1)const char JetDATA[]="" : the Jet data
-//(2)const char MetDATA[]="" : the MET data
-//(3)const char *MC_files[]={"","",.....}: the files locations
-//(4)const char *MC_SampleNames[]={"","",.....}: the sample names
-//(5)const Float_t MC_Weights[]={,,....}: the sample weights 
-//   weight = ( filter(QCDSamples=1) * sect) /n_ev;
-//The program will skip empty strings. The arrays (3)(4)(5) have to have the same size and have to be corresponding.
 //------------(II) the PU reweight-------------------------------------
 //From https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupInformation
 const Double_t Spring11[]={0.0698146584, 0.0698146584, 0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0630151648,0.0526654164,0.0402754482,0.0292988928,0.0194384503,0.0122016783,0.007207042,0.004003637,0.0020278322,0.0010739954,0.0004595759,0.0002229748,0.0001028162,4.58337152809607E-05};
