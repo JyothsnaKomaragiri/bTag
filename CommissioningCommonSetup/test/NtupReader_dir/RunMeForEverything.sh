@@ -1,5 +1,11 @@
+###############################################################
+#Author : Caroline Collard (IPHC) - first commit : april 2011 #
+#         Jinzhong Zhang (NEU,USA) - version 4 coding         #
+###############################################################
 #!/bin/bash
-echo -e "IMPORTANT : you have to specify parameters in the Configuration.h, btagNtupReader.C, and displayPlots.C
+echo -e "
+-----------------------------------------------------------------------------------------------------------------
+\e[00;36mIMPORTANT : you have to specify parameters in the Configuration.h, btagNtupReader.C, and displayPlots.C\e[00m
 -----------------------------------------------------------------------------------------------------------------
 (I) Configuration.h :  where the data/MC are and which version
 
@@ -22,9 +28,9 @@ echo -e "IMPORTANT : you have to specify parameters in the Configuration.h, btag
      (5)\e[00;33mconst Float_t MC_Weights[]={,,....};\e[00m : the sample weights 
         weight = ( filter(QCDSamples=1) * sect) /n_ev;
      The program will skip empty strings. The arrays (3)(4)(5) have to have the same size and have to be corresponding.
-     For MC, \e[0;31mif the name starts with \"qcd\", it will be used in Run_on_Jet;
-             if the name starts with \"qcdmu\", it will be used in Run_on_bTag;
-             if the name starts with neither of them, it will not be used.\e[00m
+     For MC, \e[0;31mif the MC_SampleName starts with \"qcd\", it will be used in Run_on_Jet;
+             if the MC_SampleName starts with \"qcdmu\", it will be used in Run_on_bTag;
+             if the MC_SampleName starts with neither of them, it will not be used.\e[00m
      For MC, the output histogram name is \e[00;33m\"histo_\"+string(MC_SampleNames[iSample])+\".root\"\e[00m
      For data, the output histogram name is histo_minijet2011.root or histo_minibtag2011.root. If you want to change both the names in \e[0;31mrun()\e[00m in btagNtupReader.C and the names in the constructor \e[00;33mtemplate<typename T> Plots<T>::Plots( Bool_t mu, Float_t ptval, UInt_t year )\e[00m in LoadDisplayRootPlot.h, but it is not necessary.
      
