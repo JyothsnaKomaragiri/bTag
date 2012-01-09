@@ -5,11 +5,10 @@
 #!/bin/bash
 echo -e "
 -----------------------------------------------------------------------------------------------------------------
-\e[00;36mIMPORTANT : you have to specify parameters in the Configuration.h, btagNtupReader.C, and displayPlots.C\e[00m
+\e[00;36m You have to specify parameters in the Configuration.h\e[00m
 -----------------------------------------------------------------------------------------------------------------
-(I) Configuration.h :  where the data/MC are and which version
 
-   1. the bTagNtuple Version
+   I. the bTagNtuple Version
    \e[00;33m#define bTagNtupleVersion 4\e[00m
    It stands for version of the commissioning ntuples:
    Version0=not using?
@@ -18,7 +17,7 @@ echo -e "
    Version3=14May2011
    Version4=29Nov2011 and 01Dec2011
 
-   2. where the data/MC are
+   II. where the data/MC are
    The samples are defined in the end of this file, classfied by versions.
    Each version must contain at least five variables:
      (1)\e[00;33mconst char JetDATA[]="";\e[00m : the Jet data
@@ -27,43 +26,56 @@ echo -e "
      (4)\e[00;33mconst char *MC_SampleNames[]={"","",.....};\e[00m : the sample names
      (5)\e[00;33mconst Float_t MC_Weights[]={,,....};\e[00m : the sample weights 
         weight = ( filter(QCDSamples=1) * sect) /n_ev;
+     The filenames should be separated by \",\", CERN castor file name, wildcards \"?\" and \"*\" are supported. e.g. \e[00;33m\"/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-120to170/*.root,/home/xxx/additional_QCD_Pt-120to170*.root\"\e[00m
      The program will skip empty strings. The arrays (3)(4)(5) have to have the same size and have to be corresponding.
      For MC, \e[0;31mif the MC_SampleName starts with \"qcd\", it will be used in Run_on_Jet;
              if the MC_SampleName starts with \"qcdmu\", it will be used in Run_on_bTag;
              if the MC_SampleName starts with neither of them, it will not be used.\e[00m
      For MC, the output histogram name is \e[00;33m\"histo_\"+string(MC_SampleNames[iSample])+\".root\"\e[00m
      For data, the output histogram name is histo_minijet2011.root or histo_minibtag2011.root. If you want to change both the names in \e[0;31mrun()\e[00m in btagNtupReader.C and the names in the constructor \e[00;33mtemplate<typename T> Plots<T>::Plots( Bool_t mu, Float_t ptval, UInt_t year )\e[00m in LoadDisplayRootPlot.h, but it is not necessary.
-     
-(II) btagNtupReader.C : trigger and cuts
 
-   3. run on Jet or on MetBtag:
-      \e[00;33m#define Run_on_Jet true\e[00m --> Run_on_Jet otherwise Run_on_Btag
-      \e[00;33m#define ptval_jet 60\e[00m --> the single jet pt cut for Run_on_Jet
-      \e[00;33m#define ptval_batg 20\e[00m --> the di-jet pt cut for Run_on_Btag
-      if you do not want to use the default parameters, you need to change the corresponding sections like \e[00;33m#if ptval_jet == 30 && Run_on_Jet == true \e[00m, like trigger path, JetPtthresholdsfornmu and cutMuonPt, etc.
-
-(III) displayPlots.C : same with btagNtupReader.C, three parameters
-      \e[00;33mbool runJet=true;\e[00m
-      \e[00;33mFloat_t ptval=60.;\e[00m
-      \e[00;33mint year=2011;\e[00m
-      It will read from the directory \"dir_jet\"+ptval_+\"pu\".
+(1) Make Control Plots    
+   a. specify \"run on Jet\" or on MetBtag:
+      \e[00;33m#define Run_on_Jet\e[00m --> Run_on_Jet otherwise Run_on_Btag
+      \e[00;33m#define ptval 80\e[00m --> the single jet pt cut or the di-jet pt cut
+      \e[00;33m#define DATAYEAR 2011\e[00m --> the year of the data
+      if you do not want to use the default parameters, you need to change the corresponding sections in btagNtupReader.C, like \e[00;33m#if ptval_jet == 30 && defined(Run_on_Jet) \e[00m, like trigger path, JetPtthresholdsfornmu and cutMuonPt, etc.
  
-Finally, all outputs will be in \e[00;33mdir_jet[jetptcut]pu/\e[00m or \e[00;33mdir_btag[jetptcut]pu/\e[00m, about tens MB. The directory will be created by the code.
+   b. all outputs will be in \e[00;33mdir_jet[jetptcut]pu/\e[00m or \e[00;33mdir_btag[jetptcut]pu/\e[00m, about tens MB. The directory will be created by the code.
+
+(2) Make Efficiency Plots
+   a. Specify which target is studying:
+      \e[00;33m#define Jet\e[00m --> Reco Jets
+      \e[00;33m#define GENJET 80\e[00m --> Gen Level Particle Jets (clustered generation level particles, not the original parton jet)
+      \e[00;33m#define PARTON 2011\e[00m -->  Gen Level Partons
+   b. Change the pileup schemes in parameter part (B)
+   c. Run and have the plots in the current directory. Default discriminators are SSVHE SSVHP TCHE TCHP. One can add more to this sh file based on instructions in EfficiencyPlotter.C.
+
+(*) Say 'N' for additional information
 "
 Choice="S"
-until [[ "$Choice" == [YyNn] ]]
+until [[ "$Choice" == [12Nn] ]]
 do
-    echo -en $"\e[33;07m Are you ready to run?(y/n)\e[00m"
+    echo -en $"\e[33;07m Which one are you ready to run?(1/2/N)\e[00m"
     read -n 1 Choice
     echo
 done
-if [[ "$Choice" == [Yy] ]]; then
-    g++ `root-config --cflags --glibs` -o btagNtupReader btagNtupReader.C
-    ./btagNtupReader
-    g++ `root-config --cflags --glibs` -o displayPlots displayPlots.C
-    ./displayPlots
-else
-    echo -e '
+
+case $Choice in
+    1)
+	g++ `root-config --cflags --glibs` -o btagNtupReader btagNtupReader.C
+	./btagNtupReader
+	g++ `root-config --cflags --glibs` -o displayPlots displayPlots.C
+	./displayPlots;;
+    2)
+	g++ `root-config --cflags --glibs` -o EfficiencyPlotter EfficiencyPlotter.C
+	for i in SSVHE SSVHP TCHE TCHP
+	do
+	    ./EfficiencyPlotter "$i" | tee $i.OUTPUT &
+	    sleep 3
+	done;;
+    [Nn])	
+	echo -e '
 ---------------------------------------------------
 * additional information: How to add a new histo? *
 ---------------------------------------------------
@@ -129,5 +141,17 @@ where selection  is the name of the histogram you want to plot,
       down determines the way of the stack histo (b,c,udgs or udsg,c,b),
       logy =1 means Logy option,
 --> example :  \e[00;33mPlotStack("npv",0, 0);\e[00m
-'
-fi
+----------------------------------------------------------------------
+* additional information: How to use the ntuples to do other studies *
+----------------------------------------------------------------------
+Make an inherit class from btagNtupReader.h, like btagNtupReader.C:
+e.g. "class Plotter : public btagNtupReader{......}"
+Basical functions offerred by the base \"btagNtupReader\" class are:
+\e[00;33m
+   virtual UInt_t   HLTPrescale(string HLTName);
+   virtual Bool_t   HLTAcceptance(string HLTName);
+   virtual UInt_t   HLTAcceptanceBit(string HLTName);//HLTriggerResults->at(HLTAcceptanceBit(HLTName)) is the HLT acceptance. One can use it to speed up the codes
+   virtual void     PrintHLTTable();
+\e[00m
+';;
+esac
