@@ -1547,6 +1547,9 @@ void btagNtupReader::Init(TTree *tree)
    fChain->SetBranchAddress("lumiBlockNumber", &lumiBlockNumber, &b_lumiBlockNumber);
    fChain->SetBranchAddress("numberOfPUVertices", &numberOfPUVertices, &b_numberOfPUVertices);
 #if bTagNtupleVersion > 3
+   // Set object pointer
+   HLTPrescaleFactors = 0;
+   HLTriggerResults = 0;
    fChain->SetBranchAddress("numberOfPUVerticesTot", &numberOfPUVerticesTot, &b_numberOfPUVerticesTot);
    fChain->SetBranchAddress("HLTPrescaleFactors", &HLTPrescaleFactors, &b_HLTPrescaleFactors);
    fChain->SetBranchAddress("HLTriggerResults", &HLTriggerResults, &b_HLTriggerResults);

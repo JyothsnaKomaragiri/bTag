@@ -4,15 +4,16 @@ void run(){
   gROOT->SetStyle("Plain");
   gStyle->SetPalette(1);
   gStyle->SetOptStat(0);
-  // FOR JET SAMPLE
-  bool runJet=true;
-  Float_t ptval=60.;
-  int year=2011;
-  Plots1D P1D(!runJet,ptval,year);
-  Plots2D P2D(!runJet,ptval,year);
+#ifdef RUN_ON_JET
+  Plots1D P1D(false,PTVAL,DATAYEAR);
+  Plots2D P2D(false,PTVAL,DATAYEAR);
+#else
+  Plots1D P1D(true,PTVAL,DATAYEAR);
+  Plots2D P2D(true,PTVAL,DATAYEAR);
+#endif
   // void PlotStack(TString selection, TString label, bool down=false, bool logy=false, bool bOverflow=false, TString labely="jets");
   //  for Jet dataset
-  if (runJet) {
+#ifdef RUN_ON_JET
     P1D.PlotStack("npv","number of PV", 1, 0,1);
     P1D.PlotStack("npv_no_scaled","number of PV", 1, 0,1);
     P1D.PlotStack("all_jetpt","jet p_{t}",1, 1, 1);
@@ -433,10 +434,7 @@ void run(){
   
     P2D.PlotStack2D("sv_eratio_vs_jetpt","jet p_{t}","SV energy ratio",  0);
     P2D.PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{t}","SV p_{t}",  0);
-  }
-  else {
-
-
+#else
     // // for btagmet dataset 
 
 
@@ -883,7 +881,7 @@ void run(){
 
     P2D.PlotStack2D("sv_eratio_vs_jetpt","jet p_{t}","SV energy ratio",  0);
     P2D.PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{t}","SV p_{t}",  0);
-  }
+#endif
 }
 
 int main() {

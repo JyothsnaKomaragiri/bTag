@@ -3,10 +3,6 @@
 //          Jinzhong Zhang (NEU,USA) - change for Run2011B and readability, and so on : Nov 2011
 ////////////////////////////////////////////////////////////////
 #include "Configuration.h"
-//############### Configuration of histograms maker ######################
-#define Run_on_Jet true
-#define ptval_jet 60
-#define ptval_btag 20
 //########################################################################
 #include "btagNtupReader.h"
 #include <TH1.h>
@@ -17,11 +13,6 @@
 #include <math.h>
 #include <cstring>
 
-#if Run_on_Jet == true
-  #define Run_on_Btag false
-#else
-  #define Run_on_Btag true
-#endif
 Float_t bEnrichCutSal=1.0;
 
 class Plotter : public btagNtupReader{
@@ -34,80 +25,85 @@ public:
 // TO BE DEFINED FIRST !
 // + check the data and MC input files
 // JetPtthresholdsfornm is the threshold from Daniel
-#if ptval_jet == 30 && Run_on_Jet == true
+#if PTVAL == 30 && defined(RUN_ON_JET)
 TString my_trigger_path="HLT_Jet30";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=30.;
 #endif
 
-#if ptval_jet == 60 && Run_on_Jet == true
+#if PTVAL == 60 && defined(RUN_ON_JET)
 TString my_trigger_path="HLT_Jet60";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=60.;
 #endif
 
-#if ptval_jet == 80 && Run_on_Jet == true
+#if PTVAL == 80 && defined(RUN_ON_JET)
 TString my_trigger_path="HLT_Jet80";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=80.;
 #endif
 
-#if ptval_jet == 110 && Run_on_Jet == true
+#if PTVAL == 110 && defined(RUN_ON_JET)
 TString my_trigger_path="HLT_Jet110";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=110.;
 #endif
 
-#if ptval_btag == 20 && Run_on_Btag == true
+#if PTVAL == 20 && !defined(RUN_ON_JET)
 TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";Float_t JetPtthresholdsfornmu=20.; Float_t cutJetPt=45.; Float_t cutMuonPt=7.;
 #endif
 
-#if ptval_btag == 40 && Run_on_Btag == true
+#if PTVAL == 40 && !defined(RUN_ON_JET)
 TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";Float_t JetPtthresholdsfornmu=60.; Float_t cutJetPt=65.; Float_t cutMuonPt=7.;
 #endif
 
-#if ptval_btag == 60 && Run_on_Btag == true
+#if PTVAL == 60 && !defined(RUN_ON_JET)
 TString my_trigger_path="HLT_BTagMu_DiJet60_Mu7";Float_t JetPtthresholdsfornmu=90; Float_t cutJetPt=95.; Float_t cutMuonPt=9.;
 #endif
 
-#if ptval_btag == 70 && Run_on_Btag == true
+#if PTVAL == 70 && !defined(RUN_ON_JET)
 TString my_trigger_path="HLT_BTagMu_DiJet70_Mu5";Float_t JetPtthresholdsfornmu=100; Float_t cutJetPt=105.; Float_t cutMuonPt=7.;
 #endif
 
-#if ptval_btag == 110 && Run_on_Btag == true
+#if PTVAL == 110 && !defined(RUN_ON_JET)
 TString my_trigger_path="HLT_BTagMu_DiJet110_Mu5";Float_t JetPtthresholdsfornmu=155;/*130?*/ Float_t cutJetPt=160.; Float_t cutMuonPt=7.;
 #endif
 
 Float_t puweight[MAXPU+1];
 TString final_dir;
 void run(){
+  RenormlizeMCWeights();
   char tmpstr[300];
-#if Run_on_Jet == true
-  sprintf(tmpstr,"dir_jet%ipu",ptval_jet);
+#ifdef RUN_ON_JET
+  sprintf(tmpstr,"dir_jet%ipu",PTVAL);
   final_dir=TString(tmpstr);
-#endif
-
-#if Run_on_Btag == true
-  sprintf(tmpstr,"dir_btag%ipu",ptval_btag);
+#else
+  sprintf(tmpstr,"dir_btag%ipu",PTVAL);
   final_dir=TString(tmpstr);
 #endif
 
   TString action = "mkdir "+final_dir;
   system(action);
+#if DATAYEAR == 2011
   cout << " ----> DATA 2011" << endl;
-  if (Run_on_Jet&&strlen(JetDATA)>0)      { 
+#ifdef RUN_ON_JET
+  if (strlen(JetDATA)>0) { 
     Plotter yt(JetDATA);
     yt.Loop(true, 1.); //weight=1
     action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minijet2011.root";
     system(action);
   }
-  if (Run_on_Btag&&strlen(MetDATA)>0){ 
+#else
+  if (strlen(MetDATA)>0){ 
     Plotter yt(MetDATA);    
     yt.Loop(true, 1.); //weight=1
     action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minibtag2011.root";
     system(action);
   }
+#endif
+#endif
 
-  //if (Run_on_Jet)  {
-  //    cout << " ----> DATA 2010" << endl;
-  //   weight=1;
-  //   Plotter yt2("/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/Jet_Run2010B-Dec22ReReco_v1_prescale/*.root",1);
-  //   yt2.Loop(0, weight);
-  //   TString action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minijet2010.root";
-  //   system(action);
-  //   }
+#if DATAYEAR == 2010
+  cout << " ----> DATA 2010" << endl;
+#ifdef RUN_ON_JET
+  Plotter yt2("/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/Jet_Run2010B-Dec22ReReco_v1_prescale/*.root");
+  yt2.Loop(true, 1.); //weight=1
+  TString action = "mv  "+final_dir+"/histoFile.root "+final_dir+"/histo_minijet2010.root";
+  system(action);
+#endif
+#endif
 
 #if defined(npu_probs) && defined(pudistribution_data_filename)
   for(Byte_t npu=0; npu<MAXPU+1; ++npu)
@@ -128,9 +124,12 @@ void run(){
   for (UInt_t iSample=0;iSample<nSamples;iSample++) 
     if (
 	strstr(MC_SampleNames[iSample],"qcd")!=NULL&&
-	strlen(MC_files[iSample])>0&&
-	((strstr(MC_SampleNames[iSample],"qcdmu")!=NULL&&Run_on_Btag)||
-	 (strstr(MC_SampleNames[iSample],"qcdmu")==NULL&&Run_on_Jet))
+#ifdef RUN_ON_JET
+	strstr(MC_SampleNames[iSample],"qcdmu")==NULL&&
+#else
+	strstr(MC_SampleNames[iSample],"qcdmu")!=NULL&&
+#endif
+	strlen(MC_files[iSample])>0
 	) {
       printf(" ----> MC : %s (weight=%f)\n",MC_SampleNames[iSample],MC_Weights[iSample]);
       Plotter xmu(MC_files[iSample]);
@@ -681,7 +680,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave)
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
-    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    nb = fChain->GetEntry(jentry);  nbytes += nb;
     Float_t weight=weightsave;
     if ( (jentry+1) % (nentries/100) == 0) clog<<"\r"<<"Calculating "<<jentry+1<<"/"<<nentries<<"("<<(jentry+1)/Float_t(nentries)*100<<"%)";
     if (!isRealData) {
@@ -1616,7 +1615,7 @@ void Plotter::AddHisto2D(vector<TH2F*> &Histo2DB, string name, const int& j, str
 #if !defined(npu_probs) || !defined(pudistribution_data_filename)
 void predefinedpuweights() {
   // 499 pb-1
-  if (Run_on_Jet) {
+#ifdef RUN_ON_JET
     /*
     //HLT_Jet60
     puweight[0]=0;
@@ -1668,9 +1667,7 @@ void predefinedpuweights() {
     puweight[23]=0.0713124;
     puweight[24]=0.0463483;
     puweight[25]=0;
-
-  }
-  else if (Run_on_Btag) {
+#else
     // BTagMu_Dijet40_Mu5
     /*
       puweight[0]=0;
@@ -1722,7 +1719,7 @@ void predefinedpuweights() {
     puweight[23]=0.0849563;
     puweight[24]=0.0416172;
     puweight[25]=0.;
-  }
+#endif
 }
 #endif
 

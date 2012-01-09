@@ -28,7 +28,7 @@ const TString format="pdf";
 ////// IMPORTANT : CHANGE THE DEFINITION OF THE CONSTRUCTOR OF THE CLASS "Plots"  TO CORRECT THE FILE LOCATION
 template<typename T> class Plots {
  public:
-  Plots(Bool_t mu,Float_t ptval,UInt_t year=2011);
+  Plots(Bool_t mu,Float_t ptval,UInt_t datayear);
   ~Plots() {
     for (UInt_t i=0; i<Nfiles&&i<MAXNFILES; i++)
       mc[i]->Close(); 
@@ -69,7 +69,7 @@ template<typename T> class Plots {
   UInt_t Nfiles;
 };
 
-template<typename T> Plots<T>::Plots( Bool_t mu, Float_t ptval, UInt_t year ) : mu_(mu),ptval_(ptval),year_(year) {
+template<typename T> Plots<T>::Plots( Bool_t mu, Float_t ptval, UInt_t datayear ) : mu_(mu),ptval_(ptval),year_(datayear) {
   char tmpstr[300];
   vector<string> nameroot;
   if (mu==false)
@@ -94,10 +94,10 @@ template<typename T> Plots<T>::Plots( Bool_t mu, Float_t ptval, UInt_t year ) : 
   Nfiles=nameroot.size();
   string dataroot;
   string dataroot2;
-  if (year==2010) {
+  if (datayear==2010) {
     dataroot=dir_+"histo_minijet2010.root";
   }
-  else if (year==2011) {
+  else if (datayear==2011) {
     if (mu==false) {dataroot=dir_+"histo_minijet2011.root"; }
     else           {dataroot=dir_+"histo_minibtag2011.root"; }
   }
@@ -112,7 +112,7 @@ void OverFlowBinFix(TH1F* );
 
 class Plots1D:public Plots<TH1F>{
  public:
- Plots1D(Bool_t mu,Float_t ptval,UInt_t year) : Plots<TH1F>(mu,ptval,year){};
+ Plots1D(Bool_t mu,Float_t ptval,UInt_t datayear) : Plots<TH1F>(mu,ptval,datayear){};
   void PlotStack(TString selection, TString label, bool down=false, bool logy=false, bool bOverflow=false, TString labely="jets");
   void TagRate(TString selection, TString label, bool down=false, bool logy=false,  TString labely="tag rate");
   void PlotData(TString selection, TString label, bool down=false, bool logy=false, bool bOverflow=false);
@@ -120,8 +120,8 @@ class Plots1D:public Plots<TH1F>{
 
 class Plots2D:public Plots<TH2F>{
  public:
- Plots2D(Bool_t mu,Float_t ptval,UInt_t year) : Plots<TH2F>(mu,ptval,year){};
-  void PlotStack2D(TString selection, TString label, TString labely, bool logy, float ymin=0., float ymax=10.);
+ Plots2D(Bool_t mu,Float_t ptval,UInt_t datayear) : Plots<TH2F>(mu,ptval,datayear){};
+ void PlotStack2D(TString selection, TString label, TString labely, bool logy, float ymin=0., float ymax=10.);
 };
 
 void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, bool bOverflow, TString labely){

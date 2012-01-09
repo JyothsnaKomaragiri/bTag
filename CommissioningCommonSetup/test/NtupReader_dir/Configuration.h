@@ -5,6 +5,17 @@
 //------------(I)Samples------------------------------
 #define bTagNtupleVersion 4
 //it stands for version of the commissioning ntuples
+//Version3=14May
+//Version4=27Dec
+//The samples are defined in the end of this file, classfied by versions.
+//Each version must contain at least five variables:
+//(1)const char JetDATA[]="" : the Jet data
+//(2)const char MetDATA[]="" : the MET data
+//(3)const char *MC_files[]={"","",.....}: the files locations
+//(4)const char *MC_SampleNames[]={"","",.....}: the sample names
+//(5)const Float_t MC_Weights[]={,,....}: the sample weights 
+//   weight = ( filter(QCDSamples=1) * sect) /n_ev;
+//The program will skip empty strings. The arrays (3)(4)(5) have to have the same size and have to be corresponding.
 //------------(II) the PU reweight-------------------------------------
 //From https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupInformation
 const Double_t Spring11[]={0.0698146584, 0.0698146584, 0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0630151648,0.0526654164,0.0402754482,0.0292988928,0.0194384503,0.0122016783,0.007207042,0.004003637,0.0020278322,0.0010739954,0.0004595759,0.0002229748,0.0001028162,4.58337152809607E-05};
@@ -17,7 +28,7 @@ const Double_t Fall2011[55]={0.014583699,0.025682975,0.038460562,0.049414536,0.0
 #define npu_probs Fall2011//comment it out to let the program calculate the pudistribution from ntuples
 //the file name of the PU distribution in data
 //See https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupReweighting for details
-#define pudistribution_data_filename "pudistRun175832_180252.root"//comment it out to reweight PU to flat distribution from 0 up to MAXPU
+#define pudistribution_data_filename "pudistRun175832_180252.root"//comment it out to reweight PU to flat distribution (PU0)
 
 const UInt_t MAXPU=sizeof(npu_probs)/sizeof(const Double_t)-1;
 //##############################
@@ -35,7 +46,7 @@ const char QCD170to300[]="/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_
 const char QCD300to470[]="/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Pt_300to470_TuneZ2_7TeV_pythia6_PU/*.root";
 const char *MC_files[]={};
 const char *MC_SampleNames[]={};
-const Float_t MC_Weights[]={};
+Float_t MC_Weights[]={};
 #endif
 
 #if bTagNtupleVersion == 1 //39X
@@ -58,7 +69,7 @@ const char QCDMu120to150[]="/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QC
 const char QCDMu150plus[]="/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/QCD_Mu_PT150_TuneZ2_7TeV_pythia6_PU/*.root"; 
 const char *MC_files[]={QCD5to15,QCD15to30,QCD30to50,QCD50to80,QCD80to120,QCD120to170,QCD170to300,QCD300to470,QCDMu15to20,QCDMu20to30,QCDMu30to50,QCDMu50to80,QCDMu80to120,QCDMu120to150,QCDMu150plus};
 const char *MC_SampleNames[]={"qcd5","qcd15","qcd30","qcd50","qcd80","qcd120","qcd170","qcd300","qcdmu15","qcdmu20","qcdmu30","qcdmu50","qcdmu80","qcdmu120","qcdmu150"};
-const Float_t MC_Weights[]={36750000000.  / 1648096.,//weight05
+Float_t MC_Weights[]={36750000000.  / 1648096.,//weight05
 		      815900000. / 5420080.,//weight15
 		      53120000.  / 3244045.,//weight30
 		      6359000.   / 2739226.,//weight50
@@ -95,7 +106,7 @@ const char QCDMu120to150[]="/opt/sbg/data/data1/cms/ccollard/files/btagCommNtupl
 const char QCDMu150plus[]="/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V3/bTagCommissioning_30_03_11/QCDMu150/QCDMu150/*.root";
 const char *MC_files[]={QCD15to30,QCD30to50,QCD50to80,QCD80to120,QCD120to170,QCD170to300,QCD300to470,QCDMu15to20,QCDMu20to30,QCDMu30to50,QCDMu50to80,QCDMu80to120,QCDMu120to150,QCDMu150plus};
 const char *MC_SampleNames[]={"qcd15","qcd30","qcd50","qcd80","qcd120","qcd170","qcd300","qcdmu15","qcdmu20","qcdmu30","qcdmu50","qcdmu80","qcdmu120","qcdmu150"};
-const Float_t MC_Weights[]={815900000. / 8213600.,//weight15
+Float_t MC_Weights[]={815900000. / 8213600.,//weight15
 		      53120000.  / 6529320.,//weight30
 		      6359000.   / 4301392.,//weight50
 		      784300.    / 6407732.,//weight80
@@ -133,7 +144,7 @@ const char QCDMu120to150[]="/opt/sbg/data/data1/cms/ccollard/files/btagCommNtupl
 const char QCDMu150plus[]="/opt/sbg/data/data1/cms/ccollard/files/btagCommNtuple/V4_DA_SVfix/MC/14MayQCDMuEnrichedPt_150/*.root";
 const char *MC_files[]={QCD15to30,QCD30to50,QCD50to80,QCD80to120,QCD120to170,QCD170to300,QCD300to470,QCDMu15to20,QCDMu20to30,QCDMu30to50,QCDMu50to80,QCDMu80to120,QCDMu120to150,QCDMu150plus};
 const char *MC_SampleNames[]={"qcd15","qcd30","qcd50","qcd80","qcd120","qcd170","qcd300","qcdmu15","qcdmu20","qcdmu30","qcdmu50","qcdmu80","qcdmu120","qcdmu150"};
-const Float_t MC_Weights[]={815900000. / 8213600.,//weight15
+Float_t MC_Weights[]={815900000. / 8213600.,//weight15
 		      53120000.  / 6529320.,//weight30
 		      6359000.   / 4301392.,//weight50
 		      784300.    / 6407732.,//weight80
@@ -153,9 +164,45 @@ const Float_t MC_Weights[]={815900000. / 8213600.,//weight15
 #if bTagNtupleVersion == 4
 const char JetDATA[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_29Nov2011_Jet_Run2011B-PromptReco-v1/*.root";
 const char MetDATA[]="";
-const char QCD120to170[]="";
+const char QCD15to30[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_27Dec2011_QCD_Pt-15to30/*.root";
+const char QCD80to120[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_27Dec2011_QCD_Pt-80to120/*.root";
+const char QCD120to170[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_27Dec2011_QCD_Pt-120to170/*.root";
+const char QCD170to300[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_27Dec2011_QCD_Pt-170to300/*.root";
+const char QCD300to470[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_27Dec2011_QCD_Pt-300to470/*.root";
+const char QCD470to600[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_27Dec2011_QCD_Pt-470to600/*.root";
+const char QCD600to800[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_27Dec2011_QCD_Pt-600to800/*.root";
+const char QCD800to1000[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_27Dec2011_QCD_Pt-800to1000/*.root";
 const char QCD15to3000[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_29Nov2011_QCD_Pt-15to3000/*.root";
-const char *MC_files[]={QCD15to3000};
-const char *MC_SampleNames[]={"qcd15to3000"};
-const Float_t MC_Weights[]={1.};
+const char *MC_files[]={QCD80to120,QCD120to170,QCD170to300,QCD300to470,QCD470to600,QCD600to800,QCD800to1000};
+const char *MC_SampleNames[]={"qcd80","qcd120","qcd170","qcd300","qcd470","qcd600","qcd800"};
+Float_t MC_Weights[]={784300.    / 6581772.,//weight80
+		      115100.    / 6127528.,//weight120
+		      24260.     / 6220160.,//weight170
+		      1168.      / 6432669.,//weight300
+		      70.22      / 3990085.,//weight470
+		      15.55      / 4245695.,//weight600
+		      1.844      / 4053888. //weight800
+};
 #endif
+const UInt_t nSamples=sizeof(MC_Weights)/sizeof(Float_t);
+
+void RenormlizeMCWeights() {
+//Renormlize MC_Weights to avoid overflow
+  Float_t MAXWeight=0.,MINWeight=1E38;
+  for (UInt_t iSample=0;iSample<nSamples;iSample++) {
+    if (MC_Weights[iSample]>MAXWeight) MAXWeight=MC_Weights[iSample];
+    if (MC_Weights[iSample]<MINWeight) MINWeight=MC_Weights[iSample];
+  }
+  Float_t MIDDLEWeight=MAXWeight/2.+MINWeight/2.;
+  printf("Renormlized SampleWeights: {");
+  for (UInt_t iSample=0;iSample<nSamples;iSample++) {
+    MC_Weights[iSample]=MC_Weights[iSample]/MIDDLEWeight;
+    if (iSample==nSamples-1) printf("%f}\n",MC_Weights[iSample]);
+    else printf("%f,",MC_Weights[iSample]);
+  }
+}
+
+//############### Configuration of histograms maker ##############
+#define RUN_ON_JET
+#define PTVAL 80
+#define DATAYEAR 2011
