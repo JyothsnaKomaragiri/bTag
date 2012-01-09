@@ -1187,11 +1187,12 @@ public :
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
-
-   bool SearchStar(string s, vector<string>& out);
-   void StringSeparator(string s, string sep, vector<string>& out);
-   void StringSeparator(string s, string sep, vector<int>& out);
 };
+
+void ExtendFileName(string s, vector<string>& out);
+void StringSeparator(string s, string sep, vector<string>& out);
+void StringSeparator(string s, string sep, vector<int>& out);
+
 
 #if bTagNtupleVersion > 3 
 RunInfo::RunInfo( vector<string> & filenames )
@@ -1333,16 +1334,13 @@ btagNtupReader::btagNtupReader(string filename)
 {
       // The following code should be used if you want this class to access a chain of trees.
       TChain * chain = new TChain("t","");
-      vector<string> filenames;
-      bool star = SearchStar(filename,filenames);
-      if(!star){
-           filenames.clear();
-           StringSeparator(filename,string(","),filenames);
-      }
-      for(unsigned int i=0;i<filenames.size();i++){
-        chain->AddFile(filenames[i].c_str());
-      }
-      cerr<<"Last file:"<<filenames[filenames.size()-1]<<" is added to TChain."<<endl; //for my debug....
+      vector<string> SeperatedStrs,filenames;
+      StringSeparator(filename,string(","),SeperatedStrs);
+      for(vector<string>::const_iterator Str=SeperatedStrs.begin();Str!=SeperatedStrs.end();Str++)
+	ExtendFileName(*Str,filenames);
+      for(vector<string>::const_iterator Str=filenames.begin();Str!=filenames.end();Str++)
+	chain->AddFile(Str->c_str());
+      cerr<<filenames.back()<<" is added to TChain."<<endl; //for my debug....
       TTree* tree = chain;
       Init(tree);
 #if bTagNtupleVersion > 3
@@ -1350,41 +1348,75 @@ btagNtupReader::btagNtupReader(string filename)
 #endif
 }
 
-bool btagNtupReader::SearchStar(string s, vector<string>& out)
-{
-  int pos = s.find('*');
-  if(pos<(int)s.size() && pos>=0){
-        string command;
-        command = "ls -ltrh " + s + "| awk {'print $9'} > tmp.AnaEnvLoader";
-        system(command.c_str());
-        ifstream ifile("tmp.AnaEnvLoader");
-        int aa =0;
-        while(!ifile.eof()){
-                string sread;
-                ifile>>sread;
-                out.push_back(sread);
-                aa++;
-        }
-        out.erase(out.end());
-//        out.erase(out.end());
-//        out.erase(out.end()-1,out.end());
-/*
-        for (int i=0; i<out.size(); i++) {
-           cout << out[i] << endl;
-        }
-*/
-        cout << " nombre de fichiers lus : " << out.size() << " last one " << out[out.size()-1]  << endl;
-        cout << " check " ;
-        string command2;
-        command2 = "ls -ltrh " + s + " | wc ";
-        system(command2.c_str());
-        system("rm tmp.AnaEnvLoader");
-        cout << endl;
-        return true;
+//copied and modified from http://www.codeproject.com/KB/string/wildcmp.aspx
+//It does not belong to any class
+Bool_t wildcmp(const char *wild, const char *string) {
+  // Written by Jack Handy - jakkhandy@hotmail.com
+  const char *cp = NULL, *mp = NULL;
+
+  while ((*string) && (*wild != '*')) {
+    if ((*wild != *string) && (*wild != '?')) {
+      return false;
+    }
+    wild++;
+    string++;
   }
-  return false;
+
+  while (*string) {
+    if (*wild == '*') {
+      if (!*++wild) {
+        return true;
+      }
+      mp = wild;
+      cp = string+1;
+    } else if ((*wild == *string) || (*wild == '?')) {
+      wild++;
+      string++;
+    } else {
+      wild = mp;
+      string = cp++;
+    }
+  }
+
+  while (*wild == '*') {
+    wild++;
+  }
+  return !*wild;
 }
-void btagNtupReader::StringSeparator(string s, string sep, vector<string>& out)
+
+void ExtendFileName(string s, vector<string>& out)
+{
+  if ( s.find("/castor/")==0 ) {
+    Short_t pos_bkslash=s.rfind("/")+1;
+    string dir=s.substr(0,pos_bkslash);
+    string command;
+    command = "nsls " + dir + " > tmp.AnaEnvLoader";
+    system(command.c_str());
+    s=s.substr(pos_bkslash,s.length()-pos_bkslash);
+    ifstream ifile("tmp.AnaEnvLoader");
+    while(!ifile.eof()){
+      string sread;
+      ifile>>sread;
+      if ( wildcmp(s.c_str(),sread.c_str()) ) out.push_back("rfio:"+dir+sread);
+    }
+  }
+  else {
+    string command;
+    command = "ls -ltrh " + s + "| awk {'print $9'} > tmp.AnaEnvLoader";
+    system(command.c_str());
+    ifstream ifile("tmp.AnaEnvLoader");
+    while(!ifile.eof()){
+      string sread;
+      ifile>>sread;
+      out.push_back(sread);
+    }
+  }
+  out.erase(out.end());
+  cout << " number of files read: " << out.size() << endl;
+  system("rm tmp.AnaEnvLoader");
+}
+
+void StringSeparator(string s, string sep, vector<string>& out)
 {
   string::size_type pos, pos_ex = 0;
   while ( (pos = s.find(sep, pos_ex)) != string::npos)
@@ -1394,7 +1426,7 @@ void btagNtupReader::StringSeparator(string s, string sep, vector<string>& out)
   }
   out.push_back(s.substr(pos_ex));
 }
-void btagNtupReader::StringSeparator(string s, string sep, vector<int>& out)
+void StringSeparator(string s, string sep, vector<int>& out)
 {
   string::size_type pos, pos_ex = 0;
   while ( (pos = s.find(sep, pos_ex)) != string::npos)
@@ -1406,7 +1438,6 @@ void btagNtupReader::StringSeparator(string s, string sep, vector<int>& out)
   string a = s.substr(pos_ex);
   out.push_back(atoi(a.c_str()));
 }
-
 
 
 btagNtupReader::~btagNtupReader()
