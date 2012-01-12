@@ -1,11 +1,31 @@
 import FWCore.ParameterSet.Config as cms
 
 DATALIST=[
-	#"/QCD_Pt-120to170_TuneZ2_7TeV_pythia6/Fall11-PU_S6-START44_V5-v1/AODSIM",
-        #  "/QCD_Pt-170to300_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-        #  "/QCD_Pt-300to470_TuneZ2_7TeV_pythia6/Fall11-PU_S6-START44_V5-v1/AODSIM",
-#          "/QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6/Fall11-Peak32PU_START42_V14B-v1/GEN-SIM-RECO",
-          "/Jet/Run2011B-PromptReco-v1/AOD"
+#"/QCD_Pt-15to30_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
+#"/QCD_Pt-30to50_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
+"/QCD_Pt-50to80_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v2/AODSIM"
+#"/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
+#"/QCD_Pt-120to170_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
+#"/QCD_Pt-170to300_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
+#"/QCD_Pt-300to470_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
+#"/QCD_Pt-470to600_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
+#"/QCD_Pt-600to800_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
+#"/QCD_Pt-800to1000_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM"
+#"/QCD_Pt-15to30_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START44_V5-v1/GEN-SIM-RECODEBUG",
+#"/QCD_Pt-30to50_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START44_V5-v1/GEN-SIM-RECODEBUG",
+#"/QCD_Pt-50to80_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START44_V5-v1/GEN-SIM-RECODEBUG",
+#"/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START44_V5-v1/GEN-SIM-RECODEBUG",
+#"/QCD_Pt-120to170_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START44_V5-v1/GEN-SIM-RECODEBUG",
+#"/QCD_Pt-170to300_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START44_V5-v1/GEN-SIM-RECODEBUG",
+#"/QCD_Pt-300to470_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START44_V5-v1/GEN-SIM-RECODEBUG",
+#"/QCD_Pt-470to600_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START44_V5-v1/GEN-SIM-RECODEBUG",
+#"/QCD_Pt-600to800_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START44_V5-v1/GEN-SIM-RECODEBUG",
+#"/QCD_Pt-800to1000_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START44_V5-v1/GEN-SIM-RECODEBUG"
+#"/QCD_Pt-120to170_TuneZ2_7TeV_pythia6/Fall11-PU_S6-START44_V5-v1/AODSIM",
+#"/QCD_Pt-170to300_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
+#"/QCD_Pt-300to470_TuneZ2_7TeV_pythia6/Fall11-PU_S6-START44_V5-v1/AODSIM",
+#"/QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6/Fall11-Peak32PU_START42_V14B-v1/GEN-SIM-RECO",
+#"/Jet/Run2011B-PromptReco-v1/AOD"
           ]
 HLTProc="HLT"
 # It will select the events based on the TriggerSelections. The ntuple will only save the triggers whose name matches any entry in TriggerSelections
@@ -25,8 +45,8 @@ process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #Global tag
-#from Configuration.PyReleaseValidation.autoCond import autoCond
-from Configuration.AlCa.autoCond import autoCond
+#from Configuration.PyReleaseValidation.autoCond import autoCond  # for <CMSSW_4_3_0
+from Configuration.AlCa.autoCond import autoCond # for >=CMSSW_4_3_0
 process.GlobalTag.globaltag = autoCond['startup']
 
 process.source = cms.Source("PoolSource",
