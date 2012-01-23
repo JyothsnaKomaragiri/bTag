@@ -1,11 +1,21 @@
+#!/bin/bash
 ###############################################################
 #Author : Caroline Collard (IPHC) - first commit : april 2011 #
 #         Jinzhong Zhang (NEU,USA) - version 4 coding         #
 ###############################################################
-#!/bin/bash
+ver=`grep "#define bTagNtupleVersion " Configuration.h`
+ver=${ver#"#define bTagNtupleVersion "}
+line=`grep -n "#if bTagNtupleVersion == $ver" Configuration.h`
+line=${line%:*}",\$p"
+jobs=`sed -n "$line" Configuration.h | grep -m 1 "const char \*MC_SampleNames"`
+jobs=${jobs#*\{}
+jobs=${jobs%\}*}
+jobs=${jobs//,/ }
+jobs=${jobs//\"/}
+TAGGERS="TCHE TCHP SSVHE SSVHP JetP JetBP CSVPF"
 echo -e "
 -----------------------------------------------------------------------------------------------------------------
-\e[00;36m You have to specify parameters in the Configuration.h\e[00m
+\e[32;07m You have to specify parameters in the Configuration.h\e[00m
 -----------------------------------------------------------------------------------------------------------------
 
    I. the bTagNtuple Version
@@ -34,46 +44,72 @@ echo -e "
      For MC, the output histogram name is \e[00;33m\"histo_\"+string(MC_SampleNames[iSample])+\".root\"\e[00m
      For data, the output histogram name is histo_minijet2011.root or histo_minibtag2011.root. If you want to change both the names in \e[0;31mrun()\e[00m in btagNtupReader.C and the names in the constructor \e[00;33mtemplate<typename T> Plots<T>::Plots( Bool_t mu, Float_t ptval, UInt_t year )\e[00m in LoadDisplayRootPlot.h, but it is not necessary.
 
-(1) Make Control Plots    
-   a. specify \"run on Jet\" or on MetBtag:
+\e[32;07mCurrent settings:\e[00m
+bTagNtupleVersion = \e[00;33m$ver\e[00m (Configuration.h)
+samples =  \e[00;33m$jobs\e[00m (Configuration.h)
+efficiency plots taggers = \e[00;33m$TAGGERS\e[00m (RunMeForEverything.sh)
+
+\e[32;07mNow choose a step to run:\e[00m
+(1) Make Commissionging Root Files    
+   a. Specify \"run on Jet\" or on MetBtag:
       \e[00;33m#define Run_on_Jet\e[00m --> Run_on_Jet otherwise Run_on_Btag
       \e[00;33m#define ptval 80\e[00m --> the single jet pt cut or the di-jet pt cut
       \e[00;33m#define DATAYEAR 2011\e[00m --> the year of the data
       if you do not want to use the default parameters, you need to change the corresponding sections in btagNtupReader.C, like \e[00;33m#if ptval_jet == 30 && defined(Run_on_Jet) \e[00m, like trigger path, JetPtthresholdsfornmu and cutMuonPt, etc.
  
-   b. all outputs will be in \e[00;33mdir_jet[jetptcut]pu/\e[00m or \e[00;33mdir_btag[jetptcut]pu/\e[00m, about tens MB. The directory will be created by the code.
+   b. All outputs will be in \e[00;33mdir_jet[jetptcut]pu/\e[00m or \e[00;33mdir_btag[jetptcut]pu/\e[00m, about tens MB. The directory will be created by the code.
 
-(2) Make Efficiency Plots
+(2) Make Commissionging Root Plots From Commissionging Root Files
+    a. Run step (1)
+    b. After all root files are generated, run this step and then all outputs will be in \e[00;33mdir_jet[jetptcut]pu/\e[00m or \e[00;33mdir_btag[jetptcut]pu/\e[00m in pdf format by default.
+
+(3) Make Efficiency Plots: Configure \"EfficiencyPlotter.C\"
    a. Specify which target is studying:
       \e[00;33m#define Jet\e[00m --> Reco Jets
-      \e[00;33m#define GENJET 80\e[00m --> Gen Level Particle Jets (clustered generation level particles, not the original parton jet)
-      \e[00;33m#define PARTON 2011\e[00m -->  Gen Level Partons
+      \e[00;33m#define GENJET\e[00m --> Gen Level Particle Jets (clustered generation level particles, not the original parton jet)
+      \e[00;33m#define PARTON\e[00m -->  Gen Level Partons
    b. Change the pileup schemes in parameter part (B)
-   c. Run and have the plots in the current directory. Default discriminators are SSVHE SSVHP TCHE TCHP. One can add more to this sh file based on instructions in EfficiencyPlotter.C.
+   c. Run this step and have the plots in the current directory. Default discriminators are SSVHE SSVHP TCHE TCHP. One can add more to this sh file based on instructions in EfficiencyPlotter.C.
 
-(*) Say 'N' for additional information
+(4) Combine Efficiencies of Different Taggers into one plot
+   a. Run step(3)
+   b. Setup \e[00;33mPUMIN\e[00m and \e[00;33mPUMAX\e[00m in CombineTaggersEfficiencies.C. The (PUMIN,PUMAX) senario must exist in EfficiencyPlotter.C.
+   c. Run this step and have the pdf plots for udsgvsb and cvsb efficiencies.
+
+(N) Say 'N' for additional information
 "
-Choice="S"
-until [[ "$Choice" == [12Nn] ]]
-do
-    echo -en $"\e[33;07m Which one are you ready to run?(1/2/N)\e[00m"
+Choice='S'
+until [[ "$Choice" == [1234Nn] ]]; do
+    echo -en $"\e[33;07m Which one are you ready to run?(1-4/N)\e[00m"
     read -n 1 Choice
     echo
 done
-
 case $Choice in
     1)
 	g++ `root-config --cflags --glibs` -o btagNtupReader btagNtupReader.C
-	./btagNtupReader
-	g++ `root-config --cflags --glibs` -o displayPlots displayPlots.C
-	./displayPlots;;
-    2)
+	for i in data $jobs
+	do 
+	    ./btagNtupReader $i | tee $i.OUTPUT &
+	    sleep 3
+	done
+	echo -e "\e[33;01mPlease run step 2 after all jobs finished.\e[00m";;
+   2) 
+                g++ `root-config --cflags --glibs` -o displayPlots displayPlots.C
+	./displayPlots
+	rm btagNtupReader
+	rm displayPlots;;
+   3)
 	g++ `root-config --cflags --glibs` -o EfficiencyPlotter EfficiencyPlotter.C
-	for i in SSVHE SSVHP TCHE TCHP
+	for i in $TAGGERS
 	do
 	    ./EfficiencyPlotter "$i" | tee $i.OUTPUT &
 	    sleep 3
 	done;;
+    4)
+                g++ `root-config --cflags --glibs` -o CombineTaggersEfficiencies CombineTaggersEfficiencies.C
+	./CombineTaggersEfficiencies $TAGGERS
+                rm EfficiencyPlotter
+                rm CombineTaggersEfficiencies;;
     [Nn])	
 	echo -e '
 ---------------------------------------------------
@@ -101,7 +137,7 @@ AddHisto(string name_of_histo, int j, string title, string xaxis, const int& nbi
 example of code : inside "j" loop (loop through the colors)
 ...
    // last histo in the definition part
-        \e[00;33m ddHisto(HistoBtag, "npv3_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:>7)",              5,0,5); //150\e[00m 
+        \e[00;33m AddHisto(HistoBtag, "npv3_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:>7)",              5,0,5); //150\e[00m 
    // my new histo 
 	\e[00;33m AddHisto(HistoBtag, "new_histo", j,"Test Caro",50,0.,1.);\e[00m 
 ....

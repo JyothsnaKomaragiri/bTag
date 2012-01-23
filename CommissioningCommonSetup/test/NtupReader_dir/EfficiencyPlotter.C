@@ -1,5 +1,5 @@
 #define btagNtupReader_cxx
-#define JetPt
+#define GENJET 
 #include "Configuration.h"
 //#########################################################
 //#####   Settings for Efficiency Calculation codes   #####
@@ -27,7 +27,7 @@
 //#define GENJET //Generated Jets (after hardonization)
 //#define CLEANMCTRUTHFLAVORBYPUTRACK
 //#define CLEANMCTRUTHFLAVORBYDecayLengthAndJetAsixPUTRACK
-#define JetCut(iJet) WhichPt[iJet]>20.&&fabs(WhichEta[iJet])<2.4&&jetNeutralEmEnergyFraction[iJet]<0.99&&jetNeutralEmEnergyFraction[iJet]<0.99&&jetnConstituents[iJet]>1&&jetChargedHadronEnergyFraction[iJet]>0.0&&jetChargedMultiplicity[iJet]>0.0&&jetChargedEmEnergyFraction[iJet]<0.99
+#define JetCut(iJet) WhichPt[iJet]>20&&fabs(WhichEta[iJet])<2.4&&jetNeutralEmEnergyFraction[iJet]<0.99&&jetNeutralEmEnergyFraction[iJet]<0.99&&jetnConstituents[iJet]>1&&jetChargedHadronEnergyFraction[iJet]>0.0&&jetChargedMultiplicity[iJet]>0.0&&jetChargedEmEnergyFraction[iJet]<0.99
 #define EventCut numberOfPUVertices<MAXPU// comment it out to drop the Event cut
 //----------------------(B)Pileup Variables--------------------------------
 //------------the PU bins-------------------------------------
@@ -605,8 +605,8 @@ void MeanPtPlot (Plotting **MC, const char *options) {
 
 void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Discriminator_Bins, const UInt_t Discriminator_nBins, Plotting::DiscriminatorOption discriminator_option,Float_t RequiredBEff, Float_t RequiredUDSGEff_ETA, Float_t RequiredUDSGEff_PT) {
   char result_filename[100],namestring[100],legendtext[100]; 
-  TLegend *Legends_Efficienies = new TLegend(0.16,0.72,0.39,0.95);
-  SetLegendStyle(Legends_Efficienies);
+  TLegend *Legends_Efficiencies = new TLegend(0.16,0.72,0.39,0.95);
+  SetLegendStyle(Legends_Efficiencies);
   Float_t Ref_eff_X[Discriminator_nBins+1],Ref_eff_XupError[Discriminator_nBins+1],Ref_eff_XdownError[Discriminator_nBins+1],
     eff_X[Discriminator_nBins+1],eff_XupError[Discriminator_nBins+1],eff_XdownError[Discriminator_nBins+1],
     eff_Y[Discriminator_nBins+1],eff_YupError[Discriminator_nBins+1],eff_YdownError[Discriminator_nBins+1];
@@ -618,6 +618,10 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
     sprintf(namestring,"%s_Eta_PU%d",Title,iPU);
     VsJetEta_plots[iPU] = new DistributionPlots2D(namestring,Discriminator_nBins,Discriminator_Bins,nEtaBins,EtaBins);
   }
+  //for udsgvsb,cvsb efficiency plots, we cut the pt at PTVAL
+  Byte_t PtBinCut=1;
+  for (;PtBinCut<nPtBins;PtBinCut++)
+    if  ( PtBins[PtBinCut-1]>=(PTVAL-1E-4) ) break;
   for (UInt_t iSample=0;iSample<nSamples;iSample++) 
     MC[iSample]->FlavourHist(discriminator_option,MC_Weights[iSample],VsJetPt_plots,VsJetEta_plots);
   //-------------make plots-----------------------------
@@ -660,9 +664,9 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
   //tempBvsUDSGwtPU->GetYaxis()->SetTickLength(1.);
   DrawTitle(MINB,MAXB,MAXUDSG*1.1);
 #ifdef MAKEJetVarPlot
-  TLegend *Legends_C_Efficienies = new TLegend(0.73,0.13,0.96,0.36,"c jets");
-  SetLegendStyle(Legends_C_Efficienies);
-  ( (TLegendEntry*) Legends_C_Efficienies->GetListOfPrimitives()->First() )->SetTextAlign(22);//centering the legend header
+  TLegend *Legends_C_Efficiencies = new TLegend(0.73,0.13,0.96,0.36,"c jets");
+  SetLegendStyle(Legends_C_Efficiencies);
+  ( (TLegendEntry*) Legends_C_Efficiencies->GetListOfPrimitives()->First() )->SetTextAlign(22);//centering the legend header
   sprintf(namestring,"UDSGC_Eff_Etawt%s",Title);
   TCanvas *Canvas_UDSGC_Eff_Eta = new TCanvas(namestring,namestring,500,500);
   sprintf(namestring,"%s;#eta;non-b jets efficiency",PLOTTITLE);
@@ -707,10 +711,10 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
     VsJetEta_plots_iPUBin->Write();
     UInt_t NReturnPoints;
     printf("Calculating B eff:\n");
-    VsJetPt_plots_iPUBin->GetEff(Ref_eff_X,Ref_eff_XdownError,Ref_eff_XupError,B);
+    VsJetPt_plots_iPUBin->GetEff(Ref_eff_X,Ref_eff_XdownError,Ref_eff_XupError,B,PtBinCut);
     printf("Calculating C eff:\n");
     Canvas_eff_BvsC->cd();
-    VsJetPt_plots_iPUBin->GetEff(eff_Y,eff_YupError,eff_YdownError,C);
+    VsJetPt_plots_iPUBin->GetEff(eff_Y,eff_YupError,eff_YdownError,C,PtBinCut);
 #ifdef SHOWDISCRIMINATORVALUESONPLOT
     if (PU_iBin==PU_nBins-1) DrawDiscirminatorValue(Discriminator_nBins,Ref_eff_X,eff_Y,Discriminator_Bins);
 #endif
@@ -723,7 +727,7 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
     PU_efficienies_BvsC->Write();
     printf("Calculating UDSG eff:\n");
     Canvas_eff_BvsUDSG->cd();
-    VsJetPt_plots_iPUBin->GetEff(eff_Y,eff_YupError,eff_YdownError,UDSG);
+    VsJetPt_plots_iPUBin->GetEff(eff_Y,eff_YupError,eff_YdownError,UDSG,PtBinCut);
 #ifdef SHOWDISCRIMINATORVALUESONPLOT
     if (PU_iBin==PU_nBins-1) DrawDiscirminatorValue(Discriminator_nBins,Ref_eff_X,eff_Y,Discriminator_Bins);
 #endif
@@ -736,7 +740,7 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
     PU_efficienies_BvsUDSG->Write();
     printf("Calculating UDSGwtNoFlavor eff:\n");
     Canvas_eff_BvsUDSGwtPU->cd();
-    VsJetPt_plots_iPUBin->GetEff(eff_Y,eff_YupError,eff_YdownError,UDSGwtNoFlavor);
+    VsJetPt_plots_iPUBin->GetEff(eff_Y,eff_YupError,eff_YdownError,UDSGwtNoFlavor,PtBinCut);
 #ifdef SHOWDISCRIMINATORVALUESONPLOT
     if (PU_iBin==PU_nBins-1) DrawDiscirminatorValue(Discriminator_nBins,Ref_eff_X,eff_Y,Discriminator_Bins);
 #endif
@@ -750,7 +754,7 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
     if ( PU_Bin_LowEdge[PU_iBin]!=PU_Bin_HighEdge[PU_iBin] )
       sprintf(legendtext,"PU = %d to %d",PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin]);
     else sprintf(legendtext,"PU = %d",PU_Bin_LowEdge[PU_iBin]);
-    Legends_Efficienies->AddEntry(PU_efficienies_BvsUDSG,legendtext,"LEP");
+    Legends_Efficiencies->AddEntry(PU_efficienies_BvsUDSG,legendtext,"LEP");
 #ifdef MAKEJetVarPlot
     const char *JetVarNames[]={"Eta","Pt"};
     DistributionPlots2D* VsJetVar_plots_iPUBin[]={VsJetEta_plots_iPUBin,VsJetPt_plots_iPUBin};
@@ -803,7 +807,7 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
 #endif
 	BC_Eff_fittingError[iFlavor]->Write();
       }
-      if (!iJetVar) Legends_C_Efficienies->AddEntry(BC_Eff_fittingError[1],legendtext,"LEP");
+      if (!iJetVar) Legends_C_Efficiencies->AddEntry(BC_Eff_fittingError[1],legendtext,"LEP");
     }
 #endif//end of #ifdef MAKEJetVarPlot
   }
@@ -811,7 +815,7 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
   //------------------------draw the total eff/mistag line---------------------
   sprintf(result_filename,"%s_UDSGeffvsBeff.pdf",Title);
   Canvas_eff_BvsUDSG->cd();
-  Legends_Efficienies->Draw();
+  Legends_Efficiencies->Draw();
   gPad->SetFixedAspectRatio();
   gPad->SetGrid();
   gPad->SetLogy();
@@ -821,14 +825,14 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
   Canvas_eff_BvsUDSG->Write();
   Canvas_eff_BvsC->cd();
   gPad->SetGrid();
-  Legends_Efficienies->Draw();
+  Legends_Efficiencies->Draw();
 #ifdef SavePDFFormat
   sprintf(result_filename,"%s_CeffvsBeff.pdf",Title);
   Canvas_eff_BvsC->SaveAs(result_filename);
   Canvas_eff_BvsC->Write();
 #endif
   Canvas_eff_BvsUDSGwtPU->cd();
-  Legends_Efficienies->Draw();
+  Legends_Efficiencies->Draw();
   gPad->SetFixedAspectRatio();
   gPad->SetGrid();
   gPad->SetLogy();
@@ -840,12 +844,12 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
 
 #ifdef MAKEJetVarPlot
   Canvas_UDSGC_Eff_Eta->cd();
-  Legends_Efficienies->SetHeader("udsg jets");
-  ( (TLegendEntry*) Legends_Efficienies->GetListOfPrimitives()->First() )->SetTextAlign(22);//centering the legend header
-  Legends_Efficienies->SetY1NDC(0.13);
-  Legends_Efficienies->SetY2NDC(0.36);
-  Legends_Efficienies->Draw();
-  Legends_C_Efficienies->Draw();
+  Legends_Efficiencies->SetHeader("udsg jets");
+  ( (TLegendEntry*) Legends_Efficiencies->GetListOfPrimitives()->First() )->SetTextAlign(22);//centering the legend header
+  Legends_Efficiencies->SetY1NDC(0.13);
+  Legends_Efficiencies->SetY2NDC(0.36);
+  Legends_Efficiencies->Draw();
+  Legends_C_Efficiencies->Draw();
   gPad->SetFixedAspectRatio();
   gPad->SetGrid();
   gPad->SetLogy();
@@ -856,8 +860,8 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
   Canvas_UDSGC_Eff_Eta->Write();
   
   Canvas_UDSGC_Eff_Pt->cd();
-  Legends_Efficienies->Draw();
-  Legends_C_Efficienies->Draw();
+  Legends_Efficiencies->Draw();
+  Legends_C_Efficiencies->Draw();
   gPad->SetFixedAspectRatio();
   gPad->SetGrid();
   gPad->SetLogy();
@@ -868,13 +872,13 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
   Canvas_UDSGC_Eff_Pt->Write();
 
   Canvas_BC_Eff_Eta->cd();
-  Legends_Efficienies->SetHeader("b jets");
-  Legends_Efficienies->SetY1NDC(0.72);
-  Legends_Efficienies->SetY2NDC(0.95);
-  Legends_Efficienies->Draw();
-  Legends_C_Efficienies->SetY1NDC(0.72);
-  Legends_C_Efficienies->SetY2NDC(0.95);
-  Legends_C_Efficienies->Draw();
+  Legends_Efficiencies->SetHeader("b jets");
+  Legends_Efficiencies->SetY1NDC(0.72);
+  Legends_Efficiencies->SetY2NDC(0.95);
+  Legends_Efficiencies->Draw();
+  Legends_C_Efficiencies->SetY1NDC(0.72);
+  Legends_C_Efficiencies->SetY2NDC(0.95);
+  Legends_C_Efficiencies->Draw();
   gPad->SetFixedAspectRatio();
   gPad->SetGrid();
 #ifdef SavePDFFormat
@@ -889,8 +893,8 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
   Canvas_BC_Eff_Eta->Write();
 
   Canvas_BC_Eff_Pt->cd();
-  Legends_Efficienies->Draw();
-  Legends_C_Efficienies->Draw();
+  Legends_Efficiencies->Draw();
+  Legends_C_Efficiencies->Draw();
   gPad->SetFixedAspectRatio();
   gPad->SetGrid();
 #ifdef SavePDFFormat
@@ -909,8 +913,7 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
 
 void Load(const char options[]="TCHP",Float_t RequiredBEff=-1., Float_t RequiredUDSGEff_ETA=0.01, Float_t RequiredUDSGEff_PT=0.05) {
   setTDRStyle();
-  RenormlizeMCWeights();
-//------------Prepare files---------------------
+ //------------Prepare files---------------------
   Bool_t UseDefaultRequiredEff=false;
   if (RequiredBEff<0) {RequiredBEff=0.5;UseDefaultRequiredEff=true;}
   Plotting *MC[nSamples];
