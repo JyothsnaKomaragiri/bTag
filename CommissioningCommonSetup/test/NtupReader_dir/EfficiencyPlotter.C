@@ -1,5 +1,5 @@
 #define btagNtupReader_cxx
-#define GENJET 
+#define JET 
 #include "Configuration.h"
 //////Keywords List for argv[1]:
 //(1)efficiencies under different discriminators: SSVHE SSVHP TCHE TCHP JetP JetBP CSVPF CSVMVA
@@ -251,8 +251,8 @@ public :
 #if bTagNtupleVersion>=4
     fChain->SetBranchStatus("Parton*",1);
     fChain->SetBranchStatus("Gen*",1);  
-#endif
     fChain->SetBranchStatus("IPnSelected*",1);  
+#endif
   }
   enum DiscriminatorOption {TCHE2D=1,TCHP2D=3,ReCalTCHE=2,ReCalTCHP=4,JetProb=5,JetBProb=6,CSVMVA=7,CSVPF=8,SSVHE=9,SSVHP=10,TCHE=11,TCHP=12,GTPF=13,JetDistStudyHighEff=22,JetDistStudyHighPur=23};
   inline  void Jet_MeanTrackLongitudinalIP(Float_t *result) {
@@ -270,11 +270,13 @@ public :
     }
   }
   inline void WhichFlavors(Byte_t iJet,vector<Flavor> &theflavors);
-  virtual void MCPtvsRecoPt(DistributionPlots2D **GenPtvsJetPt, DistributionPlots2D **PartonvsJetPt, DistributionPlots1D **, DistributionPlots1D **);
   virtual void FlavourHist(DiscriminatorOption option, const Float_t weight, DistributionPlots2D **VsJetPt, DistributionPlots2D **VsJetEta, DistributionPlots2D **VsJetPhi=NULL, DistributionPlots2D **VsEventPtHat=NULL);
   virtual void MeanPt(DistributionPlots1D **TotalPt, DistributionPlots1D **TotalEntries);
   virtual void UncertaintyOfMeanPt(DistributionPlots1D *Average, DistributionPlots1D **Variance,Byte_t PU_LowEdge,Byte_t PU_HighEdge);
+#if bTagNtupleVersion>=4
   virtual void NPUTracks(DistributionPlots2D *,DistributionPlots2D *,DistributionPlots2D *,DistributionPlots2D *);
+  virtual void MCPtvsRecoPt(DistributionPlots2D **GenPtvsJetPt, DistributionPlots2D **PartonvsJetPt, DistributionPlots1D **, DistributionPlots1D **);
+#endif
   virtual void PileUpDistribution(TH1D* dis) {
      if (fChain == 0) return;
      Long64_t nentries = fChain->GetEntries();//GetEntriesFast() will give you something wrong in the first running
@@ -381,6 +383,7 @@ inline void SetLegendStyle(TLegend *Legends) {
   //Legends->SetFillStyle(0); //transparent background
 }
 
+#if bTagNtupleVersion>=4
 void MCPtvsRecoPt (Plotting **MC, const char *options) {
   char namestring[100],legendtext[100];
   TLegend *Legends = new TLegend(0.16,0.72,0.5,0.95);
@@ -463,6 +466,7 @@ void MCPtvsRecoPt (Plotting **MC, const char *options) {
   canvas_Parton->Write();
   canvas_Parton->SaveAs("JetPtRelPartonPt.pdf");
 }
+#endif
 
 #define DRAWUNCERTAINTY
 void MeanPtPlot (Plotting **MC, const char *options) {
@@ -1050,6 +1054,7 @@ void Load(const char options[]="TCHP",Float_t RequiredBEff=-1., Float_t Required
   if ( strstr(options,"MeanPt")!=NULL ) {
     MeanPtPlot(MC,options);
   }
+#if bTagNtupleVersion>=4
   if ( strstr(options,"MCPt")!=NULL ) {
     MCPtvsRecoPt(MC,options);
   }
@@ -1088,6 +1093,7 @@ void Load(const char options[]="TCHP",Float_t RequiredBEff=-1., Float_t Required
     NJetPlotswtDecayLengthAndJetAxisCut-> DrawAndWrite(options);
     RatioPlotswtDecayLengthAndJetAxisCut->DrawAndWrite(options);
   }
+#endif
   result->Close();
   return;
 }
@@ -1373,35 +1379,6 @@ void Plotting::WhichFlavors(Byte_t iJet,vector<Flavor> &theflavors) {
   }
 }
 
-void Plotting::NPUTracks(DistributionPlots2D *NJetPlots,DistributionPlots2D *RatioPlots,DistributionPlots2D *NJetPlotswtDecayLengthAndJetAxisCut,DistributionPlots2D *RatioPlotswtDecayLengthAndJetAxisCut) {
-  if (fChain == 0) return;
-  Long64_t nentries = fChain->GetEntries();
-  for (Long64_t jentry=0; jentry<nentries;jentry++) {
-    if ( LoadTree(jentry) < 0 ) break;
-    fChain->GetEntry(jentry);
-#ifdef EventCut
-    if (!(EventCut)) continue;
-#endif
-#ifdef CALJETMEANZ
-    Float_t MeanZ[30];
-    Jet_MeanTrackLongitudinalIP(MeanZ);
-#endif
-    for ( Byte_t iJet=0; iJet<nJets; iJet++ ) {
-      if (!(JetCut(iJet))) continue;
-      vector<Flavor> theflavors;
-      WhichFlavors(iJet,theflavors);
-      for (vector<Flavor>::const_iterator iflavor=theflavors.begin();iflavor!=theflavors.end();iflavor++) {
-	NJetPlots->Fill(*iflavor,IPnSelectedPUTracks[iJet],numberOfPUVertices,puweight[numberOfPUVertices]);
-	if ( IPnSelectedTracks[iJet] ==0 ) RatioPlots->Fill(*iflavor,-1,numberOfPUVertices,puweight[numberOfPUVertices]);
-	else RatioPlots->Fill(*iflavor,IPnSelectedPUTracks[iJet]/Float_t(IPnSelectedTracks[iJet]),numberOfPUVertices,puweight[numberOfPUVertices]);
-	NJetPlotswtDecayLengthAndJetAxisCut->Fill(*iflavor,IPnSelectedAndDecayLengthAndJetAsixPUTracks[iJet],numberOfPUVertices,puweight[numberOfPUVertices]);
-	if ( IPnSelectedAndDecayLengthAndJetAsixTracks[iJet]==0 ) RatioPlotswtDecayLengthAndJetAxisCut->Fill(*iflavor,-1,numberOfPUVertices,puweight[numberOfPUVertices]);
-	else RatioPlotswtDecayLengthAndJetAxisCut->Fill(*iflavor,IPnSelectedAndDecayLengthAndJetAsixPUTracks[iJet]/Float_t(IPnSelectedAndDecayLengthAndJetAsixTracks[iJet]),numberOfPUVertices,puweight[numberOfPUVertices]);
-      }
-    }
-  }
-}
-
 void Plotting::FlavourHist(DiscriminatorOption option, const Float_t weight, DistributionPlots2D **VsJetPt, DistributionPlots2D **VsJetEta, DistributionPlots2D **VsJetPhi, DistributionPlots2D **VsEventPtHat) {
   VsJetPhi=NULL;VsEventPtHat=NULL;//Not plotting there now
   if (fChain == 0) return;
@@ -1434,6 +1411,35 @@ void Plotting::FlavourHist(DiscriminatorOption option, const Float_t weight, Dis
   }
 //Jets which are heavily biased by PU tracks are considered as no flavor (PU)
   cout<<Nevents<<" events were considered."<<endl;
+}
+#if bTagNtupleVersion>=4
+void Plotting::NPUTracks(DistributionPlots2D *NJetPlots,DistributionPlots2D *RatioPlots,DistributionPlots2D *NJetPlotswtDecayLengthAndJetAxisCut,DistributionPlots2D *RatioPlotswtDecayLengthAndJetAxisCut) {
+  if (fChain == 0) return;
+  Long64_t nentries = fChain->GetEntries();
+  for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    if ( LoadTree(jentry) < 0 ) break;
+    fChain->GetEntry(jentry);
+#ifdef EventCut
+    if (!(EventCut)) continue;
+#endif
+#ifdef CALJETMEANZ
+    Float_t MeanZ[30];
+    Jet_MeanTrackLongitudinalIP(MeanZ);
+#endif
+    for ( Byte_t iJet=0; iJet<nJets; iJet++ ) {
+      if (!(JetCut(iJet))) continue;
+      vector<Flavor> theflavors;
+      WhichFlavors(iJet,theflavors);
+      for (vector<Flavor>::const_iterator iflavor=theflavors.begin();iflavor!=theflavors.end();iflavor++) {
+	NJetPlots->Fill(*iflavor,IPnSelectedPUTracks[iJet],numberOfPUVertices,puweight[numberOfPUVertices]);
+	if ( IPnSelectedTracks[iJet] ==0 ) RatioPlots->Fill(*iflavor,-1,numberOfPUVertices,puweight[numberOfPUVertices]);
+	else RatioPlots->Fill(*iflavor,IPnSelectedPUTracks[iJet]/Float_t(IPnSelectedTracks[iJet]),numberOfPUVertices,puweight[numberOfPUVertices]);
+	NJetPlotswtDecayLengthAndJetAxisCut->Fill(*iflavor,IPnSelectedAndDecayLengthAndJetAsixPUTracks[iJet],numberOfPUVertices,puweight[numberOfPUVertices]);
+	if ( IPnSelectedAndDecayLengthAndJetAsixTracks[iJet]==0 ) RatioPlotswtDecayLengthAndJetAxisCut->Fill(*iflavor,-1,numberOfPUVertices,puweight[numberOfPUVertices]);
+	else RatioPlotswtDecayLengthAndJetAxisCut->Fill(*iflavor,IPnSelectedAndDecayLengthAndJetAsixPUTracks[iJet]/Float_t(IPnSelectedAndDecayLengthAndJetAsixTracks[iJet]),numberOfPUVertices,puweight[numberOfPUVertices]);
+      }
+    }
+  }
 }
 
 void Plotting::MCPtvsRecoPt(DistributionPlots2D **GenPtvsJetPt, DistributionPlots2D **PartonvsJetPt, DistributionPlots1D **BiasFromGenPt, DistributionPlots1D **BiasFromPartonPt) {
@@ -1471,6 +1477,7 @@ void Plotting::MCPtvsRecoPt(DistributionPlots2D **GenPtvsJetPt, DistributionPlot
   }
   cout<<Nevents<<" events were considered while looking for MCPtvsRecoPt."<<endl;
 }
+#endif
 
 void Plotting::MeanPt(DistributionPlots1D **TotalPt, DistributionPlots1D **TotalEntries) {
   if (fChain == 0) return;
