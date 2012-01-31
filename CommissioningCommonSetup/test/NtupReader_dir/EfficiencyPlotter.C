@@ -710,11 +710,11 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
 #endif
     NReturnPoints=SelectPoints(Discriminator_nBins,Ref_eff_X,Ref_eff_XdownError,Ref_eff_XupError,eff_X,eff_Y,eff_XdownError,eff_XupError,eff_YdownError,eff_YupError,(MAXB-MINB)/NEFFPOINTS,(MAXC-MINC)/NEFFPOINTS);
     //printf("Kept %d points on the plot.\n",NReturnPoints);
-    TGraphAsymmErrors *PU_efficienies_BvsC=new TGraphAsymmErrors(NReturnPoints,eff_X,eff_Y,eff_XdownError,eff_XupError,eff_YdownError,eff_YupError);
-    sprintf(namestring,"%s_efficienies_CvsB_PU%dto%d",Title,PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin]);
-    SetPlotStyle(PU_efficienies_BvsC,namestring,color);
-    PU_efficienies_BvsC->Draw("same,P");
-    PU_efficienies_BvsC->Write();
+    TGraphAsymmErrors *PU_efficiencies_BvsC=new TGraphAsymmErrors(NReturnPoints,eff_X,eff_Y,eff_XdownError,eff_XupError,eff_YdownError,eff_YupError);
+    sprintf(namestring,"%s_efficiencies_CvsB_PU%dto%d",Title,PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin]);
+    SetPlotStyle(PU_efficiencies_BvsC,namestring,color);
+    PU_efficiencies_BvsC->Draw("same,P");
+    PU_efficiencies_BvsC->Write();
     printf("Calculating UDSG eff:\n");
     Canvas_eff_BvsUDSG->cd();
     VsJetPt_plots_iPUBin->GetEff(eff_Y,eff_YupError,eff_YdownError,UDSG,PtBinCut);
@@ -723,11 +723,11 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
 #endif
     NReturnPoints=SelectPoints(Discriminator_nBins,Ref_eff_X,Ref_eff_XdownError,Ref_eff_XupError,eff_X,eff_Y,eff_XdownError,eff_XupError,eff_YdownError,eff_YupError,(MAXB-MINB)/NEFFPOINTS,-1.);
     printf("Kept %d points on the plot.\n",NReturnPoints);
-    TGraphAsymmErrors *PU_efficienies_BvsUDSG=new TGraphAsymmErrors(NReturnPoints,eff_X,eff_Y,eff_XdownError,eff_XupError,eff_YdownError,eff_YupError);
-    sprintf(namestring,"%s_efficienies_UDSGvsB_PU%dto%d",Title,PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin]);
-    SetPlotStyle(PU_efficienies_BvsUDSG,namestring,color);
-    PU_efficienies_BvsUDSG->Draw("same,P");
-    PU_efficienies_BvsUDSG->Write();
+    TGraphAsymmErrors *PU_efficiencies_BvsUDSG=new TGraphAsymmErrors(NReturnPoints,eff_X,eff_Y,eff_XdownError,eff_XupError,eff_YdownError,eff_YupError);
+    sprintf(namestring,"%s_efficiencies_UDSGvsB_PU%dto%d",Title,PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin]);
+    SetPlotStyle(PU_efficiencies_BvsUDSG,namestring,color);
+    PU_efficiencies_BvsUDSG->Draw("same,P");
+    PU_efficiencies_BvsUDSG->Write();
     printf("Calculating UDSGwtNoFlavor eff:\n");
     Canvas_eff_BvsUDSGwtPU->cd();
     VsJetPt_plots_iPUBin->GetEff(eff_Y,eff_YupError,eff_YdownError,UDSGwtNoFlavor,PtBinCut);
@@ -736,15 +736,15 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
 #endif
     NReturnPoints=SelectPoints(Discriminator_nBins,Ref_eff_X,Ref_eff_XdownError,Ref_eff_XupError,eff_X,eff_Y,eff_XdownError,eff_XupError,eff_YdownError,eff_YupError,(MAXB-MINB)/NEFFPOINTS,-1.);
     printf("Kept %d points on the plot.\n",NReturnPoints);
-    TGraphAsymmErrors *PU_efficienies_BvsUDSGwtPU=new TGraphAsymmErrors(NReturnPoints,eff_X,eff_Y,eff_XdownError,eff_XupError,eff_YdownError,eff_YupError);
-    sprintf(namestring,"%s_efficienies_UDSGwtPUvsB_PU%dto%d",Title,PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin]);
-    SetPlotStyle(PU_efficienies_BvsUDSGwtPU,namestring,color);
-    PU_efficienies_BvsUDSGwtPU->Draw("same,P");
-    PU_efficienies_BvsUDSGwtPU->Write();
+    TGraphAsymmErrors *PU_efficiencies_BvsUDSGwtPU=new TGraphAsymmErrors(NReturnPoints,eff_X,eff_Y,eff_XdownError,eff_XupError,eff_YdownError,eff_YupError);
+    sprintf(namestring,"%s_efficiencies_UDSGwtPUvsB_PU%dto%d",Title,PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin]);
+    SetPlotStyle(PU_efficiencies_BvsUDSGwtPU,namestring,color);
+    PU_efficiencies_BvsUDSGwtPU->Draw("same,P");
+    PU_efficiencies_BvsUDSGwtPU->Write();
     if ( PU_Bin_LowEdge[PU_iBin]!=PU_Bin_HighEdge[PU_iBin] )
       sprintf(legendtext,"PU = %d to %d",PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin]);
     else sprintf(legendtext,"PU = %d",PU_Bin_LowEdge[PU_iBin]);
-    Legends_Efficiencies->AddEntry(PU_efficienies_BvsUDSG,legendtext,"LEP");
+    Legends_Efficiencies->AddEntry(PU_efficiencies_BvsUDSG,legendtext,"LEP");
 #ifdef MAKEJetVarPlot
     const char *JetVarNames[]={"Eta","Pt"};
     DistributionPlots2D* VsJetVar_plots_iPUBin[]={VsJetEta_plots_iPUBin,VsJetPt_plots_iPUBin};
@@ -761,7 +761,7 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
       VsJetVar_plots_iPUBin[iJetVar]->GetJetVarPlot(UDSGC_Eff,UDSGC_Eff_fittingError,nFlavors,PlottingFlavors,B,RequiredBEff,Required_BEffAccuracy,IsLogY,false);
       Canvases[iJetVar]->cd();
       for (Byte_t iFlavor=0;iFlavor<nFlavors;iFlavor++) {
-	sprintf(namestring,"%s_%s_efficienies_%s_PU%dto%d_RequireBEff=%.2f",Title,Flavor_Names[Int_t(PlottingFlavors[iFlavor])],JetVarNames[iJetVar],PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin],RequiredBEff);
+	sprintf(namestring,"%s_%s_efficiencies_%s_PU%dto%d_RequireBEff=%.2f",Title,Flavor_Names[Int_t(PlottingFlavors[iFlavor])],JetVarNames[iJetVar],PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin],RequiredBEff);
 	SetPlotStyle(UDSGC_Eff_fittingError[iFlavor],namestring,colors[iFlavor]);
 	UDSGC_Eff_fittingError[iFlavor]->Draw("same,P");
 #ifdef SHOWSECONDERRORBAR
@@ -786,7 +786,7 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
       VsJetVar_plots_iPUBin[iJetVar]->GetJetVarPlot(BC_Eff,BC_Eff_fittingError,nFlavors,PlottingFlavors,UDSG,RequiredUDSGEff[iJetVar],Required_UDSGEffAccuracy,IsLogY,true);
       Canvases[iJetVar]->cd();
       for (Byte_t iFlavor=0;iFlavor<nFlavors;iFlavor++) {
-	sprintf(namestring,"%s_%s_efficienies_%s_PU%dto%d_Required_UDSGEff_ETA=%.2f",Title,Flavor_Names[Int_t(PlottingFlavors[iFlavor])],JetVarNames[iJetVar],PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin],RequiredUDSGEff_ETA);
+	sprintf(namestring,"%s_%s_efficiencies_%s_PU%dto%d_Required_UDSGEff_ETA=%.2f",Title,Flavor_Names[Int_t(PlottingFlavors[iFlavor])],JetVarNames[iJetVar],PU_Bin_LowEdge[PU_iBin],PU_Bin_HighEdge[PU_iBin],RequiredUDSGEff_ETA);
 	SetPlotStyle(BC_Eff_fittingError[iFlavor],namestring,colors[iFlavor]);
 	BC_Eff_fittingError[iFlavor]->Draw("same,P");
 #ifdef SHOWSECONDERRORBAR
