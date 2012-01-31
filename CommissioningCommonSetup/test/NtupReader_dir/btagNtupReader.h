@@ -136,9 +136,6 @@ public :
    Float_t         SVvtxDistJetAxis[MAXNJets];   //[nJets]
    Int_t           SVtotCharge[MAXNJets];   //[nJets]
    Int_t           IPnSelectedTracks[MAXNJets];   //[nJets]
-   Int_t           IPnSelectedPUTracks[MAXNJets];   //[nJets]
-   Int_t           IPnSelectedAndDecayLengthAndJetAsixTracks[MAXNJets];   //[nJets]
-   Int_t           IPnSelectedAndDecayLengthAndJetAsixPUTracks[MAXNJets];   //[nJets]
    Float_t         IPghostTrackPt[MAXNJets];   //[nJets]
    Float_t         IPghostTrackPtRel[MAXNJets];   //[nJets]
    Float_t         IPghostTrackEta[MAXNJets];   //[nJets]
@@ -464,9 +461,6 @@ public :
    TBranch        *b_SVvtxDistJetAxis;   //!
    TBranch        *b_SVtotCharge;   //!
    TBranch        *b_IPnSelectedTracks;   //!
-   TBranch        *b_IPnSelectedPUTracks;   //!
-   TBranch        *b_IPnSelectedAndDecayLengthAndJetAsixTracks;   //!
-   TBranch        *b_IPnSelectedAndDecayLengthAndJetAsixPUTracks;   //!
    TBranch        *b_IPghostTrackPt;   //!
    TBranch        *b_IPghostTrackPtRel;   //!
    TBranch        *b_IPghostTrackEta;   //!
@@ -713,7 +707,10 @@ public :
    Float_t         GenJetPt[MAXNJets];   //[nJets]
    Float_t         GenJetEta[MAXNJets];   //[nJets]
    Float_t         GenJetPhi[MAXNJets];   //[nJets]
-
+   Int_t           IPnSelectedPUTracks[MAXNJets];   //[nJets]
+   Int_t           IPnSelectedAndDecayLengthAndJetAsixTracks[MAXNJets];   //[nJets]
+   Int_t           IPnSelectedAndDecayLengthAndJetAsixPUTracks[MAXNJets];   //[nJets]
+ 
    TBranch        *b_mcweight;   //!
    TBranch        *b_HLTPrescaleFactors;   //!
    TBranch        *b_HLTriggerResults;   //!
@@ -723,6 +720,9 @@ public :
    TBranch        *b_GenJetPt;   //!
    TBranch        *b_GenJetEta;   //!
    TBranch        *b_GenJetPhi;   //!
+   TBranch        *b_IPnSelectedPUTracks;   //!
+   TBranch        *b_IPnSelectedAndDecayLengthAndJetAsixTracks;   //!
+   TBranch        *b_IPnSelectedAndDecayLengthAndJetAsixPUTracks;   //!
 
    RunInfo *RunInfo_;
    virtual UInt_t   HLTPrescale(string HLTName);
