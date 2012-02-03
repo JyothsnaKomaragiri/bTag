@@ -21,8 +21,7 @@ using namespace std;
 
 const TString format="pdf";
 
-//#define PLOT_COMMON_TITLE "CMS Preliminary 2011,  #sqrt{s} = 7 TeV"
-#define PLOT_COMMON_TITLE "CMS Run2011B Validation,  #sqrt{s} = 7 TeV"
+#define PLOT_COMMON_TITLE "CMS 2011 preliminary, #sqrt{s} = 7 TeV"
 
 #define MAXNFILES 10
 ////// IMPORTANT : CHANGE THE DEFINITION OF THE CONSTRUCTOR OF THE CLASS "Plots"  TO CORRECT THE FILE LOCATION
@@ -855,7 +854,7 @@ void Plots1D::TagRate(TString selection, TString label, bool down, bool logy, TS
     canvas->SaveAs(name_can2.Data());
   }
 }
-
+//#define ShowRatio//show ratio plots among scenarioes
 void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, bool bOverflow){
   TString npv1;
   TString npv2;
@@ -867,7 +866,6 @@ void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, b
   histo0_Data1 = (TH1F*)data->Get(npv1);
   histo0_Data2 = (TH1F*)data->Get(npv2);
   histo0_Data3 = (TH1F*)data->Get(npv3);
-
   // fix overflow bins:
  
   if(bOverflow){
@@ -939,12 +937,13 @@ void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, b
   // CREATE CANVAS
   canvas = new TCanvas("c1", "c1",10,32,782,552);
   canvas->cd();
-
+  
+#ifdef ShowRatio
   // FIRST MC & DATA
   canvas_1 = new TPad("canvas_1", "canvas_1",0,0.25,1.0,0.98);
   canvas_1->Draw();
   canvas_1->cd();
-
+#endif
 
   if (histo0_Data1->GetMaximum() > histo0_Data2->GetMaximum()) histo0_Data2->SetMaximum(histo0_Data1->GetMaximum() *1.1);
   if (histo0_Data3->GetMaximum() > histo0_Data2->GetMaximum()) histo0_Data2->SetMaximum(histo0_Data3->GetMaximum() *1.1);
@@ -959,7 +958,7 @@ void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, b
       qw = new TLegend(0.5,0.60,0.85,1.);
     }
     else {
-      qw = new TLegend(0.65,0.60,0.95,1.);
+      qw = new TLegend(0.7,0.60,0.95,1.);
     }
   } 
   else {
@@ -1006,9 +1005,9 @@ void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, b
       //      qw->SetHeader("2011 BTagMu_DiJet110_Mu5 L=212 pb^{-1}"); // 60
     }
   }
-  qw->AddEntry(histo0_Data1,        "data (#PV: 1-3)",           "p"); 
-  qw->AddEntry(histo0_Data2,        "data (#PV: 4-7)",           "p"); 
-  qw->AddEntry(histo0_Data3,        "data (#PV: >7)",           "p"); 
+  qw->AddEntry(histo0_Data1,        "data (#PV: 1-6)",           "p"); 
+  qw->AddEntry(histo0_Data2,        "data (#PV: 7-10)",           "p"); 
+  qw->AddEntry(histo0_Data3,        "data (#PV: >=11)",           "p"); 
   qw->SetFillColor(0);
   qw->Draw();
    
@@ -1017,10 +1016,11 @@ void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, b
   latex->SetTextSize(0.055);
   latex->SetTextFont(42); //22
   latex->SetTextAlign(13);
-  latex->DrawLatex(0.14, 0.96, PLOT_COMMON_TITLE);
+  latex->DrawLatex(0.1, 0.96, PLOT_COMMON_TITLE);
 
   canvas->cd();
-  // SECOND DATA/MC RATIO
+#ifdef ShowRatio
+  // SECOND DATA/DATA RATIO
   canvas_2 = new TPad("canvas_2", "canvas_2",0,0.,1.0,0.32);
   canvas_2->Draw();
   canvas_2->cd();
@@ -1030,7 +1030,7 @@ void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, b
   histo0_ratio->SetMarkerStyle(20);
   histo0_ratio->SetMarkerSize(0.75);
   histo0_ratio->SetLineWidth(2);
-  histo0_ratio->GetYaxis()->SetTitle("#PV 4-7/#PV 1-3");
+  histo0_ratio->GetYaxis()->SetTitle("#PV 7-10/#PV 1-6");
   histo0_ratio->GetXaxis()->SetTitle(label);  
   histo0_ratio->GetYaxis()->SetTitleOffset( 0.4 );
   histo0_ratio->GetYaxis()->SetTitleSize( 0.1 );
@@ -1043,14 +1043,18 @@ void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, b
   histo0_ratio->SetMinimum(0.4);
   histo0_ratio->SetMaximum(1.6);
   histo0_ratio->Draw("E1X0");
-
   canvas->cd();
+#endif
   // SAVE FILES
   TString name_can=dir_+"npv_"+selection+"_Linear."+format;
   canvas->SaveAs(name_can.Data());
 
   if (logy==1) {
+#ifdef ShowRatio
     canvas_1->SetLogy(logy);
+#else
+    canvas->SetLogy(logy);
+#endif
     TString name_can2=dir_+"npv_"+selection+"_Log."+format;
     canvas->SaveAs(name_can2.Data());
   }
@@ -1058,11 +1062,13 @@ void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, b
 
 void Plots2D::PlotStack2D(TString selection, TString label, TString labely, bool logy, float ymin, float ymax){
   histo0_Data = (TH2F*) data->Get(selection);
-  TProfile * pro_data = histo0_Data->ProfileX();
-
-  //###################################################
-  //###################################################
-
+  TProfile * pro_data = histo0_Data->ProfileX(selection+"data",1,-1,"");
+  //according to http://root.cern.ch/root/html/TProfile.html#TProfile:BuildOptions, the eerror calculation of root TProfile is buggy ( 0 error for spread 0 bin ), so we correct it manually
+  //corrections reference: http://web-docs.gsi.de/~halo/docs/hydra/classDocumentation/doxy_dev/root52800b/html/classTProfileHelper.html#6c0a7cb6d5cbb2595cb35ac8f6f1250d
+  for (UInt_t ibin=0;ibin<=pro_data->GetNbinsX();ibin++) {
+    if ( pro_data->GetBinError(ibin)<1E-5 ) pro_data->SetBinError(ibin,sqrt(pro_data->GetBinContent(ibin)));
+    //cerr<<pro_data->GetBinCenter(ibin)<<","<<pro_data->GetBinContent(ibin)<<"+/-"<<pro_data->GetBinError(ibin)<<"("<<pro_data->GetBinEntries(ibin)<<" ) ;  ";
+  }
   TString bsel = selection+"_b";
   TString csel = selection+"_c";
   TString lsel = selection+"_udsg"; 
@@ -1091,23 +1097,20 @@ void Plots2D::PlotStack2D(TString selection, TString label, TString labely, bool
     }
   }
 
-
-  // SCALE MC TO DATA
+   /*  // SCALE MC TO DATA
   float scaleparam=histo0_Data->Integral()/histo0_MC->Integral();
   histo0_MC_b->Scale(scaleparam);
   histo0_MC_c->Scale(scaleparam);
   histo0_MC_udsg->Scale(scaleparam);
   histo0_MC_gspl->Scale(scaleparam);
   histo0_MC->Scale(scaleparam);
-
-
-  TProfile * pro_mc = histo0_MC->ProfileX();
-  TProfile * pro_mc_b = histo0_MC_b->ProfileX();
-  TProfile * pro_mc_c = histo0_MC_c->ProfileX();
-  TProfile * pro_mc_udsg = histo0_MC_udsg->ProfileX();
-  TProfile * pro_mc_gspl = histo0_MC_gspl->ProfileX();
-
-
+  */
+    TProfile * pro_mc = histo0_MC->ProfileX(selection+"_qcdtotal");
+    TProfile * pro_mc_b = histo0_MC_b->ProfileX(bsel);
+    TProfile * pro_mc_c = histo0_MC_c->ProfileX(csel);
+    TProfile * pro_mc_udsg = histo0_MC_udsg->ProfileX(lsel);
+    TProfile * pro_mc_gspl = histo0_MC_gspl->ProfileX(gsel);
+ 
   // SET COLORS
   pro_mc->SetLineColor(1);
   pro_mc_b->SetLineColor(2);
@@ -1188,19 +1191,19 @@ void Plots2D::PlotStack2D(TString selection, TString label, TString labely, bool
   canvas->cd();
 
   pro_mc_gspl->Draw("hist");
-  pro_mc->Draw("hist,same");
   pro_mc_b->Draw("hist,same");
   pro_mc_c->Draw("hist,same");
   pro_mc_udsg->Draw("hist,same");
+  pro_mc->Draw("hist,same");
   pro_data->Draw("e,same");
 
   // ADD LEGEND
   TLegend* qw = 0;
   if (mu_==false) {
-    qw = new TLegend(0.6,0.11,0.9,0.33);
+    qw = new TLegend(0.35,0.11,0.65,0.33);
   } 
   else {
-    qw = new TLegend(0.6,0.11,0.9,0.33);
+    qw = new TLegend(0.35,0.11,0.65,0.33);
   }
 
   if (mu_==false) {
