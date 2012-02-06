@@ -16,6 +16,7 @@ void run(){
   //  for Jet dataset
 #ifdef RUN_ON_JET
     P1D.PlotStack("npv","number of PV", 1, 0,1);
+    P1D.PlotStack("npv_no_scaled","number of PV", 1, 0,1);
     P1D.PlotStack("all_jetpt","jet p_{t}",1, 1, 1);
 
     P1D.PlotStack("discri_tche","TCHE discriminator",1, 1, 1);
