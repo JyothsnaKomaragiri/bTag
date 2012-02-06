@@ -141,7 +141,9 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
   TString csel = selection+"_c";
   TString lsel = selection+"_udsg"; 
   TString gsel = selection+"_gspl";
-  if (selection=="npv" || selection=="pthat" || selection=="npv_no_scaled" || selection=="npu") {
+  Bool_t DoNotStack=false;
+  if (selection=="npv" || selection=="pthat" || selection=="npv_no_scaled" || selection=="npu") DoNotStack=true;
+  if (DoNotStack) {
     // IF selection=="npv" or selection=="pthat", no _b info
     // PUT DUMMY NAMES TO AVOID CRASH...
     bsel = "sv_jetpt_b";
@@ -211,7 +213,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
  
   // SCALE MC TO DATA
   float scaleparam=histo0_Data->Integral()/histo0_MC->Integral();
-  if (selection!="npv_no_scaled" && selection!="npu") {
+  if (!DoNotStack) {
     histo0_MC_b->Scale(scaleparam);
     histo0_MC_c->Scale(scaleparam);
     histo0_MC_udsg->Scale(scaleparam);
@@ -259,7 +261,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
 
 
   histo0_ratio->Divide(histo0_MC);
-
+  /*
   if (selection=="npv_no_scaled" ){
     for (int iii=1; iii<histo0_ratio->GetNbinsX(); iii++) {
       cout << iii-1 << " " << histo0_ratio->GetBinContent(iii) << endl;
@@ -270,7 +272,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
       cout << iii-1 << " " << histo0_MC->GetBinContent(iii) << endl;
     }
   }
-
+  */
  
   // MAKE 2010/2011 RATIO 
   TH1F * histo0_rat2010 = (TH1F*) histo0_2010->Clone();
@@ -292,18 +294,21 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
 
   // DO STACK
   THStack* hs= new THStack();
-  if (down==false) {
-    hs->Add(histo0_MC_udsg);
-    hs->Add(histo0_MC_c);
-    hs->Add(histo0_MC_gspl); 
-    hs->Add(histo0_MC_b);
+  if (!DoNotStack) {
+    if (down==false) {
+      hs->Add(histo0_MC_udsg);
+      hs->Add(histo0_MC_c);
+      hs->Add(histo0_MC_gspl); 
+      hs->Add(histo0_MC_b);
+    }
+    else {
+      hs->Add(histo0_MC_b);
+      hs->Add(histo0_MC_gspl);  
+      hs->Add(histo0_MC_c);
+      hs->Add(histo0_MC_udsg);
+    }
   }
-  else {
-    hs->Add(histo0_MC_b);
-    hs->Add(histo0_MC_gspl);  
-    hs->Add(histo0_MC_c);
-    hs->Add(histo0_MC_udsg);
-  }
+  else hs->Add(histo0_MC);
   
   // SET COSMETICS
   histo0_Data->SetMarkerStyle(20);
@@ -368,13 +373,9 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
     if (ptval_==110. && mu_==true) hs->SetMaximum(hs->GetMaximum() *2. );
   }
   if (ptval_==110. && mu_==true && selection=="sv_vtx_pt" ) hs->SetMaximum(hs->GetMaximum() *1.5 );
-  if (selection!="npv" && selection!="npv_no_scaled" && selection!="npu") {
-    hs->Draw("hist");
-  }
-  else {
-    if (histo0_MC->GetMaximum() <histo0_Data->GetMaximum() )  histo0_MC->SetMaximum(histo0_Data->GetMaximum() );
-    histo0_MC->Draw("hist");
-  }
+  
+  hs->Draw("hist");
+  
   if (selection!="pthat" && selection!="npu") histo0_Data->Draw("e same");
 
   // ADD LEGEND
@@ -461,7 +462,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
 
     }
   }
-  if (selection!="npv" && selection!="npv_no_scaled" && selection!="npu") {
+  if (!DoNotStack) {
     qw->AddEntry(histo0_MC_b,        "QCD (b quark) "           ,"f");
     qw->AddEntry(histo0_MC_gspl,     "QCD (b from gspl) "     ,"f");
     qw->AddEntry(histo0_MC_c,        "QCD (c quark) "           ,"f");

@@ -16,7 +16,6 @@ void run(){
   //  for Jet dataset
 #ifdef RUN_ON_JET
     P1D.PlotStack("npv","number of PV", 1, 0,1);
-    P1D.PlotStack("npv_no_scaled","number of PV", 1, 0,1);
     P1D.PlotStack("all_jetpt","jet p_{t}",1, 1, 1);
 
     P1D.PlotStack("discri_tche","TCHE discriminator",1, 1, 1);
@@ -418,24 +417,24 @@ void run(){
     P1D.PlotStack("npv3_muon_Pt",        "Muon p_{T} (#PV:>=11)",                  1, 1, 1);
     P1D.PlotStack("npv3_muon_ptrel",    "Muon p_{T}^{rel} (#PV:>=11)",             1, 0, 1);
     P1D.PlotStack("npv3_muon_DeltaR",         "Muon1 deltaR (#PV:>=11)",           1, 0, 1);
-    P2D.PlotStack2D("track_vs_jetpt", "jet p_{t}", "track multiplicity",  0);
-    P2D.PlotStack2D("cutseltrack_vs_jetpt", "jet p_{t}", "track multiplicity", 0,0,17.);
+    P2D.PlotStack2D("track_vs_jetpt", "jet p_{t}", "track multiplicity",  0,10,35.);
+    P2D.PlotStack2D("cutseltrack_vs_jetpt", "jet p_{t}", "track multiplicity", 0,4,17.);
     P2D.PlotStack2D("sv_track_vs_jetpt",    "jet p_{t}", "SV track multiplicity",  0,1.,5.5);
 
-    P2D.PlotStack2D("sv_mass_vs_flightDistSignCut", "flight dist sign.", "SV mass",   0);
-    P2D.PlotStack2D("sv_mass_vs_flightDistCut","flight dist.", "SV mass",  0);
+    P2D.PlotStack2D("sv_mass_vs_flightDistSignCut", "flight dist sign.", "SV mass",   0, 0, 6.5);
+    P2D.PlotStack2D("sv_mass_vs_flightDistCut","flight dist.", "SV mass",  0,0,4.5);
 
-    P2D.PlotStack2D("avg_sv_mass_vs_jetpt", "jet p_{t}", "SV mass", 0);
+    P2D.PlotStack2D("avg_sv_mass_vs_jetpt", "jet p_{t}", "SV mass", 0,0,5.5);
 
-    P2D.PlotStack2D("sv_deltar_jet_vs_jetpt", "jet p_{t}", "#Delta R(vertex dir., jet)", 0);
-    P2D.PlotStack2D("sv_deltar_sum_jet_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, jet)",  0);
-    P2D.PlotStack2D("sv_deltar_sum_dir_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, vertex dir.)",  0);
-    P2D.PlotStack2D("muon_ptrel_vs_jetpt", "jet p_{t}","muon p_{t}^{rel}",  0);
-    P2D.PlotStack2D("muon_DeltaR_vs_jetpt","jet p_{t}","muon #Delta R",   0);
+    P2D.PlotStack2D("sv_deltar_jet_vs_jetpt", "jet p_{t}", "#Delta R(vertex dir., jet)", 0,0,0.13);
+    P2D.PlotStack2D("sv_deltar_sum_dir_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, vertex dir.)",  0,0,0.09);
+    P2D.PlotStack2D("sv_deltar_sum_jet_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, jet)",  0,0,0.09);
+    P2D.PlotStack2D("muon_ptrel_vs_jetpt", "jet p_{t}","muon p_{t}^{rel}",  0,0,1);
+    P2D.PlotStack2D("muon_DeltaR_vs_jetpt","jet p_{t}","muon #Delta R",   0,0,1.);
 
   
-    P2D.PlotStack2D("sv_eratio_vs_jetpt","jet p_{t}","SV energy ratio",  0);
-    P2D.PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{t}","SV p_{t}",  0);
+    P2D.PlotStack2D("sv_eratio_vs_jetpt","jet p_{t}","SV energy ratio",  0,0,0.75);
+    P2D.PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{t}","SV p_{t}",  0,0,55);
 #else
     // // for btagmet dataset 
 
@@ -866,23 +865,23 @@ void run(){
     P1D.PlotStack("npv3_muon_ptrel",    "Muon p_{T}^{rel} (#PV:>=11)",             1, 0, 1);
     P1D.PlotStack("npv3_muon_DeltaR",         "Muon1 deltaR (#PV:>=11)",           1, 0, 1);
 
-    P2D.PlotStack2D("track_vs_jetpt", "jet p_{t}", "track multiplicity",  0);
-    P2D.PlotStack2D("cutseltrack_vs_jetpt", "jet p_{t}", "track multiplicity", 0);
-    P2D.PlotStack2D("sv_track_vs_jetpt",    "jet p_{t}", "SV track multiplicity",  0);
+    P2D.PlotStack2D("track_vs_jetpt", "jet p_{t}", "track multiplicity",  0,10,35);
+    P2D.PlotStack2D("cutseltrack_vs_jetpt", "jet p_{t}", "track multiplicity", 0,4,17);
+    P2D.PlotStack2D("sv_track_vs_jetpt",    "jet p_{t}", "SV track multiplicity",  0,1.,5.5);
 
-    P2D.PlotStack2D("sv_mass_vs_flightDistSignCut", "flight dist sign.", "SV mass", 0);
-    P2D.PlotStack2D("sv_mass_vs_flightDistCut","flight dist.", "SV mass",  0);
+    P2D.PlotStack2D("sv_mass_vs_flightDistSignCut", "flight dist sign.", "SV mass", 0, 0, 6.5);
+    P2D.PlotStack2D("sv_mass_vs_flightDistCut","flight dist.", "SV mass",  0,0,4.5);
 
-    P2D.PlotStack2D("avg_sv_mass_vs_jetpt", "jet p_{t}", "SV mass", 0);
+    P2D.PlotStack2D("avg_sv_mass_vs_jetpt", "jet p_{t}", "SV mass", 0,0,5.5);
 
-    P2D.PlotStack2D("sv_deltar_jet_vs_jetpt", "jet p_{t}", "#Delta R(vertex dir., jet)", 0);
-    P2D.PlotStack2D("sv_deltar_sum_jet_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, jet)",  0);
-    P2D.PlotStack2D("sv_deltar_sum_dir_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, vertex dir.)",  0);
+    P2D.PlotStack2D("sv_deltar_jet_vs_jetpt", "jet p_{t}", "#Delta R(vertex dir., jet)", 0,0,0.13);
+    P2D.PlotStack2D("sv_deltar_sum_jet_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, jet)",  0,0,0.09);
+    P2D.PlotStack2D("sv_deltar_sum_dir_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, vertex dir.)",  0,0,0.09);
     P2D.PlotStack2D("muon_ptrel_vs_jetpt", "jet p_{t}","muon p_{t}^{rel}",  0);
     P2D.PlotStack2D("muon_DeltaR_vs_jetpt","jet p_{t}","muon #Delta R",   0);
 
-    P2D.PlotStack2D("sv_eratio_vs_jetpt","jet p_{t}","SV energy ratio",  0);
-    P2D.PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{t}","SV p_{t}",  0);
+    P2D.PlotStack2D("sv_eratio_vs_jetpt","jet p_{t}","SV energy ratio",  0,0,0.75);
+    P2D.PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{t}","SV p_{t}",  0,0,55);
 #endif
 }
 
