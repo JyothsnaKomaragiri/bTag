@@ -68,8 +68,8 @@ void combine(vector<string>& algos,Byte_t option=1)
   }
   latex.Draw();
   leg->Draw("same");
-  if ( option==0 ) c1->SaveAs("Combined_udsgvsb_Efficienies.pdf");
-  if ( option==1 ) c1->SaveAs("Combined_cvsb_Efficienies.pdf");
+  if ( option==0 ) c1->SaveAs("Combined_udsgvsb_Efficiencies.pdf");
+  if ( option==1 ) c1->SaveAs("Combined_cvsb_Efficiencies.pdf");
 }
 
 int main( int argc, char* argv[] ) {
