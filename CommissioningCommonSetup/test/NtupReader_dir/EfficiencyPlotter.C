@@ -11,9 +11,9 @@
 //#define CALJETMEANZ//if do not use the mean Track Longitudinal IP per jet, comment it out to speed up
 //#define PARTON //partonkinematics (before hardonization)
 //#define GENJET //Generated Jets (after hardonization)
-//#define CLEANMCTRUTHFLAVORBYPUTRACK
-//#define CLEANMCTRUTHFLAVORBYDecayLengthAndJetAsixPUTRACK
-#define JetCut(iJet) WhichPt[iJet]>20&&fabs(WhichEta[iJet])<2.4&&jetNeutralEmEnergyFraction[iJet]<0.99&&jetNeutralEmEnergyFraction[iJet]<0.99&&jetnConstituents[iJet]>1&&jetChargedHadronEnergyFraction[iJet]>0.0&&jetChargedMultiplicity[iJet]>0.0&&jetChargedEmEnergyFraction[iJet]<0.99
+//#define CLEANMCTRUTHFLAVORBYPUTRACK //MC with sim information only
+//#define CLEANMCTRUTHFLAVORBYDecayLengthAndJetAsixPUTRACK // MC with sim information only 
+#define JetCut(iJet) WhichPt[iJet]>20&&fabs(WhichEta[iJet])<2.4&&jetNeutralEmEnergyFraction[iJet]<0.99&&jetnConstituents[iJet]>1&&jetChargedHadronEnergyFraction[iJet]>0.0&&jetChargedMultiplicity[iJet]>0.0&&jetChargedEmEnergyFraction[iJet]<0.99
 #define EventCut numberOfPUVertices<MAXPU// comment it out to drop the Event cut
 //----------------------(B)Pileup Variables--------------------------------
 //------------the PU bins-------------------------------------
@@ -31,7 +31,7 @@ const Byte_t PU_nBins=sizeof(PU_Bin_LowEdge)/sizeof(Byte_t);
   #define SHOWDISCRIMINATORVALUESONPLOT //show discriminator values on non b eff vs b eff plots
 #endif
 #define RESULT_FILENAME "result"//the file name of the result, it will be named as result_filename+"_"+option+".root"
-#define PLOTTITLE "CMS Simulation"
+#define PLOTTITLE "CMS 2011 simulation preliminary, #sqrt{s} = 7 TeV"
 const EColor ColorList[]={kBlack,kRed,kGreen,kMagenta,kBlue,kCyan,kGray,EColor(kOrange+7)}; const unsigned char numColor=sizeof(ColorList)/sizeof(EColor);
 #define NDISCRIMINATORBINS 5000
 #define NEFFPOINTS 25//appoximate number of points on non B eff vs B eff plots
@@ -351,14 +351,13 @@ void SetPlotStyle(T *plot, char * name, EColor color, Int_t LineStyle=1, Int_t M
     plot->SetMarkerSize(0.4);
 }
 
-Float_t MINB=0,MAXB=1.,MINUDSG=1E-4,MAXUDSG=1.,MINC=1E-4,MAXC=1.;
-void SetAxisesRanges(Float_t fMINB=0,Float_t fMAXB=1.,Float_t fMINUDSG=1E-4,Float_t fMAXUDSG=1.,Float_t fMINC=1E-4,Float_t fMAXC=1.) {
-  MINB=fMINB;
-  MAXB=fMAXB;
-  MINUDSG=fMINUDSG;
-  MAXUDSG=fMAXUDSG;
-  MINC=fMINC;
-  MAXC=fMAXC;
+Float_t MINUDSG_JetVar=8E-4,MAXUDSG_JetVar=0.3,MINBC_JetVar=0.15,MAXBC_JetVar=0.9,MINB=0,MAXB=1.,MINUDSG=1E-4,MAXUDSG=1.,MINC=1E-4,MAXC=1.;
+inline void SetAxisesRanges(Float_t fMINUDSG_JetVar=8E-4,Float_t fMAXUDSG_JetVar=0.3,Float_t fMINBC_JetVar=0.15,Float_t fMAXBC_JetVar=0.9,Float_t fMINB=0,Float_t fMAXB=1.,Float_t fMINUDSG=1E-4,Float_t fMAXUDSG=1.,Float_t fMINC=1E-4,Float_t fMAXC=1.) {
+  MINUDSG_JetVar=fMINUDSG_JetVar;  MAXUDSG_JetVar=fMAXUDSG_JetVar;
+  MINBC_JetVar=fMINBC_JetVar;  MAXBC_JetVar=fMAXBC_JetVar;
+  MINB=fMINB;  MAXB=fMAXB;
+  MINUDSG=fMINUDSG;  MAXUDSG=fMAXUDSG;
+  MINC=fMINC;  MAXC=fMAXC;
 }
 
 void DrawDiscirminatorValue(UInt_t NPoints,Float_t *eff_X,Float_t *eff_Y,const Float_t *Discriminator_Values) {
@@ -596,7 +595,7 @@ void MeanPtPlot (Plotting **MC, const char *options) {
 
 void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Discriminator_Bins, const UInt_t Discriminator_nBins, Plotting::DiscriminatorOption discriminator_option,Float_t RequiredBEff, Float_t RequiredUDSGEff_ETA, Float_t RequiredUDSGEff_PT) {
   char result_filename[100],namestring[100],legendtext[100]; 
-  TLegend *Legends_Efficiencies = new TLegend(0.16,0.72,0.39,0.95);
+  TLegend *Legends_Efficiencies = new TLegend(0.23,0.67,0.46,0.9);
   SetLegendStyle(Legends_Efficiencies);
   Float_t Ref_eff_X[Discriminator_nBins+1],Ref_eff_XupError[Discriminator_nBins+1],Ref_eff_XdownError[Discriminator_nBins+1],
     eff_X[Discriminator_nBins+1],eff_XupError[Discriminator_nBins+1],eff_XdownError[Discriminator_nBins+1],
@@ -617,13 +616,15 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
     MC[iSample]->FlavourHist(discriminator_option,MC_Weights[iSample],VsJetPt_plots,VsJetEta_plots);
   //-------------make plots-----------------------------
   TLatex latex;
-  latex.SetTextSize(0.03);
-#define DrawTitle(MINX,MAXX,MAXY) latex.SetTextAlign(11);	\
-  latex.DrawLatex(MINX,MAXY,Title);			\
-  latex.SetTextAlign(31);			\
-  latex.DrawLatex(MAXX,MAXY,PLOTTITLE)
 //11=horizontal left vertical bottom
 //31=horizontal right vertical bottom
+#define DrawTitle(MINX,MAXX,MAXY) latex.SetTextAlign(31);	\
+  latex.SetTextSize(0.05);					\
+  latex.DrawLatex(MAXX,MAXY,Title);			\
+  latex.SetTextSize(0.03);				\
+  latex.SetTextAlign(11);			\
+  latex.DrawLatex(MINX,MAXY,PLOTTITLE)
+
   sprintf(namestring,"eff_BvsUDSGwt%s",Title);
   TCanvas *Canvas_eff_BvsUDSG = new TCanvas(namestring,namestring,500,500);
   sprintf(namestring,"%s;b jets efficiency;udsg jets efficiency",PLOTTITLE);
@@ -648,37 +649,33 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
   sprintf(namestring,"eff_BvsUDSGwtPUwt%s",Title);
   TCanvas *Canvas_eff_BvsUDSGwtPU = new TCanvas(namestring,namestring,500,500);
   sprintf(namestring,"%s;b jets efficiency;udsg with PU jets efficiency",PLOTTITLE);
-  //TH1F * tempBvsUDSGwtPU=
   Canvas_eff_BvsUDSGwtPU->DrawFrame(MINB,MINUDSG,MAXB,MAXUDSG,namestring);
-  //tempBvsUDSGwtPU->GetXaxis()->SetNdivisions(10);
-  //tempBvsUDSGwtPU->GetXaxis()->SetLabelSize(0.05);
-  //tempBvsUDSGwtPU->GetYaxis()->SetTickLength(1.);
   DrawTitle(MINB,MAXB,MAXUDSG*1.1);
 #ifdef MAKEJetVarPlot
-  TLegend *Legends_C_Efficiencies = new TLegend(0.73,0.13,0.96,0.36,"c jets");
+  TLegend *Legends_C_Efficiencies = new TLegend(0.2,0.5,0.43,0.68,"c jets");
   SetLegendStyle(Legends_C_Efficiencies);
   ( (TLegendEntry*) Legends_C_Efficiencies->GetListOfPrimitives()->First() )->SetTextAlign(22);//centering the legend header
   sprintf(namestring,"UDSGC_Eff_Etawt%s",Title);
   TCanvas *Canvas_UDSGC_Eff_Eta = new TCanvas(namestring,namestring,500,500);
   sprintf(namestring,"%s;#eta;non-b jets efficiency",PLOTTITLE);
-  Canvas_UDSGC_Eff_Eta->DrawFrame(EtaBins[0],MINUDSG,EtaBins[nEtaBins],MAXC*RequiredBEff*1.5,namestring);
-  DrawTitle(EtaBins[0],EtaBins[nEtaBins],MAXC*RequiredBEff*1.5*1.1);
+  Canvas_UDSGC_Eff_Eta->DrawFrame(EtaBins[0],MINUDSG_JetVar,EtaBins[nEtaBins],MAXUDSG_JetVar,namestring);
+  DrawTitle(EtaBins[0],EtaBins[nEtaBins],MAXUDSG_JetVar*1.1);
 
   sprintf(namestring,"UDSGC_Eff_Ptwt%s",Title);
   TCanvas *Canvas_UDSGC_Eff_Pt = new TCanvas(namestring,namestring,500,500);
   sprintf(namestring,"%s;p_{T} (GeV/c);non-b jets efficiency",PLOTTITLE);
-  Canvas_UDSGC_Eff_Pt->DrawFrame(PtBins[0],MINUDSG,PtBins[nPtBins],MAXC*RequiredBEff*1.5,namestring);
-  DrawTitle(PtBins[0],PtBins[nPtBins],MAXC*RequiredBEff*1.5*1.1);
+  Canvas_UDSGC_Eff_Pt->DrawFrame(PtBins[0],MINUDSG_JetVar,PtBins[nPtBins],MAXUDSG_JetVar,namestring);
+  DrawTitle(PtBins[0],PtBins[nPtBins],MAXUDSG_JetVar*1.1);
   sprintf(namestring,"BC_Eff_Etawt%s",Title);
   TCanvas *Canvas_BC_Eff_Eta = new TCanvas(namestring,namestring,500,500);
   sprintf(namestring,"%s;#eta;bc jets efficiency",PLOTTITLE);
-  Canvas_BC_Eff_Eta->DrawFrame(EtaBins[0],MINB,EtaBins[nEtaBins],MAXB,namestring);
-  DrawTitle(EtaBins[0],EtaBins[nEtaBins],MAXB*1.01);
+  Canvas_BC_Eff_Eta->DrawFrame(EtaBins[0],MINBC_JetVar,EtaBins[nEtaBins],MAXBC_JetVar,namestring);
+  DrawTitle(EtaBins[0],EtaBins[nEtaBins],MAXBC_JetVar*1.01);
   sprintf(namestring,"BC_Eff_Ptwt%s",Title);
   TCanvas *Canvas_BC_Eff_Pt = new TCanvas(namestring,namestring,500,500);
   sprintf(namestring,"%s;p_{T} (GeV/c);bc jets efficiency",PLOTTITLE);
-  Canvas_BC_Eff_Pt->DrawFrame(PtBins[0],MINB,PtBins[nPtBins],MAXB,namestring);
-  DrawTitle(PtBins[0],PtBins[nPtBins],MAXB*1.01);
+  Canvas_BC_Eff_Pt->DrawFrame(PtBins[0],MINBC_JetVar,PtBins[nPtBins],MAXBC_JetVar,namestring);
+  DrawTitle(PtBins[0],PtBins[nPtBins],MAXBC_JetVar*1.01);
 #endif
 
   for (Byte_t PU_iBin=0; PU_iBin<PU_nBins; PU_iBin++) {
@@ -837,8 +834,10 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
   Canvas_UDSGC_Eff_Eta->cd();
   Legends_Efficiencies->SetHeader("udsg jets");
   ( (TLegendEntry*) Legends_Efficiencies->GetListOfPrimitives()->First() )->SetTextAlign(22);//centering the legend header
-  Legends_Efficiencies->SetY1NDC(0.13);
-  Legends_Efficiencies->SetY2NDC(0.36);
+  Legends_Efficiencies->SetX1NDC(0.65);
+  Legends_Efficiencies->SetX2NDC(0.88);
+  Legends_Efficiencies->SetY1NDC(0.2);
+  Legends_Efficiencies->SetY2NDC(0.43);
   Legends_Efficiencies->Draw();
   Legends_C_Efficiencies->Draw();
   gPad->SetFixedAspectRatio();
@@ -864,11 +863,11 @@ void EfficienciesPlotting (Plotting **MC, const char *Title, const Float_t *Disc
 
   Canvas_BC_Eff_Eta->cd();
   Legends_Efficiencies->SetHeader("b jets");
-  Legends_Efficiencies->SetY1NDC(0.72);
-  Legends_Efficiencies->SetY2NDC(0.95);
+  Legends_Efficiencies->SetY1NDC(0.34);
+  Legends_Efficiencies->SetY2NDC(0.57);
   Legends_Efficiencies->Draw();
-  Legends_C_Efficiencies->SetY1NDC(0.72);
-  Legends_C_Efficiencies->SetY2NDC(0.95);
+  Legends_C_Efficiencies->SetY1NDC(0.5);
+  Legends_C_Efficiencies->SetY2NDC(0.73);
   Legends_C_Efficiencies->Draw();
   gPad->SetFixedAspectRatio();
   gPad->SetGrid();
@@ -984,7 +983,7 @@ void Load(const char options[]="TCHP",Float_t RequiredBEff=-1., Float_t Required
     for (UInt_t i=0; i<=NDISCRIMINATORBINS; i++)
       JetProbability_Bins[i]=start+i*binwidth;
     SetAxisesRanges();
-    EfficienciesPlotting(MC,"JetProbability",JetProbability_Bins,NDISCRIMINATORBINS,Plotting::JetProb,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
+    EfficienciesPlotting(MC,"JetP",JetProbability_Bins,NDISCRIMINATORBINS,Plotting::JetProb,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
   }
   if ( strstr(options,"JetBP")!=NULL ) {
     const Float_t start=0,end=7.,binwidth=(end-start)/Float_t(NDISCRIMINATORBINS);
@@ -992,7 +991,7 @@ void Load(const char options[]="TCHP",Float_t RequiredBEff=-1., Float_t Required
     for (UInt_t i=0; i<=NDISCRIMINATORBINS; i++)
       JetBProbability_Bins[i]=start+i*binwidth;
     SetAxisesRanges();
-    EfficienciesPlotting(MC,"JetBProbability",JetBProbability_Bins,NDISCRIMINATORBINS,Plotting::JetBProb,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
+    EfficienciesPlotting(MC,"JetBP",JetBProbability_Bins,NDISCRIMINATORBINS,Plotting::JetBProb,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
   }
   if ( strstr(options,"CSVMVA")!=NULL ) {
     const Float_t start=0,end=1,binwidth=(end-start)/Float_t(NDISCRIMINATORBINS);
@@ -1000,15 +999,15 @@ void Load(const char options[]="TCHP",Float_t RequiredBEff=-1., Float_t Required
     for (UInt_t i=0; i<=NDISCRIMINATORBINS; i++)
       CombinedSecondaryVertex_Bins[i]=start+i*binwidth;
     SetAxisesRanges();
-    EfficienciesPlotting(MC,"CombinedSecondaryVertexMVA",CombinedSecondaryVertex_Bins,NDISCRIMINATORBINS,Plotting::CSVMVA,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
+    EfficienciesPlotting(MC,"CSVMVA",CombinedSecondaryVertex_Bins,NDISCRIMINATORBINS,Plotting::CSVMVA,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
   }
   if ( strstr(options,"CSVPF")!=NULL ) {
     const Float_t start=0,end=1,binwidth=(end-start)/Float_t(NDISCRIMINATORBINS);
     Float_t CombinedSecondaryVertex_Bins[NDISCRIMINATORBINS+1];
     for (UInt_t i=0; i<=NDISCRIMINATORBINS; i++)
       CombinedSecondaryVertex_Bins[i]=start+i*binwidth;
-    SetAxisesRanges();
-    EfficienciesPlotting(MC,"CombinedSecondaryVertex",CombinedSecondaryVertex_Bins,NDISCRIMINATORBINS,Plotting::CSVPF,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
+    SetAxisesRanges(1E-4,0.2,0.15,0.9,0.25,1);
+    EfficienciesPlotting(MC,"CSV",CombinedSecondaryVertex_Bins,NDISCRIMINATORBINS,Plotting::CSVPF,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
   }
   if ( strstr(options,"TCHE")!=NULL ) {
     const Float_t start=-10.,end=30,binwidth=(end-start)/Float_t(NDISCRIMINATORBINS);
@@ -1016,15 +1015,15 @@ void Load(const char options[]="TCHP",Float_t RequiredBEff=-1., Float_t Required
     for (UInt_t i=0; i<=NDISCRIMINATORBINS; i++)
       TrackCounting_Bins[i]=start+i*binwidth;
     SetAxisesRanges();
-    EfficienciesPlotting(MC,"TrackCountingHighEfficiency",TrackCounting_Bins,NDISCRIMINATORBINS,Plotting::TCHE,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
+    EfficienciesPlotting(MC,"TCHE",TrackCounting_Bins,NDISCRIMINATORBINS,Plotting::TCHE,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
   }
   if ( strstr(options,"TCHP")!=NULL ) {
     const Float_t start=-10.,end=30,binwidth=(end-start)/Float_t(NDISCRIMINATORBINS);
     Float_t TrackCounting_Bins[NDISCRIMINATORBINS+1];
     for (UInt_t i=0; i<=NDISCRIMINATORBINS; i++)
       TrackCounting_Bins[i]=start+i*binwidth;
-    SetAxisesRanges(0,1,1E-5);
-    EfficienciesPlotting(MC,"TrackCountingHighPurity",TrackCounting_Bins,NDISCRIMINATORBINS,Plotting::TCHP,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
+    SetAxisesRanges(8E-4,0.5,0.1,0.8,0,1,1E-4);
+    EfficienciesPlotting(MC,"TCHP",TrackCounting_Bins,NDISCRIMINATORBINS,Plotting::TCHP,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
   }
   if ( strstr(options,"SSVHE")!=NULL ) {
     const Float_t start=1.,end=5,binwidth=(end-start)/Float_t(NDISCRIMINATORBINS);
@@ -1032,8 +1031,8 @@ void Load(const char options[]="TCHP",Float_t RequiredBEff=-1., Float_t Required
     for (UInt_t i=0; i<=NDISCRIMINATORBINS; i++)
       SimpleSecondaryVertex_Bins[i]=start+i*binwidth;
     if (UseDefaultRequiredEff) {RequiredBEff=0.5;RequiredUDSGEff_ETA=0.002;RequiredUDSGEff_PT=0.01;}//it has different default values
-    SetAxisesRanges(0,0.8,1E-4,0.1,1E-4,0.2);
-    EfficienciesPlotting(MC,"SimpleSecondaryVertexHighEfficiency",SimpleSecondaryVertex_Bins,NDISCRIMINATORBINS,Plotting::SSVHE,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
+    SetAxisesRanges(1E-3,0.3,0,0.7,0,0.7,1E-4,3E-2,1E-4,0.2);
+    EfficienciesPlotting(MC,"SSVHE",SimpleSecondaryVertex_Bins,NDISCRIMINATORBINS,Plotting::SSVHE,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
   }
   if ( strstr(options,"SSVHP")!=NULL ) {
     const Float_t start=1.,end=5,binwidth=(end-start)/Float_t(NDISCRIMINATORBINS);
@@ -1041,8 +1040,8 @@ void Load(const char options[]="TCHP",Float_t RequiredBEff=-1., Float_t Required
     for (UInt_t i=0; i<=NDISCRIMINATORBINS; i++)
       SimpleSecondaryVertex_Bins[i]=start+i*binwidth;
     if (UseDefaultRequiredEff) {RequiredBEff=0.3;RequiredUDSGEff_ETA=0.0002;RequiredUDSGEff_PT=0.001;}//it has different default values since the purity is too high
-    SetAxisesRanges(0,0.6,1E-5,0.05,1E-4,0.2);
-    EfficienciesPlotting(MC,"SimpleSecondaryVertexHighPurity",SimpleSecondaryVertex_Bins,NDISCRIMINATORBINS,Plotting::SSVHP,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
+    SetAxisesRanges(5E-5,0.1,0,0.6,0.25,0.6,1E-4,5E-3,1E-4,0.2);
+    EfficienciesPlotting(MC,"SSVHP",SimpleSecondaryVertex_Bins,NDISCRIMINATORBINS,Plotting::SSVHP,RequiredBEff,RequiredUDSGEff_ETA,RequiredUDSGEff_PT);
   }
   if ( strstr(options,"TracktoJetDistHEStudy")!=NULL ) {
     const Float_t TracktoJetDist_Bins[]={0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.11,0.15,0.19,0.23,0.3,0.9};

@@ -90,7 +90,7 @@ case $Choice in
 	for i in data $jobs
 	do 
 	    ./btagNtupReader $i | tee $i.OUTPUT &
-	    sleep 3
+	    sleep 10
 	done
 	echo -e "\e[33;01mPlease run step 2 after all jobs finished.\e[00m";;
    2) 
@@ -103,7 +103,7 @@ case $Choice in
 	for i in $TAGGERS
 	do
 	    ./EfficiencyPlotter "$i" | tee $i.OUTPUT &
-	    sleep 3
+	    sleep 10
 	done;;
     4)
                 g++ `root-config --cflags --glibs` -o CombineTaggersEfficiencies CombineTaggersEfficiencies.C
