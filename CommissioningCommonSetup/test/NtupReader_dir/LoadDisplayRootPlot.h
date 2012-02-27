@@ -22,7 +22,7 @@ using namespace std;
 
 const TString format="pdf";
 
-#define PLOT_COMMON_TITLE "CMS 2011 preliminary, #sqrt{s} = 7 TeV"
+#define PLOT_COMMON_TITLE "CMS 2011 preliminary, #sqrt{s} = 7 TeV, 4.7 fb^{-1}"
 
 #define MAXNFILES 10
 ////// IMPORTANT : CHANGE THE DEFINITION OF THE CONSTRUCTOR OF THE CLASS "Plots"  TO CORRECT THE FILE LOCATION
@@ -326,7 +326,6 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
   histo0_2010->SetMarkerSize(0.5);
 
   //  hs->SetTitle(histo0_Data->GetTitle());
-  //  hs->SetTitle(label);
 
   if (selection=="sv_vtxsum_phi" || selection=="sv_vtxdir_phi" || selection=="sv_vtxsum_eta" || selection=="sv_vtxdir_eta") {
     hs->SetMaximum(hs->GetMaximum()*1.5);
@@ -374,9 +373,12 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
     if (ptval_==110. && mu_==true) hs->SetMaximum(hs->GetMaximum() *2. );
   }
   if (ptval_==110. && mu_==true && selection=="sv_vtx_pt" ) hs->SetMaximum(hs->GetMaximum() *1.5 );
-  
+
+  if (selection=="sv_flightsig3d") hs->SetMinimum(10);
   hs->Draw("hist");
-  
+  hs->GetHistogram()->SetTitleSize(0.08,"Y");
+  hs->GetHistogram()->SetTitleOffset(0.45,"Y");
+ 
   if (selection!="pthat" && selection!="npu") histo0_Data->Draw("e same");
 
   // ADD LEGEND
@@ -392,7 +394,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
       qw = new TLegend(0.54,0.63,0.88,0.9);
     }
     else {
-      qw = new TLegend(0.6,0.73,0.95,1.);
+      qw = new TLegend(0.65,0.73,0.95,1.);
     }
   } 
   else {
@@ -409,7 +411,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
       qw = new TLegend(0.54,0.63,0.88,0.9);
     }
     else {
-      qw = new TLegend(0.6,0.73,0.95,1.);
+      qw = new TLegend(0.65,0.73,0.95,1.);
     }
   }
   /*
@@ -485,7 +487,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
   latex->SetTextFont(42); //22
 
   latex->SetTextAlign(13);
-  latex->DrawLatex(0.14, 0.96, PLOT_COMMON_TITLE);
+  latex->DrawLatex(0.12, 0.96, PLOT_COMMON_TITLE);
 
 
   canvas->cd();
@@ -694,7 +696,6 @@ void Plots1D::TagRate(TString selection, TString label, bool down, bool logy, TS
   TagRate_Data->GetXaxis()->SetTitle(label);  
 
   TString titlenam="Tag Rate for " + selection;
-  // hs->SetTitle(label);
 
   gStyle->SetOptTitle(0);
 
@@ -816,7 +817,7 @@ void Plots1D::TagRate(TString selection, TString label, bool down, bool logy, TS
   latex->SetTextFont(42); //22
 
   latex->SetTextAlign(13);
-  latex->DrawLatex(0.14, 0.96, PLOT_COMMON_TITLE);
+  latex->DrawLatex(0.12, 0.96, PLOT_COMMON_TITLE);
 
 
   canvas->cd();
@@ -1270,7 +1271,7 @@ void Plots2D::PlotStack2D(TString selection, TString label, TString labely, bool
   latex->SetTextFont(42); //22
 
   latex->SetTextAlign(13);
-  latex->DrawLatex(0.14, 0.96, PLOT_COMMON_TITLE);
+  latex->DrawLatex(0.12, 0.96, PLOT_COMMON_TITLE);
 
   canvas->cd();
 
