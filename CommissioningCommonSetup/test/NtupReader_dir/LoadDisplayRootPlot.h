@@ -16,6 +16,7 @@
 #include <TProfile.h>
 #include <TStyle.h>
 #include <TLatex.h>
+#include <TAxis.h>
 
 using namespace std;
 
@@ -293,7 +294,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
   histo0_MC_udsg->SetFillColor(4);
 
   // DO STACK
-  THStack* hs= new THStack();
+  THStack* hs= new THStack(selection,label+";"+label+";entries");
   if (!DoNotStack) {
     if (down==false) {
       hs->Add(histo0_MC_udsg);
@@ -325,7 +326,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
   histo0_2010->SetMarkerSize(0.5);
 
   //  hs->SetTitle(histo0_Data->GetTitle());
-  hs->SetTitle(label);
+  //  hs->SetTitle(label);
 
   if (selection=="sv_vtxsum_phi" || selection=="sv_vtxdir_phi" || selection=="sv_vtxsum_eta" || selection=="sv_vtxdir_eta") {
     hs->SetMaximum(hs->GetMaximum()*1.5);
@@ -411,7 +412,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
       qw = new TLegend(0.6,0.73,0.95,1.);
     }
   }
-
+  /*
   if (selection!="pthat" && selection!="npu") {
     if (year_==2010) {
       //     qw->SetHeader("CMS Preliminary, 33 pb^{-1}");
@@ -462,11 +463,13 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
 
     }
   }
+  */
+  qw->AddEntry(histo0_Data,        "data",           "p");
   if (!DoNotStack) {
-    qw->AddEntry(histo0_MC_b,        "QCD (b quark) "           ,"f");
-    qw->AddEntry(histo0_MC_gspl,     "QCD (b from gspl) "     ,"f");
-    qw->AddEntry(histo0_MC_c,        "QCD (c quark) "           ,"f");
-    qw->AddEntry(histo0_MC_udsg,     "QCD (uds quark & g) "     ,"f");
+    qw->AddEntry(histo0_MC_b,        "b quark"           ,"f");
+    qw->AddEntry(histo0_MC_gspl,     "b from gluon splitting"     ,"f");
+    qw->AddEntry(histo0_MC_c,        "c quark"           ,"f");
+    qw->AddEntry(histo0_MC_udsg,     "uds quark or gluon"     ,"f");
   }
   else {
     qw->AddEntry(histo0_MC,     "QCD "     ,"f");
@@ -746,7 +749,7 @@ void Plots1D::TagRate(TString selection, TString label, bool down, bool logy, TS
       qw = new TLegend(0.6,0.73,0.95,1.);
     }
   }
-
+  /*
   if (selection!="pthat" && selection!="npu") {
     if (year_==2010) {
       //     qw->SetHeader("CMS Preliminary, 33 pb^{-1}");
@@ -797,10 +800,12 @@ void Plots1D::TagRate(TString selection, TString label, bool down, bool logy, TS
 
     }
   }
-  qw->AddEntry(TagRate_MC_b,        "QCD (b quark) "           ,"f");
-  qw->AddEntry(TagRate_MC_gspl,     "QCD (b from gspl) "     ,"f");
-  qw->AddEntry(TagRate_MC_c,        "QCD (c quark) "           ,"f");
-  qw->AddEntry(TagRate_MC_udsg,     "QCD (uds quark & g) "     ,"f");
+  */
+  qw->AddEntry(TagRate_Data,        "data"                     ,"p");
+  qw->AddEntry(TagRate_MC_b,        "b quark"                  ,"f");
+  qw->AddEntry(TagRate_MC_gspl,     "b from gluon splitting"   ,"f");
+  qw->AddEntry(TagRate_MC_c,        "c quark"                  ,"f");
+  qw->AddEntry(TagRate_MC_udsg,     "uds quark or gluon"     ,"f");
  
   qw->SetFillColor(0);
   qw->Draw();
@@ -1206,7 +1211,7 @@ void Plots2D::PlotStack2D(TString selection, TString label, TString labely, bool
   else {
     qw = new TLegend(0.35,0.11,0.65,0.33);
   }
-
+  /*
   if (mu_==false) {
     if (ptval_==30) {
       //       qw->SetHeader("2011 effective lumi : 0.0053  pb^{-1}"); // 30
@@ -1248,12 +1253,13 @@ void Plots2D::PlotStack2D(TString selection, TString label, TString labely, bool
     }
 
   }
-
-  qw->AddEntry(pro_mc,        "QCD (total) "           ,"l");
-  qw->AddEntry(pro_mc_b,        "QCD (b quark) "           ,"l");
-  qw->AddEntry(pro_mc_gspl,     "QCD (b from gspl) "     ,"l");
-  qw->AddEntry(pro_mc_c,        "QCD (c quark) "           ,"l");
-  qw->AddEntry(pro_mc_udsg,     "QCD (uds quark & g) "     ,"l");
+ */
+  qw->AddEntry(pro_data,        "data"                   ,"p");
+  qw->AddEntry(pro_mc,          "total "                 ,"l");
+  qw->AddEntry(pro_mc_b,        "b quark"                ,"l");
+  qw->AddEntry(pro_mc_gspl,     "b from gluon splitting" ,"l");
+  qw->AddEntry(pro_mc_c,        "c quark"                ,"l");
+  qw->AddEntry(pro_mc_udsg,     "uds quark or gluon"     ,"l");
  
   qw->SetFillColor(0);
   qw->Draw();
