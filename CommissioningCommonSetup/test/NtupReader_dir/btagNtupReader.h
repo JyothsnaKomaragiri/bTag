@@ -1410,8 +1410,8 @@ void ExtendFileName(string s, vector<string>& out)
       ifile>>sread;
       out.push_back(sread);
     }
+    out.erase(out.end());
   }
-  out.erase(out.end());
   cout << " number of files read: " << out.size() << endl;
   system("rm tmp.AnaEnvLoader");
 }
