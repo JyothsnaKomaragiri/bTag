@@ -5,6 +5,7 @@
 ###############################################################
 ver=`grep "#define bTagNtupleVersion " Configuration.h`
 ver=${ver#"#define bTagNtupleVersion "}
+ver=`expr match "$ver" '\([0-9]*\)'`
 line=`grep -n "#if bTagNtupleVersion == $ver" Configuration.h`
 line=${line%:*}",\$p"
 jobs=`sed -n "$line" Configuration.h | grep -m 1 "const char \*MC_SampleNames"`
@@ -19,7 +20,7 @@ echo -e "
 -----------------------------------------------------------------------------------------------------------------
 
    I. the bTagNtuple Version
-   \e[00;33m#define bTagNtupleVersion 4\e[00m
+   \e[00;33m#define bTagNtupleVersion ?\e[00m
    It stands for version of the commissioning ntuples:
    Version0=not using?
    Version1=not using?
@@ -49,7 +50,7 @@ bTagNtupleVersion = \e[00;33m$ver\e[00m (Configuration.h)
 samples =  \e[00;33m$jobs\e[00m (Configuration.h)
 efficiency plots taggers = \e[00;33m$TAGGERS\e[00m (RunMeForEverything.sh)
 
-\e[32;07mNow choose a step to run:\e[00m
+\e[32;07mNow choose a mission to run:\e[00m
 (1) Make Commissionging Root Files    
    a. Specify \"run on Jet\" or on MetBtag:
       \e[00;33m#define Run_on_Jet\e[00m --> Run_on_Jet otherwise Run_on_Btag
