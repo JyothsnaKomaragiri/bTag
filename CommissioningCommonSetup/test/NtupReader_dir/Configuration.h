@@ -3,7 +3,7 @@
 //#####   General Settings for all codes   #########
 //##################################################
 //------------(I)Samples------------------------------
-#define bTagNtupleVersion 4
+#define bTagNtupleVersion 4 
 //it stands for version of the commissioning ntuples
 //Version3=14May
 //Version4=27Dec
@@ -30,7 +30,11 @@ const Double_t Fall2011[55]={0.014583699,0.025682975,0.038460562,0.049414536,0.0
 //See https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupReweighting for details
 #define pudistribution_data_filename "pudistRun175832_180252.root"//comment it out to reweight PU to flat distribution (PU0)
 
+#ifdef npu_probs
 const UInt_t MAXPU=sizeof(npu_probs)/sizeof(const Double_t)-1;
+#else
+const UInt_t MAXPU=50;
+#endif
 //##############################
 //#######   Samples   ##########
 //##############################
