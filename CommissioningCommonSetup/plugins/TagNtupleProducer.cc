@@ -2460,6 +2460,7 @@ void TagNtupleProducer::beginRun(const Run& r, const EventSetup& iSet)
     // if init returns TRUE, initialisation has succeeded!
     HLTTableName->assign(hltConfigProvider_.tableName());
     HLTNamesSet->clear();
+    HLTTableBitMatch_.clear();
     const vector<string> & HLTNamesSet_=hltConfigProvider_.triggerNames();
     for ( vector<string>::const_iterator itertable=HLTNamesSet_.begin();itertable!=HLTNamesSet_.end();itertable++ ) {
       Bool_t selected=false;
