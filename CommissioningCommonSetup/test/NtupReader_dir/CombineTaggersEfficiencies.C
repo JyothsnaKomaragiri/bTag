@@ -24,16 +24,6 @@ obj->SetMarkerStyle(markerStyleList[i]);
 obj->SetMarkerSize(.3);
 }
 
-string FullName(string shortname) {
-  if ( shortname=="CSVPF" ) return string("CombinedSecondaryVertex");
-  if ( shortname=="CSVMVA" ) return string("CombinedSecondaryVertexMVA");
-  if ( shortname=="TCHE" ) return string("TrackCountingHighEfficiency");
-  if ( shortname=="TCHP" ) return string("TrackCountingHighPurity");
-  if ( shortname=="SSVHE" ) return string("SimpleSecondaryVertexHighEfficiency");
-  if ( shortname=="SSVHP" ) return string("SimpleSecondaryVertexHighPurity");
-  if ( shortname=="JetP" ) return string("JetProbability");
-  if ( shortname=="JetBP" ) return string("JetBProbability");
-}
 //option=0 udsgvsb
 //option=1 cvsb
 void combine(vector<string>& algos,Byte_t option=1)
@@ -56,8 +46,8 @@ void combine(vector<string>& algos,Byte_t option=1)
     char filename[200],objname[200];
     sprintf(filename,"result_%s.root",algo->c_str());
     TFile *_file=TFile::Open(filename);
-    if ( option==0 ) sprintf(objname,"%s_efficiencies_UDSGvsB_PU%dto%d",FullName(*algo).c_str(),PUMIN,PUMAX);
-    if ( option==1 ) sprintf(objname,"%s_efficiencies_CvsB_PU%dto%d",FullName(*algo).c_str(),PUMIN,PUMAX);
+    if ( option==0 ) sprintf(objname,"%s_efficiencies_UDSGvsB_PU%dto%d",algo->c_str(),PUMIN,PUMAX);
+    if ( option==1 ) sprintf(objname,"%s_efficiencies_CvsB_PU%dto%d",algo->c_str(),PUMIN,PUMAX);
     printf("%s->%s\n",filename,objname);
     TGraphAsymmErrors *eff=(TGraphAsymmErrors *) _file->Get(objname);
     if (eff!=NULL) {
@@ -65,6 +55,7 @@ void combine(vector<string>& algos,Byte_t option=1)
       eff->Draw("lpsame");
       leg->AddEntry(eff,algo->c_str(),"lp");
     }
+    else printf("%s is not found in %s",objname,filename);
   }
   latex.Draw();
   leg->Draw("same");
