@@ -46,14 +46,17 @@ void combine(vector<string>& algos,Byte_t option=1)
     char filename[200],objname[200];
     sprintf(filename,"result_%s.root",algo->c_str());
     TFile *_file=TFile::Open(filename);
-    if ( option==0 ) sprintf(objname,"%s_efficiencies_UDSGvsB_PU%dto%d",algo->c_str(),PUMIN,PUMAX);
-    if ( option==1 ) sprintf(objname,"%s_efficiencies_CvsB_PU%dto%d",algo->c_str(),PUMIN,PUMAX);
+    string obj;
+    if ( algo->compare("CSVPF")==0 ) obj.assign("CSV");
+    else obj.assign(*algo);
+    if ( option==0 ) sprintf(objname,"%s_efficiencies_UDSGvsB_PU%dto%d",obj.c_str(),PUMIN,PUMAX);
+    if ( option==1 ) sprintf(objname,"%s_efficiencies_CvsB_PU%dto%d",obj.c_str(),PUMIN,PUMAX);
     printf("%s->%s\n",filename,objname);
     TGraphAsymmErrors *eff=(TGraphAsymmErrors *) _file->Get(objname);
     if (eff!=NULL) {
       setStyle(algo-algos.begin(),eff,1);
       eff->Draw("lpsame");
-      leg->AddEntry(eff,algo->c_str(),"lp");
+      leg->AddEntry(eff,obj.c_str(),"lp");
     }
     else printf("%s is not found in %s",objname,filename);
   }
