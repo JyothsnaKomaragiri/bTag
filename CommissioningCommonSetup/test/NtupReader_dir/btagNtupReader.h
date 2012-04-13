@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 
 using namespace std;
@@ -1258,7 +1259,6 @@ inline void IgnoreHLTversion(string & HLTName) {
 
 Bool_t RunInfo::BuildHLTNameBitMap(map<string,Int_t> &HLTNameBitMap_, UInt_t RunNumber_)
 {
-  HLTNameBitMap_.clear();
   if (fChain == 0) return false;
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
@@ -1267,6 +1267,7 @@ Bool_t RunInfo::BuildHLTNameBitMap(map<string,Int_t> &HLTNameBitMap_, UInt_t Run
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if ( RunNumber!= RunNumber_ ) continue;
+    HLTNameBitMap_.clear();
     for(unsigned int i=0;i<HLTNamesSet->size();i++) {
       IgnoreHLTversion(HLTNamesSet->at(i));
       cerr<<i<<":"<<HLTNamesSet->at(i)<<endl;
@@ -1282,14 +1283,17 @@ Bool_t btagNtupReader::HLTAcceptance(string HLTName)
   IgnoreHLTversion(HLTName);
   if ( RunInfo_->RunNumber!=runNumber )
     if (!RunInfo_->BuildHLTNameBitMap(HLTNameBitMap_,runNumber)) {
-      cerr<<"HLT menu of run "<<runNumber<<" does not exist in the ntuple."<<endl;
+      if ( !HLTNameBitMap_.empty() ) {
+	cout<<"HLT menu of run "<<runNumber<<" does not exist in the ntuple."<<endl;
+	HLTNameBitMap_.clear();
+      }
       return false;
     }
   try{
     return HLTriggerResults->at(HLTNameBitMap_[HLTName]);
   }
   catch(...) {
-    cerr<<"The requested "<<HLTName<<" does not exist in current HLT Menu."<<endl;
+    cout<<"The requested "<<HLTName<<" does not exist in current HLT Menu."<<endl;
     return false;
   }
 }
@@ -1299,14 +1303,17 @@ UInt_t btagNtupReader::HLTAcceptanceBit(string HLTName)
   IgnoreHLTversion(HLTName);
   if ( RunInfo_->RunNumber!=runNumber )
     if (!RunInfo_->BuildHLTNameBitMap(HLTNameBitMap_,runNumber)) {
-      cerr<<"HLT menu of run "<<runNumber<<" does not exist in the ntuple."<<endl;
+      if ( !HLTNameBitMap_.empty() ) {
+	cout<<"HLT menu of run "<<runNumber<<" does not exist in the ntuple."<<endl;
+	HLTNameBitMap_.clear();
+      }
       return false;
     }
   try{
     return HLTNameBitMap_[HLTName];
   }
   catch(...) {
-    cerr<<"The requested "<<HLTName<<" does not exist in current HLT Menu."<<endl;
+    cout<<"The requested "<<HLTName<<" does not exist in current HLT Menu."<<endl;
     return -1;
   }
 }
@@ -1317,14 +1324,17 @@ UInt_t btagNtupReader::HLTPrescale(string HLTName)
   IgnoreHLTversion(HLTName);
   if ( RunInfo_->RunNumber!=runNumber )
     if (!RunInfo_->BuildHLTNameBitMap(HLTNameBitMap_,runNumber)) {
-      cerr<<"HLT menu of run "<<runNumber<<" does not exist in the ntuple."<<endl;
+      if ( !HLTNameBitMap_.empty() ) {
+	cout<<"HLT menu of run "<<runNumber<<" does not exist in the ntuple."<<endl;
+	HLTNameBitMap_.clear();
+      }
       return 1;
     }
   try{
     return HLTPrescaleFactors->at(HLTNameBitMap_[HLTName]);
   }
   catch(...) {
-    cerr<<"The requested "<<HLTName<<" does not exist in current HLT Menu."<<endl;
+    cout<<"The requested "<<HLTName<<" does not exist in current HLT Menu."<<endl;
     return 1;
   }
 }
@@ -1338,9 +1348,10 @@ btagNtupReader::btagNtupReader(string filename)
       StringSeparator(filename,string(","),SeperatedStrs);
       for(vector<string>::const_iterator Str=SeperatedStrs.begin();Str!=SeperatedStrs.end();Str++)
 	ExtendFileName(*Str,filenames);
-      for(vector<string>::const_iterator Str=filenames.begin();Str!=filenames.end();Str++)
+      for(vector<string>::const_iterator Str=filenames.begin();Str!=filenames.end();Str++) {
 	chain->AddFile(Str->c_str());
-      cerr<<filenames.back()<<" is added to TChain."<<endl; //for my debug....
+	cout<<Str-filenames.begin()<<":"<<*Str<<" is added to TChain."<<endl; //for my debug....
+      }
       TTree* tree = chain;
       Init(tree);
 #if bTagNtupleVersion > 3
@@ -1386,14 +1397,17 @@ Bool_t wildcmp(const char *wild, const char *string) {
 
 void ExtendFileName(string s, vector<string>& out)
 {
+  time_t seconds = time (NULL);
+  char tmpfile[200];
+  sprintf(tmpfile,"/tmp/tmp-%ld",seconds);
   if ( s.find("/castor/")==0 ) {
     Short_t pos_bkslash=s.rfind("/")+1;
     string dir=s.substr(0,pos_bkslash);
     string command;
-    command = "nsls " + dir + " > tmp.AnaEnvLoader";
+    command = "nsls " + dir + " > "+ string(tmpfile);
     system(command.c_str());
     s=s.substr(pos_bkslash,s.length()-pos_bkslash);
-    ifstream ifile("tmp.AnaEnvLoader");
+    ifstream ifile(tmpfile);
     while(!ifile.eof()){
       string sread;
       ifile>>sread;
@@ -1402,9 +1416,9 @@ void ExtendFileName(string s, vector<string>& out)
   }
   else {
     string command;
-    command = "ls -ltrh " + s + "| awk {'print $9'} > tmp.AnaEnvLoader";
+    command = "ls -ltrh " + s + "| awk {'print $9'} > "+string(tmpfile);
     system(command.c_str());
-    ifstream ifile("tmp.AnaEnvLoader");
+    ifstream ifile(tmpfile);
     while(!ifile.eof()){
       string sread;
       ifile>>sread;
@@ -1413,7 +1427,7 @@ void ExtendFileName(string s, vector<string>& out)
     out.erase(out.end());
   }
   cout << " number of files read: " << out.size() << endl;
-  system("rm tmp.AnaEnvLoader");
+  system( (string("rm ")+string(tmpfile)).c_str() );
 }
 
 void StringSeparator(string s, string sep, vector<string>& out)
