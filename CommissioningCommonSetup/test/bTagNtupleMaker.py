@@ -1,9 +1,7 @@
-import FWCore.ParameterSet.Config as cms
-
 DATALIST=[
 #"/QCD_Pt-15to30_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
 #"/QCD_Pt-30to50_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
-"/QCD_Pt-50to80_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v2/AODSIM"
+#"/QCD_Pt-50to80_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v2/AODSIM"
 #"/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
 #"/QCD_Pt-120to170_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
 #"/QCD_Pt-170to300_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
@@ -25,10 +23,17 @@ DATALIST=[
 #"/QCD_Pt-170to300_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
 #"/QCD_Pt-300to470_TuneZ2_7TeV_pythia6/Fall11-PU_S6-START44_V5-v1/AODSIM",
 #"/QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6/Fall11-Peak32PU_START42_V14B-v1/GEN-SIM-RECO",
-#"/Jet/Run2011B-PromptReco-v1/AOD"
+#"/Jet/Run2011B-PromptReco-v1/AOD",
+#"/Jet/Run2012A-PromptReco-v1/AOD",
+#"/BTag/Run2012A-PromptReco-v1/AOD",
+"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-PU_S7_START52_V5-v1/AODSIM"
           ]
+
 HLTProc="HLT"
 # It will select the events based on the TriggerSelections. The ntuple will only save the triggers whose name matches any entry in TriggerSelections
+
+import FWCore.ParameterSet.Config as cms
+
 TriggerSelections=cms.vstring("HLT_*Jet*")
 
 process = cms.Process("validation")
@@ -50,9 +55,10 @@ from Configuration.AlCa.autoCond import autoCond # for >=CMSSW_4_3_0
 process.GlobalTag.globaltag = autoCond['startup']
 
 process.source = cms.Source("PoolSource",
-#    fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_QCD_Pt-15to3000_TuneZ2_Fall11_Peak32PU_RECO.root")
-fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD.root",
-                                  "file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD_2.root")
+#    fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_Chamonix_TTbar_AODSIM.root")
+    fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_Summer12_QCD15to3000.root")
+#fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD.root",
+#                                  "file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD_2.root")
 )
 
 process.maxEvents = cms.untracked.PSet(
@@ -98,7 +104,7 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
 # Apply "loose PF JetID" first
 process.PFJetsFilter = cms.EDFilter("PFJetSelector",
   src = cms.InputTag("ak5PFJets"),
-  cut = cms.string("pt > 10.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99"),
+  cut = cms.string("pt > 30.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99"),
   filter = cms.bool(True)
 )
 
@@ -110,7 +116,9 @@ process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 ##------------------  PF JETS --------------
 process.ak5PFJetsJEC = process.ak5PFJetsL2L3.clone(
     src = 'PFJetsFilter', 
-    correctors = ['ak5PFL2L3'])
+    correctors = ['ak5PFL2L3']
+#    correctors = ['ak5PFL1FastL2L3']
+)
 
 #............................................
 
@@ -235,6 +243,7 @@ process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 process.AK5PFbyRef = process.AK5byRef.clone(
   jets = "ak5PFJetsJEC"
 )
+
 process.AK5PFbyValAlgo = process.AK5byValAlgo.clone(
   srcByReference = "AK5PFbyRef"
 )
@@ -406,15 +415,19 @@ if __name__ == '__main__' and 'submit' in sys.argv:
     home_=os.getenv("HOME")
     castorhome_=castorhome_.replace("/castor/cern.ch/","")
     time=datetime.datetime.now().strftime("%d%b%Y")
-    new_py = open('bTagNtupleMaker.py').read()
-    needdel = re.match(r".*(\nimport sys,os,datetime,re.*)", new_py, re.DOTALL)
-    new_py = new_py.replace(needdel.group(1),"")
-    new_py = re.sub("input = cms.untracked.int32(.*)",
-                    "input = cms.untracked.int32(-1)",
-                    new_py)
     for dataset_ in DATALIST:
+        new_py = open('bTagNtupleMaker.py').read()
+#        needdel = re.match(r".*(\nimport sys,os,datetime,re.*)", new_py, re.DOTALL)
+#        new_py = new_py.replace(needdel.group(1),"")
+        crab_py_start_index=new_py.find(']')
+        crab_py_end_index=new_py.rfind("\nimport sys,os,datetime,re")
+        new_py = new_py[crab_py_start_index+1:crab_py_end_index-1]
+        new_py = re.sub("input = cms.untracked.int32(.*)",
+                        "input = cms.untracked.int32(-1)",
+                        new_py)
         dirname_=dataset_.split("/")
         if "Run20" not in dataset_:
+            print 'Submitting %s as MC' % dataset_
             jobcontrol_='''
 total_number_of_events = -1
 number_of_jobs = 128
@@ -425,10 +438,12 @@ number_of_jobs = 128
                             "process.GlobalTag.globaltag = autoCond['startup']",
                             new_py)
         else:
+            print 'Submitting %s as DATA' % dataset_
             jobcontrol_='''
-lumi_mask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Prompt/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt
+lumi_mask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/DCSOnly/json_DCSONLY.txt
+#/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Prompt/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt
 total_number_of_lumis = -1
-number_of_jobs = 300
+number_of_jobs = 40
 '''
             dirname_=time+"_"+dirname_[1]+"_"+dirname_[2]
             new_py = re.sub("process.GlobalTag.globaltag = autoCond\[.*\]",
