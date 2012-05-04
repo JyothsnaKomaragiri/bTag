@@ -53,6 +53,9 @@ public :
    UInt_t          runNumber;
    UInt_t          lumiBlockNumber;
    UInt_t          numberOfPUVertices;
+#if bTagNtupleVersion > 4
+   Float_t          numberOfPUVerticesMixingTruth;
+#endif
    UInt_t          numberOfPUVerticesTot;
    UInt_t          numberOfPrimaryVertices;
    UInt_t          numberOfTracksAtPV;
@@ -378,6 +381,9 @@ public :
    TBranch        *b_runNumber;   //!
    TBranch        *b_lumiBlockNumber;   //!
    TBranch        *b_numberOfPUVertices;   //!
+#if bTagNtupleVersion > 4
+   TBranch        *b_numberOfPUVerticesMixingTruth;   //!
+#endif
    TBranch        *b_numberOfPUVerticesTot;   //!
    TBranch        *b_numberOfPrimaryVertices;   //!
    TBranch        *b_numberOfTracksAtPV;   //!
@@ -1595,6 +1601,9 @@ void btagNtupReader::Init(TTree *tree)
    // Set object pointer
    HLTPrescaleFactors = 0;
    HLTriggerResults = 0;
+#if bTagNtupleVersion > 4
+   fChain->SetBranchAddress("numberOfPUVerticesMixingTruth", &numberOfPUVerticesMixingTruth, &b_numberOfPUVerticesMixingTruth);
+#endif
    fChain->SetBranchAddress("numberOfPUVerticesTot", &numberOfPUVerticesTot, &b_numberOfPUVerticesTot);
    fChain->SetBranchAddress("HLTPrescaleFactors", &HLTPrescaleFactors, &b_HLTPrescaleFactors);
    fChain->SetBranchAddress("HLTriggerResults", &HLTriggerResults, &b_HLTriggerResults);

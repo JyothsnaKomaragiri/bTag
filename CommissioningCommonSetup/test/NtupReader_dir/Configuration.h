@@ -3,7 +3,7 @@
 //#####   General Settings for all codes   #########
 //##################################################
 //------------(I)Samples------------------------------
-#define bTagNtupleVersion 4 
+#define bTagNtupleVersion 5
 //it stands for version of the commissioning ntuples
 //Version3=14May
 //Version4=27Dec
@@ -23,17 +23,17 @@ const Double_t Spring11[]={0.0698146584, 0.0698146584, 0.0698146584,0.0698146584
 // From https://twiki.cern.ch/twiki/bin/view/CMS/PileupMCReweightingUtilities
 // For MC ntuple, use in-time only num of PUs for reweighting (numberOfPUVertices)
 const Double_t Fall2011[55]={0.014583699,0.025682975,0.038460562,0.049414536,0.056931087,0.061182816,0.062534625,0.061476918,0.058677499,0.055449877,0.051549051,0.047621024,0.043923799,0.040569076,0.037414654,0.034227033,0.031437714,0.028825596,0.026218978,0.023727061,0.021365645,0.01918743,0.016972815,0.014920601,0.013038989,0.011293777,0.009612465,0.008193556,0.006888047,0.005715239,0.004711232,0.003869926,0.003154521,0.002547417,0.002024714,0.001574411,0.001245808,0.000955206,0.000735305,0.000557304,0.000412503,0.000305502,0.000231002,0.000165701,0.000121201,9.30006E-05,6.40004E-05,4.22003E-05,2.85002E-05,1.96001E-05,1.59001E-05,1.01001E-05,8.50006E-06,6.60004E-06,2.70002E-06};
-
+const Double_t Summer2012[60] = {2.344E-05,2.344E-05,2.344E-05,2.344E-05,4.687E-04,4.687E-04,7.032E-04,9.414E-04,1.234E-03,1.603E-03,2.464E-03,3.250E-03,5.021E-03,6.644E-03,8.502E-03,1.121E-02,1.518E-02,2.033E-02,2.608E-02,3.171E-02,3.667E-02,4.060E-02,4.338E-02,4.520E-02,    4.641E-02,    4.735E-02,    4.816E-02,    4.881E-02,    4.917E-02,    4.909E-02,    4.842E-02,    4.707E-02,    4.501E-02,    4.228E-02,    3.896E-02,    3.521E-02,    3.118E-02,    2.702E-02,    2.287E-02,    1.885E-02,    1.508E-02,    1.166E-02,    8.673E-03,    6.190E-03,    4.222E-03,    2.746E-03,    1.698E-03,    9.971E-04,    5.549E-04,    2.924E-04,    1.457E-04,    6.864E-05,    3.054E-05,    1.282E-05,    5.081E-06,    1.898E-06,    6.688E-07,2.221E-07,    6.947E-08,    2.047E-08   };  
 //Link to a predefined PU scenario
-#define npu_probs Fall2011//comment it out to let the program calculate the pudistribution from ntuples
+#define npu_probs Summer2012//comment it out to let the program calculate the pudistribution from ntuples
 //the file name of the PU distribution in data
 //See https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupReweighting for details
-#define pudistribution_data_filename "pudistRun175832_180252.root"//comment it out to reweight PU to flat distribution (PU0)
+//#define pudistribution_data_filename "2012Prompt_json_DCSONLY_190389-190688.root"//comment it out to reweight PU to flat distribution (PU0)
 
 #ifdef npu_probs
 const UInt_t MAXPU=sizeof(npu_probs)/sizeof(const Double_t)-1;
 #else
-const UInt_t MAXPU=50;
+const UInt_t MAXPU=60;
 #endif
 //##############################
 //#######   Samples   ##########
@@ -166,23 +166,22 @@ Float_t MC_Weights[]={815900000. / 8213600.,//weight15
 #endif
 
 #if bTagNtupleVersion == 4
-const char JetDATA[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_01Dec2011_Jet_Run2011B-PromptReco-v1/*.root";
+const char JetDATA[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_15Apr2012_Jet_Run2012A-PromptReco-v1/*.root";
 const char MetDATA[]="";
+const char QCD15to3000[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_11Apr2012_QCD_Pt-15to3000/*.root";
 const char QCD15to30[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-15to30/*.root";
-const char QCD30to50[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-30to50/*.root";
-const char QCD50to80[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-50to80/*.root";
-const char QCD80to120[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-80to120/*.root";
-const char QCD120to170[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-120to170/*.root";
-const char QCD170to300[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-170to300/*.root";
-const char QCD300to470[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-300to470/*.root";
-const char QCD470to600[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-470to600/*.root";
-const char QCD600to800[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-600to800/*.root";
-const char QCD800to1000[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_27Dec2011_QCD_Pt-800to1000/*.root";
-const char QCD15to3000[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_29Nov2011_QCD_Pt-15to3000/*.root";
-const char *MC_files[]={QCD15to30,QCD30to50,QCD50to80,QCD80to120,QCD120to170,QCD170to300,QCD300to470,QCD470to600,QCD600to800,QCD800to1000};
-const char *MC_SampleNames[]={"qcd15","qcd30","qcd50","qcd80","qcd120","qcd170","qcd300","qcd470","qcd600","qcd800"};
-Float_t MC_Weights[]={815900000. / 10991904.,//weight15
-		      53120000.  / 6583068.,//weight30
+const char QCD30to50[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_03Feb2012_QCD_Pt-30to50/*.root";
+const char QCD50to80[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_03Feb2012_QCD_Pt-50to80/*.root";
+const char QCD80to120[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_03Feb2012_QCD_Pt-80to120/*.root";
+const char QCD120to170[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_03Feb2012_QCD_Pt-120to170/*.root";
+const char QCD170to300[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_03Feb2012_QCD_Pt-170to300/*.root";
+const char QCD300to470[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_03Feb2012_QCD_Pt-300to470/*.root";
+const char QCD470to600[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_03Feb2012_QCD_Pt-470to600/*.root";
+const char QCD600to800[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_03Feb2012_QCD_Pt-600to800/*.root";
+const char QCD800to1000[]="/afs/cern.ch/user/z/zhangjin/MetaData/bTaggingNtuple_03Feb2012_QCD_Pt-800to1000/*.root";
+const char *MC_files[]={QCD30to50,QCD50to80,QCD80to120,QCD120to170,QCD170to300,QCD300to470,QCD470to600,QCD600to800,QCD800to1000};
+const char *MC_SampleNames[]={"qcd30","qcd50","qcd80","qcd120","qcd170","qcd300","qcd470","qcd600","qcd800"};
+Float_t MC_Weights[]={53120000.  / 6583068.,//weight30
                       6359000.   / 6600000., //weight50
 		      784300.    / 6581772.,//weight80
 		      115100.    / 6127528.,//weight120
@@ -193,6 +192,16 @@ Float_t MC_Weights[]={815900000. / 10991904.,//weight15
 		      1.844      / 4053888. //weight800
 };
 #endif
+
+#if bTagNtupleVersion == 5
+const char JetDATA[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_15Apr2012_Jet_Run2012A-PromptReco-v1/*.root";
+const char MetDATA[]="";
+const char QCD15to3000[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_15Apr2012_QCD_Pt-15to3000/*.root";
+const char *MC_files[]={QCD15to3000};
+const char *MC_SampleNames[]={"qcd15to3000"};
+Float_t MC_Weights[]={1};
+#endif
+
 const UInt_t nSamples=sizeof(MC_Weights)/sizeof(Float_t);
 
 //############### Configuration of histograms maker ##############
