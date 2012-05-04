@@ -159,9 +159,10 @@ public:
   std::string *HLTTableName;
   std::vector<UInt_t> *HLTPrescaleFactors;
   std::vector<Bool_t> *HLTriggerResults;
-
-  UInt_t numberOfPUVertices;   // at BC=0
-  UInt_t numberOfPUVerticesTot;  // all PU : BC=0 and out-of-time PU
+  
+  UInt_t numberOfPUVertices; // the number of pileup interactions that have been added to the event from BX=0
+  Float_t numberOfPUVerticesMixingTruth;// the "MixingTruth" mean number of pileup interactions for this event from which each bunch crossing has been sampled; same for all bunch crossings in an event (before possion smearing); in fact BX=-1, this value is zero, it's a bug I believe.
+  UInt_t numberOfPUVerticesTot;  // all PX : BX=0 and out-of-time PU
   UInt_t numberOfPrimaryVertices ;
   UInt_t numberOfTracksAtPV;
   Float_t PVx;
@@ -865,6 +866,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   EventInfo->Branch(  "HLTriggerResults",  &HLTriggerResults);
 
   EventInfo->Branch(  "numberOfPUVertices",       &numberOfPUVertices, "numberOfPUVertices/i");
+  EventInfo->Branch(  "numberOfPUVerticesMixingTruth",       &numberOfPUVerticesMixingTruth, "numberOfPUVerticesMixingTruth/F");
   EventInfo->Branch(  "numberOfPUVerticesTot",       &numberOfPUVerticesTot, "numberOfPUVerticesTot/i");
   EventInfo->Branch(  "numberOfPrimaryVertices" , &numberOfPrimaryVertices , "numberOfPrimaryVertices/i"); 
   EventInfo->Branch(  "numberOfTracksAtPV" , &numberOfTracksAtPV , "numberOfTracksAtPV/i"); 
@@ -1401,20 +1403,27 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       numberOfPUVertices = (*puInfo)[0].getPU_NumInteractions();
       // std::cout<<" numberOfPUVertices = " << numberOfPUVertices << std::endl;
     }
+    numberOfPUVerticesMixingTruth=numberOfPUVertices;
     numberOfPUVerticesTot=numberOfPUVertices;
 #else
      Handle<std::vector< PileupSummaryInfo > >  PupInfo;
      iEvent.getByLabel(PileupSrc_, PupInfo);
      std::vector<PileupSummaryInfo>::const_iterator PVI;
-     numberOfPUVertices=0;
+     numberOfPUVertices=0; // the number of pileup interactions that have been added to the event from this bunch crossing
+     numberOfPUVerticesMixingTruth=0;// the *true* mean number of pileup interactions for this event from which each bunch crossing has been sampled; same for all bunch crossings in an event
      numberOfPUVerticesTot=0;
      for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
-       Int_t n_bc=PVI->getBunchCrossing();
-       for (Int_t ipu=0; ipu <PVI->getPU_NumInteractions(); ipu++) {
-        if (n_bc==0) numberOfPUVertices++;
-        numberOfPUVerticesTot++;
-       }
-    }
+       Int_t BX = PVI->getBunchCrossing();
+       if(BX == 0) {
+	 numberOfPUVertices = PVI->getPU_NumInteractions();
+#ifdef GetPUFromEarlyThan_4_4_0
+	 numberOfPUVerticesMixingTruth = -1.;//not available
+#else
+	 numberOfPUVerticesMixingTruth = PVI->getTrueNumInteractions();
+#endif
+       } 
+       numberOfPUVerticesTot+=numberOfPUVertices;
+     }
 #endif
   }
   
