@@ -229,6 +229,7 @@ public:
   Int_t trackHasSharedPix3[MAXTRACKS];
   Int_t trackHasSharedPixAll[MAXTRACKS];
   Bool_t trackIsVertexTrack[MAXTRACKS];
+  Bool_t trackIsFromB[MAXTRACKS];
 
   //MC Truth Information
   Int_t PartonFlavor[MAXJETS];//PartonFlavor==0 means that the jet matches no GEN level parton.It could be a piled-up jet or bad reconstructed jet.One see the algorithms in: http://cmslxr.fnal.gov/lxr/source/PhysicsTools/JetMCAlgos/plugins/JetFlavourIdentifier.cc and http://cmslxr.fnal.gov/lxr/source/PhysicsTools/JetMCAlgos/plugins/JetPartonMatcher.cc                
@@ -934,6 +935,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   EventInfo->Branch(  "trackHasSharedPix3",  trackHasSharedPix3, "trackHasSharedPix3[nTracks]/I");
   EventInfo->Branch(  "trackHasSharedPixAll",  trackHasSharedPixAll, "trackHasSharedPixAll[nTracks]/I");
   EventInfo->Branch( "trackIsVertexTrack", trackIsVertexTrack, "trackIsVertexTrack[nTracks]/O") ;
+  EventInfo->Branch( "trackIsFromB", trackIsFromB, "trackIsFromB[nTracks]/O") ;
 
   //MC Truth Information
   EventInfo->Branch(  "MCTrueFlavor", PartonFlavor, "MCTrueFlavor[nJets]/I"); 
@@ -1687,6 +1689,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  if(iTotalTracksCounter >= (Int_t)MAXTRACKS) return;
 	  
 	  trackJetIndex[iTotalTracksCounter] = iJet;
+	  trackIsFromB[iTotalTracksCounter] = false;
 	  Bool_t isSelected = false;
 	  for(track_iterator jTrack = ipTagInfo[thisJetRef]->selectedTracks().begin(); jTrack != ipTagInfo[thisJetRef]->selectedTracks().end(); jTrack++)
 	    {
@@ -1696,55 +1699,59 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	      }
 	    }
 	
-	  Bool_t isSelectedPUTrack=false;
+	  Bool_t isPUTrack=false;
+	  if (getSimTruth_) {//start investigating if the track is from PU
+	    TrackBase::ParameterVector rParameters = (*iTrack)->parameters();
+	    TrackBase::CovarianceMatrix recoTrackCovMatrix = (*iTrack)->covariance();
+	    recoTrackCovMatrix.Invert();
+	    vector<SimTrack>::iterator BestMatchSimTrk=STC.end();
+	    Double_t BestChi2=1E30;
+	    for (vector<SimTrack>::iterator Trk_iter = STC.begin(); Trk_iter != STC.end(); ++Trk_iter ) {
+	      reco::TrackBase::ParameterVector sParameters=SimTrackParameterVectorMap[Trk_iter];
+	      reco::TrackBase::ParameterVector diffParameters = rParameters - sParameters;
+	      diffParameters[2] = reco::deltaPhi(diffParameters[2],0.f);
+	      Double_t chi2 = ROOT::Math::Dot(diffParameters * recoTrackCovMatrix, diffParameters);
+	      if (chi2<chi2cut_&&chi2<BestChi2) {
+		BestChi2=chi2;
+		BestMatchSimTrk=Trk_iter;
+	      }
+	    }
+	    if ( BestMatchSimTrk!=STC.end() ) {
+	      vector<SimTrack>::iterator thisTrk=BestMatchSimTrk;
+	      SimVertex *thisVtx=NULL;//the very beginning vertex of this track
+	      do {
+		Int_t PID=thisTrk->type();
+		if ( (PID>=5000&&PID<6000)||(PID%1000>=500&&PID%1000<600) )//whether from B
+		    trackIsFromB[iTotalTracksCounter] = true;
+		if (thisTrk->noVertex()) break;
+		thisVtx=&SVC[thisTrk->vertIndex()];
+		if (thisVtx->noParent()) break;
+		Int_t TrkID =Int_t( thisVtx->parentIndex() );
+		thisTrk = STC.begin();
+		for (; thisTrk != STC.end(); ++thisTrk )
+		  if ( (Int_t) thisTrk->trackId() == TrkID) break;
+		if ( thisTrk==STC.end() ) {
+		  edm::LogError("SimBug")<<"parentIndex/trackId Error, considered as no parent track"<<endl;
+		  break;
+		}
+	      }while(true);
+	      if (thisVtx==NULL) isPUTrack=true;
+	      else if ( thisTrk==STC.end() ) isPUTrack=true;
+	      else if ( thisTrk->noGenpart() ) isPUTrack=true;
+	      if (isPUTrack&&numberOfPUVertices==0) {
+		isPUTrack=false;
+		edm::LogError("SimBug")<<"Found a PU track in PU0 event."<<endl;
+	      }
+	    }
+	    else {
+	      isPUTrack=false;
+	      edm::LogWarning("MCMatching")<<"No matched SimTrack. Increase TrackMCTruthMatchChi2Cut??"<<endl;
+	    }
+	  }//end of getSimTruth
+
 	  if(isSelected) {
 	    nSelectedTracks++;
-	    if (getSimTruth_) {//start investigating if the track is from PU
-	      TrackBase::ParameterVector rParameters = (*iTrack)->parameters();
-	      TrackBase::CovarianceMatrix recoTrackCovMatrix = (*iTrack)->covariance();
-	      recoTrackCovMatrix.Invert();
-	      vector<SimTrack>::iterator BestMatchSimTrk=STC.end();
-	      Double_t BestChi2=1E30;
-	      for (vector<SimTrack>::iterator Trk_iter = STC.begin(); Trk_iter != STC.end(); ++Trk_iter ) {
-		reco::TrackBase::ParameterVector sParameters=SimTrackParameterVectorMap[Trk_iter];
-		reco::TrackBase::ParameterVector diffParameters = rParameters - sParameters;
-		diffParameters[2] = reco::deltaPhi(diffParameters[2],0.f);
-		Double_t chi2 = ROOT::Math::Dot(diffParameters * recoTrackCovMatrix, diffParameters);
-		if (chi2<chi2cut_&&chi2<BestChi2) {
-		  BestChi2=chi2;
-		  BestMatchSimTrk=Trk_iter;
-		}
-	      }
-	      if ( BestMatchSimTrk!=STC.end() ) {
-		vector<SimTrack>::iterator thisTrk=BestMatchSimTrk;
-		SimVertex *thisVtx=NULL;//the very beginning vertex of this track
-		do {
-		  if (thisTrk->noVertex()) break;
-		  thisVtx=&SVC[thisTrk->vertIndex()];
-		  if (thisVtx->noParent()) break;
-		  Int_t TrkID =Int_t( thisVtx->parentIndex() );
-		  thisTrk = STC.begin();
-		  for (; thisTrk != STC.end(); ++thisTrk )
-		    if ( (Int_t) thisTrk->trackId() == TrkID) break;
-		  if ( thisTrk==STC.end() ) {
-		    edm::LogError("SimBug")<<"parentIndex/trackId Error, considered as no parent track"<<endl;
-		    break;
-		  }
-		}while(true);
-		if (thisVtx==NULL) isSelectedPUTrack=true;
-		else if ( thisTrk==STC.end() ) isSelectedPUTrack=true;
-		else if ( thisTrk->noGenpart() ) isSelectedPUTrack=true;
-		if (isSelectedPUTrack&&numberOfPUVertices==0) {
-		  isSelectedPUTrack=false;
-		  edm::LogError("SimBug")<<"Found a PU track in PU0 event."<<endl;
-		}
-	      }
-	      else {
-		isSelectedPUTrack=false;
-		edm::LogWarning("MCMatching")<<"No matched SimTrack. Increase TrackMCTruthMatchChi2Cut??"<<endl;
-	      }
-	    }//end of getSimTruth
-	    if (isSelectedPUTrack) nSelectedPUTracks++;
+	    if (isPUTrack) nSelectedPUTracks++;
 	  }
 
 	  // check if track is attached to a vertex
@@ -1811,7 +1818,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  trackDeltaR[iTotalTracksCounter] = ( ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),(*iTrack)->momentum()) );
 
 	  if (isSelected && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixTracks++;
-	  if (isSelectedPUTrack && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixPUTracks++;
+	  if (isSelected && isPUTrack && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixPUTracks++;
 
 	  if(getSharedHitInfo_) {
 	    Int_t tsharedP1, tsharedP2, tsharedP3;
