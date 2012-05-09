@@ -194,17 +194,20 @@ Float_t MC_Weights[]={53120000.  / 6583068.,//weight30
 #endif
 
 #if bTagNtupleVersion == 5
-const char JetDATA[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_15Apr2012_Jet_Run2012A-PromptReco-v1/*.root";
+const char JetDATA[]="/opt/sbg/data/data2/cms/cbeluffi/bTaggingNtuple_30april_Jet_Run2012A_PromptReco-v1/*.root";
 const char MetDATA[]="";
-const char QCD15to3000[]="/castor/cern.ch/user/z/zhangjin/bTaggingNtuple_15Apr2012_QCD_Pt-15to3000/*.root";
-const char *MC_files[]={QCD15to3000};
-const char *MC_SampleNames[]={"qcd15to3000"};
-Float_t MC_Weights[]={1};
+const char QCD120to170[]="/opt/sbg/data/data2/cms/cbeluffi/Ntuples_MC_8Tev/bTaggingNtuple_4April2012_QCD_Pt-120to170_8TeV/*.root";
+const char QCD170to300[]="/opt/sbg/data/data2/cms/cbeluffi/Ntuples_MC_8Tev/bTaggingNtuple_4April2012_QCD_Pt-170to300_8TeV/*.root";
+const char *MC_files[]={QCD120to170,QCD170to300};
+const char *MC_SampleNames[]={"qcd120","qcd170"};
+Float_t MC_Weights[]={115100.    / 242400.,//weight120
+		      24260.     / 50000.,//weight170
+};
 #endif
 
 const UInt_t nSamples=sizeof(MC_Weights)/sizeof(Float_t);
 
 //############### Configuration of histograms maker ##############
 #define RUN_ON_JET
-#define PTVAL 60
-#define DATAYEAR 2011
+#define PTVAL 140
+#define DATAYEAR 2012

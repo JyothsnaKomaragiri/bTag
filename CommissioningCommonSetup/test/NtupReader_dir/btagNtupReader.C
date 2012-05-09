@@ -56,6 +56,10 @@ TString my_trigger_path="HLT_PFJet80";Float_t JetPtthresholdsfornmu=-1; Float_t 
 TString my_trigger_path="HLT_PFJet80";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=120.;
 #endif
 
+#if PTVAL == 140 && defined(RUN_ON_JET)
+TString my_trigger_path="HLT_PFJet140";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=140.;
+#endif
+
 #endif
 
 #if DATAYEAR==2011
@@ -843,6 +847,23 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
         }
       }
     }
+    
+    // HLT_PFJet140
+    else if (my_trigger_path=="HLT_PFJet140") {
+      if (isRealData && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
+        if ( triggerHLT_PFJet140 ) {
+	  cut_trigger=true;
+	  prescale =prescaleHLT_PFJet140;
+        }
+      }
+      else { // APPLIED ON MC AND DATA 2010
+        if ( triggerHLT_PFJet140 ) {
+	  cut_trigger=true;
+	  prescale =prescaleHLT_PFJet140;
+        }
+      }
+    }    
+    
 #endif //endof bTagNtupleVersion<=3
 
     if (cut_trigger) {
@@ -877,7 +898,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 	Bool_t cut_mu_pass=true;// BYPASS THIS CUT IF YOU DON'T CARE ABOUT MUON IN JET
 #endif
 
-	if (jetPt[i]>cutJetPt && -2.4<jetEta[i] && jetEta[i]<2.4 && cut_mu_pass) {
+	if (jetPt[i]<300 &&jetPt[i]>cutJetPt && -2.4<jetEta[i] && jetEta[i]<2.4 && cut_mu_pass) {
 	  for (int j=0; j<jmax; j++) {
 	    int ok=0;
 	    if (j==0) ok=1;  // everyone 

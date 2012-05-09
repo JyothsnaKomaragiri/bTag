@@ -781,6 +781,8 @@ public :
    Int_t           prescaleHLT_Jet80;
    Bool_t          triggerHLT_Jet110;
    Int_t           prescaleHLT_Jet110;
+   Bool_t          triggerHLT_PFJet140;
+   Int_t           prescaleHLT_PFJet140;   
    Bool_t          triggerHLT_Jet150;
    Int_t           prescaleHLT_Jet150;
    Bool_t          triggerHLT_Jet190;

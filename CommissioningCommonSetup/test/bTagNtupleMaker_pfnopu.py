@@ -109,7 +109,7 @@ jecSetPF = jecSetBase + 'PF'
 if usePFnoPU:
   jecSetPF += 'chs'
   
-runOnMC =True 
+runOnMC =False 
 
 usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=runOnMC, postfix=postfix) 
 
