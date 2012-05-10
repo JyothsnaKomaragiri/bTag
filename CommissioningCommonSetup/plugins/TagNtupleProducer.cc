@@ -57,6 +57,7 @@
 #include "SimDataFormats/JetMatching/interface/JetFlavour.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 //Simulation Information Headers
@@ -93,6 +94,11 @@
 #include <TFile.h>
 #include <utility>
 
+using namespace edm;
+using namespace std;
+using namespace reco;
+using namespace ROOT::Math::VectorUtil;
+
 // maximum array size (the arrays are stored with variable size in the root tree)
 const UInt_t MAXJETS = 40;
 const UInt_t MAXTRACKS = 300;
@@ -115,6 +121,7 @@ public:
 									       Float_t charge,
 									       const reco::BeamSpot& bs) const;
   void getSharedHitsInfo(UInt_t layer, const reco::TrackRefVector & tracks, Int_t &nSharedHits, Int_t &nTotalHits);
+  Bool_t GenParticleParentTree( HepMC::GenParticle *genPar );
   Int_t  hasSharedHit(UInt_t layer, size_t location, const reco::TrackRefVector & tracks);      
   // ----------member data ---------------------------
   
@@ -640,11 +647,6 @@ public:
 //
 // constructors and destructor
 //
-
-using namespace edm;
-using namespace std;
-using namespace reco;
-using namespace ROOT::Math::VectorUtil;
 
 namespace{
   struct JetRefCompare : public binary_function<RefToBase<Jet>, RefToBase<Jet>, Bool_t> {
@@ -1515,17 +1517,21 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     }
   //SimTrack,SimVertex Container, we build a map from SimTrack to its TrackParameter Vector here
   //if sample is AODSIM, getSimTruth_ must be false
-  Handle<SimTrackContainer> STCollectionH;
   map< vector<SimTrack>::iterator,reco::TrackBase::ParameterVector > SimTrackParameterVectorMap;
   SimTrackContainer STC;
-  Handle<SimVertexContainer> SVCollectionH;
   SimVertexContainer SVC;
+  HepMC::GenEvent *HepGenEvent=NULL;
   if (getSimTruth_) {
     //SimTrack and SimVertex
+    Handle<SimTrackContainer> STCollectionH;
+    Handle<SimVertexContainer> SVCollectionH;
+    Handle<edm::HepMCProduct> HepMCH;
     iEvent.getByLabel(simTruthTag_, STCollectionH);
     iEvent.getByLabel(simTruthTag_, SVCollectionH);
     STC = *STCollectionH.product();
     SVC = *SVCollectionH.product();
+    iEvent.getByLabel(HepMCTag_, HepMCH);
+    HepGenEvent=const_cast<HepMC::GenEvent *>( HepMCH->GetEvent() );
     for (vector<SimTrack>::iterator Trk_iter = STC.begin(); Trk_iter != STC.end(); ++Trk_iter ) {
       Basic3DVector<Double_t> momAtVtx( Trk_iter->momentum().x(),Trk_iter->momentum().y(), Trk_iter->momentum().z() );
       Basic3DVector<Double_t> vert;
@@ -1676,7 +1682,6 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       PVChi2 = pv->chi2();
       PVndof = pv->ndof();
       PVNormalizedChi2 = pv->normalizedChi2();
-
       //some counters
       size_t counter=0;
       size_t nSelectedTracks=0;
@@ -1720,9 +1725,6 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	      vector<SimTrack>::iterator thisTrk=BestMatchSimTrk;
 	      SimVertex *thisVtx=NULL;//the very beginning vertex of this track
 	      do {
-		Int_t PID=thisTrk->type();
-		if ( (PID>=5000&&PID<6000)||(PID%1000>=500&&PID%1000<600) )//whether from B
-		    trackIsFromB[iTotalTracksCounter] = true;
 		if (thisTrk->noVertex()) break;
 		thisVtx=&SVC[thisTrk->vertIndex()];
 		if (thisVtx->noParent()) break;
@@ -1735,9 +1737,12 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		  break;
 		}
 	      }while(true);
+	      
 	      if (thisVtx==NULL) isPUTrack=true;
-	      else if ( thisTrk==STC.end() ) isPUTrack=true;
+	      if ( thisTrk==STC.end() ) isPUTrack=true;
 	      else if ( thisTrk->noGenpart() ) isPUTrack=true;
+	      else trackIsFromB[iTotalTracksCounter]=GenParticleParentTree( HepGenEvent->barcode_to_particle(thisTrk->genpartIndex()) );
+
 	      if (isPUTrack&&numberOfPUVertices==0) {
 		isPUTrack=false;
 		edm::LogError("SimBug")<<"Found a PU track in PU0 event."<<endl;
@@ -2648,6 +2653,18 @@ Int_t TagNtupleProducer::hasSharedHit(UInt_t layer, size_t location, const reco:
   return bFoundHit;
 }
 
+Bool_t TagNtupleProducer::GenParticleParentTree( HepMC::GenParticle *genPar ) {
+  HepMC::GenVertex *thisVtx = genPar->production_vertex();
+  if (thisVtx) {
+      for (HepMC::GenVertex::particles_in_const_iterator pgenD = thisVtx->particles_in_const_begin(); pgenD != thisVtx->particles_in_const_end(); ++pgenD)
+	if ( (*pgenD)->pdg_id()!=92 )  {//Pythia special code for string, we only care about the particles after hadronization
+	  UInt_t PID=abs( (*pgenD)->pdg_id() );
+	  if ( (PID>=5000&&PID<6000)||(PID%1000>=500&&PID%1000<600) ) return true;
+	  if ( GenParticleParentTree( (*pgenD) ) )   return true;
+	}
+  }
+  return false;
+}
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(TagNtupleProducer);
