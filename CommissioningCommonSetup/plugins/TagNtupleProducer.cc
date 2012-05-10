@@ -1358,8 +1358,10 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	getMCTruth_=false;
       }
       try{
-	Handle<SimTrackContainer> STCollectionH;  Handle<SimVertexContainer> SVCollectionH;
-	getSimTruth_=iEvent.getByLabel(simTruthTag_, STCollectionH)&&iEvent.getByLabel(simTruthTag_, SVCollectionH);
+	Handle<SimTrackContainer> STCollectionH;
+	Handle<SimVertexContainer> SVCollectionH;
+	Handle<HepMCProduct> HepMCH;
+    	getSimTruth_=iEvent.getByLabel(simTruthTag_, STCollectionH)&&iEvent.getByLabel(simTruthTag_, SVCollectionH)&&iEvent.getByLabel(HepMCTag_, HepMCH);
       }
       catch (cms::Exception) {
 	LogWarning("DataFormat")<< "Simulation level information is not found.(BadTag? or AOD?)";
