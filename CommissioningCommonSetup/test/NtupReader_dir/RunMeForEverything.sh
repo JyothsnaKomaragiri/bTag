@@ -8,12 +8,18 @@ ver=${ver#"#define bTagNtupleVersion "}
 ver=`expr match "$ver" '\([0-9]*\)'`
 line=`grep -n "#if bTagNtupleVersion == $ver" Configuration.h`
 line=${line%:*}",\$p"
-jobs=`sed -n "$line" Configuration.h | grep -m 1 "const char \*MC_SampleNames"`
-jobs=${jobs#*\{}
-jobs=${jobs%\}*}
-jobs=${jobs//,/ }
-jobs=${jobs//\"/}
-TAGGERS="TCHE TCHP SSVHE SSVHP JetP JetBP CSVPF"
+if [ -n "$1" ]; then 
+    jobs=$1
+    TAGGERS=$1
+else
+    jobs=`sed -n "$line" Configuration.h | grep -m 1 "const char \*MC_SampleNames"`
+    jobs=${jobs#*\{}
+    jobs=${jobs%\}*}
+    jobs=${jobs//,/ }
+    jobs=${jobs//\"/}
+    jobs="data $jobs"
+    TAGGERS="TCHE TCHP SSVHE SSVHP JetP JetBP CSVPF"
+fi
 echo -e "
 -----------------------------------------------------------------------------------------------------------------
 \e[32;07m You have to specify parameters in the Configuration.h\e[00m
@@ -50,8 +56,8 @@ bTagNtupleVersion = \e[00;33m$ver\e[00m (Configuration.h)
 samples =  \e[00;33m$jobs\e[00m (Configuration.h)
 efficiency plots taggers = \e[00;33m$TAGGERS\e[00m (RunMeForEverything.sh)
 
-\e[32;07mNow choose a mission to run:\e[00m
-(1) Make Commissionging Root Files    
+\e[32;07mNow choose a mission to run ( if choose A or B, the job will run on lxplus batch):\e[00m
+(1/A) Make Commissionging Root Files    
    a. Specify \"run on Jet\" or on MetBtag:
       \e[00;33m#define Run_on_Jet\e[00m --> Run_on_Jet otherwise Run_on_Btag
       \e[00;33m#define ptval 80\e[00m --> the single jet pt cut or the di-jet pt cut
@@ -64,7 +70,7 @@ efficiency plots taggers = \e[00;33m$TAGGERS\e[00m (RunMeForEverything.sh)
     a. Run step (1)
     b. After all root files are generated, run this step and then all outputs will be in \e[00;33mdir_jet[jetptcut]pu/\e[00m or \e[00;33mdir_btag[jetptcut]pu/\e[00m in pdf format by default.
 
-(3) Make Efficiency Plots: Configure \"EfficiencyPlotter.C\"
+(3/B) Make Efficiency Plots: Configure \"EfficiencyPlotter.C\"
    a. Specify which target is studying:
       \e[00;33m#define Jet\e[00m --> Reco Jets
       \e[00;33m#define GENJET\e[00m --> Gen Level Particle Jets (clustered generation level particles, not the original parton jet)
@@ -80,30 +86,38 @@ efficiency plots taggers = \e[00;33m$TAGGERS\e[00m (RunMeForEverything.sh)
 (N) Say 'N' for additional information
 "
 Choice='S'
-until [[ "$Choice" == [1234Nn] ]]; do
-    echo -en $"\e[33;07m Which one are you ready to run?(1-4/N)\e[00m"
+until [[ "$Choice" == [1234NnAB] ]]; do
+    echo -en $"\e[33;07m Which one are you ready to run?(1-4/A/B/N)\e[00m"
     read -n 1 Choice
     echo
 done
 case $Choice in
-    1)
+    [1A])
 	g++ `root-config --cflags --glibs` -o btagNtupReader btagNtupReader.C
-	for i in data $jobs
-	do 
-	    ./btagNtupReader $i | tee $i.OUTPUT &
+	for i in $jobs
+	do
+	    if [ "$Choice" == "A" ]; then
+		bsub -q 2nd "cd $CMSSW_BASE/src/;eval \`scramv1 runtime -sh\`;cd `pwd`;./btagNtupReader $i | tee $i.OUTPUT" 
+	    else
+		./btagNtupReader $i | tee $i.OUTPUT &
+	    fi
 	    sleep 10
 	done
-	echo -e "\e[33;01mPlease run step 2 after all jobs finished.\e[00m";;
+	echo -e "\e[33;01mPlease run step 2 after all jobs finish.\e[00m";;
    2) 
-                g++ `root-config --cflags --glibs` -o displayPlots displayPlots.C
+        g++ `root-config --cflags --glibs` -o displayPlots displayPlots.C
 	./displayPlots
 	rm btagNtupReader
 	rm displayPlots;;
-   3)
+   [3B])
 	g++ `root-config --cflags --glibs` -o EfficiencyPlotter EfficiencyPlotter.C
 	for i in $TAGGERS
 	do
-	    ./EfficiencyPlotter "$i" | tee $i.OUTPUT &
+	    if [ "$Choice" == "B" ]; then
+		bsub -q 2nd "cd $CMSSW_BASE/src/;eval \`scramv1 runtime -sh\`;cd `pwd`;./EfficiencyPlotter \"$i\" | tee $i.OUTPUT" 
+	    else
+		./EfficiencyPlotter "$i" | tee $i.OUTPUT &
+	    fi
 	    sleep 10
 	done;;
     4)
