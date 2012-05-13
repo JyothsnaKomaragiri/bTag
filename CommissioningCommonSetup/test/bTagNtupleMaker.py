@@ -1,3 +1,6 @@
+#########################
+#####    Settings   #####
+#########################
 DATALIST=[
 #"/QCD_Pt-15to30_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
 #"/QCD_Pt-30to50_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
@@ -28,14 +31,21 @@ DATALIST=[
 #"/BTag/Run2012A-PromptReco-v1/AOD",
 "/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-PU_S7_START52_V5-v1/AODSIM"
           ]
-
 HLTProc="HLT"
-# It will select the events based on the TriggerSelections. The ntuple will only save the triggers whose name matches any entry in TriggerSelections
+runOnMC = True
+usePFnoPU = True
 
 import FWCore.ParameterSet.Config as cms
 
+#JetSelection
+JetCut=cms.string("pt > 30.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99")
+
+# It will select the events based on the TriggerSelections. The ntuple will only save the triggers whose name matches any entry in TriggerSelections
 TriggerSelections=cms.vstring("HLT_*Jet*")
 
+############################
+###    Main Program   ######
+############################
 process = cms.Process("validation")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
@@ -52,17 +62,18 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 #Global tag
 #from Configuration.PyReleaseValidation.autoCond import autoCond  # for <CMSSW_4_3_0
 from Configuration.AlCa.autoCond import autoCond # for >=CMSSW_4_3_0
-#process.GlobalTag.globaltag = autoCond['startup']
-process.GlobalTag.globaltag = autoCond['com10']
+
+if runOnMC:
+  process.GlobalTag.globaltag = autoCond['startup']
+else:
+  process.GlobalTag.globaltag = autoCond['com10']
 
 process.source = cms.Source("PoolSource",
-<<<<<<< bTagNtupleMaker.py
 #    fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_Chamonix_TTbar_AODSIM.root")
-   fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/k/kkaadze/BTagging/QCD_Fall11_44_Pt80to120_RECODEBUG.root")
-=======
-    fileNames = cms.untracked.vstring("rfio:/dpm/in2p3.fr/home/cms/phedex/store/data/Run2012A/Jet/AOD/PromptReco-v1/000/190/934/304B8EF5-CE85-E111-B4DF-003048F110BE.root")
+#   fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/k/kkaadze/BTagging/QCD_Fall11_44_Pt80to120_RECODEBUG.root")
+                            fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Summer12_QCD15to3000.root")
+#    fileNames = cms.untracked.vstring("rfio:/dpm/in2p3.fr/home/cms/phedex/store/data/Run2012A/Jet/AOD/PromptReco-v1/000/190/934/304B8EF5-CE85-E111-B4DF-003048F110BE.root")
 #    fileNames = cms.untracked.vstring("file:/storage1/cms/jandrea/425MC/TTJets_TuneZ2_7TeV/TTJets_TuneZ2_7TeV/NTuple_67_1_HhM.root")
->>>>>>> 1.4
 #fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD.root",
 #                                  "file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD_2.root")
 )
@@ -70,16 +81,6 @@ process.source = cms.Source("PoolSource",
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(100)
 )
-
-
-
-process.out = cms.OutputModule("PoolOutputModule",
-    outputCommands = cms.untracked.vstring('drop *'),
-    fileName = cms.untracked.string('testtt.root')
-)
-
-
-
 
 ########### Trigger selection ###########
 # Select events based on the HLT triggers....singleJet and BTag triggers
@@ -95,36 +96,6 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
    l1tResults = cms.InputTag( "" ),
    throw = cms.bool( False) #set to false to deal with missing triggers while running over different trigger menus
 )
-
-
-
-
-########### Jet selection and JEC use PFtoPAT and PFnoPU ###########
-# Apply "loose PF JetID" first
-
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
-from PhysicsTools.PatAlgos.tools.pfTools import *
-
-usePFnoPU = True
-
-postfix = "PF2PAT"  # to have only PF2PAT
-jetAlgo="AK5"
-jecSetBase = jetAlgo
-jecSetPF = jecSetBase + 'PF'
-if usePFnoPU:
-  jecSetPF += 'chs'
-  
-runOnMC =True 
-
-usePF2PAT(process,runPF2PAT=True, jetAlgo=jetAlgo, runOnMC=runOnMC, postfix=postfix) 
-
-applyPostfix(process,"patJetCorrFactors",postfix).payload    = cms.string('AK5PFchs')
-
-
-
-process.pfPileUpPF2PAT.Enable = True
-process.pfPileUpPF2PAT.Vertices = cms.InputTag('goodOfflinePrimaryVertices')
-
 
 ########### Event cleaning ###########
 #Require a good vertex
@@ -155,24 +126,18 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
                                 thresh = cms.untracked.double(0.25)
                                 )
 				
-
-
-				
-process.PFJetsFilter = cms.EDFilter("PFJetSelector",
-  src = cms.InputTag("ak5PFJetsJEC"),
-  cut = cms.string("pt > 30.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99"),
-  filter = cms.bool(True)
-)
-
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
 process.ak5PFJetsJEC = process.ak5PFJetsL2L3.clone(
     src = 'ak5PFJets', 
     correctors = ['ak5PFL2L3']
-#    correctors = ['ak5PFL1FastL2L3']
 )
 
-
+process.PFJetsFilter = cms.EDFilter("PFJetSelector",
+  src = cms.InputTag("ak5PFJetsJEC"),
+  cut = JetCut,
+  filter = cms.bool(True)
+)
 
 #Filter to remove pthat>15 events in MinBias samples
 process.pthat_filter = cms.EDFilter("MCProcessFilter",
@@ -183,20 +148,39 @@ process.pthat_filter = cms.EDFilter("MCProcessFilter",
 
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryPaths_cfi")
 
+########### Jet selection and JEC use PFtoPAT and PFnoPU ###########
+#JetID
+
+if usePFnoPU :
+    process.out = cms.OutputModule("PoolOutputModule",
+                                   outputCommands = cms.untracked.vstring('drop *'),
+                                   fileName = cms.untracked.string('EmptyFile.root')
+                                   )
+    process.load("PhysicsTools.PatAlgos.patSequences_cff")
+    from PhysicsTools.PatAlgos.tools.pfTools import *
+    postfix="PF2PAT"
+    usePF2PAT(process,runPF2PAT=True, jetAlgo="AK5", runOnMC=runOnMC, postfix=postfix) 
+    applyPostfix(process,"patJetCorrFactors",postfix).payload = cms.string('AK5PFchs')
+    process.pfPileUpPF2PAT.Enable = True
+    process.pfPileUpPF2PAT.Vertices = cms.InputTag('goodOfflinePrimaryVertices')
+    process.selectedPatJetsPF2PAT.cut = JetCut
+    process.JECAlgo = cms.Sequence( getattr(process,"patPF2PATSequence"+postfix) )
+    JetID=cms.InputTag("selectedPatJetsPF2PAT")
+else:
+    process.JECAlgo = cms.Sequence( process.ak5PFJetsJEC*process.PFJetsFilter )
+    JetID=cms.InputTag("PFJetsFilter")
+
 ########### Rerun b-tagging for PF Jets ###########
 process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 
 process.ak5PFJetTracksAssociatorAtVertex = cms.EDProducer("JetTracksAssociatorAtVertex",
    process.j2tParametersVX,
-   jets = cms.InputTag("selectedPatJetsPF2PAT")
-   
+   jets = JetID
 )
 
 
 process.standardImpactParameterPFTagInfos = process.impactParameterTagInfos.clone(
-  #jets = cms.InputTag("selectedPatJetsPF2PAT")
   jetTracks = "ak5PFJetTracksAssociatorAtVertex"
-  
 )
 
 
@@ -265,11 +249,11 @@ process.standardCombinedSecondaryVertexMVAPFBJetTags = process.combinedSecondary
 )
 
 process.standardSoftMuonPFTagInfos = process.softMuonTagInfos.clone(
-  jets = "selectedPatJetsPF2PAT"
+  jets = JetID
 )
 
 process.standardSoftElectronPFTagInfos = process.softElectronTagInfos.clone(
-  jets = "selectedPatJetsPF2PAT"
+  jets = JetID
 )
 
 process.standardSoftMuonPFBJetTags = process.softMuonBJetTags.clone(
@@ -296,7 +280,7 @@ process.standardSoftElectronByIP3dPFBJetTags = process.softElectronByIP3dBJetTag
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 
 process.AK5PFbyRef = process.AK5byRef.clone(
-  jets = "selectedPatJetsPF2PAT"
+  jets = JetID
 )
 
 process.AK5PFbyValAlgo = process.AK5byValAlgo.clone(
@@ -310,13 +294,13 @@ process.flavourSeq = cms.Sequence(
 ########### Generation Level Jet Matching ###########
 #stole from PAT
 process.load("PhysicsTools.PatAlgos.mcMatchLayer0.jetMatch_cfi")
-process.patJetGenJetMatch.src = "selectedPatJetsPF2PAT"
+process.patJetGenJetMatch.src = JetID
 
 ########### Dump contents into ntuple ###########
 process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 
 process.standardPFBTagNtuple = process.bTagNtuple.clone()
-process.standardPFBTagNtuple.jetSrc = cms.InputTag( "selectedPatJetsPF2PAT" )
+process.standardPFBTagNtuple.jetSrc = JetID
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
 process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::"+HLTProc)
 process.standardPFBTagNtuple.TriggerSelection = TriggerSelections
@@ -335,7 +319,7 @@ process.standardPFBTagNtuple.MuonTagInfos = cms.InputTag( "standardSoftMuonPFTag
 process.standardPFBTagNtuple.Label = cms.string("standardPF")
 process.standardPFBTagNtuple.GenJetMatcher = cms.InputTag("patJetGenJetMatch")
 process.standardPFBTagNtuple.filename = cms.string("standardPFNtuple.root")
-process.standardPFBTagNtuple.TrackMCTruthMatchChi2Cut = cms.double(1E9)
+process.standardPFBTagNtuple.TrackMCTruthMatchChi2Cut = cms.double(25)
 process.standardPFBTagNtuple.bTagConfig = cms.VPSet(
     cms.PSet(
     alias = cms.string("standardTrackCountingHighEffPFBJetTags"),
@@ -431,20 +415,24 @@ process.slTaggers = cms.Sequence(
     process.standardSoftElectronByIP3dPFBJetTags 
 )
 
+if runOnMC:
+  process.GenHistory = cms.Sequence(
+#    process.pthat_filter+
+    process.flavorHistorySeq *
+    process.flavourSeq *
+    process.patJetGenJetMatch
+    )
+else:
+  process.GenHistory = cms.Sequence()
 
 process.plots = cms.Path( 
-  process.ak5PFJets *
-  process.ak5PFJetsJEC *  
-  process.PFJetsFilter *       
+  process.noscraping + 
+  process.JetHLTFilter + 
   process.offlinePrimaryVertices *
   process.goodOfflinePrimaryVertices *
-  getattr(process,"patPF2PATSequence"+postfix) *  
-  process.noscraping + 
   process.primaryVertexFilter +
-
-  #  process.pthat_filter+
-  process.JetHLTFilter + 
- # process.flavorHistorySeq +
+  process.JECAlgo*
+  process.GenHistory +
   process.ak5PFJetTracksAssociatorAtVertex  *
   process.standardImpactParameterPFTagInfos  *
   process.svTagInfos *
@@ -452,11 +440,8 @@ process.plots = cms.Path(
   process.svTaggers *
   process.slTagInfos *
   process.slTaggers *
-#  process.flavourSeq *
-#  process.patJetGenJetMatch *
   process.standardPFBTagNtuple 
-  
-)
+  )
 
 ## Added for getting the L1 and HLT summary report
 process.options = cms.untracked.PSet(
@@ -466,78 +451,72 @@ process.options = cms.untracked.PSet(
 process.MessageLogger.categories.append('L1GtTrigReport')
 process.MessageLogger.categories.append('HLTrigReport')
 process.MessageLogger.cerr.FwkReport.reportEvery = 500
-process.MessageLogger.cerr.threshold = cms.untracked.string('ERROR')
+process.MessageLogger.cerr.threshold = cms.untracked.string('WARNING')
 
-#import sys,os,datetime,re
-#
-#if __name__ == '__main__' and 'submit' in sys.argv:
-#    castorhome_=os.getenv("CASTOR_HOME")
-#    home_=os.getenv("HOME")
-#    castorhome_=castorhome_.replace("/castor/cern.ch/","")
-#    time=datetime.datetime.now().strftime("%d%b%Y")
-#    for dataset_ in DATALIST:
-#        new_py = open('bTagNtupleMaker.py').read()
-##        needdel = re.match(r".*(\nimport sys,os,datetime,re.*)", new_py, re.DOTALL)
-##        new_py = new_py.replace(needdel.group(1),"")standardPFNtuple.root
-#        crab_py_start_index=new_py.find(']')
-#        crab_py_end_index=new_py.rfind("\nimport sys,os,datetime,re")
-#        new_py = new_py[crab_py_start_index+1:crab_py_end_index-1]
-#        new_py = re.sub("input = cms.untracked.int32(.*)",
-#                        "input = cms.untracked.int32(-1)",
-#                        new_py)
-#        dirname_=dataset_.split("/")
-#        if "Run20" not in dataset_:
-#            print 'Submitting %s as MC' % dataset_
-#            jobcontrol_='''
-#total_number_of_events = -1
-#number_of_jobs = 128goodOfflinePrimaryVertices
-#'''
-#            dirname_ = re.sub("_Tune.*", "",dirname_[1])
-#            dirname_=time+"_"+dirname_
-#            new_py = re.sub("process.GlobalTag.globaltag = autoCond\[.*\]",
-#                            "process.GlobalTag.globaltag = autoCond['startup']",
-#                            new_py)
-#        else:
-#            print 'Submitting %s as DATA' % dataset_
-#            jobcontrol_='''
-#lumi_mask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/DCSOnly/json_DCSONLY.txt
-##/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Prompt/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt
-#total_number_of_lumis = -1
-#number_of_jobs = 40
-#'''
-#            dirname_=time+"_"+dirname_[1]+"_"+dirname_[2]
-#            new_py = re.sub("process.GlobalTag.globaltag = autoCond\[.*\]",
-#                            "process.GlobalTag.globaltag = autoCond['com10']",
-#                            new_py)
-#            new_py = new_py.replace("  process.flavorHistorySeq +\n","")
-#            new_py = new_py.replace("  process.flavourSeq *\n","")
-#            new_py = new_py.replace("  process.patJetGenJetMatch *\n","")
-#        crab_cfg = '''
-#[CRAB]
-#jobtype = cmssw
-#scheduler = glite
-#
-#[CMSSW]
-#datasetpath = %(dataset_)s
-#pset = bTagNtupleMaker_crab.py
-#output_file = standardPFNtuple.root
-#%(jobcontrol_)s
-#
-#[USER]
-#ui_working_dir = %(home_)s/scratch0/crab_bTaggingNtuple_%(dirname_)s
-#return_data = 0
-#copy_data = 1
-#storage_element=srm-cms.cern.ch
-#storage_path=/srm/managerv2?SFN=/castor/cern.ch
-#user_remote_dir = %(castorhome_)s/bTaggingNtuple_%(dirname_)s
-#publish_data=0
-#''' % locals()
-#        open('crab.cfg', 'wt').write(crab_cfg)
-#        open('bTagNtupleMaker_crab.py', 'wt').write(new_py)
-#        if 'test' not in sys.argv:
-#            os.system('crab -create -submit all')
-#            os.system('rm crab.cfg')
-#            os.system('rm bTagNtupleMaker_crab.py')
+import sys,os,datetime,re
 
+if __name__ == '__main__' in sys.argv:
+    castorhome_=os.getenv("CASTOR_HOME")
+    home_=os.getenv("HOME")
+    castorhome_=castorhome_.replace("/castor/cern.ch/","")
+    time=datetime.datetime.now().strftime("%d%b%Y")
+    for dataset_ in DATALIST:
+        new_py = open('bTagNtupleMaker.py').read()
+        needdel = re.match(r".*(\nimport sys,os,datetime,re.*)", new_py, re.DOTALL)
+        new_py = new_py.replace(needdel.group(1),"")
+        crab_py_start_index=new_py.find(']')
+        crab_py_end_index=new_py.rfind("\nimport sys,os,datetime,re")
+        new_py = new_py[crab_py_start_index+1:crab_py_end_index-1]
+        new_py = re.sub("input = cms.untracked.int32(.*)",
+                        "input = cms.untracked.int32(-1)",
+                        new_py)
+        dirname_=dataset_.split("/")
+        if "Run20" not in dataset_:
+            print 'Submitting %s as MC' % dataset_
+            jobcontrol_='''
+total_number_of_events = -1
+number_of_jobs = 128
+'''
+            dirname_ = re.sub("_Tune.*", "",dirname_[1])
+            dirname_=time+"_"+dirname_
+            new_py = re.sub("runOnMC = .*\n",
+                            "runOnMC = true\n",
+                            new_py)
+        else:
+            print 'Submitting %s as DATA' % dataset_
+            jobcontrol_='''
+lumi_mask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/DCSOnly/json_DCSONLY.txt
+/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Prompt/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt
+total_number_of_lumis = -1
+number_of_jobs = 40
+'''
+            dirname_=time+"_"+dirname_[1]+"_"+dirname_[2]
+            new_py = re.sub("runOnMC = .*\n",
+                            "runOnMC = false\n",
+                            new_py)
+        crab_cfg = '''
+[CRAB]
+jobtype = cmssw
+scheduler = glite
 
+[CMSSW]
+datasetpath = %(dataset_)s
+pset = bTagNtupleMaker_crab.py
+output_file = standardPFNtuple.root
+%(jobcontrol_)s
 
+[USER]
+ui_working_dir = %(home_)s/scratch0/crab_bTaggingNtuple_%(dirname_)s
+return_data = 0
+copy_data = 1
+storage_element=srm-cms.cern.ch
+storage_path=/srm/managerv2?SFN=/castor/cern.ch
+user_remote_dir = %(castorhome_)s/bTaggingNtuple_%(dirname_)s
+publish_data=0
+''' % locals()
+        open('crab.cfg', 'wt').write(crab_cfg)
+        open('bTagNtupleMaker_crab.py', 'wt').write(new_py)
+        if 'submit' in sys.argv:
+            os.system('crab -create -submit all')
+            os.system('rm crab.cfg')
+            os.system('rm bTagNtupleMaker_crab.py')
