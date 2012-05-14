@@ -28,8 +28,8 @@ DATALIST=[
 #"/QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6/Fall11-Peak32PU_START42_V14B-v1/GEN-SIM-RECO",
 #"/Jet/Run2011B-PromptReco-v1/AOD",
 #"/Jet/Run2012A-PromptReco-v1/AOD",
-#"/BTag/Run2012A-PromptReco-v1/AOD",
-"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-PU_S7_START52_V5-v1/AODSIM"
+"/BTag/Run2012A-PromptReco-v1/AOD",
+#"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-PU_S7_START52_V5-v1/AODSIM"
           ]
 HLTProc="HLT"
 runOnMC = True
@@ -455,7 +455,7 @@ process.MessageLogger.cerr.threshold = cms.untracked.string('WARNING')
 
 import sys,os,datetime,re
 
-if __name__ == '__main__' in sys.argv:
+if __name__ == '__main__':
     castorhome_=os.getenv("CASTOR_HOME")
     home_=os.getenv("HOME")
     castorhome_=castorhome_.replace("/castor/cern.ch/","")
@@ -492,7 +492,7 @@ number_of_jobs = 40
 '''
             dirname_=time+"_"+dirname_[1]+"_"+dirname_[2]
             new_py = re.sub("runOnMC = .*\n",
-                            "runOnMC = false\n",
+                            "runOnMC = False\n",
                             new_py)
         crab_cfg = '''
 [CRAB]
