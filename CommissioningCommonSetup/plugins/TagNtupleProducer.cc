@@ -101,7 +101,7 @@ using namespace ROOT::Math::VectorUtil;
 
 // maximum array size (the arrays are stored with variable size in the root tree)
 const UInt_t MAXJETS = 40;
-const UInt_t MAXTRACKS = 300;
+const UInt_t MAXTRACKS = 1500;
 
 
 class TagNtupleProducer : public edm::EDAnalyzer {
@@ -122,7 +122,7 @@ public:
 									       const reco::BeamSpot& bs) const;
   void getSharedHitsInfo(UInt_t layer, const reco::TrackRefVector & tracks, Int_t &nSharedHits, Int_t &nTotalHits);
   Bool_t GenParticleParentTree( HepMC::GenParticle *genPar );
-  Int_t  hasSharedHit(UInt_t layer, size_t location, const reco::TrackRefVector & tracks);      
+  Bool_t hasSharedHit(UInt_t layer, track_iterator, const reco::TrackRefVector & tracks);      
   // ----------member data ---------------------------
   
   //Input from python config
@@ -228,15 +228,19 @@ public:
   Float_t trackDistJetAxis[MAXTRACKS];
   Float_t trackDeltaR[MAXTRACKS];
   Float_t trackIP3d[MAXTRACKS];
-  Float_t trackIP2d[MAXTRACKS];
   Float_t trackIP3dError[MAXTRACKS];
+  Float_t trackIP3dProbability[MAXTRACKS];
+  Float_t trackIP2d[MAXTRACKS];
   Float_t trackIP2dError[MAXTRACKS];
-  Int_t trackHasSharedPix1[MAXTRACKS];
-  Int_t trackHasSharedPix2[MAXTRACKS];
-  Int_t trackHasSharedPix3[MAXTRACKS];
-  Int_t trackHasSharedPixAll[MAXTRACKS];
+  Float_t trackIP2dProbability[MAXTRACKS];
+  Float_t trackPtRel[MAXTRACKS];
+  Bool_t trackHasSharedPix1[MAXTRACKS];
+  Bool_t trackHasSharedPix2[MAXTRACKS];
+  Bool_t trackHasSharedPix3[MAXTRACKS];
+  Bool_t trackHasSharedPixAll[MAXTRACKS];
   Bool_t trackIsVertexTrack[MAXTRACKS];
   Bool_t trackIsFromB[MAXTRACKS];
+  Bool_t trackIsFromPU[MAXTRACKS];
 
   //MC Truth Information
   Int_t PartonFlavor[MAXJETS];//PartonFlavor==0 means that the jet matches no GEN level parton.It could be a piled-up jet or bad reconstructed jet.One see the algorithms in: http://cmslxr.fnal.gov/lxr/source/PhysicsTools/JetMCAlgos/plugins/JetFlavourIdentifier.cc and http://cmslxr.fnal.gov/lxr/source/PhysicsTools/JetMCAlgos/plugins/JetPartonMatcher.cc                
@@ -282,9 +286,7 @@ public:
                
   //impactParameterTagInfos
   Int_t IPnSelectedTracks[MAXJETS];                       
-  Int_t IPnSelectedPUTracks[MAXJETS];
   Int_t IPnSelectedAndDecayLengthAndJetAsixTracks[MAXJETS];
-  Int_t IPnSelectedAndDecayLengthAndJetAsixPUTracks[MAXJETS];
   math::XYZVector IPghostTrackP3[MAXJETS];      
   Float_t IPghostTrackPt[MAXJETS];                        
   Float_t IPghostTrackPtRel[MAXJETS];                        
@@ -299,31 +301,6 @@ public:
   Int_t   IPPix3TotalHits[MAXJETS];
   Int_t   IPPixAllSharedHits[MAXJETS];
   Int_t   IPPixAllTotalHits[MAXJETS];
-
-  std::vector< Int_t* > IP3dTrackQuality;    
-  std::vector< Int_t* > IP3dHasSharedPix1;
-  std::vector< Int_t* > IP3dHasSharedPix2;
-  std::vector< Int_t* > IP3dHasSharedPix3;
-  std::vector< Int_t* > IP3dHasSharedPixAll;
-  std::vector< Float_t* > IP3d;
-  std::vector< Float_t* > IP3dError;
-  std::vector< Float_t* > IP3dProbability;
-  std::vector< Float_t* > IP3dTrackPtRel;
-  std::vector< Float_t* > IP3dDistJetAxis;
-  std::vector< Float_t* > IP3dDecayLength;
-  std::vector< Float_t* > IP3dDeltaR;
-  std::vector< Float_t* > IP3dMomentum;
-  std::vector< Float_t* > IP3dTransverseMomentum;
-  std::vector< Float_t* > IP3dEta;
-  std::vector< Float_t* > IP3dPhi;
-  std::vector< Int_t* >   IP3dNHits;
-  std::vector< Int_t* >   IP3dNPixelHits;
-  std::vector< Float_t* > IP3dNormChi2;
-  std::vector< Int_t* >   IP2dTrackQuality;    
-  std::vector< Float_t* > IP2d;
-  std::vector< Float_t* > IP2dError;
-  std::vector< Float_t* > IP2dProbability;
-  std::vector< Float_t* > IP2dTrackPtRel;
 
   //softElectronTagInfos
   Int_t nElectrons[MAXJETS]; 
@@ -689,33 +666,6 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
       bTagArrays[ibTag->getParameter<string>("alias")] = new Float_t[MAXJETS];
     }
   
-  for(Int_t i=0; i<4; i++){
-    IP3dTrackQuality.push_back( new Int_t[MAXJETS]);    
-    IP3dHasSharedPix1.push_back(  new Int_t[MAXJETS]);
-    IP3dHasSharedPix2.push_back( new Int_t[MAXJETS]);
-    IP3dHasSharedPix3.push_back( new Int_t[MAXJETS]);
-    IP3dHasSharedPixAll.push_back( new Int_t[MAXJETS]);
-    IP3d.push_back( new Float_t[MAXJETS]);
-    IP3dError.push_back( new Float_t[MAXJETS]);
-    IP3dProbability.push_back( new Float_t[MAXJETS]);
-    IP3dTrackPtRel.push_back( new Float_t[MAXJETS]);
-    IP3dDistJetAxis.push_back( new Float_t[MAXJETS]);
-    IP3dDecayLength.push_back(new Float_t[MAXJETS] );
-    IP3dDeltaR.push_back( new Float_t[MAXJETS]);
-    IP3dMomentum.push_back( new Float_t[MAXJETS]);
-    IP3dTransverseMomentum.push_back( new Float_t[MAXJETS]);
-    IP3dEta.push_back( new Float_t[MAXJETS]);
-    IP3dPhi.push_back( new Float_t[MAXJETS]);
-    IP3dNHits.push_back( new Int_t[MAXJETS]);
-    IP3dNPixelHits.push_back( new Int_t[MAXJETS]);
-    IP3dNormChi2.push_back( new Float_t[MAXJETS]);
-    IP2dTrackQuality.push_back( new Int_t[MAXJETS]);    
-    IP2d.push_back( new Float_t[MAXJETS]);
-    IP2dError.push_back( new Float_t[MAXJETS]);
-    IP2dProbability.push_back( new Float_t[MAXJETS]);
-    IP2dTrackPtRel.push_back( new Float_t[MAXJETS]);
-  }
-  
   muonIsGlobal            .push_back(muon1IsGlobal           ); muonIsGlobal            .push_back(muon2IsGlobal);
   muonIsTracker           .push_back(muon1IsTracker          ); muonIsTracker           .push_back(muon2IsTracker          ); 
   muonIsStandalone        .push_back(muon1IsStandalone       ); muonIsStandalone        .push_back(muon2IsStandalone       ); 
@@ -929,13 +879,16 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   EventInfo->Branch(  "trackDistJetAxis",  trackDistJetAxis, "trackDistJetAxis[nTracks]/F");
   EventInfo->Branch(  "trackDeltaR", trackDeltaR, "trackDeltaR[nTracks]/F");
   EventInfo->Branch(  "trackIP3d", trackIP3d, "trackIP3d[nTracks]/F");
-  EventInfo->Branch(  "trackIP2d",  trackIP2d, "trackIP2d[nTracks]/F");
   EventInfo->Branch(  "trackIP3dError",  trackIP3dError, "trackIP3dError[nTracks]/F");
+  EventInfo->Branch(  "trackIP3dProbability",  trackIP3dProbability, "trackIP3dProbability[nTracks]/F");
+  EventInfo->Branch(  "trackIP2d",  trackIP2d, "trackIP2d[nTracks]/F");
   EventInfo->Branch(  "trackIP2dError",  trackIP2dError, "trackIP2dError[nTracks]/F");
-  EventInfo->Branch(  "trackHasSharedPix1",  trackHasSharedPix1, "trackHasSharedPix1[nTracks]/I");
-  EventInfo->Branch(  "trackHasSharedPix2",  trackHasSharedPix2, "trackHasSharedPix2[nTracks]/I");
-  EventInfo->Branch(  "trackHasSharedPix3",  trackHasSharedPix3, "trackHasSharedPix3[nTracks]/I");
-  EventInfo->Branch(  "trackHasSharedPixAll",  trackHasSharedPixAll, "trackHasSharedPixAll[nTracks]/I");
+  EventInfo->Branch(  "trackIP2dProbability",  trackIP2dProbability, "trackIP2dProbability[nTracks]/F");
+  EventInfo->Branch(  "trackPtRel",  trackPtRel, "trackPtRel[nTracks]/F");
+  EventInfo->Branch(  "trackHasSharedPix1",  trackHasSharedPix1, "trackHasSharedPix1[nTracks]/O");
+  EventInfo->Branch(  "trackHasSharedPix2",  trackHasSharedPix2, "trackHasSharedPix2[nTracks]/O");
+  EventInfo->Branch(  "trackHasSharedPix3",  trackHasSharedPix3, "trackHasSharedPix3[nTracks]/O");
+  EventInfo->Branch(  "trackHasSharedPixAll",  trackHasSharedPixAll, "trackHasSharedPixAll[nTracks]/O");
   EventInfo->Branch( "trackIsVertexTrack", trackIsVertexTrack, "trackIsVertexTrack[nTracks]/O") ;
   EventInfo->Branch( "trackIsFromB", trackIsFromB, "trackIsFromB[nTracks]/O") ;
 
@@ -985,9 +938,8 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
                
   //impactParameterTagInfos
   EventInfo->Branch(  "IPnSelectedTracks",  IPnSelectedTracks, "IPnSelectedTracks[nJets]/I"); 
-  EventInfo->Branch(  "IPnSelectedPUTracks",  IPnSelectedPUTracks, "IPnSelectedPUTracks[nJets]/I"); 
   EventInfo->Branch(  "IPnSelectedAndDecayLengthAndJetAsixTracks",  IPnSelectedAndDecayLengthAndJetAsixTracks, "IPnSelectedAndDecayLengthAndJetAsixTracks[nJets]/I"); 
-  EventInfo->Branch(  "IPnSelectedAndDecayLengthAndJetAsixPUTracks",  IPnSelectedAndDecayLengthAndJetAsixPUTracks, "IPnSelectedAndDecayLengthAndJetAsixPUTracks[nJets]/I"); 
+ 
   //  math::XYZVector "IPghostTrackP3",    [nJets];      
   EventInfo->Branch(  "IPghostTrackPt",  IPghostTrackPt, "IPghostTrackPt[nJets]/F");                        
   EventInfo->Branch(  "IPghostTrackPtRel", IPghostTrackPtRel, "IPghostTrackPtRel[nJets]/F");                        
@@ -1002,58 +954,6 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   EventInfo->Branch(  "IPPix3TotalHits", IPPix3TotalHits, "IPPix3TotalHits[nJets]/I");
   EventInfo->Branch(  "IPPixAllSharedHits", IPPixAllSharedHits, "IPPixAllSharedHits[nJets]/I");
   EventInfo->Branch(  "IPPixAllTotalHits", IPPixAllTotalHits, "IPPixAllTotalHits[nJets]/I");
-
-  for(Int_t i=0; i<4; i++){
-    TString name = "IP3dTrackQuality"; name += (i+1);
-    EventInfo->Branch( name, IP3dTrackQuality[i], name + "[nJets]/I");
-    name = "IP3dHasSharedPix1"; name += (i+1);
-    EventInfo->Branch( name, IP3dHasSharedPix1[i], name + "[nJets]/I");
-    name = "IP3dHasSharedPix2"; name += (i+1);
-    EventInfo->Branch( name, IP3dHasSharedPix2[i], name + "[nJets]/I");
-    name = "IP3dHasSharedPix3"; name += (i+1);
-    EventInfo->Branch( name, IP3dHasSharedPix3[i], name + "[nJets]/I");
-    name = "IP3dHasSharedPixAll"; name += (i+1);
-    EventInfo->Branch( name, IP3dHasSharedPixAll[i], name + "[nJets]/I");
-    name = "IP3d"; name += (i+1);
-    EventInfo->Branch( name, IP3d[i], name + "[nJets]/F");
-    name = "IP3dError"; name += (i+1);
-    EventInfo->Branch( name, IP3dError[i], name + "[nJets]/F");
-    name = "IP3dProbability"; name += (i+1);
-    EventInfo->Branch( name, IP3dProbability[i], name + "[nJets]/F");
-    name = "IP3dTrackPtRel"; name += (i+1);
-    EventInfo->Branch( name, IP3dTrackPtRel[i], name + "[nJets]/F");
-    name = "IP3dDistJetAxis"; name += (i+1);
-    EventInfo->Branch( name, IP3dDistJetAxis[i], name + "[nJets]/F");
-    name = "IP3dDecayLength"; name += (i+1);
-    EventInfo->Branch( name, IP3dDecayLength[i], name + "[nJets]/F");
-    name = "IP3dDeltaR"; name += (i+1);
-    EventInfo->Branch( name, IP3dDeltaR[i], name + "[nJets]/F");
-    name = "IP3dMomentum"; name += (i+1);
-    EventInfo->Branch( name, IP3dMomentum[i], name + "[nJets]/F");
-    name = "IP3dTransverseMomentum"; name += (i+1);
-    EventInfo->Branch( name, IP3dTransverseMomentum[i], name + "[nJets]/F");
-    name = "IP3dEta"; name += (i+1);
-    EventInfo->Branch( name, IP3dEta[i], name + "[nJets]/F");
-    name = "IP3dPhi"; name += (i+1);
-    EventInfo->Branch( name, IP3dPhi[i], name + "[nJets]/F");
-    name = "IP3dNHits"; name += (i+1);
-    EventInfo->Branch( name, IP3dNHits[i], name + "[nJets]/I");
-    name = "IP3dNPixelHits"; name += (i+1);
-    EventInfo->Branch( name, IP3dNPixelHits[i], name + "[nJets]/I");
-    name = "IP3dNormChi2"; name += (i+1);
-    EventInfo->Branch( name, IP3dNormChi2[i], name + "[nJets]/F");
-    name = "IP2dTrackQuality"; name += (i+1);
-    EventInfo->Branch( name, IP2dTrackQuality[i], name + "[nJets]/I");
-    name = "IP2d"; name += (i+1);
-    EventInfo->Branch( name, IP2d[i], name + "[nJets]/F");
-    name = "IP2dError"; name += (i+1);
-    EventInfo->Branch( name, IP2dError[i], name + "[nJets]/F");
-    name = "IP2dProbability"; name += (i+1);
-    EventInfo->Branch( name, IP2dProbability[i], name + "[nJets]/F");
-    name = "IP2dTrackPtRel"; name += (i+1);
-    EventInfo->Branch( name, IP2dTrackPtRel[i], name + "[nJets]/F");
-
-  }
 
   //softElectronTagInfos
   EventInfo->Branch(  "nElectrons",  nElectrons, "nElectrons[nJets]/I");  
@@ -1586,29 +1486,31 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   map< string, reco::JetTagCollection > bTags;
 
-  for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) 
-    {
-      edm::Handle<reco::JetTagCollection> bTagHandle;
-      iEvent.getByLabel(ibTag->getParameter<InputTag>("label"), bTagHandle);
-      bTags[ibTag->getParameter<string>("alias")] = *bTagHandle;
-    }
-
+  for (vector< ParameterSet >::iterator ibTag = bTag_Config_.begin(); ibTag != bTag_Config_.end(); ibTag++) {
+    edm::Handle<reco::JetTagCollection> bTagHandle;
+    iEvent.getByLabel(ibTag->getParameter<InputTag>("label"), bTagHandle);
+    bTags[ibTag->getParameter<string>("alias")] = *bTagHandle;
+  }
   
   //instantiate a tagging variable computer for unification of some calculations like vertex mass corrections
   edm::ESHandle<JetTagComputer> computerHandle;;
-  iSetup.get<JetTagComputerRecord>().get(SVComputer_.label(), computerHandle);
+  iSetup.get<JetTagComputerRecord>().get( SVComputer_.label(), computerHandle );
   const GenericMVAJetTagComputer *computer =
-    dynamic_cast<const GenericMVAJetTagComputer*>(
-						  computerHandle.product());
+    dynamic_cast<const GenericMVAJetTagComputer*>( computerHandle.product() );
   if (!computer){
-    std::cout<<" computer missing !!!"<< std::endl;
+    edm::LogError("DataLost")<<"computer missing !!!"<<endl;
     exit(1);
   }
+
   computer->passEventSetup(iSetup);
   
   Int_t iTotalTracksCounter = 0;
   nJets = jets->size();
-  if(nJets > (Int_t)MAXJETS) return;
+  if ( nJets > (Int_t) MAXJETS ) {
+    edm::LogError("Buffer")<<"increase MAXJETS or set tighter cuts, this event is dropped"<<endl;
+    return;
+  }
+
   //Begin Loop over Jets and record the various information
   for (Int_t iJet = 0; iJet<nJets; iJet++)
     {
@@ -1621,14 +1523,10 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       jetEta[iJet] = (thisJetRef->p4().Eta());
       jetPhi[iJet] = (thisJetRef->p4().Phi());
       //Store some Calo Jet Information:
-      if(const CaloJet* caloJet = dynamic_cast<const CaloJet*>(&(*(thisJetRef.get()) )))
-	{
-	  jetEMFraction[iJet] = (caloJet->emEnergyFraction());
-	}
-      else
-	{
-	  jetEMFraction[iJet] = (-1.0);
-	}
+      if( const CaloJet* caloJet = dynamic_cast<const CaloJet*>(&(*(thisJetRef.get()) )) )
+	jetEMFraction[iJet] = (caloJet->emEnergyFraction());
+      else jetEMFraction[iJet] = (-1.0);
+
       //Store some Particle Flow Jet Information
       if(const PFJet* pfJet = dynamic_cast<const PFJet*>(&(*(thisJetRef.get()) )))
 	{
@@ -1654,9 +1552,6 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       jetVertexChi2[iJet] = (thisJetRef->vertexChi2());
       jetVertexChi2Ndof[iJet] = (thisJetRef->vertexNdof());
       jetVertexNormalizedChi2[iJet] = (thisJetRef->vertexNormalizedChi2());
-
-      //Track Information
-
 
       //Stolen from CMSSW/RecoBTag/ImpactParameter/plugins/TrackIPProducer.cc
       Vertex dummy;
@@ -1685,28 +1580,55 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       PVndof = pv->ndof();
       PVNormalizedChi2 = pv->normalizedChi2();
       //some counters
-      size_t counter=0;
       size_t nSelectedTracks=0;
       size_t nSelectedAndDecayLengthAndJetAsixTracks=0;
-      size_t nSelectedPUTracks=0;
-      size_t nSelectedAndDecayLengthAndJetAsixPUTracks=0;
-    
-      for(track_iterator iTrack = (*jetTracks)[thisJetRef].begin(); iTrack != (*jetTracks)[thisJetRef].end(); iTrack++)
+
+      //jet axis of the selected tracks jet
+      const GlobalVector jetAxis = ipTagInfo[thisJetRef]->axis();
+      const math::XYZVector axis( jetAxis.x(), jetAxis.y(), jetAxis.z());
+      //jet direction
+      GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
+
+      typedef  vector< pair<track_iterator,Measurement1D> > trackSortedQueueVec;
+      trackSortedQueueVec trackSortedQueue;
+      for(track_iterator iTrack = (*jetTracks)[thisJetRef].begin(); iTrack != (*jetTracks)[thisJetRef].end(); iTrack++) {
+	Measurement1D ip3d = IPTools::signedImpactParameter3D( builder->build(*iTrack), direction, *pv).second;
+	trackSortedQueue.push_back( make_pair(iTrack,ip3d) );
+      }
+      
+      if ( !trackSortedQueue.empty() )
+	for(trackSortedQueueVec::iterator iTrack = trackSortedQueue.begin(); iTrack != trackSortedQueue.end()-1; iTrack++)
+	  for (trackSortedQueueVec::iterator jTrack=iTrack+1; jTrack != trackSortedQueue.end(); jTrack++) 
+	    if ( (*iTrack).second.value()<(*jTrack).second.value() ) swap(*iTrack,*jTrack);
+
+      RefVector<TrackCollection> SelectedBTaggingTracks=ipTagInfo[thisJetRef]->selectedTracks();
+      for(trackSortedQueueVec::const_iterator iTrack_iter = trackSortedQueue.begin(); iTrack_iter != trackSortedQueue.end(); iTrack_iter++)
 	{ 
-	  if(iTotalTracksCounter >= (Int_t)MAXTRACKS) return;
+	  track_iterator iTrack=iTrack_iter->first;
+	  if(iTotalTracksCounter >= (Int_t)MAXTRACKS) {
+	    edm::LogError("Buffer")<<"increase MAXTRACKS, this event is dropped"<<endl;
+	    return;
+	  }
 	  
 	  trackJetIndex[iTotalTracksCounter] = iJet;
-	  trackIsFromB[iTotalTracksCounter] = false;
 	  Bool_t isSelected = false;
-	  for(track_iterator jTrack = ipTagInfo[thisJetRef]->selectedTracks().begin(); jTrack != ipTagInfo[thisJetRef]->selectedTracks().end(); jTrack++)
-	    {
-	      if((*iTrack)==(*jTrack)) {
-		isSelected = true;
-		break;
-	      }
+	  trackIsFromPU[iTotalTracksCounter] = false;
+	  trackIsFromB[iTotalTracksCounter] = false;
+	  trackIP3dProbability[iTotalTracksCounter] = -9999.;
+	  trackIP2dProbability[iTotalTracksCounter] = -9999.;
+	  
+	  for(Byte_t jTrack = 0; jTrack<SelectedBTaggingTracks.size(); jTrack ++ ) {
+	    if( (*iTrack)==SelectedBTaggingTracks[jTrack] ) {
+	      trackIP3dProbability[iTotalTracksCounter] = (ipTagInfo[thisJetRef]->probabilities(0)[jTrack]);
+	      trackIP2dProbability[iTotalTracksCounter] = (ipTagInfo[thisJetRef]->probabilities(1)[jTrack]);
+	      isSelected = true;
+	      break;
 	    }
-	
-	  Bool_t isPUTrack=false;
+	  }
+	  
+	  trackPtRel[iTotalTracksCounter] = ( Perp( math::XYZVector( (*iTrack)->px(),(*iTrack)->py(),(*iTrack)->pz() ), 
+						    axis) );
+	  
 	  if (getSimTruth_) {//start investigating if the track is from PU
 	    TrackBase::ParameterVector rParameters = (*iTrack)->parameters();
 	    TrackBase::CovarianceMatrix recoTrackCovMatrix = (*iTrack)->covariance();
@@ -1740,45 +1662,37 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 		}
 	      }while(true);
 	      
-	      if (thisVtx==NULL) isPUTrack=true;
-	      if ( thisTrk==STC.end() ) isPUTrack=true;
-	      else if ( thisTrk->noGenpart() ) isPUTrack=true;
+	      if (thisVtx==NULL) trackIsFromPU[iTotalTracksCounter]=true;
+	      if ( thisTrk==STC.end() ) trackIsFromPU[iTotalTracksCounter]=true;
+	      else if ( thisTrk->noGenpart() ) trackIsFromPU[iTotalTracksCounter]=true;
 	      else trackIsFromB[iTotalTracksCounter]=GenParticleParentTree( HepGenEvent->barcode_to_particle(thisTrk->genpartIndex()) );
 
-	      if (isPUTrack&&numberOfPUVertices==0) {
-		isPUTrack=false;
+	      if (trackIsFromPU[iTotalTracksCounter]&&numberOfPUVertices==0) {
+		trackIsFromPU[iTotalTracksCounter]=false;
 		edm::LogError("SimBug")<<"Found a PU track in PU0 event."<<endl;
 	      }
 	    }
 	    else {
-	      isPUTrack=false;
-	      edm::LogWarning("MCMatching")<<"No matched SimTrack. Increase TrackMCTruthMatchChi2Cut??"<<endl;
+	      trackIsFromPU[iTotalTracksCounter]=false;
+	      edm::LogInfo("MCMatching")<<"No matched SimTrack. Increase TrackMCTruthMatchChi2Cut??"<<endl;
 	    }
 	  }//end of getSimTruth
 
-	  if(isSelected) {
-	    nSelectedTracks++;
-	    if (isPUTrack) nSelectedPUTracks++;
-	  }
-
+	  if(isSelected) nSelectedTracks++;
+	  
 	  // check if track is attached to a vertex
 	  trackIsVertexTrack[iTotalTracksCounter] = false;
-	  Bool_t hasVertex = svTagInfo[thisJetRef]->nVertices() > 0;
-	  if(hasVertex)
-	    {
-	      const Vertex &sv = svTagInfo[thisJetRef]->secondaryVertex(0);
-	      for(Vertex::trackRef_iterator iter = sv.tracks_begin();
-		  iter != sv.tracks_end(); iter++) {
-		if (sv.trackWeight(*iter) < 0.5)
-		  continue;
-		
-		TrackRef vtxTrackRef =  (*iter).castTo<TrackRef>();
-
-		if( vtxTrackRef == (*iTrack) ){
-		  trackIsVertexTrack[iTotalTracksCounter] = true;
-		}
-	      }
+	  if( svTagInfo[thisJetRef]->nVertices() > 0 ) {
+	    const Vertex &sv = svTagInfo[thisJetRef]->secondaryVertex(0);
+	    for(Vertex::trackRef_iterator iter = sv.tracks_begin();
+		iter != sv.tracks_end(); iter++) {
+	      if (sv.trackWeight(*iter) < 0.5) continue;
+	      
+	      TrackRef vtxTrackRef =  (*iter).castTo<TrackRef>();
+	      
+	      if( vtxTrackRef == (*iTrack) ) trackIsVertexTrack[iTotalTracksCounter] = true;
 	    }
+	  }
 
 	  trackSelected[iTotalTracksCounter] = (isSelected);
 	  track3Momentum[iTotalTracksCounter] = (math::XYZVector((*iTrack)->px(),(*iTrack)->py(),(*iTrack)->pz()));
@@ -1800,12 +1714,10 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  }
 	  trackLongitudinalImpactParameter[iTotalTracksCounter] = ((*iTrack)->dz(pv->position()));
   	  TransientTrack transientTrack = builder->build(*iTrack);
-  	  GlobalVector direction(thisJetRef->momentum().x(), thisJetRef->momentum().y(), thisJetRef->momentum().z());
-  	  Measurement1D ip3d = IPTools::signedImpactParameter3D(transientTrack, direction, *pv).second;
-  	  Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
-  	  trackIP3d[iTotalTracksCounter] = (ip3d.value());
+   	  Measurement1D ip2d = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pv).second;
+  	  trackIP3d[iTotalTracksCounter] = (iTrack_iter->second.value());
   	  trackIP2d[iTotalTracksCounter] = (ip2d.value());
-  	  trackIP3dError[iTotalTracksCounter] = (ip3d.error());
+  	  trackIP3dError[iTotalTracksCounter] = (iTrack_iter->second.error());
   	  trackIP2dError[iTotalTracksCounter] = (ip2d.error());
 	  Double_t decayLength=-1;
 	  TrajectoryStateOnSurface closest =
@@ -1825,18 +1737,26 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  trackDeltaR[iTotalTracksCounter] = ( ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),(*iTrack)->momentum()) );
 
 	  if (isSelected && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixTracks++;
-	  if (isSelected && isPUTrack && decayLength < 5 && fabs(distJetAxis) < 0.07) nSelectedAndDecayLengthAndJetAsixPUTracks++;
 
 	  if(getSharedHitInfo_) {
-	    Int_t tsharedP1, tsharedP2, tsharedP3;
-	    trackHasSharedPix1[iTotalTracksCounter] = ( tsharedP1 = hasSharedHit(1, counter, (*jetTracks)[thisJetRef]));
-	    trackHasSharedPix2[iTotalTracksCounter] = ( tsharedP2 = hasSharedHit(2, counter, (*jetTracks)[thisJetRef]));
-	    trackHasSharedPix3[iTotalTracksCounter] = ( tsharedP3 = hasSharedHit(3, counter, (*jetTracks)[thisJetRef]));
+	    Bool_t tsharedP1, tsharedP2, tsharedP3;
+	    trackHasSharedPix1[iTotalTracksCounter] = ( tsharedP1 = hasSharedHit(1, iTrack, (*jetTracks)[thisJetRef]));
+	    trackHasSharedPix2[iTotalTracksCounter] = ( tsharedP2 = hasSharedHit(2, iTrack, (*jetTracks)[thisJetRef]));
+	    trackHasSharedPix3[iTotalTracksCounter] = ( tsharedP3 = hasSharedHit(3, iTrack, (*jetTracks)[thisJetRef]));
 	    trackHasSharedPixAll[iTotalTracksCounter] = ( tsharedP1 || tsharedP2 || tsharedP3 );
 	  }
-	  counter++;
+	  else {
+	    trackHasSharedPix1[iTotalTracksCounter] = false;
+	    trackHasSharedPix2[iTotalTracksCounter] = false;
+	    trackHasSharedPix3[iTotalTracksCounter] = false;
+	    trackHasSharedPixAll[iTotalTracksCounter] = false;
+	  }
+
 	  iTotalTracksCounter++;
-	}       
+	}
+      
+      IPnSelectedTracks[iJet] = nSelectedTracks;                       
+      IPnSelectedAndDecayLengthAndJetAsixTracks[iJet] = nSelectedAndDecayLengthAndJetAsixTracks;                       
 
       //MC Truth Information
       reco::GenJetRef GenJet;
@@ -1884,10 +1804,9 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       }
       
       //secondaryVertexTagInfos:
-      
+
       SVnSelectedTracks[iJet] = (svTagInfo[thisJetRef]->nSelectedTracks());  
-      Bool_t hasVertex = svTagInfo[thisJetRef]->nVertices() > 0;
-      if(hasVertex)
+      if( svTagInfo[thisJetRef]->nVertices() > 0 )
 	{
 	  // Compute tagging variables
 	  std::vector<const reco::BaseTagInfo*>  baseTagInfos;
@@ -2036,18 +1955,10 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 	}
       
-      
-      //impactParameterTagInfos
+      //impactParameterTagInfos ghost track
    
-      const GlobalVector jetAxis = ipTagInfo[thisJetRef]->axis();
-      const math::XYZVector axis( jetAxis.x(), jetAxis.y(), jetAxis.z());
       const math::XYZVector ghostTrack(ipTagInfo[thisJetRef]->ghostTrack()->px(),ipTagInfo[thisJetRef]->ghostTrack()->py(),ipTagInfo[thisJetRef]->ghostTrack()->pz());
 
-      //	  IPnSelectedTracks.push_back(ipTagInfo[thisJetRef]->selectedTracks().size());                       
-      IPnSelectedTracks[iJet] = nSelectedTracks;                       
-      IPnSelectedPUTracks[iJet] = nSelectedPUTracks;                       
-      IPnSelectedAndDecayLengthAndJetAsixTracks[iJet] = nSelectedAndDecayLengthAndJetAsixTracks;                       
-      IPnSelectedAndDecayLengthAndJetAsixPUTracks[iJet] = nSelectedAndDecayLengthAndJetAsixPUTracks;                       
       IPghostTrackP3[iJet] = (ghostTrack);
       IPghostTrackPt[iJet] = (ipTagInfo[thisJetRef]->ghostTrack()->pt());                        
       IPghostTrackPtRel[iJet] = (Perp(ghostTrack,axis));
@@ -2055,6 +1966,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       IPghostTrackPhi[iJet] = (ipTagInfo[thisJetRef]->ghostTrack()->phi());                       
       IPghostTrackDeltaR[iJet] = (deltaR(thisJetRef->eta(), thisJetRef->phi(), ipTagInfo[thisJetRef]->ghostTrack()->eta(), ipTagInfo[thisJetRef]->ghostTrack()->phi()));                    
 
+      //impactParameterTagInfos pixel hits
       if(getSharedHitInfo_) {
 	Int_t nPix1Shared, nPix1Total;
 	Int_t nPix2Shared, nPix2Total;
@@ -2069,97 +1981,6 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	IPPixAllTotalHits[iJet] = (nPix1Total + nPix2Total + nPix3Total); IPPixAllSharedHits[iJet] = (nPix1Shared + nPix2Shared + nPix3Shared);
       }
       
-      for(UInt_t iTrack = 0; iTrack < 4; iTrack++)
-	{
-	  if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
-	    {
-	      size_t location3D = ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig)[iTrack];
-	      for(Int_t i = 2; i>-2; i--){
-		if(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->quality(reco::TrackBase::TrackQuality(i))){
-		  IP3dTrackQuality[iTrack][iJet] = (i);
-		  break;
-		}
-	      }
-
-	      if(getSharedHitInfo_) {
-		Int_t sharedP1, sharedP2, sharedP3;
-		IP3dHasSharedPix1[iTrack][iJet] = (sharedP1=hasSharedHit(1, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
-		IP3dHasSharedPix2[iTrack][iJet] = (sharedP2=hasSharedHit(2, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
-		IP3dHasSharedPix3[iTrack][iJet] = (sharedP3=hasSharedHit(3, location3D,  ipTagInfo[thisJetRef]->selectedTracks()));
-		IP3dHasSharedPixAll[iTrack][iJet] = ( sharedP1 || sharedP2 || sharedP3  );
-	      }
-	      
-	      IP3d[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.value());
-	      IP3dError[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location3D].ip3d.error());
-	      IP3dProbability[iTrack][iJet] = (ipTagInfo[thisJetRef]->probabilities(0)[location3D]);
-	      const math::XYZVector thisTrack(ipTagInfo[thisJetRef]->selectedTracks()[location3D]->px(),
-					      ipTagInfo[thisJetRef]->selectedTracks()[location3D]->py(),
-					      ipTagInfo[thisJetRef]->selectedTracks()[location3D]->pz());
-	      IP3dTrackPtRel[iTrack][iJet] = ( Perp(thisTrack,axis ) );
-	      IP3dDistJetAxis[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location3D].distanceToJetAxis.value());
-	      IP3dDecayLength[iTrack][iJet] = ( (ipTagInfo[thisJetRef]->impactParameterData()[location3D].closestToJetAxis 
-						 -  RecoVertex::convertPos(pv->position())).mag() );
-	      IP3dDeltaR[iTrack][iJet] = (  ROOT::Math::VectorUtil::DeltaR(thisJetRef->momentum(),ipTagInfo[thisJetRef]->selectedTracks()[location3D]->momentum()) );
-	      IP3dMomentum[iTrack][iJet] = (ipTagInfo[thisJetRef]->selectedTracks()[location3D]->p() );
-	      IP3dTransverseMomentum[iTrack][iJet] = ( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->pt() );
-	      IP3dEta[iTrack][iJet] = ( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->eta() );
-	      IP3dPhi[iTrack][iJet] = ( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->phi() );
-	      IP3dNHits[iTrack][iJet] = ( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->hitPattern().numberOfValidHits() ); 
-	      IP3dNPixelHits[iTrack][iJet] = ( ipTagInfo[thisJetRef]->selectedTracks()[location3D]->hitPattern().numberOfValidPixelHits() ); 
-	      IP3dNormChi2[iTrack][iJet] = (  ipTagInfo[thisJetRef]->selectedTracks()[location3D]->normalizedChi2() );
-	    }
-	  else
-	    {
-	      IP3dHasSharedPix1[iTrack][iJet] = (-1);
-	      IP3dHasSharedPix2[iTrack][iJet] = (-1);
-	      IP3dHasSharedPix3[iTrack][iJet] = (-1);
-	      IP3dHasSharedPixAll[iTrack][iJet] = (-1);
-
-	      IP3dTrackQuality[iTrack][iJet] = (-100);
-	      IP3d[iTrack][iJet] = (-100.0);
-	      IP3dError[iTrack][iJet] = (-1.0);
-	      IP3dProbability[iTrack][iJet] = (-1.0);
-	      IP3dTrackPtRel[iTrack][iJet] = (-1.0);
-	      IP3dDistJetAxis[iTrack][iJet] = (-100);
-	      IP3dDecayLength[iTrack][iJet] = (-100);
-	      IP3dDeltaR[iTrack][iJet] = (-100);
-	      IP3dMomentum[iTrack][iJet] = (-100);
-	      IP3dTransverseMomentum[iTrack][iJet] = (-100);
-	      IP3dEta[iTrack][iJet] = (-100);
-	      IP3dPhi[iTrack][iJet] = (-100);
-	      IP3dNHits[iTrack][iJet] = ( -100);
-	      IP3dNPixelHits[iTrack][iJet] = (-100);
-	      IP3dNormChi2[iTrack][iJet] = ( -100 );
-	    }
-	  if(iTrack <  ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP3DSig).size())
-	    {
-	      size_t location2D = ipTagInfo[thisJetRef]->sortedIndexes(TrackIPTagInfo::IP2DSig)[iTrack];
-	      for(Int_t i = 2; i>-2; i--){
-		if(ipTagInfo[thisJetRef]->selectedTracks()[location2D]->quality(reco::TrackBase::TrackQuality(i))){
-		  IP2dTrackQuality[iTrack][iJet] = (i);
-		  break;
-		}
-	      }
-	      IP2d[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location2D].ip2d.value());
-	      IP2dError[iTrack][iJet] = (ipTagInfo[thisJetRef]->impactParameterData()[location2D].ip2d.error());
-	      IP2dProbability[iTrack][iJet] = (ipTagInfo[thisJetRef]->probabilities(1)[location2D]);
-	      const math::XYZVector thisTrack(ipTagInfo[thisJetRef]->selectedTracks()[location2D]->px(),
-					      ipTagInfo[thisJetRef]->selectedTracks()[location2D]->py(),
-					      ipTagInfo[thisJetRef]->selectedTracks()[location2D]->pz());
-	      IP2dTrackPtRel[iTrack][iJet] = ( Perp(thisTrack,axis ) );
-
-	    }
-	  else
-	    {
-	      IP2dTrackQuality[iTrack][iJet] = (-100);
-	      IP2d[iTrack][iJet] = (-100.0);
-	      IP2dError[iTrack][iJet] = (-1.0);
-	      IP2dProbability[iTrack][iJet] = (-1.0);
-	      IP2dTrackPtRel[iTrack][iJet] = (-1.0);
-	    }
-	} 
-      
-
       //softElectronTagInfos
 
       for(UInt_t i=0; i<4; i++){
@@ -2175,7 +1996,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	electronTrackQuality[i][iJet] = (-9999 );
 	electronSip2d[i][iJet] = (-9999);   
 	electronIp2d[i][iJet] = (-9999 );   
-	electronIpe2d[i][iJet] = ( -9999 );   		       
+	electronIpe2d[i][iJet] = (-9999);   		       
 	electronSip3d[i][iJet] = (-9999);   
 	electronIp3d[i][iJet] = (-9999 );   
 	electronIpe3d[i][iJet] = ( -9999 );   
@@ -2196,8 +2017,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	electrondeltaPhiEleClusterTrackAtCalo[i][iJet] = (-9999);
       } 
 
-      Bool_t hasLeptons = softElectronTagInfo[thisJetRef]->leptons() > 0;
-      if(hasLeptons)
+      if( softElectronTagInfo[thisJetRef]->leptons() > 0 )
 	{
 	  nElectrons[iJet] = (softElectronTagInfo[thisJetRef]->leptons());
 
@@ -2327,8 +2147,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
       }
 
-      hasLeptons = softMuonTagInfo[thisJetRef]->leptons() > 0;
-      if(hasLeptons)
+      if ( softMuonTagInfo[thisJetRef]->leptons() > 0 )
 	{
 	  nMuons[iJet] = (softMuonTagInfo[thisJetRef]->leptons());
 	      
@@ -2432,9 +2251,7 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-void TagNtupleProducer::beginJob()
-{
-}
+void TagNtupleProducer::beginJob() {}
 
 //copied and modified from http://www.codeproject.com/KB/string/wildcmp.aspx
 //It does not belong to any class
@@ -2529,6 +2346,36 @@ void TagNtupleProducer::endJob() {
   file->Close();
 }
 
+//take it from
+// http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/SimTracker/TrackAssociation/src/TrackAssociatorByChi2.cc?revision=1.41&view=markup
+std::pair<Bool_t,reco::TrackBase::ParameterVector> 
+TagNtupleProducer::parametersAtClosestApproach(Basic3DVector<Double_t> vertex,
+					       Basic3DVector<Double_t> momAtVtx,
+					       Float_t charge,
+					       const reco::BeamSpot& bs) const{
+  
+  TrackBase::ParameterVector sParameters;
+  try {
+    FreeTrajectoryState ftsAtProduction(GlobalPoint(vertex.x(),vertex.y(),vertex.z()),
+					GlobalVector(momAtVtx.x(),momAtVtx.y(),momAtVtx.z()),
+					TrackCharge(charge),
+					theMF.product());
+    TSCBLBuilderNoMaterial tscblBuilder;
+    TrajectoryStateClosestToBeamLine tsAtClosestApproach = tscblBuilder(ftsAtProduction,bs);//as in TrackProducerAlgorithm
+    
+    GlobalPoint v = tsAtClosestApproach.trackStateAtPCA().position();
+    GlobalVector p = tsAtClosestApproach.trackStateAtPCA().momentum();
+    sParameters[0] = tsAtClosestApproach.trackStateAtPCA().charge()/p.mag();
+    sParameters[1] = Geom::halfPi() - p.theta();
+    sParameters[2] = p.phi();
+    sParameters[3] = (-v.x()*sin(p.phi())+v.y()*cos(p.phi()));
+    sParameters[4] = v.z()*p.perp()/p.mag() - (v.x()*p.x()+v.y()*p.y())/p.perp() * p.z()/p.mag();
+    
+    return pair<Bool_t,TrackBase::ParameterVector>(true,sParameters);
+  } catch ( ... ) {
+    return pair<Bool_t,TrackBase::ParameterVector>(false,sParameters);
+  }
+}
 
 void TagNtupleProducer::getSharedHitsInfo(UInt_t layer, const reco::TrackRefVector & tracks, Int_t &nSharedHits, Int_t &nTotalHits){
 
@@ -2577,46 +2424,11 @@ void TagNtupleProducer::getSharedHitsInfo(UInt_t layer, const reco::TrackRefVect
   }
 }
 
-//take it from
-// http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/SimTracker/TrackAssociation/src/TrackAssociatorByChi2.cc?revision=1.41&view=markup
-std::pair<Bool_t,reco::TrackBase::ParameterVector> 
-TagNtupleProducer::parametersAtClosestApproach(Basic3DVector<Double_t> vertex,
-					       Basic3DVector<Double_t> momAtVtx,
-					       Float_t charge,
-					       const reco::BeamSpot& bs) const{
-  
-  TrackBase::ParameterVector sParameters;
-  try {
-    FreeTrajectoryState ftsAtProduction(GlobalPoint(vertex.x(),vertex.y(),vertex.z()),
-					GlobalVector(momAtVtx.x(),momAtVtx.y(),momAtVtx.z()),
-					TrackCharge(charge),
-					theMF.product());
-    TSCBLBuilderNoMaterial tscblBuilder;
-    TrajectoryStateClosestToBeamLine tsAtClosestApproach = tscblBuilder(ftsAtProduction,bs);//as in TrackProducerAlgorithm
-    
-    GlobalPoint v = tsAtClosestApproach.trackStateAtPCA().position();
-    GlobalVector p = tsAtClosestApproach.trackStateAtPCA().momentum();
-    sParameters[0] = tsAtClosestApproach.trackStateAtPCA().charge()/p.mag();
-    sParameters[1] = Geom::halfPi() - p.theta();
-    sParameters[2] = p.phi();
-    sParameters[3] = (-v.x()*sin(p.phi())+v.y()*cos(p.phi()));
-    sParameters[4] = v.z()*p.perp()/p.mag() - (v.x()*p.x()+v.y()*p.y())/p.perp() * p.z()/p.mag();
-    
-    return pair<Bool_t,TrackBase::ParameterVector>(true,sParameters);
-  } catch ( ... ) {
-    return pair<Bool_t,TrackBase::ParameterVector>(false,sParameters);
-  }
-}
-
-Int_t TagNtupleProducer::hasSharedHit(UInt_t layer, size_t location, const reco::TrackRefVector & tracks){
-
-  Int_t bFoundHit=0;
-
+Bool_t TagNtupleProducer::hasSharedHit(UInt_t layer, track_iterator thisTrack, const reco::TrackRefVector & tracks) {
   //iterate over hits of this track 
-  for(trackingRecHit_iterator hitIt = tracks[location]->recHitsBegin(); hitIt != tracks[location]->recHitsEnd(); hitIt++  ){
+  for(trackingRecHit_iterator hitIt = (*thisTrack)->recHitsBegin(); hitIt != (*thisTrack)->recHitsEnd(); hitIt++  ){
     if( !(*hitIt)->isValid() ) continue;
    
-
     DetId detid = (*hitIt)->geographicalId();
     UInt_t subdet = detid.subdetId();
     
@@ -2632,27 +2444,19 @@ Int_t TagNtupleProducer::hasSharedHit(UInt_t layer, size_t location, const reco:
     }
     
     // if they are on the desired layer
-    if(layer == thislayer){
-      //iterate over all other tracks avoiding Double_t counting
-      size_t counter = 0;
-       
+    if(layer == thislayer)  //iterate over all other tracks avoiding double counting
       for(track_iterator itTrack2 = tracks.begin(); itTrack2!=tracks.end(); itTrack2++){
-	if(counter==location){ counter++; continue;}  //avoid double counting track 
+	if (thisTrack==itTrack2) continue;//avoid double counting track 
 	// iterate again over hits
 	for(trackingRecHit_iterator hitIt2 = (*itTrack2)->recHitsBegin(); hitIt2 != (*itTrack2)->recHitsEnd(); hitIt2++  ){
 	  if( !(*hitIt2)->isValid() ) continue;
 	  DetId detid2 = (*hitIt2)->geographicalId();
-	  if( detid.rawId() == detid2.rawId()  ){
-	    // check identity via
-	    if( (*hitIt)->sharesInput( &(**hitIt2), TrackingRecHit::some )) bFoundHit=1; 
-	  }
+	  if( detid.rawId() == detid2.rawId()  )// check identity via
+	    if( (*hitIt)->sharesInput( &(**hitIt2), TrackingRecHit::some )) return true;
 	}
-	counter++;
       }
-    }
   }
-
-  return bFoundHit;
+  return false;
 }
 
 Bool_t TagNtupleProducer::GenParticleParentTree( HepMC::GenParticle *genPar ) {
