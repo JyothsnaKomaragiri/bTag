@@ -891,6 +891,7 @@ TagNtupleProducer::TagNtupleProducer(const edm::ParameterSet& iConfig):
   EventInfo->Branch(  "trackHasSharedPixAll",  trackHasSharedPixAll, "trackHasSharedPixAll[nTracks]/O");
   EventInfo->Branch( "trackIsVertexTrack", trackIsVertexTrack, "trackIsVertexTrack[nTracks]/O") ;
   EventInfo->Branch( "trackIsFromB", trackIsFromB, "trackIsFromB[nTracks]/O") ;
+  EventInfo->Branch( "trackIsFromPU", trackIsFromPU, "trackIsFromPU[nTracks]/O") ;
 
   //MC Truth Information
   EventInfo->Branch(  "MCTrueFlavor", PartonFlavor, "MCTrueFlavor[nJets]/I"); 
