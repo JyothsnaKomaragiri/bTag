@@ -28,8 +28,9 @@ DATALIST=[
 #"/QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6/Fall11-Peak32PU_START42_V14B-v1/GEN-SIM-RECO",
 #"/Jet/Run2011B-PromptReco-v1/AOD",
 #"/Jet/Run2012A-PromptReco-v1/AOD",
-"/BTag/Run2012A-PromptReco-v1/AOD",
-#"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-PU_S7_START52_V5-v1/AODSIM"
+#"/BTag/Run2012A-PromptReco-v1/AOD",
+"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-NoPileUp_START52_V9-v5/AODSIM",
+"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-PU_S7_START52_V5-v1/AODSIM"
           ]
 HLTProc="HLT"
 runOnMC = True
@@ -70,8 +71,8 @@ else:
 
 process.source = cms.Source("PoolSource",
 #    fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_Chamonix_TTbar_AODSIM.root")
-#   fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/k/kkaadze/BTagging/QCD_Fall11_44_Pt80to120_RECODEBUG.root")
-                            fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Summer12_QCD15to3000.root")
+#                            fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/k/kkaadze/BTagging/QCD_Fall11_44_Pt80to120_RECODEBUG.root")
+                           fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Summer12_QCD15to3000.root")
 #    fileNames = cms.untracked.vstring("rfio:/dpm/in2p3.fr/home/cms/phedex/store/data/Run2012A/Jet/AOD/PromptReco-v1/000/190/934/304B8EF5-CE85-E111-B4DF-003048F110BE.root")
 #    fileNames = cms.untracked.vstring("file:/storage1/cms/jandrea/425MC/TTJets_TuneZ2_7TeV/TTJets_TuneZ2_7TeV/NTuple_67_1_HhM.root")
 #fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD.root",
@@ -455,7 +456,7 @@ process.MessageLogger.cerr.threshold = cms.untracked.string('WARNING')
 
 import sys,os,datetime,re
 
-if __name__ == '__main__':
+if sys.argv[0] != "cmsRun":
     castorhome_=os.getenv("CASTOR_HOME")
     home_=os.getenv("HOME")
     castorhome_=castorhome_.replace("/castor/cern.ch/","")
@@ -466,7 +467,7 @@ if __name__ == '__main__':
         new_py = new_py.replace(needdel.group(1),"")
         crab_py_start_index=new_py.find(']')
         crab_py_end_index=new_py.rfind("\nimport sys,os,datetime,re")
-        new_py = new_py[crab_py_start_index+1:crab_py_end_index-1]
+        new_py = new_py[crab_py_start_index+1:crab_py_end_index]
         new_py = re.sub("input = cms.untracked.int32(.*)",
                         "input = cms.untracked.int32(-1)",
                         new_py)
@@ -477,10 +478,10 @@ if __name__ == '__main__':
 total_number_of_events = -1
 number_of_jobs = 128
 '''
-            dirname_ = re.sub("_Tune.*", "",dirname_[1])
-            dirname_=time+"_"+dirname_
+#            dirname_ = re.sub("_Tune.*", "",dirname_[1])
+            dirname_=time+"_"+dirname_[1]+"_"+dirname_[2]
             new_py = re.sub("runOnMC = .*\n",
-                            "runOnMC = true\n",
+                            "runOnMC = True\n",
                             new_py)
         else:
             print 'Submitting %s as DATA' % dataset_
