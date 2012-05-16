@@ -39,7 +39,10 @@ usePFnoPU = True
 import FWCore.ParameterSet.Config as cms
 
 #JetSelection
-JetCut=cms.string("pt > 30.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99")
+if usePFnoPU :
+   JetCut=cms.string("pt > 30.0 && abs(eta) < 2.4")
+else:
+   JetCut=cms.string("pt > 30.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99")
 
 # It will select the events based on the TriggerSelections. The ntuple will only save the triggers whose name matches any entry in TriggerSelections
 TriggerSelections=cms.vstring("HLT_*Jet*")
@@ -483,10 +486,10 @@ number_of_jobs = 128
         else:
             print 'Submitting %s as DATA' % dataset_
             jobcontrol_='''
-lumi_mask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/DCSOnly/json_DCSONLY.txt
-/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Prompt/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt
+lumi_mask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/Prompt/Cert_190456-193557_8TeV_PromptReco_Collisions12_JSON.txt
+#/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Prompt/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt
 total_number_of_lumis = -1
-number_of_jobs = 40
+number_of_jobs = 240
 '''
             dirname_=time+"_"+dirname_[1]+"_"+dirname_[2]
             new_py = re.sub("runOnMC = .*\n",
@@ -502,6 +505,9 @@ datasetpath = %(dataset_)s
 pset = bTagNtupleMaker_crab.py
 output_file = standardPFNtuple.root
 %(jobcontrol_)s
+
+[GRID] 
+ce_black_list=T2_BR_SPRACE
 
 [USER]
 ui_working_dir = %(home_)s/scratch0/crab_bTaggingNtuple_%(dirname_)s
