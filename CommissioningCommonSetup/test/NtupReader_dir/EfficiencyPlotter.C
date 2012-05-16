@@ -1,5 +1,5 @@
 #define btagNtupReader_cxx
-#define JET 
+//#define GENJET 
 #include "Configuration.h"
 //////Keywords List for argv[1]:
 //(1)efficiencies under different discriminators: SSVHE SSVHP TCHE TCHP JetP JetBP CSVPF CSVMVA
@@ -13,13 +13,17 @@
 //#define GENJET //Generated Jets (after hardonization)
 //#define CLEANMCTRUTHFLAVORBYPUTRACK //MC with sim information only
 //#define CLEANMCTRUTHFLAVORBYDecayLengthAndJetAsixPUTRACK // MC with sim information only 
-#define JetCut(iJet) WhichPt[iJet]>20&&fabs(WhichEta[iJet])<2.4&&jetNeutralEmEnergyFraction[iJet]<0.99&&jetnConstituents[iJet]>1&&jetChargedHadronEnergyFraction[iJet]>0.0&&jetChargedMultiplicity[iJet]>0.0&&jetChargedEmEnergyFraction[iJet]<0.99
-#define EventCut numberOfPUVertices<MAXPU// comment it out to drop the Event cut
+#define JetCut(iJet) fabs(WhichEta[iJet])<2.4//Do not apply pt cut here. It will fill all into ptbins. For udsgvsb or cvsb plots, it will use (PTVAL,max) bins of the 2D histos.
+#if bTagNtupleVersion>4
+#define EventCut numberOfPUVerticesMixingTruth<MAXPU//&&HLTAcceptance("HLT_PFJet40")// comment it out to drop the Event cut
+#else
+#define EventCut numberOfPUVertices<MAXPU//&&HLTAcceptance("HLT_PFJet40")// comment it out to drop the Event cut
+#endif
 //----------------------(B)Pileup Variables--------------------------------
 //------------the PU bins-------------------------------------
 //the largest PU should be MAXPU but not MAXPU-1
-const Byte_t PU_Bin_LowEdge[]={0,12};
-const Byte_t PU_Bin_HighEdge[]={0,16};
+const Byte_t PU_Bin_LowEdge[]={10,25,35};
+const Byte_t PU_Bin_HighEdge[]={12,30,40};
 const Byte_t PU_nBins=sizeof(PU_Bin_LowEdge)/sizeof(Byte_t);
 //MC PU distribution
 //----------------------(C)Options particularly for pt/eta plots---------------
@@ -238,6 +242,7 @@ public :
   Plotting(string filename):btagNtupReader(filename){
   //Speed up by opening only useful branches
     fChain->SetBranchStatus("*",0);
+    fChain->SetBranchStatus("HLTriggerResults",1);
     fChain->SetBranchStatus("pthat*",1);
     fChain->SetBranchStatus("nJets*",1);
     fChain->SetBranchStatus("nTracks*",1);
@@ -273,8 +278,10 @@ public :
   virtual void FlavourHist(DiscriminatorOption option, const Float_t weight, DistributionPlots2D **VsJetPt, DistributionPlots2D **VsJetEta, DistributionPlots2D **VsJetPhi=NULL, DistributionPlots2D **VsEventPtHat=NULL);
   virtual void MeanPt(DistributionPlots1D **TotalPt, DistributionPlots1D **TotalEntries);
   virtual void UncertaintyOfMeanPt(DistributionPlots1D *Average, DistributionPlots1D **Variance,Byte_t PU_LowEdge,Byte_t PU_HighEdge);
-#if bTagNtupleVersion>=4
+#if bTagNtupleVersion==4
   virtual void NPUTracks(DistributionPlots2D *,DistributionPlots2D *,DistributionPlots2D *,DistributionPlots2D *);
+#endif
+#if bTagNtupleVersion>=4
   virtual void MCPtvsRecoPt(DistributionPlots2D **GenPtvsJetPt, DistributionPlots2D **PartonvsJetPt, DistributionPlots1D **, DistributionPlots1D **);
 #endif
   virtual void PileUpDistribution(TH1D* dis) {
@@ -1058,6 +1065,8 @@ void Load(const char options[]="TCHP",Float_t RequiredBEff=-1., Float_t Required
   if ( strstr(options,"MCPt")!=NULL ) {
     MCPtvsRecoPt(MC,options);
   }
+#endif
+#if bTagNtupleVersion==4
   if ( strstr(options,"NPUTracks")!=NULL ) {
     const Byte_t MAXPUTrack=10, NPercents=25;
     Float_t NTracks[MAXPUTrack+2],PUs[MAXPU+2],Percents[NPercents+1];
@@ -1396,6 +1405,9 @@ void Plotting::FlavourHist(DiscriminatorOption option, const Float_t weight, Dis
     Float_t MeanZ[30];
     Jet_MeanTrackLongitudinalIP(MeanZ);
 #endif
+#if bTagNtupleVersion>4
+    numberOfPUVertices=UInt_t(numberOfPUVerticesMixingTruth);
+#endif
     for ( Byte_t iJet=0; iJet<nJets; iJet++ ) {
       if (!(JetCut(iJet))) continue;
       Float_t this_variable=Var[iJet];
@@ -1412,7 +1424,7 @@ void Plotting::FlavourHist(DiscriminatorOption option, const Float_t weight, Dis
 //Jets which are heavily biased by PU tracks are considered as no flavor (PU)
   cout<<Nevents<<" events were considered."<<endl;
 }
-#if bTagNtupleVersion>=4
+#if bTagNtupleVersion==4
 void Plotting::NPUTracks(DistributionPlots2D *NJetPlots,DistributionPlots2D *RatioPlots,DistributionPlots2D *NJetPlotswtDecayLengthAndJetAxisCut,DistributionPlots2D *RatioPlotswtDecayLengthAndJetAxisCut) {
   if (fChain == 0) return;
   Long64_t nentries = fChain->GetEntries();
@@ -1425,6 +1437,9 @@ void Plotting::NPUTracks(DistributionPlots2D *NJetPlots,DistributionPlots2D *Rat
 #ifdef CALJETMEANZ
     Float_t MeanZ[30];
     Jet_MeanTrackLongitudinalIP(MeanZ);
+#endif
+#if bTagNtupleVersion>4
+    numberOfPUVertices=UInt_t(numberOfPUVerticesMixingTruth);
 #endif
     for ( Byte_t iJet=0; iJet<nJets; iJet++ ) {
       if (!(JetCut(iJet))) continue;
@@ -1441,7 +1456,9 @@ void Plotting::NPUTracks(DistributionPlots2D *NJetPlots,DistributionPlots2D *Rat
     }
   }
 }
+#endif
 
+#if bTagNtupleVersion>=4
 void Plotting::MCPtvsRecoPt(DistributionPlots2D **GenPtvsJetPt, DistributionPlots2D **PartonvsJetPt, DistributionPlots1D **BiasFromGenPt, DistributionPlots1D **BiasFromPartonPt) {
   if (fChain == 0) return;
     Long64_t Nevents=0;
@@ -1455,6 +1472,9 @@ void Plotting::MCPtvsRecoPt(DistributionPlots2D **GenPtvsJetPt, DistributionPlot
 #ifdef CALJETMEANZ
     Float_t MeanZ[30];
     Jet_MeanTrackLongitudinalIP(MeanZ);
+#endif
+#if bTagNtupleVersion>4
+    numberOfPUVertices=UInt_t(numberOfPUVerticesMixingTruth);
 #endif
     for ( Byte_t iJet=0; iJet<nJets; iJet++ ) {
 #ifdef JetCut
@@ -1493,6 +1513,9 @@ void Plotting::MeanPt(DistributionPlots1D **TotalPt, DistributionPlots1D **Total
     Float_t MeanZ[30];
     Jet_MeanTrackLongitudinalIP(MeanZ);
 #endif
+#if bTagNtupleVersion>4
+    numberOfPUVertices=UInt_t(numberOfPUVerticesMixingTruth);
+#endif
     for ( Byte_t iJet=0; iJet<nJets; iJet++ ) {
 #ifdef JetCut
       if (!(JetCut(iJet))) continue;
@@ -1519,6 +1542,9 @@ void Plotting::UncertaintyOfMeanPt(DistributionPlots1D *Average, DistributionPlo
     fChain->GetEntry(jentry);
 #ifdef EventCut
     if (!(EventCut)) continue;
+#endif
+#if bTagNtupleVersion>4
+    numberOfPUVertices=UInt_t(numberOfPUVerticesMixingTruth);
 #endif
     if (numberOfPUVertices<PU_LowEdge||numberOfPUVertices>PU_HighEdge) continue;
 #ifdef CALJETMEANZ

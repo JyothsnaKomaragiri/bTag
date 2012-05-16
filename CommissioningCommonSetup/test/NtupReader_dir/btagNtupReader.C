@@ -18,26 +18,6 @@
 
 Float_t bEnrichCutSal=1.0;
 
-class Plotter : public btagNtupReader{
-public:
-  Plotter(string filename):btagNtupReader(filename){};
-  virtual void     Loop(Bool_t isRealData, Float_t weight, const string resultfilename);
-  virtual void     AddHisto(vector<TH1F*> &HistoBtag, string name,  const int& j, string title,  const int& nbins, const Float_t& min, const Float_t& max);
-  virtual void     AddHisto2D(vector<TH2F*> &Histo2DB, string name,  const int& j, string title, const int& nbins, const Float_t& min, const Float_t& max, const int& nbinsy, const Float_t& miny, const Float_t& maxy);
-  virtual void PileUpDistribution(TH1D* dis) {
-     if (fChain == 0) return;
-     Long64_t nentries = fChain->GetEntries();//GetEntriesFast() will give you something wrong in the first running
-     for (Long64_t jentry=0; jentry<nentries;jentry++) {
-       if ( LoadTree(jentry) < 0 ) break;
-       fChain->GetEntry(jentry);
-#if bTagNtupleVersion>4
-       dis->Fill(numberOfPUVerticesMixingTruth);
-#else
-       dis->Fill(numberOfPUVertices);
-#endif
-     }
-  }
-};
 // TO BE DEFINED FIRST !
 #if DATAYEAR==2012
 #if PTVAL == 30 && defined(RUN_ON_JET)
@@ -58,6 +38,7 @@ TString my_trigger_path="HLT_PFJet80";Float_t JetPtthresholdsfornmu=-1; Float_t 
 
 #if PTVAL == 140 && defined(RUN_ON_JET)
 TString my_trigger_path="HLT_PFJet140";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=140.;
+#define MaxJetPt 300
 #endif
 
 #endif
@@ -89,26 +70,47 @@ TString my_trigger_path="HLT_Jet80";Float_t JetPtthresholdsfornmu=-1; Float_t cu
 TString my_trigger_path="HLT_Jet110";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=110.;
 #endif
 
-#if PTVAL == 20 && !defined(RUN_ON_JET)
+#if PTVAL == 20 && !defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";Float_t JetPtthresholdsfornmu=20.; Float_t cutJetPt=45.; Float_t cutMuonPt=7.;
 #endif
 
-#if PTVAL == 40 && !defined(RUN_ON_JET)
+#if PTVAL == 40 && !defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";Float_t JetPtthresholdsfornmu=60.; Float_t cutJetPt=65.; Float_t cutMuonPt=7.;
 #endif
 
-#if PTVAL == 60 && !defined(RUN_ON_JET)
+#if PTVAL == 60 && !defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet60_Mu7";Float_t JetPtthresholdsfornmu=90; Float_t cutJetPt=95.; Float_t cutMuonPt=9.;
 #endif
 
-#if PTVAL == 70 && !defined(RUN_ON_JET)
+#if PTVAL == 70 && !defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet70_Mu5";Float_t JetPtthresholdsfornmu=100; Float_t cutJetPt=105.; Float_t cutMuonPt=7.;
 #endif
 
-#if PTVAL == 110 && !defined(RUN_ON_JET)
+#if PTVAL == 110 && !defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet110_Mu5";Float_t JetPtthresholdsfornmu=155;/*130?*/ Float_t cutJetPt=160.; Float_t cutMuonPt=7.;
 #endif
 #endif
+
+class Plotter : public btagNtupReader{
+public:
+  Plotter(string filename):btagNtupReader(filename){};
+  virtual void     Loop(Bool_t isRealData, Float_t weight, const string resultfilename);
+  virtual void     AddHisto(vector<TH1F*> &HistoBtag, string name,  const int& j, string title,  const int& nbins, const Float_t& min, const Float_t& max);
+  virtual void     AddHisto2D(vector<TH2F*> &Histo2DB, string name,  const int& j, string title, const int& nbins, const Float_t& min, const Float_t& max, const int& nbinsy, const Float_t& miny, const Float_t& maxy);
+  virtual void PileUpDistribution(TH1D* dis) {
+     if (fChain == 0) return;
+     Long64_t nentries = fChain->GetEntries();//GetEntriesFast() will give you something wrong in the first running
+     for (Long64_t jentry=0; jentry<nentries;jentry++) {
+       if ( LoadTree(jentry) < 0 ) break;
+       fChain->GetEntry(jentry);
+#if bTagNtupleVersion>4
+       dis->Fill(numberOfPUVerticesMixingTruth);
+#else
+       dis->Fill(numberOfPUVertices);
+#endif
+     }
+  }
+};
 
 Float_t puweight[MAXPU+1];
 TString final_dir;
@@ -632,7 +634,11 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
   // in this case, do not put "j" but 0!
   // example : 
   // AddHisto(HistoBtag, "another_new_histo", 0,"Test Caro 2",50,0.,1.);
-  AddHisto2D(Histo2DB, "pu_vs_pv", 0,"pu vs pv",60,0,MAXPU, 60,0,MAXPU); //2D-0
+  AddHisto2D(Histo2DB, "pu_vs_pv", 0,"pu vs pv",MAXPU,0,MAXPU, MAXPU,0,MAXPU); //2D-0
+  AddHisto2D(Histo2DB, "ip3dvsphi",0,"ip3d vs phi",60,-3.14,3.14,20000,-35.,35.); //2D-1
+  AddHisto2D(Histo2DB, "ip2dvsphi",0,"ip2d vs phi",60,-3.14,3.14,20000,-1.,1.); //2D-2
+  AddHisto2D(Histo2DB, "ip3dsigvsphi",0,"ip3dsig vs phi",60,-3.14,3.14,2000,-35.,35.); //2D-3
+  AddHisto2D(Histo2DB, "ip2dsigvsphi",0,"ip2dsig vs phi",60,-3.14,3.14,2000,-35.,35.); //2D-4
 
   cout << " # histos created : " << HistoBtag.size() << " (nhisto_to_clone : " << nhisto_to_clone  << ")" << endl;
   /*
@@ -703,8 +709,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
     bool cut_trigger= false;
 
     UInt_t prescale=1;
-    // HLT_BTagMu_DiJet20_Mu5
-#if bTagNtupleVersion>3
+#if bTagNtupleVersion>=4
     if (JetPtthresholdsfornmu>0) {//"<0" means that we are not studying BTagMu trigger.
       UInt_t nmu=0;
       for (int i=0; i<nJets; i++)
@@ -729,6 +734,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
       for (int i=0; i<nJets; i++)
 	if (-2.4<jetEta[i] && jetEta[i]<2.4 && jetPt[i]>JetPtthresholdsfornmu) nmu++;
 
+    // HLT_BTagMu_DiJet20_Mu5
     if (my_trigger_path=="HLT_BTagMu_DiJet20_Mu5") {
       if (isRealData && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
 	if ( triggerHLT_BTagMu_DiJet20_Mu5 && nmu>1 ) {
@@ -799,7 +805,6 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
       }
     }
 
-
     // HLT_Jet60
     else if (my_trigger_path=="HLT_Jet60") {
       if (isRealData && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
@@ -847,23 +852,6 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
         }
       }
     }
-    
-    // HLT_PFJet140
-    else if (my_trigger_path=="HLT_PFJet140") {
-      if (isRealData && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
-        if ( triggerHLT_PFJet140 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_PFJet140;
-        }
-      }
-      else { // APPLIED ON MC AND DATA 2010
-        if ( triggerHLT_PFJet140 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_PFJet140;
-        }
-      }
-    }    
-    
 #endif //endof bTagNtupleVersion<=3
 
     if (cut_trigger) {
@@ -886,7 +874,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 
       for (int i=0; i<nJets; i++) {
 	// cut on Muon in jets from plot_muJet.cfg
-#if Run_on_Btag == true
+#ifdef RUN_ON_BTAG
 	Bool_t cut_mu_pass=false;
 	if (muon1Pt[i]> cutMuonPt     && TMath::Abs(muon1Eta[i]) < 2.4 && muon1IsGlobal[i] == 1     && 
 	    muon1GlobalMuonHits[i]> 0 && muon1NumberOfMatches[i]>1     && muon1InnerValidHits[i]>10 &&
@@ -898,7 +886,10 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 	Bool_t cut_mu_pass=true;// BYPASS THIS CUT IF YOU DON'T CARE ABOUT MUON IN JET
 #endif
 
-	if (jetPt[i]<300 &&jetPt[i]>cutJetPt && -2.4<jetEta[i] && jetEta[i]<2.4 && cut_mu_pass) {
+#ifdef MAXJETPT
+	if ( jetPt[i]<MAXJETPT )
+#endif
+	  if (jetPt[i]>cutJetPt && -2.4<jetEta[i] && jetEta[i]<2.4 && cut_mu_pass) {
 	  for (int j=0; j<jmax; j++) {
 	    int ok=0;
 	    if (j==0) ok=1;  // everyone 
@@ -1022,6 +1013,9 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 
 	      // info on tracks
 	      int ntrack_jet=0;
+#if bTagNtupleVersion>=5
+          int nselectedtrack_jet=0;
+#endif
 	      int nseltrack_jet=0;
 	      int ncutseltrack_jet=0;
 	      int n1_ip=-1;
@@ -1059,6 +1053,12 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 		  if (TMath::Abs(trackLongitudinalImpactParameter[k]) < 17) cut2=true;
 		  if (trackTransverseMomentum[k]> 1 && TMath::Abs(trackIP2d[k]) < 0.2) cut3=true;
 		  if (TMath::Abs(trackDistJetAxis[k])< 0.07 && trackDecayLength[k]< 5) cut4=true;
+		  if (trackSelected[k] && trackTransverseMomentum[k]>4 && fabs(trackEta[k])<1.0 ) {
+		    Histo2DB[1+jmax*nhisto_to_clone2D]->Fill(trackPhi[k],trackIP3d[k], weight);
+		    Histo2DB[2+jmax*nhisto_to_clone2D]->Fill(trackPhi[k],trackIP2d[k], weight);
+		    Histo2DB[3+jmax*nhisto_to_clone2D]->Fill(trackPhi[k],trackIP3d[k]/trackIP3dError[k], weight);
+		    Histo2DB[4+jmax*nhisto_to_clone2D]->Fill(trackPhi[k],trackIP2d[k]/trackIP2dError[k], weight);
+		  }
 		  if (trackNormChi2[k]< 5 && trackNPixelHits[k] >=2 && cut2 && cut3 && cut4) HistoBtag[21+j*nhisto_to_clone]->Fill(trackNHits[k], weight);
 		  if (trackNormChi2[k]< 5 && trackNHits[k]>= 8      && cut2 && cut3 && cut4) HistoBtag[22+j*nhisto_to_clone]->Fill(trackNPixelHits[k], weight);
 		  if (trackNHits[k]>= 8   && trackNPixelHits[k] >=2 && cut2 && cut3 && cut4) HistoBtag[23+j*nhisto_to_clone]->Fill(trackNormChi2[k], weight);
@@ -1163,12 +1163,22 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 		      sig3_ip=sig;
 		      n3_ip=k;
 		    }
+#if bTagNtupleVersion>=5
+		    if ( nselectedtrack_jet<3 && trackSelected[k] ) {
+		      if (TMath::Abs(trackDistJetAxis[k]) < 0.07 && trackDecayLength[k] < 5 && trackIP3d[k]>-99 && trackIP3dError[k]>-0.5) {  
+			HistoBtag[38+nselectedtrack_jet*3+j*nhisto_to_clone]->Fill(trackIP3d[k], weight);
+			HistoBtag[39+nselectedtrack_jet*3+j*nhisto_to_clone]->Fill(trackIP3d[k]/trackIP3dError[k], weight);
+			HistoBtag[40+nselectedtrack_jet*3+j*nhisto_to_clone]->Fill(trackIP3d[k]/trackIP3dError[k], weight);
+		      }
+		      nselectedtrack_jet++;
+		    }
+#endif
 		  }  
 		} // end trackJetIndex
 	      } // end nTracks loop
 	      HistoBtag[9+j*nhisto_to_clone]->Fill(ntrack_jet, weight);  // ntracks_jet
 	      HistoBtag[11+j*nhisto_to_clone]->Fill(nseltrack_jet, weight); // nseltracks_jet
-
+#if bTagNtupleVersion<=4
 	      // IP
 	      if (TMath::Abs(IP3dDistJetAxis1[i]) < 0.07 && IP3dDecayLength1[i] < 5 && IP3d1[i]>-99 && IP3dError1[i]>-0.5) {  
 		HistoBtag[38+j*nhisto_to_clone]->Fill(IP3d1[i], weight);
@@ -1185,6 +1195,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 		HistoBtag[45+j*nhisto_to_clone]->Fill(IP3d3[i]/IP3dError3[i], weight);
 		HistoBtag[46+j*nhisto_to_clone]->Fill(IP3d3[i]/IP3dError3[i], weight);
 	      }
+#endif
 
 	      // tracks sorted by ip
 	      if (n1_ip>-1)  {
@@ -1292,8 +1303,6 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 	      Histo2DB[3+j*nhisto_to_clone2D]->Fill(jetPt[i],ntrack_jet, weight);
 	      Histo2DB[4+j*nhisto_to_clone2D]->Fill(jetPt[i],nseltrack_jet, weight);
 	      Histo2DB[5+j*nhisto_to_clone2D]->Fill(jetPt[i],ncutseltrack_jet, weight);
-
-		    
 
 	      // SV
 	      Histo2DB[0+j*nhisto_to_clone2D]->Fill(jetPt[i],SVnVertexTracks[i], weight);
@@ -1445,7 +1454,6 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 		Histo2DB[6+j*nhisto_to_clone2D]->Fill(jetPt[i], SVMass[i], weight);
 			
 	      } // end cut SVnVertices
-
                 // muon info
 	      HistoBtag[83+j*nhisto_to_clone]->Fill(nMuons[i], weight);
 
@@ -1566,8 +1574,8 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 	} //jet cut (Pt, Eta)
       } // end loop i : Jet
     } // cut trigger
-        
   } // loop event
+
   clog<<"\r"<<"Calculating "<<nentries<<"/"<<nentries<<"(100/100%)"<<endl;
   TString rootfiletofill = final_dir+"/"+resultfilename+".root";
   TFile* fout  = new TFile(rootfiletofill,"RECREATE");
