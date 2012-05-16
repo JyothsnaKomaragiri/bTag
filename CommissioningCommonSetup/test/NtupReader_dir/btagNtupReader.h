@@ -5,8 +5,8 @@
 
 #if !defined(btagNtupReader_h) && defined(bTagNtupleVersion)
 #define btagNtupReader_h
-#define MAXNJets 30
-#define MAXNTracks 500
+#define MAXNJets 40
+#define MAXNTracks 1500
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -53,9 +53,6 @@ public :
    UInt_t          runNumber;
    UInt_t          lumiBlockNumber;
    UInt_t          numberOfPUVertices;
-#if bTagNtupleVersion > 4
-   Float_t          numberOfPUVerticesMixingTruth;
-#endif
    UInt_t          numberOfPUVerticesTot;
    UInt_t          numberOfPrimaryVertices;
    UInt_t          numberOfTracksAtPV;
@@ -105,10 +102,6 @@ public :
    Float_t         trackIP2d[MAXNTracks];   //[nTracks]
    Float_t         trackIP3dError[MAXNTracks];   //[nTracks]
    Float_t         trackIP2dError[MAXNTracks];   //[nTracks]
-   Int_t           trackHasSharedPix1[MAXNTracks];   //[nTracks]
-   Int_t           trackHasSharedPix2[MAXNTracks];   //[nTracks]
-   Int_t           trackHasSharedPix3[MAXNTracks];   //[nTracks]
-   Int_t           trackHasSharedPixAll[MAXNTracks];   //[nTracks]
    Bool_t          trackIsVertexTrack[MAXNTracks];   //[nTracks]
    Int_t           MCTrueFlavor[MAXNJets];   //[nJets]
    Float_t         SV3dDistance[MAXNJets];   //[nJets]
@@ -153,102 +146,6 @@ public :
    Int_t           IPPix3TotalHits[MAXNJets];   //[nJets]
    Int_t           IPPixAllSharedHits[MAXNJets];   //[nJets]
    Int_t           IPPixAllTotalHits[MAXNJets];   //[nJets]
-   Int_t           IP3dTrackQuality1[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix11[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix21[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix31[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPixAll1[MAXNJets];   //[nJets]
-   Float_t         IP3d1[MAXNJets];   //[nJets]
-   Float_t         IP3dError1[MAXNJets];   //[nJets]
-   Float_t         IP3dProbability1[MAXNJets];   //[nJets]
-   Float_t         IP3dTrackPtRel1[MAXNJets];   //[nJets]
-   Float_t         IP3dDistJetAxis1[MAXNJets];   //[nJets]
-   Float_t         IP3dDecayLength1[MAXNJets];   //[nJets]
-   Float_t         IP3dDeltaR1[MAXNJets];   //[nJets]
-   Float_t         IP3dMomentum1[MAXNJets];   //[nJets]
-   Float_t         IP3dTransverseMomentum1[MAXNJets];   //[nJets]
-   Float_t         IP3dEta1[MAXNJets];   //[nJets]
-   Float_t         IP3dPhi1[MAXNJets];   //[nJets]
-   Int_t           IP3dNHits1[MAXNJets];   //[nJets]
-   Int_t           IP3dNPixelHits1[MAXNJets];   //[nJets]
-   Float_t         IP3dNormChi21[MAXNJets];   //[nJets]
-   Int_t           IP2dTrackQuality1[MAXNJets];   //[nJets]
-   Float_t         IP2d1[MAXNJets];   //[nJets]
-   Float_t         IP2dError1[MAXNJets];   //[nJets]
-   Float_t         IP2dProbability1[MAXNJets];   //[nJets]
-   Float_t         IP2dTrackPtRel1[MAXNJets];   //[nJets]
-   Int_t           IP3dTrackQuality2[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix12[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix22[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix32[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPixAll2[MAXNJets];   //[nJets]
-   Float_t         IP3d2[MAXNJets];   //[nJets]
-   Float_t         IP3dError2[MAXNJets];   //[nJets]
-   Float_t         IP3dProbability2[MAXNJets];   //[nJets]
-   Float_t         IP3dTrackPtRel2[MAXNJets];   //[nJets]
-   Float_t         IP3dDistJetAxis2[MAXNJets];   //[nJets]
-   Float_t         IP3dDecayLength2[MAXNJets];   //[nJets]
-   Float_t         IP3dDeltaR2[MAXNJets];   //[nJets]
-   Float_t         IP3dMomentum2[MAXNJets];   //[nJets]
-   Float_t         IP3dTransverseMomentum2[MAXNJets];   //[nJets]
-   Float_t         IP3dEta2[MAXNJets];   //[nJets]
-   Float_t         IP3dPhi2[MAXNJets];   //[nJets]
-   Int_t           IP3dNHits2[MAXNJets];   //[nJets]
-   Int_t           IP3dNPixelHits2[MAXNJets];   //[nJets]
-   Float_t         IP3dNormChi22[MAXNJets];   //[nJets]
-   Int_t           IP2dTrackQuality2[MAXNJets];   //[nJets]
-   Float_t         IP2d2[MAXNJets];   //[nJets]
-   Float_t         IP2dError2[MAXNJets];   //[nJets]
-   Float_t         IP2dProbability2[MAXNJets];   //[nJets]
-   Float_t         IP2dTrackPtRel2[MAXNJets];   //[nJets]
-   Int_t           IP3dTrackQuality3[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix13[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix23[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix33[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPixAll3[MAXNJets];   //[nJets]
-   Float_t         IP3d3[MAXNJets];   //[nJets]
-   Float_t         IP3dError3[MAXNJets];   //[nJets]
-   Float_t         IP3dProbability3[MAXNJets];   //[nJets]
-   Float_t         IP3dTrackPtRel3[MAXNJets];   //[nJets]
-   Float_t         IP3dDistJetAxis3[MAXNJets];   //[nJets]
-   Float_t         IP3dDecayLength3[MAXNJets];   //[nJets]
-   Float_t         IP3dDeltaR3[MAXNJets];   //[nJets]
-   Float_t         IP3dMomentum3[MAXNJets];   //[nJets]
-   Float_t         IP3dTransverseMomentum3[MAXNJets];   //[nJets]
-   Float_t         IP3dEta3[MAXNJets];   //[nJets]
-   Float_t         IP3dPhi3[MAXNJets];   //[nJets]
-   Int_t           IP3dNHits3[MAXNJets];   //[nJets]
-   Int_t           IP3dNPixelHits3[MAXNJets];   //[nJets]
-   Float_t         IP3dNormChi23[MAXNJets];   //[nJets]
-   Int_t           IP2dTrackQuality3[MAXNJets];   //[nJets]
-   Float_t         IP2d3[MAXNJets];   //[nJets]
-   Float_t         IP2dError3[MAXNJets];   //[nJets]
-   Float_t         IP2dProbability3[MAXNJets];   //[nJets]
-   Float_t         IP2dTrackPtRel3[MAXNJets];   //[nJets]
-   Int_t           IP3dTrackQuality4[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix14[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix24[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPix34[MAXNJets];   //[nJets]
-   Int_t           IP3dHasSharedPixAll4[MAXNJets];   //[nJets]
-   Float_t         IP3d4[MAXNJets];   //[nJets]
-   Float_t         IP3dError4[MAXNJets];   //[nJets]
-   Float_t         IP3dProbability4[MAXNJets];   //[nJets]
-   Float_t         IP3dTrackPtRel4[MAXNJets];   //[nJets]
-   Float_t         IP3dDistJetAxis4[MAXNJets];   //[nJets]
-   Float_t         IP3dDecayLength4[MAXNJets];   //[nJets]
-   Float_t         IP3dDeltaR4[MAXNJets];   //[nJets]
-   Float_t         IP3dMomentum4[MAXNJets];   //[nJets]
-   Float_t         IP3dTransverseMomentum4[MAXNJets];   //[nJets]
-   Float_t         IP3dEta4[MAXNJets];   //[nJets]
-   Float_t         IP3dPhi4[MAXNJets];   //[nJets]
-   Int_t           IP3dNHits4[MAXNJets];   //[nJets]
-   Int_t           IP3dNPixelHits4[MAXNJets];   //[nJets]
-   Float_t         IP3dNormChi24[MAXNJets];   //[nJets]
-   Int_t           IP2dTrackQuality4[MAXNJets];   //[nJets]
-   Float_t         IP2d4[MAXNJets];   //[nJets]
-   Float_t         IP2dError4[MAXNJets];   //[nJets]
-   Float_t         IP2dProbability4[MAXNJets];   //[nJets]
-   Float_t         IP2dTrackPtRel4[MAXNJets];   //[nJets]
    Int_t           nElectrons[MAXNJets];   //[nJets]
 
    Int_t           nMuons[MAXNJets];   //[nJets]
@@ -376,14 +273,10 @@ public :
    Float_t         standardTrackCountingHighPurPFBJetTags[MAXNJets];   //[nJets]
 
    // List of branches
-
    TBranch        *b_eventNumber;   //!
    TBranch        *b_runNumber;   //!
    TBranch        *b_lumiBlockNumber;   //!
    TBranch        *b_numberOfPUVertices;   //!
-#if bTagNtupleVersion > 4
-   TBranch        *b_numberOfPUVerticesMixingTruth;   //!
-#endif
    TBranch        *b_numberOfPUVerticesTot;   //!
    TBranch        *b_numberOfPrimaryVertices;   //!
    TBranch        *b_numberOfTracksAtPV;   //!
@@ -481,104 +374,7 @@ public :
    TBranch        *b_IPPix3TotalHits;   //!
    TBranch        *b_IPPixAllSharedHits;   //!
    TBranch        *b_IPPixAllTotalHits;   //!
-   TBranch        *b_IP3dTrackQuality1;   //!
-   TBranch        *b_IP3dHasSharedPix11;   //!
-   TBranch        *b_IP3dHasSharedPix21;   //!
-   TBranch        *b_IP3dHasSharedPix31;   //!
-   TBranch        *b_IP3dHasSharedPixAll1;   //!
-   TBranch        *b_IP3d1;   //!
-   TBranch        *b_IP3dError1;   //!
-   TBranch        *b_IP3dProbability1;   //!
-   TBranch        *b_IP3dTrackPtRel1;   //!
-   TBranch        *b_IP3dDistJetAxis1;   //!
-   TBranch        *b_IP3dDecayLength1;   //!
-   TBranch        *b_IP3dDeltaR1;   //!
-   TBranch        *b_IP3dMomentum1;   //!
-   TBranch        *b_IP3dTransverseMomentum1;   //!
-   TBranch        *b_IP3dEta1;   //!
-   TBranch        *b_IP3dPhi1;   //!
-   TBranch        *b_IP3dNHits1;   //!
-   TBranch        *b_IP3dNPixelHits1;   //!
-   TBranch        *b_IP3dNormChi21;   //!
-   TBranch        *b_IP2dTrackQuality1;   //!
-   TBranch        *b_IP2d1;   //!
-   TBranch        *b_IP2dError1;   //!
-   TBranch        *b_IP2dProbability1;   //!
-   TBranch        *b_IP2dTrackPtRel1;   //!
-   TBranch        *b_IP3dTrackQuality2;   //!
-   TBranch        *b_IP3dHasSharedPix12;   //!
-   TBranch        *b_IP3dHasSharedPix22;   //!
-   TBranch        *b_IP3dHasSharedPix32;   //!
-   TBranch        *b_IP3dHasSharedPixAll2;   //!
-   TBranch        *b_IP3d2;   //!
-   TBranch        *b_IP3dError2;   //!
-   TBranch        *b_IP3dProbability2;   //!
-   TBranch        *b_IP3dTrackPtRel2;   //!
-   TBranch        *b_IP3dDistJetAxis2;   //!
-   TBranch        *b_IP3dDecayLength2;   //!
-   TBranch        *b_IP3dDeltaR2;   //!
-   TBranch        *b_IP3dMomentum2;   //!
-   TBranch        *b_IP3dTransverseMomentum2;   //!
-   TBranch        *b_IP3dEta2;   //!
-   TBranch        *b_IP3dPhi2;   //!
-   TBranch        *b_IP3dNHits2;   //!
-   TBranch        *b_IP3dNPixelHits2;   //!
-   TBranch        *b_IP3dNormChi22;   //!
-   TBranch        *b_IP2dTrackQuality2;   //!
-   TBranch        *b_IP2d2;   //!
-   TBranch        *b_IP2dError2;   //!
-   TBranch        *b_IP2dProbability2;   //!
-   TBranch        *b_IP2dTrackPtRel2;   //!
-   TBranch        *b_IP3dTrackQuality3;   //!
-   TBranch        *b_IP3dHasSharedPix13;   //!
-   TBranch        *b_IP3dHasSharedPix23;   //!
-   TBranch        *b_IP3dHasSharedPix33;   //!
-   TBranch        *b_IP3dHasSharedPixAll3;   //!
-   TBranch        *b_IP3d3;   //!
-   TBranch        *b_IP3dError3;   //!
-   TBranch        *b_IP3dProbability3;   //!
-   TBranch        *b_IP3dTrackPtRel3;   //!
-   TBranch        *b_IP3dDistJetAxis3;   //!
-   TBranch        *b_IP3dDecayLength3;   //!
-   TBranch        *b_IP3dDeltaR3;   //!
-   TBranch        *b_IP3dMomentum3;   //!
-   TBranch        *b_IP3dTransverseMomentum3;   //!
-   TBranch        *b_IP3dEta3;   //!
-   TBranch        *b_IP3dPhi3;   //!
-   TBranch        *b_IP3dNHits3;   //!
-   TBranch        *b_IP3dNPixelHits3;   //!
-   TBranch        *b_IP3dNormChi23;   //!
-   TBranch        *b_IP2dTrackQuality3;   //!
-   TBranch        *b_IP2d3;   //!
-   TBranch        *b_IP2dError3;   //!
-   TBranch        *b_IP2dProbability3;   //!
-   TBranch        *b_IP2dTrackPtRel3;   //!
-   TBranch        *b_IP3dTrackQuality4;   //!
-   TBranch        *b_IP3dHasSharedPix14;   //!
-   TBranch        *b_IP3dHasSharedPix24;   //!
-   TBranch        *b_IP3dHasSharedPix34;   //!
-   TBranch        *b_IP3dHasSharedPixAll4;   //!
-   TBranch        *b_IP3d4;   //!
-   TBranch        *b_IP3dError4;   //!
-   TBranch        *b_IP3dProbability4;   //!
-   TBranch        *b_IP3dTrackPtRel4;   //!
-   TBranch        *b_IP3dDistJetAxis4;   //!
-   TBranch        *b_IP3dDecayLength4;   //!
-   TBranch        *b_IP3dDeltaR4;   //!
-   TBranch        *b_IP3dMomentum4;   //!
-   TBranch        *b_IP3dTransverseMomentum4;   //!
-   TBranch        *b_IP3dEta4;   //!
-   TBranch        *b_IP3dPhi4;   //!
-   TBranch        *b_IP3dNHits4;   //!
-   TBranch        *b_IP3dNPixelHits4;   //!
-   TBranch        *b_IP3dNormChi24;   //!
-   TBranch        *b_IP2dTrackQuality4;   //!
-   TBranch        *b_IP2d4;   //!
-   TBranch        *b_IP2dError4;   //!
-   TBranch        *b_IP2dProbability4;   //!
-   TBranch        *b_IP2dTrackPtRel4;   //!
    TBranch        *b_nElectrons;   //!
-
    TBranch        *b_nMuons;   //!
    TBranch        *b_muon1IsGlobal;   //!
    TBranch        *b_muon1IsTracker;   //!
@@ -704,7 +500,224 @@ public :
    TBranch        *b_standardTrackCountingHighPurPFBJetTags;   //!
 
 //from newest version to old versions
-#if bTagNtupleVersion > 3
+#if bTagNtupleVersion >= 5
+   Float_t         numberOfPUVerticesMixingTruth;
+   Float_t         trackIP3dProbability[MAXNTracks];   //[nTracks]
+   Float_t         trackIP2dProbability[MAXNTracks];   //[nTracks]
+   Float_t         trackPtRel[MAXNTracks];   //[nTracks]
+   Bool_t           trackHasSharedPix1[MAXNTracks];   //[nTracks]
+   Bool_t           trackHasSharedPix2[MAXNTracks];   //[nTracks]
+   Bool_t           trackHasSharedPix3[MAXNTracks];   //[nTracks]
+   Bool_t           trackHasSharedPixAll[MAXNTracks];   //[nTracks] 
+   Bool_t          trackIsFromB[MAXNTracks];   //[nTracks]
+   Bool_t          trackIsFromPU[MAXNTracks];   //[nTracks]
+   TBranch        *b_numberOfPUVerticesMixingTruth;   //!
+   TBranch        *b_trackIP3dProbability;   //!
+   TBranch        *b_trackIP2dProbability;   //!
+   TBranch        *b_trackPtRel;   //!
+   TBranch        *b_trackIsFromB;   //!
+   TBranch        *b_trackIsFromPU;   //!
+#else
+   Int_t           trackHasSharedPix1[MAXNTracks];   //[nTracks]
+   Int_t           trackHasSharedPix2[MAXNTracks];   //[nTracks]
+   Int_t           trackHasSharedPix3[MAXNTracks];   //[nTracks]
+   Int_t           trackHasSharedPixAll[MAXNTracks];   //[nTracks]
+
+   Int_t           IP3dTrackQuality1[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix11[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix21[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix31[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPixAll1[MAXNJets];   //[nJets]
+   Float_t         IP3d1[MAXNJets];   //[nJets]
+   Float_t         IP3dError1[MAXNJets];   //[nJets]
+   Float_t         IP3dProbability1[MAXNJets];   //[nJets]
+   Float_t         IP3dTrackPtRel1[MAXNJets];   //[nJets]
+   Float_t         IP3dDistJetAxis1[MAXNJets];   //[nJets]
+   Float_t         IP3dDecayLength1[MAXNJets];   //[nJets]
+   Float_t         IP3dDeltaR1[MAXNJets];   //[nJets]
+   Float_t         IP3dMomentum1[MAXNJets];   //[nJets]
+   Float_t         IP3dTransverseMomentum1[MAXNJets];   //[nJets]
+   Float_t         IP3dEta1[MAXNJets];   //[nJets]
+   Float_t         IP3dPhi1[MAXNJets];   //[nJets]
+   Int_t           IP3dNHits1[MAXNJets];   //[nJets]
+   Int_t           IP3dNPixelHits1[MAXNJets];   //[nJets]
+   Float_t         IP3dNormChi21[MAXNJets];   //[nJets]
+   Int_t           IP2dTrackQuality1[MAXNJets];   //[nJets]
+   Float_t         IP2d1[MAXNJets];   //[nJets]
+   Float_t         IP2dError1[MAXNJets];   //[nJets]
+   Float_t         IP2dProbability1[MAXNJets];   //[nJets]
+   Float_t         IP2dTrackPtRel1[MAXNJets];   //[nJets]
+   Int_t           IP3dTrackQuality2[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix12[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix22[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix32[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPixAll2[MAXNJets];   //[nJets]
+   Float_t         IP3d2[MAXNJets];   //[nJets]
+   Float_t         IP3dError2[MAXNJets];   //[nJets]
+   Float_t         IP3dProbability2[MAXNJets];   //[nJets]
+   Float_t         IP3dTrackPtRel2[MAXNJets];   //[nJets]
+   Float_t         IP3dDistJetAxis2[MAXNJets];   //[nJets]
+   Float_t         IP3dDecayLength2[MAXNJets];   //[nJets]
+   Float_t         IP3dDeltaR2[MAXNJets];   //[nJets]
+   Float_t         IP3dMomentum2[MAXNJets];   //[nJets]
+   Float_t         IP3dTransverseMomentum2[MAXNJets];   //[nJets]
+   Float_t         IP3dEta2[MAXNJets];   //[nJets]
+   Float_t         IP3dPhi2[MAXNJets];   //[nJets]
+   Int_t           IP3dNHits2[MAXNJets];   //[nJets]
+   Int_t           IP3dNPixelHits2[MAXNJets];   //[nJets]
+   Float_t         IP3dNormChi22[MAXNJets];   //[nJets]
+   Int_t           IP2dTrackQuality2[MAXNJets];   //[nJets]
+   Float_t         IP2d2[MAXNJets];   //[nJets]
+   Float_t         IP2dError2[MAXNJets];   //[nJets]
+   Float_t         IP2dProbability2[MAXNJets];   //[nJets]
+   Float_t         IP2dTrackPtRel2[MAXNJets];   //[nJets]
+   Int_t           IP3dTrackQuality3[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix13[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix23[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix33[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPixAll3[MAXNJets];   //[nJets]
+   Float_t         IP3d3[MAXNJets];   //[nJets]
+   Float_t         IP3dError3[MAXNJets];   //[nJets]
+   Float_t         IP3dProbability3[MAXNJets];   //[nJets]
+   Float_t         IP3dTrackPtRel3[MAXNJets];   //[nJets]
+   Float_t         IP3dDistJetAxis3[MAXNJets];   //[nJets]
+   Float_t         IP3dDecayLength3[MAXNJets];   //[nJets]
+   Float_t         IP3dDeltaR3[MAXNJets];   //[nJets]
+   Float_t         IP3dMomentum3[MAXNJets];   //[nJets]
+   Float_t         IP3dTransverseMomentum3[MAXNJets];   //[nJets]
+   Float_t         IP3dEta3[MAXNJets];   //[nJets]
+   Float_t         IP3dPhi3[MAXNJets];   //[nJets]
+   Int_t           IP3dNHits3[MAXNJets];   //[nJets]
+   Int_t           IP3dNPixelHits3[MAXNJets];   //[nJets]
+   Float_t         IP3dNormChi23[MAXNJets];   //[nJets]
+   Int_t           IP2dTrackQuality3[MAXNJets];   //[nJets]
+   Float_t         IP2d3[MAXNJets];   //[nJets]
+   Float_t         IP2dError3[MAXNJets];   //[nJets]
+   Float_t         IP2dProbability3[MAXNJets];   //[nJets]
+   Float_t         IP2dTrackPtRel3[MAXNJets];   //[nJets]
+   Int_t           IP3dTrackQuality4[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix14[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix24[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPix34[MAXNJets];   //[nJets]
+   Int_t           IP3dHasSharedPixAll4[MAXNJets];   //[nJets]
+   Float_t         IP3d4[MAXNJets];   //[nJets]
+   Float_t         IP3dError4[MAXNJets];   //[nJets]
+   Float_t         IP3dProbability4[MAXNJets];   //[nJets]
+   Float_t         IP3dTrackPtRel4[MAXNJets];   //[nJets]
+   Float_t         IP3dDistJetAxis4[MAXNJets];   //[nJets]
+   Float_t         IP3dDecayLength4[MAXNJets];   //[nJets]
+   Float_t         IP3dDeltaR4[MAXNJets];   //[nJets]
+   Float_t         IP3dMomentum4[MAXNJets];   //[nJets]
+   Float_t         IP3dTransverseMomentum4[MAXNJets];   //[nJets]
+   Float_t         IP3dEta4[MAXNJets];   //[nJets]
+   Float_t         IP3dPhi4[MAXNJets];   //[nJets]
+   Int_t           IP3dNHits4[MAXNJets];   //[nJets]
+   Int_t           IP3dNPixelHits4[MAXNJets];   //[nJets]
+   Float_t         IP3dNormChi24[MAXNJets];   //[nJets]
+   Int_t           IP2dTrackQuality4[MAXNJets];   //[nJets]
+   Float_t         IP2d4[MAXNJets];   //[nJets]
+   Float_t         IP2dError4[MAXNJets];   //[nJets]
+   Float_t         IP2dProbability4[MAXNJets];   //[nJets]
+   Float_t         IP2dTrackPtRel4[MAXNJets];   //[nJets]
+   TBranch        *b_IP3dTrackQuality1;   //!
+   TBranch        *b_IP3dHasSharedPix11;   //!
+   TBranch        *b_IP3dHasSharedPix21;   //!
+   TBranch        *b_IP3dHasSharedPix31;   //!
+   TBranch        *b_IP3dHasSharedPixAll1;   //!
+   TBranch        *b_IP3d1;   //!
+   TBranch        *b_IP3dError1;   //!
+   TBranch        *b_IP3dProbability1;   //!
+   TBranch        *b_IP3dTrackPtRel1;   //!
+   TBranch        *b_IP3dDistJetAxis1;   //!
+   TBranch        *b_IP3dDecayLength1;   //!
+   TBranch        *b_IP3dDeltaR1;   //!
+   TBranch        *b_IP3dMomentum1;   //!
+   TBranch        *b_IP3dTransverseMomentum1;   //!
+   TBranch        *b_IP3dEta1;   //!
+   TBranch        *b_IP3dPhi1;   //!
+   TBranch        *b_IP3dNHits1;   //!
+   TBranch        *b_IP3dNPixelHits1;   //!
+   TBranch        *b_IP3dNormChi21;   //!
+   TBranch        *b_IP2dTrackQuality1;   //!
+   TBranch        *b_IP2d1;   //!
+   TBranch        *b_IP2dError1;   //!
+   TBranch        *b_IP2dProbability1;   //!
+   TBranch        *b_IP2dTrackPtRel1;   //!
+   TBranch        *b_IP3dTrackQuality2;   //!
+   TBranch        *b_IP3dHasSharedPix12;   //!
+   TBranch        *b_IP3dHasSharedPix22;   //!
+   TBranch        *b_IP3dHasSharedPix32;   //!
+   TBranch        *b_IP3dHasSharedPixAll2;   //!
+   TBranch        *b_IP3d2;   //!
+   TBranch        *b_IP3dError2;   //!
+   TBranch        *b_IP3dProbability2;   //!
+   TBranch        *b_IP3dTrackPtRel2;   //!
+   TBranch        *b_IP3dDistJetAxis2;   //!
+   TBranch        *b_IP3dDecayLength2;   //!
+   TBranch        *b_IP3dDeltaR2;   //!
+   TBranch        *b_IP3dMomentum2;   //!
+   TBranch        *b_IP3dTransverseMomentum2;   //!
+   TBranch        *b_IP3dEta2;   //!
+   TBranch        *b_IP3dPhi2;   //!
+   TBranch        *b_IP3dNHits2;   //!
+   TBranch        *b_IP3dNPixelHits2;   //!
+   TBranch        *b_IP3dNormChi22;   //!
+   TBranch        *b_IP2dTrackQuality2;   //!
+   TBranch        *b_IP2d2;   //!
+   TBranch        *b_IP2dError2;   //!
+   TBranch        *b_IP2dProbability2;   //!
+   TBranch        *b_IP2dTrackPtRel2;   //!
+   TBranch        *b_IP3dTrackQuality3;   //!
+   TBranch        *b_IP3dHasSharedPix13;   //!
+   TBranch        *b_IP3dHasSharedPix23;   //!
+   TBranch        *b_IP3dHasSharedPix33;   //!
+   TBranch        *b_IP3dHasSharedPixAll3;   //!
+   TBranch        *b_IP3d3;   //!
+   TBranch        *b_IP3dError3;   //!
+   TBranch        *b_IP3dProbability3;   //!
+   TBranch        *b_IP3dTrackPtRel3;   //!
+   TBranch        *b_IP3dDistJetAxis3;   //!
+   TBranch        *b_IP3dDecayLength3;   //!
+   TBranch        *b_IP3dDeltaR3;   //!
+   TBranch        *b_IP3dMomentum3;   //!
+   TBranch        *b_IP3dTransverseMomentum3;   //!
+   TBranch        *b_IP3dEta3;   //!
+   TBranch        *b_IP3dPhi3;   //!
+   TBranch        *b_IP3dNHits3;   //!
+   TBranch        *b_IP3dNPixelHits3;   //!
+   TBranch        *b_IP3dNormChi23;   //!
+   TBranch        *b_IP2dTrackQuality3;   //!
+   TBranch        *b_IP2d3;   //!
+   TBranch        *b_IP2dError3;   //!
+   TBranch        *b_IP2dProbability3;   //!
+   TBranch        *b_IP2dTrackPtRel3;   //!
+   TBranch        *b_IP3dTrackQuality4;   //!
+   TBranch        *b_IP3dHasSharedPix14;   //!
+   TBranch        *b_IP3dHasSharedPix24;   //!
+   TBranch        *b_IP3dHasSharedPix34;   //!
+   TBranch        *b_IP3dHasSharedPixAll4;   //!
+   TBranch        *b_IP3d4;   //!
+   TBranch        *b_IP3dError4;   //!
+   TBranch        *b_IP3dProbability4;   //!
+   TBranch        *b_IP3dTrackPtRel4;   //!
+   TBranch        *b_IP3dDistJetAxis4;   //!
+   TBranch        *b_IP3dDecayLength4;   //!
+   TBranch        *b_IP3dDeltaR4;   //!
+   TBranch        *b_IP3dMomentum4;   //!
+   TBranch        *b_IP3dTransverseMomentum4;   //!
+   TBranch        *b_IP3dEta4;   //!
+   TBranch        *b_IP3dPhi4;   //!
+   TBranch        *b_IP3dNHits4;   //!
+   TBranch        *b_IP3dNPixelHits4;   //!
+   TBranch        *b_IP3dNormChi24;   //!
+   TBranch        *b_IP2dTrackQuality4;   //!
+   TBranch        *b_IP2d4;   //!
+   TBranch        *b_IP2dError4;   //!
+   TBranch        *b_IP2dProbability4;   //!
+   TBranch        *b_IP2dTrackPtRel4;   //!
+#endif
+
+#if bTagNtupleVersion >= 4
    Float_t         mcweight;
    vector<unsigned int> *HLTPrescaleFactors;
    vector<bool>    *HLTriggerResults;
@@ -714,9 +727,7 @@ public :
    Float_t         GenJetPt[MAXNJets];   //[nJets]
    Float_t         GenJetEta[MAXNJets];   //[nJets]
    Float_t         GenJetPhi[MAXNJets];   //[nJets]
-   Int_t           IPnSelectedPUTracks[MAXNJets];   //[nJets]
    Int_t           IPnSelectedAndDecayLengthAndJetAsixTracks[MAXNJets];   //[nJets]
-   Int_t           IPnSelectedAndDecayLengthAndJetAsixPUTracks[MAXNJets];   //[nJets]
  
    TBranch        *b_mcweight;   //!
    TBranch        *b_HLTPrescaleFactors;   //!
@@ -727,9 +738,7 @@ public :
    TBranch        *b_GenJetPt;   //!
    TBranch        *b_GenJetEta;   //!
    TBranch        *b_GenJetPhi;   //!
-   TBranch        *b_IPnSelectedPUTracks;   //!
    TBranch        *b_IPnSelectedAndDecayLengthAndJetAsixTracks;   //!
-   TBranch        *b_IPnSelectedAndDecayLengthAndJetAsixPUTracks;   //!
 
    RunInfo *RunInfo_;
    virtual UInt_t   HLTPrescale(string HLTName);
@@ -737,6 +746,13 @@ public :
    virtual UInt_t   HLTAcceptanceBit(string HLTName);
    virtual void     PrintHLTTable() {RunInfo_->PrintHLTTable();};
    map<string,Int_t> HLTNameBitMap_;
+#endif
+
+#if bTagNtupleVersion == 4
+   Int_t           IPnSelectedPUTracks[MAXNJets];   //[nJets]
+   Int_t           IPnSelectedAndDecayLengthAndJetAsixPUTracks[MAXNJets];   //[nJets]
+   TBranch        *b_IPnSelectedPUTracks;   //!
+   TBranch        *b_IPnSelectedAndDecayLengthAndJetAsixPUTracks;   //!
 #endif
 
 #if bTagNtupleVersion <= 3
@@ -781,8 +797,6 @@ public :
    Int_t           prescaleHLT_Jet80;
    Bool_t          triggerHLT_Jet110;
    Int_t           prescaleHLT_Jet110;
-   Bool_t          triggerHLT_PFJet140;
-   Int_t           prescaleHLT_PFJet140;   
    Bool_t          triggerHLT_Jet150;
    Int_t           prescaleHLT_Jet150;
    Bool_t          triggerHLT_Jet190;
@@ -1203,7 +1217,7 @@ void StringSeparator(string s, string sep, vector<string>& out);
 void StringSeparator(string s, string sep, vector<int>& out);
 
 
-#if bTagNtupleVersion > 3 
+#if bTagNtupleVersion >=4 
 RunInfo::RunInfo( vector<string> & filenames )
 {
   // The following code should be used if you want this class to access a chain of trees.
@@ -1278,7 +1292,7 @@ Bool_t RunInfo::BuildHLTNameBitMap(map<string,Int_t> &HLTNameBitMap_, UInt_t Run
     HLTNameBitMap_.clear();
     for(unsigned int i=0;i<HLTNamesSet->size();i++) {
       IgnoreHLTversion(HLTNamesSet->at(i));
-      cerr<<i<<":"<<HLTNamesSet->at(i)<<endl;
+      //      cerr<<i<<":"<<HLTNamesSet->at(i)<<endl;
       HLTNameBitMap_[HLTNamesSet->at(i)]=i;
     }
     return true;
@@ -1298,7 +1312,7 @@ Bool_t btagNtupReader::HLTAcceptance(string HLTName)
       return false;
     }
   try{
-    return HLTriggerResults->at(HLTNameBitMap_[HLTName]);
+     return HLTriggerResults->at(HLTNameBitMap_[HLTName]);
   }
   catch(...) {
     cout<<"The requested "<<HLTName<<" does not exist in current HLT Menu."<<endl;
@@ -1503,123 +1517,10 @@ void btagNtupReader::Init(TTree *tree)
    fChain = tree;
    fCurrent = -1;
    fChain->SetMakeClass(1);
-#if bTagNtupleVersion <= 3 
-     fChain->SetBranchAddress("triggerHLTL1Jet6U", &triggerHLT_L1Jet6U, &b_triggerHLT_L1Jet6U);
-     fChain->SetBranchAddress("triggerHLTL1Jet10U", &triggerHLT_L1Jet10U, &b_triggerHLT_L1Jet10U);
-     fChain->SetBranchAddress("triggerHLTJet15U", &triggerHLT_Jet15U, &b_triggerHLT_Jet15U);
-     fChain->SetBranchAddress("triggerHLTJet30U", &triggerHLT_Jet30U, &b_triggerHLT_Jet30U);
-     fChain->SetBranchAddress("triggerHLTJet50U", &triggerHLT_Jet50U, &b_triggerHLT_Jet50U);
-     fChain->SetBranchAddress("triggerHLTJet70U", &triggerHLT_Jet70U, &b_triggerHLT_Jet70U);
-     fChain->SetBranchAddress("triggerHLTJet100U", &triggerHLT_Jet100U, &b_triggerHLT_Jet100U);
-     fChain->SetBranchAddress("triggerHLTBTagIPJet50U", &triggerHLT_BTagIP_Jet50U, &b_triggerHLT_BTagIP_Jet50U);
-     fChain->SetBranchAddress("triggerHLTBTagMuJet10U", &triggerHLT_BTagMu_Jet10U, &b_triggerHLT_BTagMu_Jet10U);
-     fChain->SetBranchAddress("triggerHLTBTagMuJet20U", &triggerHLT_BTagMu_Jet20U, &b_triggerHLT_BTagMu_Jet20U);
-     fChain->SetBranchAddress("triggerHLTBTagMuDiJet10U", &triggerHLT_BTagMu_DiJet10U, &b_triggerHLT_BTagMu_DiJet10U);
-     fChain->SetBranchAddress("triggerHLTBTagMuDiJet20U", &triggerHLT_BTagMu_DiJet20U, &b_triggerHLT_BTagMu_DiJet20U);
-     fChain->SetBranchAddress("triggerHLTBTagMuDiJet20UMu5", &triggerHLT_BTagMu_DiJet20U_Mu5, &b_triggerHLT_BTagMu_DiJet20U_Mu5);
-     fChain->SetBranchAddress("triggerHLTBTagMuDiJet30U", &triggerHLT_BTagMu_DiJet30U, &b_triggerHLT_BTagMu_DiJet30U);
-     fChain->SetBranchAddress("triggerHLTBTagMuDiJet30UMu5", &triggerHLT_BTagMu_DiJet30U_Mu5, &b_triggerHLT_BTagMu_DiJet30U_Mu5);
-#if bTagNtupleVersion >= 1
-       fChain->SetBranchAddress("prescaleHLTL1Jet6U", &prescaleHLT_L1Jet6U, &b_prescaleHLT_L1Jet6U);
-       fChain->SetBranchAddress("prescaleHLTL1Jet10U", &prescaleHLT_L1Jet10U, &b_prescaleHLT_L1Jet10U);
-       fChain->SetBranchAddress("prescaleHLTJet15U", &prescaleHLT_Jet15U, &b_prescaleHLT_Jet15U);
-       fChain->SetBranchAddress("prescaleHLTJet30U", &prescaleHLT_Jet30U, &b_prescaleHLT_Jet30U);
-       fChain->SetBranchAddress("prescaleHLTJet50U", &prescaleHLT_Jet50U, &b_prescaleHLT_Jet50U);
-       fChain->SetBranchAddress("prescaleHLTJet70U", &prescaleHLT_Jet70U, &b_prescaleHLT_Jet70U);
-       fChain->SetBranchAddress("prescaleHLTJet100U", &prescaleHLT_Jet100U, &b_prescaleHLT_Jet100U);
-       fChain->SetBranchAddress("prescaleHLTBTagIPJet50U", &prescaleHLT_BTagIP_Jet50U, &b_prescaleHLT_BTagIP_Jet50U);
-       fChain->SetBranchAddress("prescaleHLTBTagMuJet10U", &prescaleHLT_BTagMu_Jet10U, &b_prescaleHLT_BTagMu_Jet10U);
-       fChain->SetBranchAddress("prescaleHLTBTagMuJet20U", &prescaleHLT_BTagMu_Jet20U, &b_prescaleHLT_BTagMu_Jet20U);
-       fChain->SetBranchAddress("prescaleHLTBTagMuDiJet10U", &prescaleHLT_BTagMu_DiJet10U, &b_prescaleHLT_BTagMu_DiJet10U);
-       fChain->SetBranchAddress("prescaleHLTBTagMuDiJet20U", &prescaleHLT_BTagMu_DiJet20U, &b_prescaleHLT_BTagMu_DiJet20U);
-       fChain->SetBranchAddress("prescaleHLTBTagMuDiJet20UMu5", &prescaleHLT_BTagMu_DiJet20U_Mu5, &b_prescaleHLT_BTagMu_DiJet20U_Mu5);
-       fChain->SetBranchAddress("prescaleHLTBTagMuDiJet30U", &prescaleHLT_BTagMu_DiJet30U, &b_prescaleHLT_BTagMu_DiJet30U);
-       fChain->SetBranchAddress("prescaleHLTBTagMuDiJet30UMu5", &prescaleHLT_BTagMu_DiJet30U_Mu5, &b_prescaleHLT_BTagMu_DiJet30U_Mu5);
-#endif
-#if bTagNtupleVersion >= 2
-     fChain->SetBranchAddress("triggerHLT_L1SingleJet36", &triggerHLT_L1SingleJet36, &b_triggerHLT_L1SingleJet36);
-     fChain->SetBranchAddress("triggerHLT_Jet30", &triggerHLT_Jet30, &b_triggerHLT_Jet30);
-     fChain->SetBranchAddress("triggerHLT_Jet60", &triggerHLT_Jet60, &b_triggerHLT_Jet60);
-     fChain->SetBranchAddress("triggerHLT_Jet80", &triggerHLT_Jet80, &b_triggerHLT_Jet80);
-     fChain->SetBranchAddress("triggerHLT_Jet110", &triggerHLT_Jet110, &b_triggerHLT_Jet110);
-     fChain->SetBranchAddress("triggerHLT_Jet150", &triggerHLT_Jet150, &b_triggerHLT_Jet150);
-     fChain->SetBranchAddress("triggerHLT_Jet190", &triggerHLT_Jet190, &b_triggerHLT_Jet190);
-     fChain->SetBranchAddress("triggerHLT_Jet240", &triggerHLT_Jet240, &b_triggerHLT_Jet240);
-     fChain->SetBranchAddress("triggerHLT_Jet370", &triggerHLT_Jet370, &b_triggerHLT_Jet370);
-     fChain->SetBranchAddress("triggerHLT_Jet370_NoJetID", &triggerHLT_Jet370_NoJetID, &b_triggerHLT_Jet370_NoJetID);
-     fChain->SetBranchAddress("triggerHLT_DiJetAve15U_v4", &triggerHLT_DiJetAve15U_v4, &b_triggerHLT_DiJetAve15U_v4);
-     fChain->SetBranchAddress("triggerHLT_DiJetAve30U_v4", &triggerHLT_DiJetAve30U_v4, &b_triggerHLT_DiJetAve30U_v4);
-     fChain->SetBranchAddress("triggerHLT_DiJetAve50U_v4", &triggerHLT_DiJetAve50U_v4, &b_triggerHLT_DiJetAve50U_v4);
-     fChain->SetBranchAddress("triggerHLT_DiJetAve70U_v4", &triggerHLT_DiJetAve70U_v4, &b_triggerHLT_DiJetAve70U_v4);
-     fChain->SetBranchAddress("triggerHLT_DiJetAve100U_v4", &triggerHLT_DiJetAve100U_v4, &b_triggerHLT_DiJetAve100U_v4);
-     fChain->SetBranchAddress("triggerHLT_DiJetAve140U_v4", &triggerHLT_DiJetAve140U_v4, &b_triggerHLT_DiJetAve140U_v4);
-     fChain->SetBranchAddress("triggerHLT_DiJetAve180U_v4", &triggerHLT_DiJetAve180U_v4, &b_triggerHLT_DiJetAve180U_v4);
-     fChain->SetBranchAddress("triggerHLT_DiJetAve300U_v4", &triggerHLT_DiJetAve300U_v4, &b_triggerHLT_DiJetAve300U_v4);
-     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet60_Mu7_v2", &triggerHLT_BTagMu_DiJet60_Mu7_v2, &b_triggerHLT_BTagMu_DiJet60_Mu7_v2);
-     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet80_Mu9_v2", &triggerHLT_BTagMu_DiJet80_Mu9_v2, &b_triggerHLT_BTagMu_DiJet80_Mu9_v2);
-     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet100_Mu9_v2", &triggerHLT_BTagMu_DiJet100_Mu9_v2, &b_triggerHLT_BTagMu_DiJet100_Mu9_v2);
-     fChain->SetBranchAddress("prescaleHLT_L1SingleJet36", &prescaleHLT_L1SingleJet36, &b_prescaleHLT_L1SingleJet36);
-     fChain->SetBranchAddress("prescaleHLT_Jet30", &prescaleHLT_Jet30, &b_prescaleHLT_Jet30);
-     fChain->SetBranchAddress("prescaleHLT_Jet60", &prescaleHLT_Jet60, &b_prescaleHLT_Jet60);
-     fChain->SetBranchAddress("prescaleHLT_Jet80", &prescaleHLT_Jet80, &b_prescaleHLT_Jet80);
-     fChain->SetBranchAddress("prescaleHLT_Jet110", &prescaleHLT_Jet110, &b_prescaleHLT_Jet110);
-     fChain->SetBranchAddress("prescaleHLT_Jet150", &prescaleHLT_Jet150, &b_prescaleHLT_Jet150);
-     fChain->SetBranchAddress("prescaleHLT_Jet190", &prescaleHLT_Jet190, &b_prescaleHLT_Jet190);
-     fChain->SetBranchAddress("prescaleHLT_Jet240", &prescaleHLT_Jet240, &b_prescaleHLT_Jet240);
-     fChain->SetBranchAddress("prescaleHLT_Jet370", &prescaleHLT_Jet370, &b_prescaleHLT_Jet370);
-     fChain->SetBranchAddress("prescaleHLT_Jet370_NoJetID", &prescaleHLT_Jet370_NoJetID, &b_prescaleHLT_Jet370_NoJetID);
-     fChain->SetBranchAddress("prescaleHLT_DiJetAve15U_v4", &prescaleHLT_DiJetAve15U_v4, &b_prescaleHLT_DiJetAve15U_v4);
-     fChain->SetBranchAddress("prescaleHLT_DiJetAve30U_v4", &prescaleHLT_DiJetAve30U_v4, &b_prescaleHLT_DiJetAve30U_v4);
-     fChain->SetBranchAddress("prescaleHLT_DiJetAve50U_v4", &prescaleHLT_DiJetAve50U_v4, &b_prescaleHLT_DiJetAve50U_v4);
-     fChain->SetBranchAddress("prescaleHLT_DiJetAve70U_v4", &prescaleHLT_DiJetAve70U_v4, &b_prescaleHLT_DiJetAve70U_v4);
-     fChain->SetBranchAddress("prescaleHLT_DiJetAve100U_v4", &prescaleHLT_DiJetAve100U_v4, &b_prescaleHLT_DiJetAve100U_v4);
-     fChain->SetBranchAddress("prescaleHLT_DiJetAve140U_v4", &prescaleHLT_DiJetAve140U_v4, &b_prescaleHLT_DiJetAve140U_v4);
-     fChain->SetBranchAddress("prescaleHLT_DiJetAve180U_v4", &prescaleHLT_DiJetAve180U_v4, &b_prescaleHLT_DiJetAve180U_v4);
-     fChain->SetBranchAddress("prescaleHLT_DiJetAve300U_v4", &prescaleHLT_DiJetAve300U_v4, &b_prescaleHLT_DiJetAve300U_v4);
-     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet60_Mu7_v2", &prescaleHLT_BTagMu_DiJet60_Mu7_v2, &b_prescaleHLT_BTagMu_DiJet60_Mu7_v2);
-     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet80_Mu9_v2", &prescaleHLT_BTagMu_DiJet80_Mu9_v2, &b_prescaleHLT_BTagMu_DiJet80_Mu9_v2);
-     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet100_Mu9_v2", &prescaleHLT_BTagMu_DiJet100_Mu9_v2, &b_prescaleHLT_BTagMu_DiJet100_Mu9_v2);
-#endif
-#if bTagNtupleVersion == 2
-     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet20_Mu5_v2", &triggerHLT_BTagMu_DiJet20_Mu5, &b_triggerHLT_BTagMu_DiJet20_Mu5);
-     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet20_Mu5_v2", &prescaleHLT_BTagMu_DiJet20_Mu5, &b_prescaleHLT_BTagMu_DiJet20_Mu5);
-#endif
-#if bTagNtupleVersion == 3
-     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet20_Mu5", &triggerHLT_BTagMu_DiJet20_Mu5, &b_triggerHLT_BTagMu_DiJet20_Mu5);
-     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet40_Mu5", &triggerHLT_BTagMu_DiJet40_Mu5, &b_triggerHLT_BTagMu_DiJet40_Mu5);
-     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet70_Mu5", &triggerHLT_BTagMu_DiJet70_Mu5, &b_triggerHLT_BTagMu_DiJet70_Mu5);
-     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet110_Mu5", &triggerHLT_BTagMu_DiJet110_Mu5, &b_triggerHLT_BTagMu_DiJet110_Mu5);
-     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet20_Mu5", &prescaleHLT_BTagMu_DiJet20_Mu5, &b_prescaleHLT_BTagMu_DiJet20_Mu5);
-     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet40_Mu5", &prescaleHLT_BTagMu_DiJet40_Mu5, &b_prescaleHLT_BTagMu_DiJet40_Mu5);
-     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet70_Mu5", &prescaleHLT_BTagMu_DiJet70_Mu5, &b_prescaleHLT_BTagMu_DiJet70_Mu5);
-     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet110_Mu5", &prescaleHLT_BTagMu_DiJet110_Mu5, &b_prescaleHLT_BTagMu_DiJet110_Mu5);
-#endif
-#endif //!end of bTagNtupleVersion <= 3 
    fChain->SetBranchAddress("eventNumber", &eventNumber, &b_eventNumber);
    fChain->SetBranchAddress("runNumber", &runNumber, &b_runNumber);
    fChain->SetBranchAddress("lumiBlockNumber", &lumiBlockNumber, &b_lumiBlockNumber);
    fChain->SetBranchAddress("numberOfPUVertices", &numberOfPUVertices, &b_numberOfPUVertices);
-#if bTagNtupleVersion > 3
-   // Set object pointer
-   HLTPrescaleFactors = 0;
-   HLTriggerResults = 0;
-#if bTagNtupleVersion > 4
-   fChain->SetBranchAddress("numberOfPUVerticesMixingTruth", &numberOfPUVerticesMixingTruth, &b_numberOfPUVerticesMixingTruth);
-#endif
-   fChain->SetBranchAddress("numberOfPUVerticesTot", &numberOfPUVerticesTot, &b_numberOfPUVerticesTot);
-   fChain->SetBranchAddress("HLTPrescaleFactors", &HLTPrescaleFactors, &b_HLTPrescaleFactors);
-   fChain->SetBranchAddress("HLTriggerResults", &HLTriggerResults, &b_HLTriggerResults);
-   fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight);
-   fChain->SetBranchAddress("PartonPt", PartonPt, &b_PartonPt);
-   fChain->SetBranchAddress("PartonEta", PartonEta, &b_PartonEta);
-   fChain->SetBranchAddress("PartonPhi", PartonPhi, &b_PartonPhi);
-   fChain->SetBranchAddress("GenJetPt", GenJetPt, &b_GenJetPt);
-   fChain->SetBranchAddress("GenJetEta", GenJetEta, &b_GenJetEta);
-   fChain->SetBranchAddress("GenJetPhi", GenJetPhi, &b_GenJetPhi);
-   fChain->SetBranchAddress("IPnSelectedPUTracks", IPnSelectedPUTracks, &b_IPnSelectedPUTracks);
-   fChain->SetBranchAddress("IPnSelectedAndDecayLengthAndJetAsixTracks", IPnSelectedAndDecayLengthAndJetAsixTracks, &b_IPnSelectedAndDecayLengthAndJetAsixTracks);
-   fChain->SetBranchAddress("IPnSelectedAndDecayLengthAndJetAsixPUTracks", IPnSelectedAndDecayLengthAndJetAsixPUTracks, &b_IPnSelectedAndDecayLengthAndJetAsixPUTracks);
-#endif
    fChain->SetBranchAddress("numberOfPrimaryVertices", &numberOfPrimaryVertices, &b_numberOfPrimaryVertices);
    fChain->SetBranchAddress("numberOfTracksAtPV", &numberOfTracksAtPV, &b_numberOfTracksAtPV);
    fChain->SetBranchAddress("PVx", &PVx, &b_PVx);
@@ -1716,6 +1617,138 @@ void btagNtupReader::Init(TTree *tree)
    fChain->SetBranchAddress("IPPix3TotalHits", IPPix3TotalHits, &b_IPPix3TotalHits);
    fChain->SetBranchAddress("IPPixAllSharedHits", IPPixAllSharedHits, &b_IPPixAllSharedHits);
    fChain->SetBranchAddress("IPPixAllTotalHits", IPPixAllTotalHits, &b_IPPixAllTotalHits);
+   fChain->SetBranchAddress("nMuons", nMuons, &b_nMuons);
+   fChain->SetBranchAddress("muon1IsGlobal", muon1IsGlobal, &b_muon1IsGlobal);
+   fChain->SetBranchAddress("muon1IsTracker", muon1IsTracker, &b_muon1IsTracker);
+   fChain->SetBranchAddress("muon1IsStandalone", muon1IsStandalone, &b_muon1IsStandalone);
+   fChain->SetBranchAddress("muon1Pt", muon1Pt, &b_muon1Pt);
+   fChain->SetBranchAddress("muon1Eta", muon1Eta, &b_muon1Eta);
+   fChain->SetBranchAddress("muon1Phi", muon1Phi, &b_muon1Phi);
+   fChain->SetBranchAddress("muon1NumberOfMatches", muon1NumberOfMatches, &b_muon1NumberOfMatches);
+   fChain->SetBranchAddress("muon1GlobalMuonHits", muon1GlobalMuonHits, &b_muon1GlobalMuonHits);
+   fChain->SetBranchAddress("muon1InnerValidHits", muon1InnerValidHits, &b_muon1InnerValidHits);
+   fChain->SetBranchAddress("muon1NExpectedOuterHits", muon1NExpectedOuterHits, &b_muon1NExpectedOuterHits);
+   fChain->SetBranchAddress("muon1NPixelHits", muon1NPixelHits, &b_muon1NPixelHits);
+   fChain->SetBranchAddress("muon1InnerNChi2", muon1InnerNChi2, &b_muon1InnerNChi2);
+   fChain->SetBranchAddress("muon1GlobalNChi2", muon1GlobalNChi2, &b_muon1GlobalNChi2);
+   fChain->SetBranchAddress("muon1VzPVDist", muon1VzPVDist, &b_muon1VzPVDist);
+   fChain->SetBranchAddress("muon1PtRel", muon1PtRel, &b_muon1PtRel);
+   fChain->SetBranchAddress("muon1Sip2d", muon1Sip2d, &b_muon1Sip2d);
+   fChain->SetBranchAddress("muon1Ip2d", muon1Ip2d, &b_muon1Ip2d);
+   fChain->SetBranchAddress("muon1Ipe2d", muon1Ipe2d, &b_muon1Ipe2d);
+   fChain->SetBranchAddress("muon1Sip3d", muon1Sip3d, &b_muon1Sip3d);
+   fChain->SetBranchAddress("muon1Ip3d", muon1Ip3d, &b_muon1Ip3d);
+   fChain->SetBranchAddress("muon1Ipe3d", muon1Ipe3d, &b_muon1Ipe3d);
+   fChain->SetBranchAddress("muon1P0Par", muon1P0Par, &b_muon1P0Par);
+   fChain->SetBranchAddress("muon1DeltaR", muon1DeltaR, &b_muon1DeltaR);
+   fChain->SetBranchAddress("muon1EtaRel", muon1EtaRel, &b_muon1EtaRel);
+   fChain->SetBranchAddress("muon1Ratio", muon1Ratio, &b_muon1Ratio);
+   fChain->SetBranchAddress("muon1TrackQuality", muon1TrackQuality, &b_muon1TrackQuality);
+   fChain->SetBranchAddress("muon1RatioRel", muon1RatioRel, &b_muon1RatioRel);
+   fChain->SetBranchAddress("muon2IsGlobal", muon2IsGlobal, &b_muon2IsGlobal);
+   fChain->SetBranchAddress("muon2IsTracker", muon2IsTracker, &b_muon2IsTracker);
+   fChain->SetBranchAddress("muon2IsStandalone", muon2IsStandalone, &b_muon2IsStandalone);
+   fChain->SetBranchAddress("muon2Pt", muon2Pt, &b_muon2Pt);
+   fChain->SetBranchAddress("muon2Eta", muon2Eta, &b_muon2Eta);
+   fChain->SetBranchAddress("muon2Phi", muon2Phi, &b_muon2Phi);
+   fChain->SetBranchAddress("muon2NumberOfMatches", muon2NumberOfMatches, &b_muon2NumberOfMatches);
+   fChain->SetBranchAddress("muon2GlobalMuonHits", muon2GlobalMuonHits, &b_muon2GlobalMuonHits);
+   fChain->SetBranchAddress("muon2InnerValidHits", muon2InnerValidHits, &b_muon2InnerValidHits);
+   fChain->SetBranchAddress("muon2NExpectedOuterHits", muon2NExpectedOuterHits, &b_muon2NExpectedOuterHits);
+   fChain->SetBranchAddress("muon2NPixelHits", muon2NPixelHits, &b_muon2NPixelHits);
+   fChain->SetBranchAddress("muon2InnerNChi2", muon2InnerNChi2, &b_muon2InnerNChi2);
+   fChain->SetBranchAddress("muon2GlobalNChi2", muon2GlobalNChi2, &b_muon2GlobalNChi2);
+   fChain->SetBranchAddress("muon2VzPVDist", muon2VzPVDist, &b_muon2VzPVDist);
+   fChain->SetBranchAddress("muon2PtRel", muon2PtRel, &b_muon2PtRel);
+   fChain->SetBranchAddress("muon2Sip2d", muon2Sip2d, &b_muon2Sip2d);
+   fChain->SetBranchAddress("muon2Ip2d", muon2Ip2d, &b_muon2Ip2d);
+   fChain->SetBranchAddress("muon2Ipe2d", muon2Ipe2d, &b_muon2Ipe2d);
+   fChain->SetBranchAddress("muon2Sip3d", muon2Sip3d, &b_muon2Sip3d);
+   fChain->SetBranchAddress("muon2Ip3d", muon2Ip3d, &b_muon2Ip3d);
+   fChain->SetBranchAddress("muon2Ipe3d", muon2Ipe3d, &b_muon2Ipe3d);
+   fChain->SetBranchAddress("muon2P0Par", muon2P0Par, &b_muon2P0Par);
+   fChain->SetBranchAddress("muon2DeltaR", muon2DeltaR, &b_muon2DeltaR);
+   fChain->SetBranchAddress("muon2EtaRel", muon2EtaRel, &b_muon2EtaRel);
+   fChain->SetBranchAddress("muon2Ratio", muon2Ratio, &b_muon2Ratio);
+   fChain->SetBranchAddress("muon2TrackQuality", muon2TrackQuality, &b_muon2TrackQuality);
+   fChain->SetBranchAddress("muon2RatioRel", muon2RatioRel, &b_muon2RatioRel);
+   fChain->SetBranchAddress("muon3IsGlobal", muon3IsGlobal, &b_muon3IsGlobal);
+   fChain->SetBranchAddress("muon3IsTracker", muon3IsTracker, &b_muon3IsTracker);
+   fChain->SetBranchAddress("muon3IsStandalone", muon3IsStandalone, &b_muon3IsStandalone);
+   fChain->SetBranchAddress("muon3Pt", muon3Pt, &b_muon3Pt);
+   fChain->SetBranchAddress("muon3Eta", muon3Eta, &b_muon3Eta);
+   fChain->SetBranchAddress("muon3Phi", muon3Phi, &b_muon3Phi);
+   fChain->SetBranchAddress("muon3NumberOfMatches", muon3NumberOfMatches, &b_muon3NumberOfMatches);
+   fChain->SetBranchAddress("muon3GlobalMuonHits", muon3GlobalMuonHits, &b_muon3GlobalMuonHits);
+   fChain->SetBranchAddress("muon3InnerValidHits", muon3InnerValidHits, &b_muon3InnerValidHits);
+   fChain->SetBranchAddress("muon3NExpectedOuterHits", muon3NExpectedOuterHits, &b_muon3NExpectedOuterHits);
+   fChain->SetBranchAddress("muon3NPixelHits", muon3NPixelHits, &b_muon3NPixelHits);
+   fChain->SetBranchAddress("muon3InnerNChi2", muon3InnerNChi2, &b_muon3InnerNChi2);
+   fChain->SetBranchAddress("muon3GlobalNChi2", muon3GlobalNChi2, &b_muon3GlobalNChi2);
+   fChain->SetBranchAddress("muon3VzPVDist", muon3VzPVDist, &b_muon3VzPVDist);
+   fChain->SetBranchAddress("muon3PtRel", muon3PtRel, &b_muon3PtRel);
+   fChain->SetBranchAddress("muon3Sip2d", muon3Sip2d, &b_muon3Sip2d);
+   fChain->SetBranchAddress("muon3Ip2d", muon3Ip2d, &b_muon3Ip2d);
+   fChain->SetBranchAddress("muon3Ipe2d", muon3Ipe2d, &b_muon3Ipe2d);
+   fChain->SetBranchAddress("muon3Sip3d", muon3Sip3d, &b_muon3Sip3d);
+   fChain->SetBranchAddress("muon3Ip3d", muon3Ip3d, &b_muon3Ip3d);
+   fChain->SetBranchAddress("muon3Ipe3d", muon3Ipe3d, &b_muon3Ipe3d);
+   fChain->SetBranchAddress("muon3P0Par", muon3P0Par, &b_muon3P0Par);
+   fChain->SetBranchAddress("muon3DeltaR", muon3DeltaR, &b_muon3DeltaR);
+   fChain->SetBranchAddress("muon3EtaRel", muon3EtaRel, &b_muon3EtaRel);
+   fChain->SetBranchAddress("muon3Ratio", muon3Ratio, &b_muon3Ratio);
+   fChain->SetBranchAddress("muon3TrackQuality", muon3TrackQuality, &b_muon3TrackQuality);
+   fChain->SetBranchAddress("muon3RatioRel", muon3RatioRel, &b_muon3RatioRel);
+   fChain->SetBranchAddress("muon4IsGlobal", muon4IsGlobal, &b_muon4IsGlobal);
+   fChain->SetBranchAddress("muon4IsTracker", muon4IsTracker, &b_muon4IsTracker);
+   fChain->SetBranchAddress("muon4IsStandalone", muon4IsStandalone, &b_muon4IsStandalone);
+   fChain->SetBranchAddress("muon4Pt", muon4Pt, &b_muon4Pt);
+   fChain->SetBranchAddress("muon4Eta", muon4Eta, &b_muon4Eta);
+   fChain->SetBranchAddress("muon4Phi", muon4Phi, &b_muon4Phi);
+   fChain->SetBranchAddress("muon4NumberOfMatches", muon4NumberOfMatches, &b_muon4NumberOfMatches);
+   fChain->SetBranchAddress("muon4GlobalMuonHits", muon4GlobalMuonHits, &b_muon4GlobalMuonHits);
+   fChain->SetBranchAddress("muon4InnerValidHits", muon4InnerValidHits, &b_muon4InnerValidHits);
+   fChain->SetBranchAddress("muon4NExpectedOuterHits", muon4NExpectedOuterHits, &b_muon4NExpectedOuterHits);
+   fChain->SetBranchAddress("muon4NPixelHits", muon4NPixelHits, &b_muon4NPixelHits);
+   fChain->SetBranchAddress("muon4InnerNChi2", muon4InnerNChi2, &b_muon4InnerNChi2);
+   fChain->SetBranchAddress("muon4GlobalNChi2", muon4GlobalNChi2, &b_muon4GlobalNChi2);
+   fChain->SetBranchAddress("muon4VzPVDist", muon4VzPVDist, &b_muon4VzPVDist);
+   fChain->SetBranchAddress("muon4PtRel", muon4PtRel, &b_muon4PtRel);
+   fChain->SetBranchAddress("muon4Sip2d", muon4Sip2d, &b_muon4Sip2d);
+   fChain->SetBranchAddress("muon4Ip2d", muon4Ip2d, &b_muon4Ip2d);
+   fChain->SetBranchAddress("muon4Ipe2d", muon4Ipe2d, &b_muon4Ipe2d);
+   fChain->SetBranchAddress("muon4Sip3d", muon4Sip3d, &b_muon4Sip3d);
+   fChain->SetBranchAddress("muon4Ip3d", muon4Ip3d, &b_muon4Ip3d);
+   fChain->SetBranchAddress("muon4Ipe3d", muon4Ipe3d, &b_muon4Ipe3d);
+   fChain->SetBranchAddress("muon4P0Par", muon4P0Par, &b_muon4P0Par);
+   fChain->SetBranchAddress("muon4DeltaR", muon4DeltaR, &b_muon4DeltaR);
+   fChain->SetBranchAddress("muon4EtaRel", muon4EtaRel, &b_muon4EtaRel);
+   fChain->SetBranchAddress("muon4Ratio", muon4Ratio, &b_muon4Ratio);
+   fChain->SetBranchAddress("muon4TrackQuality", muon4TrackQuality, &b_muon4TrackQuality);
+   fChain->SetBranchAddress("muon4RatioRel", muon4RatioRel, &b_muon4RatioRel);
+   fChain->SetBranchAddress("standardCombinedSecondaryVertexMVAPFBJetTags", standardCombinedSecondaryVertexMVAPFBJetTags, &b_standardCombinedSecondaryVertexMVAPFBJetTags);
+   fChain->SetBranchAddress("standardCombinedSecondaryVertexPFBJetTags", standardCombinedSecondaryVertexPFBJetTags, &b_standardCombinedSecondaryVertexPFBJetTags);
+   fChain->SetBranchAddress("standardGhostTrackPFBJetTags", standardGhostTrackPFBJetTags, &b_standardGhostTrackPFBJetTags);
+   fChain->SetBranchAddress("standardJetBProbabilityPFBJetTags", standardJetBProbabilityPFBJetTags, &b_standardJetBProbabilityPFBJetTags);
+   fChain->SetBranchAddress("standardJetProbabilityPFBJetTags", standardJetProbabilityPFBJetTags, &b_standardJetProbabilityPFBJetTags);
+   fChain->SetBranchAddress("standardSimpleSecondaryVertexHighEffPFBJetTags", standardSimpleSecondaryVertexHighEffPFBJetTags, &b_standardSimpleSecondaryVertexHighEffPFBJetTags);
+   fChain->SetBranchAddress("standardSimpleSecondaryVertexHighPurPFBJetTags", standardSimpleSecondaryVertexHighPurPFBJetTags, &b_standardSimpleSecondaryVertexHighPurPFBJetTags);
+   fChain->SetBranchAddress("standardSoftElectronByIP3dPFBJetTags", standardSoftElectronByIP3dPFBJetTags, &b_standardSoftElectronByIP3dPFBJetTags);
+   fChain->SetBranchAddress("standardSoftElectronByPtPFBJetTags", standardSoftElectronByPtPFBJetTags, &b_standardSoftElectronByPtPFBJetTags);
+   fChain->SetBranchAddress("standardSoftMuonByIP3dPFBJetTags", standardSoftMuonByIP3dPFBJetTags, &b_standardSoftMuonByIP3dPFBJetTags);
+   fChain->SetBranchAddress("standardSoftMuonByPtPFBJetTags", standardSoftMuonByPtPFBJetTags, &b_standardSoftMuonByPtPFBJetTags);
+   fChain->SetBranchAddress("standardSoftMuonPFBJetTags", standardSoftMuonPFBJetTags, &b_standardSoftMuonPFBJetTags);
+   fChain->SetBranchAddress("standardTrackCountingHighEffPFBJetTags", standardTrackCountingHighEffPFBJetTags, &b_standardTrackCountingHighEffPFBJetTags);
+   fChain->SetBranchAddress("standardTrackCountingHighPurPFBJetTags", standardTrackCountingHighPurPFBJetTags, &b_standardTrackCountingHighPurPFBJetTags);
+
+#if bTagNtupleVersion >= 5
+   fChain->SetBranchAddress("numberOfPUVerticesMixingTruth", &numberOfPUVerticesMixingTruth, &b_numberOfPUVerticesMixingTruth);
+   fChain->SetBranchAddress("trackIP3dProbability", trackIP3dProbability, &b_trackIP3dProbability);
+   fChain->SetBranchAddress("trackIP2dProbability", trackIP2dProbability, &b_trackIP2dProbability);
+   fChain->SetBranchAddress("trackPtRel", trackPtRel, &b_trackPtRel);
+   fChain->SetBranchAddress("trackIsFromB", trackIsFromB, &b_trackIsFromB);
+   fChain->SetBranchAddress("trackIsFromPU", trackIsFromPU, &b_trackIsFromPU);
+#else
    fChain->SetBranchAddress("IP3dTrackQuality1", IP3dTrackQuality1, &b_IP3dTrackQuality1);
    fChain->SetBranchAddress("IP3dHasSharedPix11", IP3dHasSharedPix11, &b_IP3dHasSharedPix11);
    fChain->SetBranchAddress("IP3dHasSharedPix21", IP3dHasSharedPix21, &b_IP3dHasSharedPix21);
@@ -1812,6 +1845,123 @@ void btagNtupReader::Init(TTree *tree)
    fChain->SetBranchAddress("IP2dError4", IP2dError4, &b_IP2dError4);
    fChain->SetBranchAddress("IP2dProbability4", IP2dProbability4, &b_IP2dProbability4);
    fChain->SetBranchAddress("IP2dTrackPtRel4", IP2dTrackPtRel4, &b_IP2dTrackPtRel4);
+#endif
+
+#if bTagNtupleVersion >= 4
+   // Set object pointer
+   HLTPrescaleFactors = 0;
+   HLTriggerResults = 0;
+   fChain->SetBranchAddress("numberOfPUVerticesTot", &numberOfPUVerticesTot, &b_numberOfPUVerticesTot);
+   fChain->SetBranchAddress("HLTPrescaleFactors", &HLTPrescaleFactors, &b_HLTPrescaleFactors);
+   fChain->SetBranchAddress("HLTriggerResults", &HLTriggerResults, &b_HLTriggerResults);
+   fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight);
+   fChain->SetBranchAddress("PartonPt", PartonPt, &b_PartonPt);
+   fChain->SetBranchAddress("PartonEta", PartonEta, &b_PartonEta);
+   fChain->SetBranchAddress("PartonPhi", PartonPhi, &b_PartonPhi);
+   fChain->SetBranchAddress("GenJetPt", GenJetPt, &b_GenJetPt);
+   fChain->SetBranchAddress("GenJetEta", GenJetEta, &b_GenJetEta);
+   fChain->SetBranchAddress("GenJetPhi", GenJetPhi, &b_GenJetPhi);
+   fChain->SetBranchAddress("IPnSelectedAndDecayLengthAndJetAsixTracks", IPnSelectedAndDecayLengthAndJetAsixTracks, &b_IPnSelectedAndDecayLengthAndJetAsixTracks);
+#endif
+
+#if bTagNtupleVersion == 4
+   fChain->SetBranchAddress("IPnSelectedPUTracks", IPnSelectedPUTracks, &b_IPnSelectedPUTracks);
+   fChain->SetBranchAddress("IPnSelectedAndDecayLengthAndJetAsixPUTracks", IPnSelectedAndDecayLengthAndJetAsixPUTracks, &b_IPnSelectedAndDecayLengthAndJetAsixPUTracks);
+#endif
+
+#if bTagNtupleVersion <= 3 
+     fChain->SetBranchAddress("triggerHLTL1Jet6U", &triggerHLT_L1Jet6U, &b_triggerHLT_L1Jet6U);
+     fChain->SetBranchAddress("triggerHLTL1Jet10U", &triggerHLT_L1Jet10U, &b_triggerHLT_L1Jet10U);
+     fChain->SetBranchAddress("triggerHLTJet15U", &triggerHLT_Jet15U, &b_triggerHLT_Jet15U);
+     fChain->SetBranchAddress("triggerHLTJet30U", &triggerHLT_Jet30U, &b_triggerHLT_Jet30U);
+     fChain->SetBranchAddress("triggerHLTJet50U", &triggerHLT_Jet50U, &b_triggerHLT_Jet50U);
+     fChain->SetBranchAddress("triggerHLTJet70U", &triggerHLT_Jet70U, &b_triggerHLT_Jet70U);
+     fChain->SetBranchAddress("triggerHLTJet100U", &triggerHLT_Jet100U, &b_triggerHLT_Jet100U);
+     fChain->SetBranchAddress("triggerHLTBTagIPJet50U", &triggerHLT_BTagIP_Jet50U, &b_triggerHLT_BTagIP_Jet50U);
+     fChain->SetBranchAddress("triggerHLTBTagMuJet10U", &triggerHLT_BTagMu_Jet10U, &b_triggerHLT_BTagMu_Jet10U);
+     fChain->SetBranchAddress("triggerHLTBTagMuJet20U", &triggerHLT_BTagMu_Jet20U, &b_triggerHLT_BTagMu_Jet20U);
+     fChain->SetBranchAddress("triggerHLTBTagMuDiJet10U", &triggerHLT_BTagMu_DiJet10U, &b_triggerHLT_BTagMu_DiJet10U);
+     fChain->SetBranchAddress("triggerHLTBTagMuDiJet20U", &triggerHLT_BTagMu_DiJet20U, &b_triggerHLT_BTagMu_DiJet20U);
+     fChain->SetBranchAddress("triggerHLTBTagMuDiJet20UMu5", &triggerHLT_BTagMu_DiJet20U_Mu5, &b_triggerHLT_BTagMu_DiJet20U_Mu5);
+     fChain->SetBranchAddress("triggerHLTBTagMuDiJet30U", &triggerHLT_BTagMu_DiJet30U, &b_triggerHLT_BTagMu_DiJet30U);
+     fChain->SetBranchAddress("triggerHLTBTagMuDiJet30UMu5", &triggerHLT_BTagMu_DiJet30U_Mu5, &b_triggerHLT_BTagMu_DiJet30U_Mu5);
+#if bTagNtupleVersion >= 1
+       fChain->SetBranchAddress("prescaleHLTL1Jet6U", &prescaleHLT_L1Jet6U, &b_prescaleHLT_L1Jet6U);
+       fChain->SetBranchAddress("prescaleHLTL1Jet10U", &prescaleHLT_L1Jet10U, &b_prescaleHLT_L1Jet10U);
+       fChain->SetBranchAddress("prescaleHLTJet15U", &prescaleHLT_Jet15U, &b_prescaleHLT_Jet15U);
+       fChain->SetBranchAddress("prescaleHLTJet30U", &prescaleHLT_Jet30U, &b_prescaleHLT_Jet30U);
+       fChain->SetBranchAddress("prescaleHLTJet50U", &prescaleHLT_Jet50U, &b_prescaleHLT_Jet50U);
+       fChain->SetBranchAddress("prescaleHLTJet70U", &prescaleHLT_Jet70U, &b_prescaleHLT_Jet70U);
+       fChain->SetBranchAddress("prescaleHLTJet100U", &prescaleHLT_Jet100U, &b_prescaleHLT_Jet100U);
+       fChain->SetBranchAddress("prescaleHLTBTagIPJet50U", &prescaleHLT_BTagIP_Jet50U, &b_prescaleHLT_BTagIP_Jet50U);
+       fChain->SetBranchAddress("prescaleHLTBTagMuJet10U", &prescaleHLT_BTagMu_Jet10U, &b_prescaleHLT_BTagMu_Jet10U);
+       fChain->SetBranchAddress("prescaleHLTBTagMuJet20U", &prescaleHLT_BTagMu_Jet20U, &b_prescaleHLT_BTagMu_Jet20U);
+       fChain->SetBranchAddress("prescaleHLTBTagMuDiJet10U", &prescaleHLT_BTagMu_DiJet10U, &b_prescaleHLT_BTagMu_DiJet10U);
+       fChain->SetBranchAddress("prescaleHLTBTagMuDiJet20U", &prescaleHLT_BTagMu_DiJet20U, &b_prescaleHLT_BTagMu_DiJet20U);
+       fChain->SetBranchAddress("prescaleHLTBTagMuDiJet20UMu5", &prescaleHLT_BTagMu_DiJet20U_Mu5, &b_prescaleHLT_BTagMu_DiJet20U_Mu5);
+       fChain->SetBranchAddress("prescaleHLTBTagMuDiJet30U", &prescaleHLT_BTagMu_DiJet30U, &b_prescaleHLT_BTagMu_DiJet30U);
+       fChain->SetBranchAddress("prescaleHLTBTagMuDiJet30UMu5", &prescaleHLT_BTagMu_DiJet30U_Mu5, &b_prescaleHLT_BTagMu_DiJet30U_Mu5);
+#endif
+#if bTagNtupleVersion >= 2
+     fChain->SetBranchAddress("triggerHLT_L1SingleJet36", &triggerHLT_L1SingleJet36, &b_triggerHLT_L1SingleJet36);
+     fChain->SetBranchAddress("triggerHLT_Jet30", &triggerHLT_Jet30, &b_triggerHLT_Jet30);
+     fChain->SetBranchAddress("triggerHLT_Jet60", &triggerHLT_Jet60, &b_triggerHLT_Jet60);
+     fChain->SetBranchAddress("triggerHLT_Jet80", &triggerHLT_Jet80, &b_triggerHLT_Jet80);
+     fChain->SetBranchAddress("triggerHLT_Jet110", &triggerHLT_Jet110, &b_triggerHLT_Jet110);
+     fChain->SetBranchAddress("triggerHLT_Jet150", &triggerHLT_Jet150, &b_triggerHLT_Jet150);
+     fChain->SetBranchAddress("triggerHLT_Jet190", &triggerHLT_Jet190, &b_triggerHLT_Jet190);
+     fChain->SetBranchAddress("triggerHLT_Jet240", &triggerHLT_Jet240, &b_triggerHLT_Jet240);
+     fChain->SetBranchAddress("triggerHLT_Jet370", &triggerHLT_Jet370, &b_triggerHLT_Jet370);
+     fChain->SetBranchAddress("triggerHLT_Jet370_NoJetID", &triggerHLT_Jet370_NoJetID, &b_triggerHLT_Jet370_NoJetID);
+     fChain->SetBranchAddress("triggerHLT_DiJetAve15U_v4", &triggerHLT_DiJetAve15U_v4, &b_triggerHLT_DiJetAve15U_v4);
+     fChain->SetBranchAddress("triggerHLT_DiJetAve30U_v4", &triggerHLT_DiJetAve30U_v4, &b_triggerHLT_DiJetAve30U_v4);
+     fChain->SetBranchAddress("triggerHLT_DiJetAve50U_v4", &triggerHLT_DiJetAve50U_v4, &b_triggerHLT_DiJetAve50U_v4);
+     fChain->SetBranchAddress("triggerHLT_DiJetAve70U_v4", &triggerHLT_DiJetAve70U_v4, &b_triggerHLT_DiJetAve70U_v4);
+     fChain->SetBranchAddress("triggerHLT_DiJetAve100U_v4", &triggerHLT_DiJetAve100U_v4, &b_triggerHLT_DiJetAve100U_v4);
+     fChain->SetBranchAddress("triggerHLT_DiJetAve140U_v4", &triggerHLT_DiJetAve140U_v4, &b_triggerHLT_DiJetAve140U_v4);
+     fChain->SetBranchAddress("triggerHLT_DiJetAve180U_v4", &triggerHLT_DiJetAve180U_v4, &b_triggerHLT_DiJetAve180U_v4);
+     fChain->SetBranchAddress("triggerHLT_DiJetAve300U_v4", &triggerHLT_DiJetAve300U_v4, &b_triggerHLT_DiJetAve300U_v4);
+     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet60_Mu7_v2", &triggerHLT_BTagMu_DiJet60_Mu7_v2, &b_triggerHLT_BTagMu_DiJet60_Mu7_v2);
+     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet80_Mu9_v2", &triggerHLT_BTagMu_DiJet80_Mu9_v2, &b_triggerHLT_BTagMu_DiJet80_Mu9_v2);
+     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet100_Mu9_v2", &triggerHLT_BTagMu_DiJet100_Mu9_v2, &b_triggerHLT_BTagMu_DiJet100_Mu9_v2);
+     fChain->SetBranchAddress("prescaleHLT_L1SingleJet36", &prescaleHLT_L1SingleJet36, &b_prescaleHLT_L1SingleJet36);
+     fChain->SetBranchAddress("prescaleHLT_Jet30", &prescaleHLT_Jet30, &b_prescaleHLT_Jet30);
+     fChain->SetBranchAddress("prescaleHLT_Jet60", &prescaleHLT_Jet60, &b_prescaleHLT_Jet60);
+     fChain->SetBranchAddress("prescaleHLT_Jet80", &prescaleHLT_Jet80, &b_prescaleHLT_Jet80);
+     fChain->SetBranchAddress("prescaleHLT_Jet110", &prescaleHLT_Jet110, &b_prescaleHLT_Jet110);
+     fChain->SetBranchAddress("prescaleHLT_Jet150", &prescaleHLT_Jet150, &b_prescaleHLT_Jet150);
+     fChain->SetBranchAddress("prescaleHLT_Jet190", &prescaleHLT_Jet190, &b_prescaleHLT_Jet190);
+     fChain->SetBranchAddress("prescaleHLT_Jet240", &prescaleHLT_Jet240, &b_prescaleHLT_Jet240);
+     fChain->SetBranchAddress("prescaleHLT_Jet370", &prescaleHLT_Jet370, &b_prescaleHLT_Jet370);
+     fChain->SetBranchAddress("prescaleHLT_Jet370_NoJetID", &prescaleHLT_Jet370_NoJetID, &b_prescaleHLT_Jet370_NoJetID);
+     fChain->SetBranchAddress("prescaleHLT_DiJetAve15U_v4", &prescaleHLT_DiJetAve15U_v4, &b_prescaleHLT_DiJetAve15U_v4);
+     fChain->SetBranchAddress("prescaleHLT_DiJetAve30U_v4", &prescaleHLT_DiJetAve30U_v4, &b_prescaleHLT_DiJetAve30U_v4);
+     fChain->SetBranchAddress("prescaleHLT_DiJetAve50U_v4", &prescaleHLT_DiJetAve50U_v4, &b_prescaleHLT_DiJetAve50U_v4);
+     fChain->SetBranchAddress("prescaleHLT_DiJetAve70U_v4", &prescaleHLT_DiJetAve70U_v4, &b_prescaleHLT_DiJetAve70U_v4);
+     fChain->SetBranchAddress("prescaleHLT_DiJetAve100U_v4", &prescaleHLT_DiJetAve100U_v4, &b_prescaleHLT_DiJetAve100U_v4);
+     fChain->SetBranchAddress("prescaleHLT_DiJetAve140U_v4", &prescaleHLT_DiJetAve140U_v4, &b_prescaleHLT_DiJetAve140U_v4);
+     fChain->SetBranchAddress("prescaleHLT_DiJetAve180U_v4", &prescaleHLT_DiJetAve180U_v4, &b_prescaleHLT_DiJetAve180U_v4);
+     fChain->SetBranchAddress("prescaleHLT_DiJetAve300U_v4", &prescaleHLT_DiJetAve300U_v4, &b_prescaleHLT_DiJetAve300U_v4);
+     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet60_Mu7_v2", &prescaleHLT_BTagMu_DiJet60_Mu7_v2, &b_prescaleHLT_BTagMu_DiJet60_Mu7_v2);
+     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet80_Mu9_v2", &prescaleHLT_BTagMu_DiJet80_Mu9_v2, &b_prescaleHLT_BTagMu_DiJet80_Mu9_v2);
+     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet100_Mu9_v2", &prescaleHLT_BTagMu_DiJet100_Mu9_v2, &b_prescaleHLT_BTagMu_DiJet100_Mu9_v2);
+#endif
+#if bTagNtupleVersion == 2
+     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet20_Mu5_v2", &triggerHLT_BTagMu_DiJet20_Mu5, &b_triggerHLT_BTagMu_DiJet20_Mu5);
+     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet20_Mu5_v2", &prescaleHLT_BTagMu_DiJet20_Mu5, &b_prescaleHLT_BTagMu_DiJet20_Mu5);
+#endif
+#if bTagNtupleVersion == 3
+     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet20_Mu5", &triggerHLT_BTagMu_DiJet20_Mu5, &b_triggerHLT_BTagMu_DiJet20_Mu5);
+     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet40_Mu5", &triggerHLT_BTagMu_DiJet40_Mu5, &b_triggerHLT_BTagMu_DiJet40_Mu5);
+     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet70_Mu5", &triggerHLT_BTagMu_DiJet70_Mu5, &b_triggerHLT_BTagMu_DiJet70_Mu5);
+     fChain->SetBranchAddress("triggerHLT_BTagMu_DiJet110_Mu5", &triggerHLT_BTagMu_DiJet110_Mu5, &b_triggerHLT_BTagMu_DiJet110_Mu5);
+     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet20_Mu5", &prescaleHLT_BTagMu_DiJet20_Mu5, &b_prescaleHLT_BTagMu_DiJet20_Mu5);
+     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet40_Mu5", &prescaleHLT_BTagMu_DiJet40_Mu5, &b_prescaleHLT_BTagMu_DiJet40_Mu5);
+     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet70_Mu5", &prescaleHLT_BTagMu_DiJet70_Mu5, &b_prescaleHLT_BTagMu_DiJet70_Mu5);
+     fChain->SetBranchAddress("prescaleHLT_BTagMu_DiJet110_Mu5", &prescaleHLT_BTagMu_DiJet110_Mu5, &b_prescaleHLT_BTagMu_DiJet110_Mu5);
+#endif
+#endif //!end of bTagNtupleVersion <= 3
+
 #if bTagNtupleVersion <= 1
      fChain->SetBranchAddress("nElectrons", nElectrons, &b_nElectrons);
      fChain->SetBranchAddress("electronPt", electronPt, &b_electronPt);
@@ -1957,128 +2107,5 @@ void btagNtupReader::Init(TTree *tree)
      fChain->SetBranchAddress("electron4deltaPhiSeedClusterTrackAtCalo", electron4deltaPhiSeedClusterTrackAtCalo, &b_electron4deltaPhiSeedClusterTrackAtCalo);
      fChain->SetBranchAddress("electron4deltaPhiEleClusterTrackAtCalo", electron4deltaPhiEleClusterTrackAtCalo, &b_electron4deltaPhiEleClusterTrackAtCalo);
 #endif
-   fChain->SetBranchAddress("nMuons", nMuons, &b_nMuons);
-   fChain->SetBranchAddress("muon1IsGlobal", muon1IsGlobal, &b_muon1IsGlobal);
-   fChain->SetBranchAddress("muon1IsTracker", muon1IsTracker, &b_muon1IsTracker);
-   fChain->SetBranchAddress("muon1IsStandalone", muon1IsStandalone, &b_muon1IsStandalone);
-   fChain->SetBranchAddress("muon1Pt", muon1Pt, &b_muon1Pt);
-   fChain->SetBranchAddress("muon1Eta", muon1Eta, &b_muon1Eta);
-   fChain->SetBranchAddress("muon1Phi", muon1Phi, &b_muon1Phi);
-   fChain->SetBranchAddress("muon1NumberOfMatches", muon1NumberOfMatches, &b_muon1NumberOfMatches);
-   fChain->SetBranchAddress("muon1GlobalMuonHits", muon1GlobalMuonHits, &b_muon1GlobalMuonHits);
-   fChain->SetBranchAddress("muon1InnerValidHits", muon1InnerValidHits, &b_muon1InnerValidHits);
-   fChain->SetBranchAddress("muon1NExpectedOuterHits", muon1NExpectedOuterHits, &b_muon1NExpectedOuterHits);
-   fChain->SetBranchAddress("muon1NPixelHits", muon1NPixelHits, &b_muon1NPixelHits);
-   fChain->SetBranchAddress("muon1InnerNChi2", muon1InnerNChi2, &b_muon1InnerNChi2);
-   fChain->SetBranchAddress("muon1GlobalNChi2", muon1GlobalNChi2, &b_muon1GlobalNChi2);
-   fChain->SetBranchAddress("muon1VzPVDist", muon1VzPVDist, &b_muon1VzPVDist);
-   fChain->SetBranchAddress("muon1PtRel", muon1PtRel, &b_muon1PtRel);
-   fChain->SetBranchAddress("muon1Sip2d", muon1Sip2d, &b_muon1Sip2d);
-   fChain->SetBranchAddress("muon1Ip2d", muon1Ip2d, &b_muon1Ip2d);
-   fChain->SetBranchAddress("muon1Ipe2d", muon1Ipe2d, &b_muon1Ipe2d);
-   fChain->SetBranchAddress("muon1Sip3d", muon1Sip3d, &b_muon1Sip3d);
-   fChain->SetBranchAddress("muon1Ip3d", muon1Ip3d, &b_muon1Ip3d);
-   fChain->SetBranchAddress("muon1Ipe3d", muon1Ipe3d, &b_muon1Ipe3d);
-   fChain->SetBranchAddress("muon1P0Par", muon1P0Par, &b_muon1P0Par);
-   fChain->SetBranchAddress("muon1DeltaR", muon1DeltaR, &b_muon1DeltaR);
-   fChain->SetBranchAddress("muon1EtaRel", muon1EtaRel, &b_muon1EtaRel);
-   fChain->SetBranchAddress("muon1Ratio", muon1Ratio, &b_muon1Ratio);
-   fChain->SetBranchAddress("muon1TrackQuality", muon1TrackQuality, &b_muon1TrackQuality);
-   fChain->SetBranchAddress("muon1RatioRel", muon1RatioRel, &b_muon1RatioRel);
-   fChain->SetBranchAddress("muon2IsGlobal", muon2IsGlobal, &b_muon2IsGlobal);
-   fChain->SetBranchAddress("muon2IsTracker", muon2IsTracker, &b_muon2IsTracker);
-   fChain->SetBranchAddress("muon2IsStandalone", muon2IsStandalone, &b_muon2IsStandalone);
-   fChain->SetBranchAddress("muon2Pt", muon2Pt, &b_muon2Pt);
-   fChain->SetBranchAddress("muon2Eta", muon2Eta, &b_muon2Eta);
-   fChain->SetBranchAddress("muon2Phi", muon2Phi, &b_muon2Phi);
-   fChain->SetBranchAddress("muon2NumberOfMatches", muon2NumberOfMatches, &b_muon2NumberOfMatches);
-   fChain->SetBranchAddress("muon2GlobalMuonHits", muon2GlobalMuonHits, &b_muon2GlobalMuonHits);
-   fChain->SetBranchAddress("muon2InnerValidHits", muon2InnerValidHits, &b_muon2InnerValidHits);
-   fChain->SetBranchAddress("muon2NExpectedOuterHits", muon2NExpectedOuterHits, &b_muon2NExpectedOuterHits);
-   fChain->SetBranchAddress("muon2NPixelHits", muon2NPixelHits, &b_muon2NPixelHits);
-   fChain->SetBranchAddress("muon2InnerNChi2", muon2InnerNChi2, &b_muon2InnerNChi2);
-   fChain->SetBranchAddress("muon2GlobalNChi2", muon2GlobalNChi2, &b_muon2GlobalNChi2);
-   fChain->SetBranchAddress("muon2VzPVDist", muon2VzPVDist, &b_muon2VzPVDist);
-   fChain->SetBranchAddress("muon2PtRel", muon2PtRel, &b_muon2PtRel);
-   fChain->SetBranchAddress("muon2Sip2d", muon2Sip2d, &b_muon2Sip2d);
-   fChain->SetBranchAddress("muon2Ip2d", muon2Ip2d, &b_muon2Ip2d);
-   fChain->SetBranchAddress("muon2Ipe2d", muon2Ipe2d, &b_muon2Ipe2d);
-   fChain->SetBranchAddress("muon2Sip3d", muon2Sip3d, &b_muon2Sip3d);
-   fChain->SetBranchAddress("muon2Ip3d", muon2Ip3d, &b_muon2Ip3d);
-   fChain->SetBranchAddress("muon2Ipe3d", muon2Ipe3d, &b_muon2Ipe3d);
-   fChain->SetBranchAddress("muon2P0Par", muon2P0Par, &b_muon2P0Par);
-   fChain->SetBranchAddress("muon2DeltaR", muon2DeltaR, &b_muon2DeltaR);
-   fChain->SetBranchAddress("muon2EtaRel", muon2EtaRel, &b_muon2EtaRel);
-   fChain->SetBranchAddress("muon2Ratio", muon2Ratio, &b_muon2Ratio);
-   fChain->SetBranchAddress("muon2TrackQuality", muon2TrackQuality, &b_muon2TrackQuality);
-   fChain->SetBranchAddress("muon2RatioRel", muon2RatioRel, &b_muon2RatioRel);
-   fChain->SetBranchAddress("muon3IsGlobal", muon3IsGlobal, &b_muon3IsGlobal);
-   fChain->SetBranchAddress("muon3IsTracker", muon3IsTracker, &b_muon3IsTracker);
-   fChain->SetBranchAddress("muon3IsStandalone", muon3IsStandalone, &b_muon3IsStandalone);
-   fChain->SetBranchAddress("muon3Pt", muon3Pt, &b_muon3Pt);
-   fChain->SetBranchAddress("muon3Eta", muon3Eta, &b_muon3Eta);
-   fChain->SetBranchAddress("muon3Phi", muon3Phi, &b_muon3Phi);
-   fChain->SetBranchAddress("muon3NumberOfMatches", muon3NumberOfMatches, &b_muon3NumberOfMatches);
-   fChain->SetBranchAddress("muon3GlobalMuonHits", muon3GlobalMuonHits, &b_muon3GlobalMuonHits);
-   fChain->SetBranchAddress("muon3InnerValidHits", muon3InnerValidHits, &b_muon3InnerValidHits);
-   fChain->SetBranchAddress("muon3NExpectedOuterHits", muon3NExpectedOuterHits, &b_muon3NExpectedOuterHits);
-   fChain->SetBranchAddress("muon3NPixelHits", muon3NPixelHits, &b_muon3NPixelHits);
-   fChain->SetBranchAddress("muon3InnerNChi2", muon3InnerNChi2, &b_muon3InnerNChi2);
-   fChain->SetBranchAddress("muon3GlobalNChi2", muon3GlobalNChi2, &b_muon3GlobalNChi2);
-   fChain->SetBranchAddress("muon3VzPVDist", muon3VzPVDist, &b_muon3VzPVDist);
-   fChain->SetBranchAddress("muon3PtRel", muon3PtRel, &b_muon3PtRel);
-   fChain->SetBranchAddress("muon3Sip2d", muon3Sip2d, &b_muon3Sip2d);
-   fChain->SetBranchAddress("muon3Ip2d", muon3Ip2d, &b_muon3Ip2d);
-   fChain->SetBranchAddress("muon3Ipe2d", muon3Ipe2d, &b_muon3Ipe2d);
-   fChain->SetBranchAddress("muon3Sip3d", muon3Sip3d, &b_muon3Sip3d);
-   fChain->SetBranchAddress("muon3Ip3d", muon3Ip3d, &b_muon3Ip3d);
-   fChain->SetBranchAddress("muon3Ipe3d", muon3Ipe3d, &b_muon3Ipe3d);
-   fChain->SetBranchAddress("muon3P0Par", muon3P0Par, &b_muon3P0Par);
-   fChain->SetBranchAddress("muon3DeltaR", muon3DeltaR, &b_muon3DeltaR);
-   fChain->SetBranchAddress("muon3EtaRel", muon3EtaRel, &b_muon3EtaRel);
-   fChain->SetBranchAddress("muon3Ratio", muon3Ratio, &b_muon3Ratio);
-   fChain->SetBranchAddress("muon3TrackQuality", muon3TrackQuality, &b_muon3TrackQuality);
-   fChain->SetBranchAddress("muon3RatioRel", muon3RatioRel, &b_muon3RatioRel);
-   fChain->SetBranchAddress("muon4IsGlobal", muon4IsGlobal, &b_muon4IsGlobal);
-   fChain->SetBranchAddress("muon4IsTracker", muon4IsTracker, &b_muon4IsTracker);
-   fChain->SetBranchAddress("muon4IsStandalone", muon4IsStandalone, &b_muon4IsStandalone);
-   fChain->SetBranchAddress("muon4Pt", muon4Pt, &b_muon4Pt);
-   fChain->SetBranchAddress("muon4Eta", muon4Eta, &b_muon4Eta);
-   fChain->SetBranchAddress("muon4Phi", muon4Phi, &b_muon4Phi);
-   fChain->SetBranchAddress("muon4NumberOfMatches", muon4NumberOfMatches, &b_muon4NumberOfMatches);
-   fChain->SetBranchAddress("muon4GlobalMuonHits", muon4GlobalMuonHits, &b_muon4GlobalMuonHits);
-   fChain->SetBranchAddress("muon4InnerValidHits", muon4InnerValidHits, &b_muon4InnerValidHits);
-   fChain->SetBranchAddress("muon4NExpectedOuterHits", muon4NExpectedOuterHits, &b_muon4NExpectedOuterHits);
-   fChain->SetBranchAddress("muon4NPixelHits", muon4NPixelHits, &b_muon4NPixelHits);
-   fChain->SetBranchAddress("muon4InnerNChi2", muon4InnerNChi2, &b_muon4InnerNChi2);
-   fChain->SetBranchAddress("muon4GlobalNChi2", muon4GlobalNChi2, &b_muon4GlobalNChi2);
-   fChain->SetBranchAddress("muon4VzPVDist", muon4VzPVDist, &b_muon4VzPVDist);
-   fChain->SetBranchAddress("muon4PtRel", muon4PtRel, &b_muon4PtRel);
-   fChain->SetBranchAddress("muon4Sip2d", muon4Sip2d, &b_muon4Sip2d);
-   fChain->SetBranchAddress("muon4Ip2d", muon4Ip2d, &b_muon4Ip2d);
-   fChain->SetBranchAddress("muon4Ipe2d", muon4Ipe2d, &b_muon4Ipe2d);
-   fChain->SetBranchAddress("muon4Sip3d", muon4Sip3d, &b_muon4Sip3d);
-   fChain->SetBranchAddress("muon4Ip3d", muon4Ip3d, &b_muon4Ip3d);
-   fChain->SetBranchAddress("muon4Ipe3d", muon4Ipe3d, &b_muon4Ipe3d);
-   fChain->SetBranchAddress("muon4P0Par", muon4P0Par, &b_muon4P0Par);
-   fChain->SetBranchAddress("muon4DeltaR", muon4DeltaR, &b_muon4DeltaR);
-   fChain->SetBranchAddress("muon4EtaRel", muon4EtaRel, &b_muon4EtaRel);
-   fChain->SetBranchAddress("muon4Ratio", muon4Ratio, &b_muon4Ratio);
-   fChain->SetBranchAddress("muon4TrackQuality", muon4TrackQuality, &b_muon4TrackQuality);
-   fChain->SetBranchAddress("muon4RatioRel", muon4RatioRel, &b_muon4RatioRel);
-   fChain->SetBranchAddress("standardCombinedSecondaryVertexMVAPFBJetTags", standardCombinedSecondaryVertexMVAPFBJetTags, &b_standardCombinedSecondaryVertexMVAPFBJetTags);
-   fChain->SetBranchAddress("standardCombinedSecondaryVertexPFBJetTags", standardCombinedSecondaryVertexPFBJetTags, &b_standardCombinedSecondaryVertexPFBJetTags);
-   fChain->SetBranchAddress("standardGhostTrackPFBJetTags", standardGhostTrackPFBJetTags, &b_standardGhostTrackPFBJetTags);
-   fChain->SetBranchAddress("standardJetBProbabilityPFBJetTags", standardJetBProbabilityPFBJetTags, &b_standardJetBProbabilityPFBJetTags);
-   fChain->SetBranchAddress("standardJetProbabilityPFBJetTags", standardJetProbabilityPFBJetTags, &b_standardJetProbabilityPFBJetTags);
-   fChain->SetBranchAddress("standardSimpleSecondaryVertexHighEffPFBJetTags", standardSimpleSecondaryVertexHighEffPFBJetTags, &b_standardSimpleSecondaryVertexHighEffPFBJetTags);
-   fChain->SetBranchAddress("standardSimpleSecondaryVertexHighPurPFBJetTags", standardSimpleSecondaryVertexHighPurPFBJetTags, &b_standardSimpleSecondaryVertexHighPurPFBJetTags);
-   fChain->SetBranchAddress("standardSoftElectronByIP3dPFBJetTags", standardSoftElectronByIP3dPFBJetTags, &b_standardSoftElectronByIP3dPFBJetTags);
-   fChain->SetBranchAddress("standardSoftElectronByPtPFBJetTags", standardSoftElectronByPtPFBJetTags, &b_standardSoftElectronByPtPFBJetTags);
-   fChain->SetBranchAddress("standardSoftMuonByIP3dPFBJetTags", standardSoftMuonByIP3dPFBJetTags, &b_standardSoftMuonByIP3dPFBJetTags);
-   fChain->SetBranchAddress("standardSoftMuonByPtPFBJetTags", standardSoftMuonByPtPFBJetTags, &b_standardSoftMuonByPtPFBJetTags);
-   fChain->SetBranchAddress("standardSoftMuonPFBJetTags", standardSoftMuonPFBJetTags, &b_standardSoftMuonPFBJetTags);
-   fChain->SetBranchAddress("standardTrackCountingHighEffPFBJetTags", standardTrackCountingHighEffPFBJetTags, &b_standardTrackCountingHighEffPFBJetTags);
-   fChain->SetBranchAddress("standardTrackCountingHighPurPFBJetTags", standardTrackCountingHighPurPFBJetTags, &b_standardTrackCountingHighPurPFBJetTags);
 }
 #endif //end of #if !defined(btagNtupReader_h) && defined(bTagNtupleVersion)
