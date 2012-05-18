@@ -89,11 +89,11 @@ template<typename T> Plots<T>::Plots( Bool_t mu, Float_t ptval, UInt_t datayear 
       printf("MC%d: histo_%s.root is added.\n",iSample,MC_SampleNames[iSample]);
       nameroot.push_back(string(dir_)+"histo_"+string(MC_SampleNames[iSample])+".root");
     }
-  /*
+
   for (UInt_t i=0; i<nameroot.size()&&i<MAXNFILES; i++) {
     mc[i] = (TFile*) gROOT->GetListOfFiles()->FindObject(nameroot[i].c_str());
     if (!mc[i] || !mc[i]->IsOpen()) mc[i] = new TFile(nameroot[i].c_str());
-    }*/
+  }
   Nfiles=nameroot.size();
   string dataroot2;
   if (datayear==2010) {
