@@ -70,23 +70,23 @@ TString my_trigger_path="HLT_Jet80";Float_t JetPtthresholdsfornmu=-1; Float_t cu
 TString my_trigger_path="HLT_Jet110";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=110.;
 #endif
 
-#if PTVAL == 20 && !defined(RUN_ON_BTAG)
+#if PTVAL == 20 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";Float_t JetPtthresholdsfornmu=20.; Float_t cutJetPt=45.; Float_t cutMuonPt=7.;
 #endif
 
-#if PTVAL == 40 && !defined(RUN_ON_BTAG)
+#if PTVAL == 40 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";Float_t JetPtthresholdsfornmu=60.; Float_t cutJetPt=65.; Float_t cutMuonPt=7.;
 #endif
 
-#if PTVAL == 60 && !defined(RUN_ON_BTAG)
+#if PTVAL == 60 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet60_Mu7";Float_t JetPtthresholdsfornmu=90; Float_t cutJetPt=95.; Float_t cutMuonPt=9.;
 #endif
 
-#if PTVAL == 70 && !defined(RUN_ON_BTAG)
+#if PTVAL == 70 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet70_Mu5";Float_t JetPtthresholdsfornmu=100; Float_t cutJetPt=105.; Float_t cutMuonPt=7.;
 #endif
 
-#if PTVAL == 110 && !defined(RUN_ON_BTAG)
+#if PTVAL == 110 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet110_Mu5";Float_t JetPtthresholdsfornmu=155;/*130?*/ Float_t cutJetPt=160.; Float_t cutMuonPt=7.;
 #endif
 #endif
