@@ -1,6 +1,0 @@
-<use    name="bTag/CommissioningCommonSetup"/>
-<use    name="rootcore"/>
-<use    name="boost_program_options"/>
-<environment>
-  <bin  file="BTagCommissioningPlotMaker.cc"/>
-</environment>
