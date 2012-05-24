@@ -1,9 +1,10 @@
-import FWCore.ParameterSet.Config as cms
-
+#########################
+#####    Settings   #####
+#########################
 DATALIST=[
 #"/QCD_Pt-15to30_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
 #"/QCD_Pt-30to50_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
-"/QCD_Pt-50to80_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v2/AODSIM"
+#"/QCD_Pt-50to80_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v2/AODSIM"
 #"/QCD_Pt-80to120_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v3/AODSIM",
 #"/QCD_Pt-120to170_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
 #"/QCD_Pt-170to300_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
@@ -25,12 +26,27 @@ DATALIST=[
 #"/QCD_Pt-170to300_TuneZ2_7TeV_pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
 #"/QCD_Pt-300to470_TuneZ2_7TeV_pythia6/Fall11-PU_S6-START44_V5-v1/AODSIM",
 #"/QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6/Fall11-Peak32PU_START42_V14B-v1/GEN-SIM-RECO",
-#"/Jet/Run2011B-PromptReco-v1/AOD"
+#"/Jet/Run2011B-PromptReco-v1/AOD",
+"/Jet/Run2012A-PromptReco-v1/AOD",
+#"/BTag/Run2012A-PromptReco-v1/AOD",
+#"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-NoPileUp_START52_V9-v5/AODSIM",
+#"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-PU_S7_START52_V5-v1/AODSIM"
           ]
 HLTProc="HLT"
+runOnMC = True
+usePFnoPU = True
+
+import FWCore.ParameterSet.Config as cms
+
+#JetSelection
+JetCut=cms.string("pt > 30.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99")
+
 # It will select the events based on the TriggerSelections. The ntuple will only save the triggers whose name matches any entry in TriggerSelections
 TriggerSelections=cms.vstring("HLT_*Jet*")
 
+############################
+###    Main Program   ######
+############################
 process = cms.Process("validation")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
@@ -47,37 +63,25 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 #Global tag
 #from Configuration.PyReleaseValidation.autoCond import autoCond  # for <CMSSW_4_3_0
 from Configuration.AlCa.autoCond import autoCond # for >=CMSSW_4_3_0
-process.GlobalTag.globaltag = autoCond['startup']
+
+if runOnMC:
+  process.GlobalTag.globaltag = autoCond['startup']
+else:
+  process.GlobalTag.globaltag = autoCond['com10']
 
 process.source = cms.Source("PoolSource",
-#    fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_QCD_Pt-15to3000_TuneZ2_Fall11_Peak32PU_RECO.root")
-fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD.root",
-                                  "file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD_2.root")
+#    fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_Chamonix_TTbar_AODSIM.root")
+#                            fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/k/kkaadze/BTagging/QCD_Fall11_44_Pt80to120_RECODEBUG.root")
+                           fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Summer12_QCD15to3000.root")
+#    fileNames = cms.untracked.vstring("rfio:/dpm/in2p3.fr/home/cms/phedex/store/data/Run2012A/Jet/AOD/PromptReco-v1/000/190/934/304B8EF5-CE85-E111-B4DF-003048F110BE.root")
+#    fileNames = cms.untracked.vstring("file:/storage1/cms/jandrea/425MC/TTJets_TuneZ2_7TeV/TTJets_TuneZ2_7TeV/NTuple_67_1_HhM.root")
+#fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD.root",
+#                                  "file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD_2.root")
 )
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(100)
 )
-
-########### Event cleaning ###########
-#Require a good vertex
-
-process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
-
-process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
-   src = cms.InputTag("offlinePrimaryVertices"),
-   cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"),
-   filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
-)
-
-#Filter for removing scraping events
-process.noscraping = cms.EDFilter("FilterOutScraping",
-                                applyfilter = cms.untracked.bool(True),
-                                debugOn = cms.untracked.bool(False),
-                                numtrack = cms.untracked.uint32(10),
-                                thresh = cms.untracked.double(0.25)
-                                )
-
 
 ########### Trigger selection ###########
 # Select events based on the HLT triggers....singleJet and BTag triggers
@@ -94,26 +98,47 @@ process.JetHLTFilter = hlt.triggerResultsFilter.clone(
    throw = cms.bool( False) #set to false to deal with missing triggers while running over different trigger menus
 )
 
-########### Jet selection and JEC ###########
-# Apply "loose PF JetID" first
-process.PFJetsFilter = cms.EDFilter("PFJetSelector",
-  src = cms.InputTag("ak5PFJets"),
-  cut = cms.string("pt > 10.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99"),
-  filter = cms.bool(True)
-)
+########### Event cleaning ###########
+#Require a good vertex
 
-# Then apply the JEC
-#...........................................
-# JEC in 38X....switch off use of confDB
+from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
+
+process.goodOfflinePrimaryVertices = cms.EDFilter(
+    "PrimaryVertexObjectFilter",
+    filterParams = pvSelector.clone( minNdof = cms.double(4.0), maxZ = cms.double(24.0) ),
+    src=cms.InputTag('offlinePrimaryVertices')
+    )
+    
+    
+process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi")
+process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
+                      vertexCollection = cms.InputTag('offlinePrimaryVertices'),
+                      minimumNDOF = cms.uint32(4) ,
+ 		      maxAbsZ = cms.double(24), 
+ 		      maxd0 = cms.double(2)	
+                     )
+
+
+#Filter for removing scraping events
+process.noscraping = cms.EDFilter("FilterOutScraping",
+                                applyfilter = cms.untracked.bool(True),
+                                debugOn = cms.untracked.bool(False),
+                                numtrack = cms.untracked.uint32(10),
+                                thresh = cms.untracked.double(0.25)
+                                )
+				
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 
-##------------------  PF JETS --------------
 process.ak5PFJetsJEC = process.ak5PFJetsL2L3.clone(
-    src = 'PFJetsFilter', 
-    correctors = ['ak5PFL2L3'])
+    src = 'ak5PFJets', 
+    correctors = ['ak5PFL2L3']
+)
 
-#............................................
-
+process.PFJetsFilter = cms.EDFilter("PFJetSelector",
+  src = cms.InputTag("ak5PFJetsJEC"),
+  cut = JetCut,
+  filter = cms.bool(True)
+)
 
 #Filter to remove pthat>15 events in MinBias samples
 process.pthat_filter = cms.EDFilter("MCProcessFilter",
@@ -124,18 +149,41 @@ process.pthat_filter = cms.EDFilter("MCProcessFilter",
 
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryPaths_cfi")
 
+########### Jet selection and JEC use PFtoPAT and PFnoPU ###########
+#JetID
+
+if usePFnoPU :
+    process.out = cms.OutputModule("PoolOutputModule",
+                                   outputCommands = cms.untracked.vstring('drop *'),
+                                   fileName = cms.untracked.string('EmptyFile.root')
+                                   )
+    process.load("PhysicsTools.PatAlgos.patSequences_cff")
+    from PhysicsTools.PatAlgos.tools.pfTools import *
+    postfix="PF2PAT"
+    usePF2PAT(process,runPF2PAT=True, jetAlgo="AK5", runOnMC=runOnMC, postfix=postfix) 
+    applyPostfix(process,"patJetCorrFactors",postfix).payload = cms.string('AK5PFchs')
+    process.pfPileUpPF2PAT.Enable = True
+    process.pfPileUpPF2PAT.Vertices = cms.InputTag('goodOfflinePrimaryVertices')
+    process.selectedPatJetsPF2PAT.cut = JetCut
+    process.JECAlgo = cms.Sequence( getattr(process,"patPF2PATSequence"+postfix) )
+    JetID=cms.InputTag("selectedPatJetsPF2PAT")
+else:
+    process.JECAlgo = cms.Sequence( process.ak5PFJetsJEC*process.PFJetsFilter )
+    JetID=cms.InputTag("PFJetsFilter")
+
 ########### Rerun b-tagging for PF Jets ###########
 process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
 
 process.ak5PFJetTracksAssociatorAtVertex = cms.EDProducer("JetTracksAssociatorAtVertex",
    process.j2tParametersVX,
-   jets = cms.InputTag("ak5PFJetsJEC")
+   jets = JetID
 )
 
 
 process.standardImpactParameterPFTagInfos = process.impactParameterTagInfos.clone(
   jetTracks = "ak5PFJetTracksAssociatorAtVertex"
 )
+
 
 process.standardSecondaryVertexPFTagInfos = process.secondaryVertexTagInfos.clone(
   trackIPTagInfos = "standardImpactParameterPFTagInfos"
@@ -202,11 +250,11 @@ process.standardCombinedSecondaryVertexMVAPFBJetTags = process.combinedSecondary
 )
 
 process.standardSoftMuonPFTagInfos = process.softMuonTagInfos.clone(
-  jets = "ak5PFJetsJEC"
+  jets = JetID
 )
 
 process.standardSoftElectronPFTagInfos = process.softElectronTagInfos.clone(
-  jets = "ak5PFJetsJEC"
+  jets = JetID
 )
 
 process.standardSoftMuonPFBJetTags = process.softMuonBJetTags.clone(
@@ -233,8 +281,9 @@ process.standardSoftElectronByIP3dPFBJetTags = process.softElectronByIP3dBJetTag
 process.load("PhysicsTools.JetMCAlgos.CaloJetsMCFlavour_cfi")
 
 process.AK5PFbyRef = process.AK5byRef.clone(
-  jets = "ak5PFJetsJEC"
+  jets = JetID
 )
+
 process.AK5PFbyValAlgo = process.AK5byValAlgo.clone(
   srcByReference = "AK5PFbyRef"
 )
@@ -246,20 +295,20 @@ process.flavourSeq = cms.Sequence(
 ########### Generation Level Jet Matching ###########
 #stole from PAT
 process.load("PhysicsTools.PatAlgos.mcMatchLayer0.jetMatch_cfi")
-process.patJetGenJetMatch.src = "ak5PFJetsJEC"
+process.patJetGenJetMatch.src = JetID
 
 ########### Dump contents into ntuple ###########
 process.load("bTag.CommissioningCommonSetup.tagntupleproducer_cfi")
 
 process.standardPFBTagNtuple = process.bTagNtuple.clone()
-process.standardPFBTagNtuple.jetSrc = cms.InputTag( "ak5PFJetsJEC" )
+process.standardPFBTagNtuple.jetSrc = JetID
 process.standardPFBTagNtuple.svComputer = cms.InputTag( "standardCombinedSecondaryVertexPF" )
 process.standardPFBTagNtuple.TriggerTag = cms.InputTag( "TriggerResults::"+HLTProc)
 process.standardPFBTagNtuple.TriggerSelection = TriggerSelections
 process.standardPFBTagNtuple.flavorHistory = cms.InputTag("flavorHistoryFilter")
 process.standardPFBTagNtuple.getSharedHitInfo = cms.bool(False)
 process.standardPFBTagNtuple.jetMCSrc = cms.InputTag( "AK5PFbyValAlgo" )
-#set this to FALSE for 39X samples, set it to TRUE for 3_11 samples
+#set this to FALSE for 39X samples, set it to TRUE for 3_11 samplesstandardPFNtuple.root
 process.standardPFBTagNtuple.HepMCTag = cms.untracked.InputTag( "generator" )
 process.standardPFBTagNtuple.BSTag = cms.InputTag( "offlineBeamSpot" )
 process.standardPFBTagNtuple.SimTruthTag = cms.untracked.InputTag( "g4SimHits" )
@@ -271,7 +320,7 @@ process.standardPFBTagNtuple.MuonTagInfos = cms.InputTag( "standardSoftMuonPFTag
 process.standardPFBTagNtuple.Label = cms.string("standardPF")
 process.standardPFBTagNtuple.GenJetMatcher = cms.InputTag("patJetGenJetMatch")
 process.standardPFBTagNtuple.filename = cms.string("standardPFNtuple.root")
-process.standardPFBTagNtuple.TrackMCTruthMatchChi2Cut = cms.double(1E9)
+process.standardPFBTagNtuple.TrackMCTruthMatchChi2Cut = cms.double(25)
 process.standardPFBTagNtuple.bTagConfig = cms.VPSet(
     cms.PSet(
     alias = cms.string("standardTrackCountingHighEffPFBJetTags"),
@@ -367,16 +416,24 @@ process.slTaggers = cms.Sequence(
     process.standardSoftElectronByIP3dPFBJetTags 
 )
 
+if runOnMC:
+  process.GenHistory = cms.Sequence(
+#    process.pthat_filter+
+    process.flavorHistorySeq *
+    process.flavourSeq *
+    process.patJetGenJetMatch
+    )
+else:
+  process.GenHistory = cms.Sequence()
 
-process.plots = cms.Path(
-#  process.pthat_filter+
-  process.JetHLTFilter +
-  process.noscraping +
+process.plots = cms.Path( 
+  process.noscraping + 
+  process.JetHLTFilter + 
   process.offlinePrimaryVertices *
-  process.oneGoodVertexFilter +
-  process.flavorHistorySeq +
-  process.PFJetsFilter *
-  process.ak5PFJetsJEC *
+  process.goodOfflinePrimaryVertices *
+  process.primaryVertexFilter +
+  process.JECAlgo*
+  process.GenHistory +
   process.ak5PFJetTracksAssociatorAtVertex  *
   process.standardImpactParameterPFTagInfos  *
   process.svTagInfos *
@@ -384,10 +441,8 @@ process.plots = cms.Path(
   process.svTaggers *
   process.slTagInfos *
   process.slTaggers *
-  process.flavourSeq *
-  process.patJetGenJetMatch *
   process.standardPFBTagNtuple 
-)
+  )
 
 ## Added for getting the L1 and HLT summary report
 process.options = cms.untracked.PSet(
@@ -397,46 +452,46 @@ process.options = cms.untracked.PSet(
 process.MessageLogger.categories.append('L1GtTrigReport')
 process.MessageLogger.categories.append('HLTrigReport')
 process.MessageLogger.cerr.FwkReport.reportEvery = 500
-process.MessageLogger.cerr.threshold = cms.untracked.string('ERROR')
+process.MessageLogger.cerr.threshold = cms.untracked.string('WARNING')
 
 import sys,os,datetime,re
 
-if __name__ == '__main__' and 'submit' in sys.argv:
+if sys.argv[0] != "cmsRun":
     castorhome_=os.getenv("CASTOR_HOME")
     home_=os.getenv("HOME")
     castorhome_=castorhome_.replace("/castor/cern.ch/","")
     time=datetime.datetime.now().strftime("%d%b%Y")
-    new_py = open('bTagNtupleMaker.py').read()
-    needdel = re.match(r".*(\nimport sys,os,datetime,re.*)", new_py, re.DOTALL)
-    new_py = new_py.replace(needdel.group(1),"")
-    new_py = re.sub("input = cms.untracked.int32(.*)",
-                    "input = cms.untracked.int32(-1)",
-                    new_py)
     for dataset_ in DATALIST:
+        new_py = open('bTagNtupleMaker.py').read()
+        crab_py_start_index=new_py.find(']')
+        crab_py_end_index=new_py.rfind("\nimport sys,os,datetime,re")
+        new_py = new_py[crab_py_start_index+1:crab_py_end_index-1]
+        new_py = re.sub("input = cms.untracked.int32(.*)",
+                        "input = cms.untracked.int32(-1)",
+                        new_py)
         dirname_=dataset_.split("/")
         if "Run20" not in dataset_:
+            print 'Submitting %s as MC' % dataset_
             jobcontrol_='''
 total_number_of_events = -1
 number_of_jobs = 128
 '''
-            dirname_ = re.sub("_Tune.*", "",dirname_[1])
-            dirname_=time+"_"+dirname_
-            new_py = re.sub("process.GlobalTag.globaltag = autoCond\[.*\]",
-                            "process.GlobalTag.globaltag = autoCond['startup']",
+            dirname_=time+"_"+dirname_[1]+"_"+dirname_[2]
+            new_py = re.sub("runOnMC = .*\n",
+                            "runOnMC = True\n",
                             new_py)
         else:
+            print 'Submitting %s as DATA' % dataset_
             jobcontrol_='''
-lumi_mask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Prompt/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt
+lumi_mask=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/Prompt/Cert_190456-193557_8TeV_PromptReco_Collisions12_JSON.txt
+#/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Prompt/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt
 total_number_of_lumis = -1
-number_of_jobs = 300
+number_of_jobs = 240
 '''
             dirname_=time+"_"+dirname_[1]+"_"+dirname_[2]
-            new_py = re.sub("process.GlobalTag.globaltag = autoCond\[.*\]",
-                            "process.GlobalTag.globaltag = autoCond['com10']",
+            new_py = re.sub("runOnMC = .*\n",
+                            "runOnMC = False\n",
                             new_py)
-            new_py = new_py.replace("  process.flavorHistorySeq +\n","")
-            new_py = new_py.replace("  process.flavourSeq *\n","")
-            new_py = new_py.replace("  process.patJetGenJetMatch *\n","")
         crab_cfg = '''
 [CRAB]
 jobtype = cmssw
@@ -447,6 +502,9 @@ datasetpath = %(dataset_)s
 pset = bTagNtupleMaker_crab.py
 output_file = standardPFNtuple.root
 %(jobcontrol_)s
+
+[GRID] 
+ce_black_list=T2_BR_SPRACE
 
 [USER]
 ui_working_dir = %(home_)s/scratch0/crab_bTaggingNtuple_%(dirname_)s
@@ -459,10 +517,7 @@ publish_data=0
 ''' % locals()
         open('crab.cfg', 'wt').write(crab_cfg)
         open('bTagNtupleMaker_crab.py', 'wt').write(new_py)
-        if 'test' not in sys.argv:
+        if 'submit' in sys.argv:
             os.system('crab -create -submit all')
             os.system('rm crab.cfg')
             os.system('rm bTagNtupleMaker_crab.py')
-
-
-

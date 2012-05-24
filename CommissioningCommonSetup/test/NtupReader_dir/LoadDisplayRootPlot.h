@@ -7,6 +7,7 @@
 #include <TString.h>
 #include <math.h>
 #include <iostream>
+#include <TROOT.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -22,7 +23,7 @@ using namespace std;
 
 const TString format="pdf";
 
-#define PLOT_COMMON_TITLE "CMS 2011 preliminary, #sqrt{s} = 7 TeV, 4.7 fb^{-1}"
+#define PLOT_COMMON_TITLE "CMS 2011 preliminary, #sqrt{s} = 8 TeV,  488 pb^{-1}"
 
 #define MAXNFILES 10
 ////// IMPORTANT : CHANGE THE DEFINITION OF THE CONSTRUCTOR OF THE CLASS "Plots"  TO CORRECT THE FILE LOCATION
@@ -33,14 +34,14 @@ template<typename T> class Plots {
     for (UInt_t i=0; i<Nfiles&&i<MAXNFILES; i++)
       mc[i]->Close(); 
     data->Close();
-    data2->Close();
+    //data2->Close();
   }
   T * histo0_Data;
   T * histo0_Data1;
   T * histo0_Data2;
   T * histo0_Data3;
 
-  T * histo0_2010;
+  //  T * histo0_2010;
   T * histo0_MC;
   T * histo0_MC_b;
   T * histo0_MC_c;
@@ -63,22 +64,20 @@ template<typename T> class Plots {
   Bool_t mu_;
   Float_t ptval_;
   UInt_t year_;
-  string dir_;
+  char dir_[100];
   TFile * mc[MAXNFILES];
-  TFile * data,*data2;
+  TFile * data;//,*data2;
   UInt_t Nfiles;
 };
 
 template<typename T> Plots<T>::Plots( Bool_t mu, Float_t ptval, UInt_t datayear ) : mu_(mu),ptval_(ptval),year_(datayear) {
-  char tmpstr[300];
+  char filename[300];
   vector<string> nameroot;
   if (mu==false)
-    sprintf(tmpstr,"dir_jet%.0fpu/",ptval_);
+    sprintf(dir_,"dir_jet%.0fpu/",ptval_);
   else
-    sprintf(tmpstr,"dir_btag%.0fpu/",ptval_);
-  dir_ = string(tmpstr);
-  cout << dir_ << endl;
-  if (ptval_!=60 && ptval_!=80 && ptval_!=110. && mu==false) nameroot.push_back(dir_+"histo_qcd15.root");
+    sprintf(dir_,"dir_btag%.0fpu/",ptval_);
+  printf("<<<<<<<< Opening directory %s >>>>>>>>\n",dir_);
   const UInt_t nSamples=sizeof(MC_Weights)/sizeof(Float_t);
   for (UInt_t iSample=0;iSample<nSamples;iSample++) 
     if (
@@ -87,25 +86,30 @@ template<typename T> Plots<T>::Plots( Bool_t mu, Float_t ptval, UInt_t datayear 
 	((strstr(MC_SampleNames[iSample],"qcdmu")!=NULL&&mu)||
 	 (strstr(MC_SampleNames[iSample],"qcdmu")==NULL&&mu==false))
 	) {
-      nameroot.push_back(dir_+"histo_"+string(MC_SampleNames[iSample])+".root");
+      printf("MC%d: histo_%s.root is added.\n",iSample,MC_SampleNames[iSample]);
+      nameroot.push_back(string(dir_)+"histo_"+string(MC_SampleNames[iSample])+".root");
     }
-  for (UInt_t i=0; i<nameroot.size()&&i<MAXNFILES; i++)
-    mc[i] = new TFile(nameroot[i].c_str());
+
+  for (UInt_t i=0; i<nameroot.size()&&i<MAXNFILES; i++) {
+    mc[i] = (TFile*) gROOT->GetListOfFiles()->FindObject(nameroot[i].c_str());
+    if (!mc[i] || !mc[i]->IsOpen()) mc[i] = new TFile(nameroot[i].c_str());
+  }
   Nfiles=nameroot.size();
-  string dataroot;
   string dataroot2;
   if (datayear==2010) {
-    dataroot=dir_+"histo_minijet2010.root";
+    sprintf(filename,"%shisto_minijet2010.root",dir_);
   }
-  else if (datayear==2011) {
-    if (mu==false) {dataroot=dir_+"histo_minijet2011.root"; }
-    else           {dataroot=dir_+"histo_minibtag2011.root"; }
+  else if (datayear>=2011) {
+    if (mu==false) sprintf(filename,"%shisto_minijet%d.root",dir_,datayear);
+    else sprintf(filename,"%shisto_minibtag%d.root",dir_,datayear);
   }
-  data   = new TFile(dataroot.c_str());
-  //  if (mu==false) {dataroot2=dir_+"histo_minijet2010.root"; }
-  if (mu==false) {dataroot2=dir_+"histo_minijet2011.root"; } // pas de 2010 pour l'instant
-  else           {dataroot2=dir_+"histo_minibtag2011.root"; }  // AS NO 2010 BTAG DATA YET, PUT 2011 TO AVOID CRASH...
+  printf("DATA: %s.\n",filename);
+  data   = new TFile(filename);
+/*
+  if (mu==false) {dataroot2=string(dir_)+"histo_minijet2010.root"; } // pas de 2010 pour l'instant
+  else           {dataroot2=string(dir_)+"histo_minibtag2011.root"; }  // AS NO 2010 BTAG DATA YET, PUT 2011 TO AVOID CRASH...
   data2  = new TFile(dataroot2.c_str());
+*/
 }
 
 void OverFlowBinFix(TH1F* );
@@ -122,6 +126,7 @@ class Plots2D:public Plots<TH2F>{
  public:
  Plots2D(Bool_t mu,Float_t ptval,UInt_t datayear) : Plots<TH2F>(mu,ptval,datayear){};
  void PlotStack2D(TString selection, TString label, TString labely, bool logy, float ymin=0., float ymax=10.);
+ void PlotProfile2D(TString selection, TString label, TString labely, bool logy, float ymin, float ymax, Bool_t isdata=true,string fitequ="");
 };
 
 void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, bool bOverflow, TString labely){
@@ -132,7 +137,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
 
   try{
     histo0_Data = (TH1F*) data->Get(selection);
-    histo0_2010 = (TH1F*) data2->Get(selection);
+    //histo0_2010 = (TH1F*) data2->Get(selection);
   }
   catch(...) {
     cerr<<selection<<" is not found in data!"<<endl;
@@ -191,8 +196,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
     OverFlowBinFix(histo0_MC_udsg);
     OverFlowBinFix(histo0_MC_gspl);
     OverFlowBinFix(histo0_Data);
-    OverFlowBinFix(histo0_2010);
-    //
+    //OverFlowBinFix(histo0_2010);
   }
 
   // equivalent for ratio plot around line 490
@@ -213,8 +217,11 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
 
  
   // SCALE MC TO DATA
-  float scaleparam=histo0_Data->Integral()/histo0_MC->Integral();
+  Float_t mctotal=histo0_MC->Integral();
+  Float_t scaleparam=histo0_Data->Integral()/mctotal;
   if (!DoNotStack) {
+  // cout<<"Check MC entries: "<<endl<<mctotal<<"(MCTotal)="<<histo0_MC_b->Integral()<<"(b)+"<<histo0_MC_c->Integral()<<"(c)+"<<histo0_MC_udsg->Integral()<<"(udsg)+"<<histo0_MC_gspl->Integral()<<"(bglsplitting)"<<endl;
+    cout<<"histo0_MC: "<<mctotal<<"; Fractions Sum Over: "<<histo0_MC_b->Integral()+histo0_MC_c->Integral()+histo0_MC_udsg->Integral()+histo0_MC_gspl->Integral()<<endl;
     histo0_MC_b->Scale(scaleparam);
     histo0_MC_c->Scale(scaleparam);
     histo0_MC_udsg->Scale(scaleparam);
@@ -236,8 +243,8 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
 
 
   // SCALE 2010 TO 2011
-  float scaledata=histo0_Data->Integral()/histo0_2010->Integral();
-  histo0_2010->Scale(scaledata);
+  // float scaledata=histo0_Data->Integral()/histo0_2010->Integral();
+  // histo0_2010->Scale(scaledata);
 
 
   // MAKE DATA/MC RATIO
@@ -251,7 +258,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
   if (selection=="muon_Pt"  ) {
     histo0_ratio->Rebin(2);
     histo0_Data->Rebin(2);
-    histo0_2010->Rebin(2);
+    //histo0_2010->Rebin(2);
     histo0_MC->Rebin(2);
     histo0_MC_b->Rebin(2);
     histo0_MC_c->Rebin(2);
@@ -276,6 +283,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
   */
  
   // MAKE 2010/2011 RATIO 
+  /*
   TH1F * histo0_rat2010 = (TH1F*) histo0_2010->Clone();
   histo0_rat2010->SetName("histo0_rat2010");
   histo0_rat2010->Divide(histo0_MC);
@@ -283,7 +291,7 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
   TH1F * histo0_ratdata = (TH1F*) histo0_Data->Clone();
   histo0_ratdata->SetName("histo0_ratdata");
   histo0_ratdata->Divide(histo0_2010);
-
+  */
 
   // SET COLORS
   histo0_Data->SetLineWidth(2);
@@ -319,12 +327,12 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
   histo0_Data->GetYaxis()->SetTitle(labely);
 
   //  if (selection=="npv" || selection=="npv_no_scaled") histo0_Data->GetXaxis()->SetTitle(histo0_MC->GetTitle());  
-
+  /*
   histo0_2010->SetMarkerStyle(21);
   histo0_2010->SetMarkerColor(7);
   histo0_2010->SetLineColor(7);
   histo0_2010->SetMarkerSize(0.5);
-
+  */
   //  hs->SetTitle(histo0_Data->GetTitle());
 
   if (selection=="sv_vtxsum_phi" || selection=="sv_vtxdir_phi" || selection=="sv_vtxsum_eta" || selection=="sv_vtxdir_eta") {
@@ -557,12 +565,12 @@ void Plots1D::PlotStack(TString selection, TString label, bool down, bool logy, 
   canvas->cd();
 
   // SAVE PNG FILES
-  TString name_can=dir_+selection+"_Linear."+format;
+  TString name_can=string(dir_)+selection+"_Linear."+format;
   canvas->SaveAs(name_can.Data());
 
   if (logy==1) {
     canvas_1->SetLogy(logy);
-    TString name_can2=dir_+selection+"_Log."+format;
+    TString name_can2=string(dir_)+selection+"_Log."+format;
     canvas->SaveAs(name_can2.Data());
   }
 }
@@ -851,13 +859,13 @@ void Plots1D::TagRate(TString selection, TString label, bool down, bool logy, TS
 
   canvas->cd();
   // SAVE PNG FILES
-  TString name_can=dir_+"tagRate_"+selection+"_Linear."+format;
+  TString name_can=string(dir_)+"tagRate_"+selection+"_Linear."+format;
   canvas->SaveAs(name_can.Data());
 
   if (logy==1) {
     canvas_1->SetLogy(logy);
     canvas->SetLogy(logy);
-    TString name_can2=dir_+"tagRate_"+selection+"_Log."+format;
+    TString name_can2=string(dir_)+"tagRate_"+selection+"_Log."+format;
     canvas->SaveAs(name_can2.Data());
   }
 }
@@ -1053,7 +1061,7 @@ void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, b
   canvas->cd();
 #endif
   // SAVE FILES
-  TString name_can=dir_+"npv_"+selection+"_Linear."+format;
+  TString name_can=string(dir_)+"npv_"+selection+"_Linear."+format;
   canvas->SaveAs(name_can.Data());
 
   if (logy==1) {
@@ -1062,8 +1070,51 @@ void Plots1D::PlotData(TString selection, TString label, bool down, bool logy, b
 #else
     canvas->SetLogy(logy);
 #endif
-    TString name_can2=dir_+"npv_"+selection+"_Log."+format;
+    TString name_can2=string(dir_)+"npv_"+selection+"_Log."+format;
     canvas->SaveAs(name_can2.Data());
+  }
+}
+
+void Plots2D::PlotProfile2D(TString selection, TString label, TString labely, bool logy, float ymin, float ymax, Bool_t isdata, string fitequ){
+  if (isdata)
+    histo0_MC=(TH2F*) data->Get(selection);
+  else {
+    for (UInt_t i=0; i<Nfiles; i++) 
+      if (i==0) histo0_MC=(TH2F*)mc[i]->Get(selection);
+      else histo0_MC->Add(histo_MC[i]);
+  }
+  TProfile * pro_mc = histo0_MC->ProfileX(selection+"_total");
+  pro_mc->SetLineColor(1);
+ Double_t titleoffsetx=0.8;
+  Double_t titleoffsety=0.8;
+  Double_t titlesizex=0.05;
+  Double_t titlesizey=0.05;
+  Double_t labelsizex=0.035;
+  Double_t labelsizey=0.035;
+  pro_mc->SetMaximum(ymax);
+  pro_mc->SetMinimum(ymin);
+  pro_mc->GetXaxis()->SetLabelSize(labelsizex);
+  pro_mc->GetXaxis()->SetTitleSize(titlesizex);
+  pro_mc->GetXaxis()->SetTitleOffset(titleoffsetx);
+  pro_mc->GetYaxis()->SetLabelSize(labelsizey);
+  pro_mc->GetYaxis()->SetTitleSize(titlesizey);
+  pro_mc->GetYaxis()->SetTitleOffset(titleoffsety);
+  pro_mc->GetXaxis()->SetTitle(label);  
+  pro_mc->GetYaxis()->SetTitle(labely);  
+  canvas = new TCanvas("c1", "c1",10,32,782,552);
+  canvas->cd();
+  if (isdata) pro_mc->Draw("E");
+  else pro_mc->Draw("hist");
+  if ( fitequ.size()>0 )
+    pro_mc->Fit( fitequ.c_str() );
+    // SAVE FILES
+  canvas->SetGrid();
+  TString name_can=string(dir_)+selection+"_Linear."+format;
+  canvas->SaveAs(name_can.Data());
+  if (logy==1) {
+    canvas->SetLogy(logy);
+    name_can=string(dir_)+selection+"_Log."+format;
+    canvas->SaveAs(name_can.Data());
   }
 }
 
@@ -1276,12 +1327,12 @@ void Plots2D::PlotStack2D(TString selection, TString label, TString labely, bool
   canvas->cd();
 
   // SAVE FILES
-  TString name_can=dir_+selection+"_Linear."+format;
+  TString name_can=string(dir_)+selection+"_Linear."+format;
   canvas->SaveAs(name_can.Data());
 
   if (logy==1) {
     canvas->SetLogy(logy);
-    name_can=dir_+selection+"_Log."+format;
+    name_can=string(dir_)+selection+"_Log."+format;
     canvas->SaveAs(name_can.Data());
   }
 }

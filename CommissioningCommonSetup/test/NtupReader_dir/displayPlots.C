@@ -6,7 +6,7 @@ void run(){
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
 #ifdef RUN_ON_JET
-  Plots1D P1D(false,PTVAL,DATAYEAR);
+  //  Plots1D P1D(false,PTVAL,DATAYEAR);
   Plots2D P2D(false,PTVAL,DATAYEAR);
 #else
   Plots1D P1D(true,PTVAL,DATAYEAR);
@@ -17,7 +17,7 @@ void run(){
 #ifdef RUN_ON_JET
     P1D.PlotStack("npv","number of PV", 1, 0,1);
     P1D.PlotStack("npv_no_scaled","number of PV", 1, 0,1);
-    P1D.PlotStack("all_jetpt","jet p_{t}",1, 1, 1);
+    P1D.PlotStack("all_jetpt","jet p_{T}",1, 1, 1);
 
     P1D.PlotStack("discri_tche","TCHE discriminator",1, 1, 1);
     P1D.PlotStack("discri_tchp","TCHP discriminator",1, 1, 1);
@@ -32,8 +32,8 @@ void run(){
 
     P1D.PlotStack("n_tracks_jet", "nr. of tracks in jet",  1, 0, 1);
     P1D.PlotStack("n_seltracks_jet","nr. of selected tracks",  1, 0, 1);
-    P1D.PlotStack("pt_tracks", "track p_{t}", 1, 1, 1);
-    P1D.PlotStack("pt_seltracks", "track p_{t}", 1, 1, 1);
+    P1D.PlotStack("pt_tracks", "track p_{T}", 1, 1, 1);
+    P1D.PlotStack("pt_seltracks", "track p_{T}", 1, 1, 1);
 
     // IP
     P1D.PlotStack("IP3d1",  "1st track 3D IP", 1, 1, 1);
@@ -53,7 +53,7 @@ void run(){
     P1D.PlotStack("trackNHits", "nr. of hits", 1, 1, 1);
     P1D.PlotStack("trackNPixelHits", "nr. of pixel hits", 1, 1, 1);
     P1D.PlotStack("trackNormChi2", "norm. #chi^{2}", 1, 1, 1);
-    P1D.PlotStack("trackTransverseMomentum", "p_{t}", 1, 1, 1);
+    P1D.PlotStack("trackTransverseMomentum", "p_{T}", 1, 1, 1);
     P1D.PlotStack("trackLongitudinalIP", "longitudinal IP", 1, 1, 1);
     P1D.PlotStack("trackIP2d", "2D IP", 1, 1, 1);
     P1D.PlotStack("trackDistJetAxis", "distance to jet axis", 1, 1, 1);
@@ -62,7 +62,7 @@ void run(){
     P1D.PlotStack("trackNHits_cut","nr. of hits",1, 1, 1);
     P1D.PlotStack("trackNPixelHits_cut","nr. of pixel hits", 1, 1, 1);
     P1D.PlotStack("trackNormChi2_cut", "norm. #chi^{2}",1, 1, 1);
-    P1D.PlotStack("trackTransverseMomentum_cut","track p_{t}",1, 1, 1);
+    P1D.PlotStack("trackTransverseMomentum_cut","track p_{T}",1, 1, 1);
     P1D.PlotStack("trackLongitudinalIP_cut", "longitudinal IP", 1, 1, 1);
     P1D.PlotStack("trackIP2d_cut", "2D IP", 1, 1, 1);
     P1D.PlotStack("trackDistJetAxis_cut", "distance to jet axis", 1, 1, 1);
@@ -81,7 +81,7 @@ void run(){
     // SV
     P1D.PlotStack("sv_nvertices0", "nr. of SV", 1, 1, 1);
     P1D.PlotStack("sv_nvertices",  "nr. of SV", 1, 1, 1);
-    P1D.PlotStack("sv_jetpt", "jet p_{t}", 1, 1, 1);
+    P1D.PlotStack("sv_jetpt", "jet p_{T}", 1, 1, 1);
     P1D.PlotStack("sv_tracksel", "SV track multiplicity", 1, 0, 1);
     P1D.PlotStack("sv_trackmul", "SV track multiplicity", 1, 0, 1);
 
@@ -97,7 +97,7 @@ void run(){
     P1D.PlotStack("sv_eratio", "SV energy ratio", 1, 0, 0);
     P1D.PlotStack("sv_ipsigcharm", "2D IP significance", 1, 1, 1);
    
-    P1D.PlotStack("sv_vtx_pt", "vertex p_{t}", 1, 1, 1);
+    P1D.PlotStack("sv_vtx_pt", "vertex p_{T}", 1, 1, 1);
     P1D.PlotStack("sv_vtxdir_eta", "vertex #eta", 1, 0, 1);
     P1D.PlotStack("sv_vtxdir_phi", "vertex #phi", 1, 0, 1);
  
@@ -106,7 +106,7 @@ void run(){
     P1D.PlotStack("sv_deltar_sum_dir","#Delta R(vertex {#vec p}, vertex dir.)"  ,1, 0, 1);
 
     P1D.PlotStack("n_cutseltracks_jet", "nr. of tracks", 1, 0, 1);
-    P1D.PlotStack("pt_cutseltracks", "track p_{t}", 1, 1, 1);
+    P1D.PlotStack("pt_cutseltracks", "track p_{T}", 1, 1, 1);
 
     // IP
     P1D.PlotStack("IP3d1Errorsorted","1st track 3D IP error", 1, 1, 1);
@@ -134,9 +134,9 @@ void run(){
     P1D.PlotData("nseltracks_jet","nr. of selected tracks", 1, 1, 1);
     P1D.PlotData("ncutseltracks_jet","nr. of selected tracks",1, 1, 1);
 
-    P1D.PlotData("pt_tracks", "track p_{t}", 1, 1, 1);
-    P1D.PlotData("pt_seltracks", "track p_{t}", 1, 1, 1);
-    P1D.PlotData("pt_cutseltracks", "track p_{t}", 1, 1, 1);
+    P1D.PlotData("pt_tracks", "track p_{T}", 1, 1, 1);
+    P1D.PlotData("pt_seltracks", "track p_{T}", 1, 1, 1);
+    P1D.PlotData("pt_cutseltracks", "track p_{T}", 1, 1, 1);
 
     P1D.PlotData("nsv0", "nr. of SV", 1, 1, 1);
     P1D.PlotData("nsv", "nr. of SV", 1, 1, 1);
@@ -312,44 +312,44 @@ void run(){
 
     P1D.PlotStack("sv_ipsigcharm_3tr",   "",    1, 1, 1);              
     P1D.PlotStack("sv_eratio_3tr",   "3-track SV energy ratio",    1, 0, 0);                  
-    P1D.PlotStack("sv_vtx_pt_3tr",   "3-track SV vtx p_{t}",    1, 1, 1);                  
+    P1D.PlotStack("sv_vtx_pt_3tr",   "3-track SV vtx p_{T}",    1, 1, 1);                  
 
     P1D.PlotStack("sv_trackmul_centered",   "SV track multiplicity",    1, 1, 1);           
     P1D.PlotStack("sv_trackmul1_centered",   "SV track multiplicity",    1, 1, 1);          
     P1D.PlotStack("sv_tracksel_centered",   "SV track multiplicity",    1, 1, 1);           
 
 
-    P1D.PlotStack("npv1_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV:1-6)",   1, 1, 1);  
-    P1D.PlotStack(  "npv1_IP3d3sig0",        "3rd sorted track 3D IP significance (#PV:1-6)", 1, 1, 1);  
-    // P1D.PlotStack( "npv1_ntracks_jet",      "nr. of tracks in jet (#PV:1-6)",                   1, 1, 1);  
-    //  P1D.PlotStack( "npv1_nseltracks_jet",   "nr. of sel tracks in jet (#PV:1-6)",               1, 1, 1);  
-    P1D.PlotStack( "npv1_ncutseltracks_jet","nr. of tracks in jet (#PV:1-6)",           1, 1, 1);  
-    P1D.PlotStack( "npv1_pt_tracks",        "Pt of tracks (#PV:1-6)",                         1, 1, 1);  
-    P1D.PlotStack( "npv1_pt_seltracks",     "Pt of  sel tracks (#PV:1-6)",                    1, 1, 1);  
-    P1D.PlotStack( "npv1_pt_cutseltracks",  "Pt of  cut sel tracks (#PV:1-6)",                1, 1, 1);  
-    P1D.PlotStack( "npv1_nsv0",             "# of secondary vertices (#PV:1-6)",              1, 1, 1);  
-    P1D.PlotStack( "npv1_nsv",              "# of secondary vertices (#PV:1-6)",              1, 1, 1);  
-    P1D.PlotStack( "npv1_flightsig3d",      "Flight Significance 3D (#PV:1-6)",               1, 1, 1);  
-    P1D.PlotStack( "npv1_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV:1-6)", 1, 1, 1);  
-    P1D.PlotStack( "npv1_svmass",           "SV mass (#PV:1-6)",                              1, 0, 1);  
-    P1D.PlotStack( "npv1_svmass_3tr",       "SV mass for >=3tracks (#PV:1-6)",                1, 0, 1);  
-    P1D.PlotStack( "npv1_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV:1-6)",      1, 1, 1);
-    P1D.PlotStack("npv1_sveratio",        "SV eratio (#PV:1-6)",                  1, 0, 0);
-    P1D.PlotStack("npv1_deltar_jet",      "SV deltaR jet (#PV:1-6)",              1, 0, 1);
-    P1D.PlotStack("npv1_deltar_sum_jet",      "SV deltaR sum jet (#PV:1-6)",      1, 0, 1);
-    P1D.PlotStack("npv1_deltar_sum_dir",      "SV deltaR sum dir (#PV:1-6)",      1, 0, 1);
-    P1D.PlotStack("npv1_vtxpt",      "SV vtx pt (#PV:1-6)",                       1, 1, 1);
-    P1D.PlotStack("npv1_discri_tche",      "TCHE discriminator (#PV:1-6)",        1, 1, 1);
-    P1D.PlotStack("npv1_discri_tchp",      "TCHP discriminator (#PV:1-6)",        1, 1, 1);
-    P1D.PlotStack("npv1_discri_jetprob",      "JP discriminator (#PV:1-6)",       1, 1, 1);
-    P1D.PlotStack("npv1_discri_jetbprob",      "JBP discriminator (#PV:1-6)",     1, 1, 1);
-    P1D.PlotStack("npv1_discri_ssche0",       "SSVHE Discriminator (#PV:1-6)",    1, 1, 1);
-    P1D.PlotStack("npv1_discri_ssche",   "SSVHE Discriminator (#PV:1-6)",         1, 0, 0);
-    P1D.PlotStack("npv1_discri_sschp0",   "SSVHP Discriminator (#PV:1-6)",        1, 1, 1);
-    P1D.PlotStack("npv1_discri_sschp",   "SSVHP Discriminator (#PV:1-6)",         1, 0, 0);
-    P1D.PlotStack("npv1_muon_Pt",        "Muon p_{T} (#PV:1-6)",                  1, 1, 1);
-    P1D.PlotStack("npv1_muon_ptrel",    "Muon p_{T}^{rel} (#PV:1-6)",             1, 0, 1);
-    P1D.PlotStack("npv1_muon_DeltaR",         "Muon1 deltaR (#PV:1-6)",           1, 0, 1);
+    P1D.PlotStack("npv1_IP3d2sig0",        "2nd sorted track 3D IP significance (1-6 PVs)",   1, 1, 1);  
+    P1D.PlotStack(  "npv1_IP3d3sig0",        "3rd sorted track 3D IP significance (1-6 PVs)", 1, 1, 1);  
+    // P1D.PlotStack( "npv1_ntracks_jet",      "nr. of tracks in jet (1-6 PVs)",                   1, 1, 1);  
+    //  P1D.PlotStack( "npv1_nseltracks_jet",   "nr. of sel tracks in jet (1-6 PVs)",               1, 1, 1);  
+    P1D.PlotStack( "npv1_ncutseltracks_jet","nr. of tracks in jet (1-6 PVs)",           1, 1, 1);  
+    P1D.PlotStack( "npv1_pt_tracks",        "Pt of tracks (1-6 PVs)",                         1, 1, 1);  
+    P1D.PlotStack( "npv1_pt_seltracks",     "Pt of  sel tracks (1-6 PVs)",                    1, 1, 1);  
+    P1D.PlotStack( "npv1_pt_cutseltracks",  "Pt of  cut sel tracks (1-6 PVs)",                1, 1, 1);  
+    P1D.PlotStack( "npv1_nsv0",             "# of secondary vertices (1-6 PVs)",              1, 1, 1);  
+    P1D.PlotStack( "npv1_nsv",              "# of secondary vertices (1-6 PVs)",              1, 1, 1);  
+    P1D.PlotStack( "npv1_flightsig3d",      "Flight Significance 3D (1-6 PVs)",               1, 1, 1);  
+    P1D.PlotStack( "npv1_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (1-6 PVs)", 1, 1, 1);  
+    P1D.PlotStack( "npv1_svmass",           "SV mass (1-6 PVs)",                              1, 0, 1);  
+    P1D.PlotStack( "npv1_svmass_3tr",       "SV mass for >=3tracks (1-6 PVs)",                1, 0, 1);  
+    P1D.PlotStack( "npv1_nsv0_3tr",         "# of secondary vertices (>=3tr) (1-6 PVs)",      1, 1, 1);
+    P1D.PlotStack("npv1_sveratio",        "SV eratio (1-6 PVs)",                  1, 0, 0);
+    P1D.PlotStack("npv1_deltar_jet",      "SV deltaR jet (1-6 PVs)",              1, 0, 1);
+    P1D.PlotStack("npv1_deltar_sum_jet",      "SV deltaR sum jet (1-6 PVs)",      1, 0, 1);
+    P1D.PlotStack("npv1_deltar_sum_dir",      "SV deltaR sum dir (1-6 PVs)",      1, 0, 1);
+    P1D.PlotStack("npv1_vtxpt",      "SV vtx pt (1-6 PVs)",                       1, 1, 1);
+    P1D.PlotStack("npv1_discri_tche",      "TCHE discriminator (1-6 PVs)",        1, 1, 1);
+    P1D.PlotStack("npv1_discri_tchp",      "TCHP discriminator (1-6 PVs)",        1, 1, 1);
+    P1D.PlotStack("npv1_discri_jetprob",      "JP discriminator (1-6 PVs)",       1, 1, 1);
+    P1D.PlotStack("npv1_discri_jetbprob",      "JBP discriminator (1-6 PVs)",     1, 1, 1);
+    P1D.PlotStack("npv1_discri_ssche0",       "SSVHE Discriminator (1-6 PVs)",    1, 1, 1);
+    P1D.PlotStack("npv1_discri_ssche",   "SSVHE Discriminator (1-6 PVs)",         1, 0, 0);
+    P1D.PlotStack("npv1_discri_sschp0",   "SSVHP Discriminator (1-6 PVs)",        1, 1, 1);
+    P1D.PlotStack("npv1_discri_sschp",   "SSVHP Discriminator (1-6 PVs)",         1, 0, 0);
+    P1D.PlotStack("npv1_muon_Pt",        "Muon p_{T} (1-6 PVs)",                  1, 1, 1);
+    P1D.PlotStack("npv1_muon_ptrel",    "Muon p_{T}^{rel} (1-6 PVs)",             1, 0, 1);
+    P1D.PlotStack("npv1_muon_DeltaR",         "Muon1 deltaR (1-6 PVs)",           1, 0, 1);
 
 
     P1D.PlotStack("npv2_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV:7-10)",   1, 1, 1);  
@@ -386,56 +386,61 @@ void run(){
     P1D.PlotStack("npv2_muon_DeltaR",         "Muon1 deltaR (#PV:7-10)",           1, 0, 1);
 
 
-    P1D.PlotStack("npv3_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV:>=11)",   1, 1, 1);  
-    P1D.PlotStack(  "npv3_IP3d3sig0",        "3rd sorted track 3D IP significance (#PV:>=11)", 1, 1, 1);  
-    // P1D.PlotStack( "npv3_ntracks_jet",      "nr. of tracks in jet (#PV:>=11)",                   1, 1, 1);  
-    //  P1D.PlotStack( "npv3_nseltracks_jet",   "nr. of sel tracks in jet (#PV:>=11)",               1, 1, 1);  
-    P1D.PlotStack( "npv3_ncutseltracks_jet","nr. of tracks in jet (#PV:>=11)",           1, 1, 1);  
-    P1D.PlotStack( "npv3_pt_tracks",        "Pt of tracks (#PV:>=11)",                         1, 1, 1);  
-    P1D.PlotStack( "npv3_pt_seltracks",     "Pt of  sel tracks (#PV:>=11)",                    1, 1, 1);  
-    P1D.PlotStack( "npv3_pt_cutseltracks",  "Pt of  cut sel tracks (#PV:>=11)",                1, 1, 1);  
-    P1D.PlotStack( "npv3_nsv0",             "# of secondary vertices (#PV:>=11)",              1, 1, 1);  
-    P1D.PlotStack( "npv3_nsv",              "# of secondary vertices (#PV:>=11)",              1, 1, 1);  
-    P1D.PlotStack( "npv3_flightsig3d",      "Flight Significance 3D (#PV:>=11)",               1, 1, 1);  
-    P1D.PlotStack( "npv3_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV:>=11)", 1, 1, 1);  
-    P1D.PlotStack( "npv3_svmass",           "SV mass (#PV:>=11)",                              1, 0, 1);  
-    P1D.PlotStack( "npv3_svmass_3tr",       "SV mass for >=3tracks (#PV:>=11)",                1, 0, 1);  
-    P1D.PlotStack( "npv3_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV:>=11)",      1, 1, 1);
+    P1D.PlotStack("npv3_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV#geq11)",   1, 1, 1);  
+    P1D.PlotStack(  "npv3_IP3d3sig0",        "3rd sorted track 3D IP significance (#PV#geq11)", 1, 1, 1);  
+    // P1D.PlotStack( "npv3_ntracks_jet",      "nr. of tracks in jet (#PV#geq11)",                   1, 1, 1);  
+    //  P1D.PlotStack( "npv3_nseltracks_jet",   "nr. of sel tracks in jet (#PV#geq11)",               1, 1, 1);  
+    P1D.PlotStack( "npv3_ncutseltracks_jet","nr. of tracks in jet (#PV#geq11)",           1, 1, 1);  
+    P1D.PlotStack( "npv3_pt_tracks",        "Pt of tracks (#PV#geq11)",                         1, 1, 1);  
+    P1D.PlotStack( "npv3_pt_seltracks",     "Pt of  sel tracks (#PV#geq11)",                    1, 1, 1);  
+    P1D.PlotStack( "npv3_pt_cutseltracks",  "Pt of  cut sel tracks (#PV#geq11)",                1, 1, 1);  
+    P1D.PlotStack( "npv3_nsv0",             "# of secondary vertices (#PV#geq11)",              1, 1, 1);  
+    P1D.PlotStack( "npv3_nsv",              "# of secondary vertices (#PV#geq11)",              1, 1, 1);  
+    P1D.PlotStack( "npv3_flightsig3d",      "Flight Significance 3D (#PV#geq11)",               1, 1, 1);  
+    P1D.PlotStack( "npv3_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV#geq11)", 1, 1, 1);  
+    P1D.PlotStack( "npv3_svmass",           "SV mass (#PV#geq11)",                              1, 0, 1);  
+    P1D.PlotStack( "npv3_svmass_3tr",       "SV mass for >=3tracks (#PV#geq11)",                1, 0, 1);  
+    P1D.PlotStack( "npv3_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV#geq11)",      1, 1, 1);
  
-    P1D.PlotStack("npv3_sveratio",        "SV eratio (#PV:>=11)",                  1, 0, 0);
-    P1D.PlotStack("npv3_deltar_jet",      "SV deltaR jet (#PV:>=11)",              1, 0, 1);
-    P1D.PlotStack("npv3_deltar_sum_jet",      "SV deltaR sum jet (#PV:>=11)",      1, 0, 1);
-    P1D.PlotStack("npv3_deltar_sum_dir",      "SV deltaR sum dir (#PV:>=11)",      1, 0, 1);
-    P1D.PlotStack("npv3_vtxpt",      "SV vtx pt (#PV:>=11)",                       1, 1, 1);
-    P1D.PlotStack("npv3_discri_tche",      "TCHE discriminator (#PV:>=11)",        1, 1, 1);
-    P1D.PlotStack("npv3_discri_tchp",      "TCHP discriminator (#PV:>=11)",        1, 1, 1);
-    P1D.PlotStack("npv3_discri_jetprob",      "JP discriminator (#PV:>=11)",       1, 1, 1);
-    P1D.PlotStack("npv3_discri_jetbprob",      "JBP discriminator (#PV:>=11)",     1, 1, 1);
-    P1D.PlotStack("npv3_discri_ssche0",       "SSVHE Discriminator (#PV:>=11)",    1, 1, 1);
-    P1D.PlotStack("npv3_discri_ssche",   "SSVHE Discriminator (#PV:>=11)",         1, 0, 0);
-    P1D.PlotStack("npv3_discri_sschp0",   "SSVHP Discriminator (#PV:>=11)",        1, 1, 1);
-    P1D.PlotStack("npv3_discri_sschp",   "SSVHP Discriminator (#PV:>=11)",         1, 0, 0);
-    P1D.PlotStack("npv3_muon_Pt",        "Muon p_{T} (#PV:>=11)",                  1, 1, 1);
-    P1D.PlotStack("npv3_muon_ptrel",    "Muon p_{T}^{rel} (#PV:>=11)",             1, 0, 1);
-    P1D.PlotStack("npv3_muon_DeltaR",         "Muon1 deltaR (#PV:>=11)",           1, 0, 1);
-    P2D.PlotStack2D("track_vs_jetpt", "jet p_{t}", "track multiplicity",  0,10,35.);
-    P2D.PlotStack2D("cutseltrack_vs_jetpt", "jet p_{t}", "track multiplicity", 0,4,17.);
-    P2D.PlotStack2D("sv_track_vs_jetpt",    "jet p_{t}", "SV track multiplicity",  0,1.,5.5);
+    P1D.PlotStack("npv3_sveratio",        "SV eratio (#PV#geq11)",                  1, 0, 0);
+    P1D.PlotStack("npv3_deltar_jet",      "SV deltaR jet (#PV#geq11)",              1, 0, 1);
+    P1D.PlotStack("npv3_deltar_sum_jet",      "SV deltaR sum jet (#PV#geq11)",      1, 0, 1);
+    P1D.PlotStack("npv3_deltar_sum_dir",      "SV deltaR sum dir (#PV#geq11)",      1, 0, 1);
+    P1D.PlotStack("npv3_vtxpt",      "SV vtx pt (#PV#geq11)",                       1, 1, 1);
+    P1D.PlotStack("npv3_discri_tche",      "TCHE discriminator (#PV#geq11)",        1, 1, 1);
+    P1D.PlotStack("npv3_discri_tchp",      "TCHP discriminator (#PV#geq11)",        1, 1, 1);
+    P1D.PlotStack("npv3_discri_jetprob",      "JP discriminator (#PV#geq11)",       1, 1, 1);
+    P1D.PlotStack("npv3_discri_jetbprob",      "JBP discriminator (#PV#geq11)",     1, 1, 1);
+    P1D.PlotStack("npv3_discri_ssche0",       "SSVHE Discriminator (#PV#geq11)",    1, 1, 1);
+    P1D.PlotStack("npv3_discri_ssche",   "SSVHE Discriminator (#PV#geq11)",         1, 0, 0);
+    P1D.PlotStack("npv3_discri_sschp0",   "SSVHP Discriminator (#PV#geq11)",        1, 1, 1);
+    P1D.PlotStack("npv3_discri_sschp",   "SSVHP Discriminator (#PV#geq11)",         1, 0, 0);
+    P1D.PlotStack("npv3_muon_Pt",        "Muon p_{T} (#PV#geq11)",                  1, 1, 1);
+    P1D.PlotStack("npv3_muon_ptrel",    "Muon p_{T}^{rel} (#PV#geq11)",             1, 0, 1);
+    P1D.PlotStack("npv3_muon_DeltaR",         "Muon1 deltaR (#PV#geq11)",           1, 0, 1);
+    P2D.PlotStack2D("track_vs_jetpt", "jet p_{T}", "track multiplicity",  0,10,35.);
+    P2D.PlotStack2D("cutseltrack_vs_jetpt", "jet p_{T}", "track multiplicity", 0,4,17.);
+    P2D.PlotStack2D("sv_track_vs_jetpt",    "jet p_{T}", "SV track multiplicity",  0,1.,5.5);
 
     P2D.PlotStack2D("sv_mass_vs_flightDistSignCut", "flight dist sign.", "SV mass",   0, 0, 6.5);
     P2D.PlotStack2D("sv_mass_vs_flightDistCut","flight dist.", "SV mass",  0,0,4.5);
 
-    P2D.PlotStack2D("avg_sv_mass_vs_jetpt", "jet p_{t}", "SV mass", 0,0,5.5);
+    P2D.PlotStack2D("avg_sv_mass_vs_jetpt", "jet p_{T}", "SV mass", 0,0,5.5);
 
-    P2D.PlotStack2D("sv_deltar_jet_vs_jetpt", "jet p_{t}", "#Delta R(vertex dir., jet)", 0,0,0.13);
-    P2D.PlotStack2D("sv_deltar_sum_dir_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, vertex dir.)",  0,0,0.09);
-    P2D.PlotStack2D("sv_deltar_sum_jet_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, jet)",  0,0,0.09);
-    P2D.PlotStack2D("muon_ptrel_vs_jetpt", "jet p_{t}","muon p_{t}^{rel}",  0,0,1);
-    P2D.PlotStack2D("muon_DeltaR_vs_jetpt","jet p_{t}","muon #Delta R",   0,0,1.);
+    P2D.PlotStack2D("sv_deltar_jet_vs_jetpt", "jet p_{T}", "#Delta R(vertex dir., jet)", 0,0,0.13);
+    P2D.PlotStack2D("sv_deltar_sum_dir_vs_jetpt","jet p_{T}", "#Delta R(vertex {#vec p}, vertex dir.)",  0,0,0.09);
+    P2D.PlotStack2D("sv_deltar_sum_jet_vs_jetpt","jet p_{T}", "#Delta R(vertex {#vec p}, jet)",  0,0,0.09);
+    P2D.PlotStack2D("muon_ptrel_vs_jetpt", "jet p_{T}","muon p_{T}^{rel}",  0,0,1);
+    P2D.PlotStack2D("muon_DeltaR_vs_jetpt","jet p_{T}","muon #Delta R",   0,0,1.);
 
   
-    P2D.PlotStack2D("sv_eratio_vs_jetpt","jet p_{t}","SV energy ratio",  0,0,0.75);
-    P2D.PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{t}","SV p_{t}",  0,0,55);
+    P2D.PlotStack2D("sv_eratio_vs_jetpt","jet p_{T}","SV energy ratio",  0,0,0.75);
+    P2D.PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{T}","SV p_{T}",  0,0,55);
+    P2D.PlotProfile2D("pu_vs_pv","# of Reco PV","# of PU",  0,0,60,false,"pol1");
+    P2D.PlotProfile2D("ip3dvsphi","track #phi","ip3d",  0,-0.02,0.02);
+    P2D.PlotProfile2D("ip2dvsphi","track #phi","ip2d",  0,0.0002,0.0012);
+    P2D.PlotProfile2D("ip3dsigvsphi","track #phi","ip3dsig",  0,0.15,0.5);
+    P2D.PlotProfile2D("ip2dsigvsphi","track #phi","ip2dsig",  0,0.1,0.35);
 #else
     // // for btagmet dataset 
 
@@ -477,8 +482,8 @@ void run(){
 
     P1D.PlotStack("n_tracks_jet", "nr. of tracks in jet",  1, 0, 1);
     P1D.PlotStack("n_seltracks_jet","nr. of selected tracks",  1, 0, 1);
-    P1D.PlotStack("pt_tracks", "track p_{t}", 1, 1, 1);
-    P1D.PlotStack("pt_seltracks", "track p_{t}", 1, 1, 1);
+    P1D.PlotStack("pt_tracks", "track p_{T}", 1, 1, 1);
+    P1D.PlotStack("pt_seltracks", "track p_{T}", 1, 1, 1);
 
     // IP
     P1D.PlotStack("IP3d1",  "1st track 3D IP", 1, 1, 1);
@@ -498,7 +503,7 @@ void run(){
     P1D.PlotStack("trackNHits", "nr. of hits", 1, 1, 1);
     P1D.PlotStack("trackNPixelHits", "nr. of pixel hits", 1, 1, 1);
     P1D.PlotStack("trackNormChi2", "norm. #chi^{2}", 1, 1, 1);
-    P1D.PlotStack("trackTransverseMomentum", "p_{t}", 1, 1, 1);
+    P1D.PlotStack("trackTransverseMomentum", "p_{T}", 1, 1, 1);
     P1D.PlotStack("trackLongitudinalIP", "longitudinal IP", 1, 1, 1);
     P1D.PlotStack("trackIP2d", "2D IP", 1, 1, 1);
     P1D.PlotStack("trackDistJetAxis", "distance to jet axis", 1, 1, 1);
@@ -507,7 +512,7 @@ void run(){
     P1D.PlotStack("trackNHits_cut","nr. of hits",1, 1, 1);
     P1D.PlotStack("trackNPixelHits_cut","nr. of pixel hits", 1, 1, 1);
     P1D.PlotStack("trackNormChi2_cut", "norm. #chi^{2}",1, 1, 1);
-    P1D.PlotStack("trackTransverseMomentum_cut","track p_{t}",1, 1, 1);
+    P1D.PlotStack("trackTransverseMomentum_cut","track p_{T}",1, 1, 1);
     P1D.PlotStack("trackLongitudinalIP_cut", "longitudinal IP", 1, 1, 1);
     P1D.PlotStack("trackIP2d_cut", "2D IP", 1, 1, 1);
     P1D.PlotStack("trackDistJetAxis_cut", "distance to jet axis", 1, 1, 1);
@@ -526,7 +531,7 @@ void run(){
     // SV
     P1D.PlotStack("sv_nvertices0", "nr. of SV", 1, 1, 1);
     P1D.PlotStack("sv_nvertices",  "nr. of SV", 1, 1, 1);
-    P1D.PlotStack("sv_jetpt", "jet p_{t}", 1, 1, 1);
+    P1D.PlotStack("sv_jetpt", "jet p_{T}", 1, 1, 1);
     P1D.PlotStack("sv_tracksel", "SV track multiplicity", 1, 0, 1);
     P1D.PlotStack("sv_trackmul", "SV track multiplicity", 1, 0, 1);
 
@@ -542,7 +547,7 @@ void run(){
     P1D.PlotStack("sv_eratio", "SV energy ratio", 1, 0, 0);
     P1D.PlotStack("sv_ipsigcharm", "2D IP significance", 1, 1, 1);
    
-    P1D.PlotStack("sv_vtx_pt", "vertex p_{t}", 1, 1, 1);
+    P1D.PlotStack("sv_vtx_pt", "vertex p_{T}", 1, 1, 1);
     P1D.PlotStack("sv_vtxdir_eta", "vertex #eta", 1, 0, 1);
     P1D.PlotStack("sv_vtxdir_phi", "vertex #phi", 1, 0, 1);
  
@@ -551,7 +556,7 @@ void run(){
     P1D.PlotStack("sv_deltar_sum_dir","#Delta R(vertex {#vec p}, vertex dir.)"  ,1, 0, 1);
 
     P1D.PlotStack("n_cutseltracks_jet", "nr. of tracks", 1, 0, 1);
-    P1D.PlotStack("pt_cutseltracks", "track p_{t}", 1, 1, 1);
+    P1D.PlotStack("pt_cutseltracks", "track p_{T}", 1, 1, 1);
 
     // IP
     P1D.PlotStack("IP3d1Errorsorted","1st track 3D IP error", 1, 1, 1);
@@ -579,9 +584,9 @@ void run(){
     P1D.PlotData("nseltracks_jet","nr. of selected tracks", 1, 1, 1);
     P1D.PlotData("ncutseltracks_jet","nr. of selected tracks",1, 1, 1);
 
-    P1D.PlotData("pt_tracks", "track p_{t}", 1, 1, 1);
-    P1D.PlotData("pt_seltracks", "track p_{t}", 1, 1, 1);
-    P1D.PlotData("pt_cutseltracks", "track p_{t}", 1, 1, 1);
+    P1D.PlotData("pt_tracks", "track p_{T}", 1, 1, 1);
+    P1D.PlotData("pt_seltracks", "track p_{T}", 1, 1, 1);
+    P1D.PlotData("pt_cutseltracks", "track p_{T}", 1, 1, 1);
 
     P1D.PlotData("nsv0", "nr. of SV", 1, 1, 1);
     P1D.PlotData("nsv", "nr. of SV", 1, 1, 1);
@@ -758,7 +763,7 @@ void run(){
 
     P1D.PlotStack("sv_ipsigcharm_3tr",   "",    1, 1, 1);              
     P1D.PlotStack("sv_eratio_3tr",   "3-track SV energy ratio",    1, 0, 0);                  
-    P1D.PlotStack("sv_vtx_pt_3tr",   "3-track SV vtx p_{t}",    1, 1, 1);                  
+    P1D.PlotStack("sv_vtx_pt_3tr",   "3-track SV vtx p_{T}",    1, 1, 1);                  
 
     P1D.PlotStack("sv_trackmul_centered",   "SV track multiplicity",    1, 1, 1);           
     P1D.PlotStack("sv_trackmul1_centered",   "SV track multiplicity",    1, 1, 1);          
@@ -767,36 +772,36 @@ void run(){
 
     P1D.PlotStack("npv1_IP3d2sig0",        "2nd sorted track 3D IP significance",   1, 1, 1);  
     P1D.PlotStack(  "npv1_IP3d3sig0",        "3rd sorted track 3D IP significance", 1, 1, 1);  
-    // P1D.PlotStack( "npv1_ntracks_jet",      "nr. of tracks in jet (#PV:1-6)",                   1, 1, 1);  
-    //  P1D.PlotStack( "npv1_nseltracks_jet",   "nr. of sel tracks in jet (#PV:1-6)",               1, 1, 1);  
-    P1D.PlotStack( "npv1_ncutseltracks_jet","nr. of tracks in jet (#PV:1-6)",           1, 1, 1);  
-    P1D.PlotStack( "npv1_pt_tracks",        "Pt of tracks (#PV:1-6)",                         1, 1, 1);  
-    P1D.PlotStack( "npv1_pt_seltracks",     "Pt of  sel tracks (#PV:1-6)",                    1, 1, 1);  
-    P1D.PlotStack( "npv1_pt_cutseltracks",  "Pt of  cut sel tracks (#PV:1-6)",                1, 1, 1);  
-    P1D.PlotStack( "npv1_nsv0",             "# of secondary vertices (#PV:1-6)",              1, 1, 1);  
-    P1D.PlotStack( "npv1_nsv",              "# of secondary vertices (#PV:1-6)",              1, 1, 1);  
-    P1D.PlotStack( "npv1_flightsig3d",      "Flight Significance 3D (#PV:1-6)",               1, 1, 1);  
-    P1D.PlotStack( "npv1_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV:1-6)", 1, 1, 1);  
-    P1D.PlotStack( "npv1_svmass",           "SV mass (#PV:1-6)",                              1, 0, 1);  
-    P1D.PlotStack( "npv1_svmass_3tr",       "SV mass for >=3tracks (#PV:1-6)",                1, 0, 1);  
-    P1D.PlotStack( "npv1_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV:1-6)",      1, 1, 1);
+    // P1D.PlotStack( "npv1_ntracks_jet",      "nr. of tracks in jet (1-6 PVs)",                   1, 1, 1);  
+    //  P1D.PlotStack( "npv1_nseltracks_jet",   "nr. of sel tracks in jet (1-6 PVs)",               1, 1, 1);  
+    P1D.PlotStack( "npv1_ncutseltracks_jet","nr. of tracks in jet (1-6 PVs)",           1, 1, 1);  
+    P1D.PlotStack( "npv1_pt_tracks",        "Pt of tracks (1-6 PVs)",                         1, 1, 1);  
+    P1D.PlotStack( "npv1_pt_seltracks",     "Pt of  sel tracks (1-6 PVs)",                    1, 1, 1);  
+    P1D.PlotStack( "npv1_pt_cutseltracks",  "Pt of  cut sel tracks (1-6 PVs)",                1, 1, 1);  
+    P1D.PlotStack( "npv1_nsv0",             "# of secondary vertices (1-6 PVs)",              1, 1, 1);  
+    P1D.PlotStack( "npv1_nsv",              "# of secondary vertices (1-6 PVs)",              1, 1, 1);  
+    P1D.PlotStack( "npv1_flightsig3d",      "Flight Significance 3D (1-6 PVs)",               1, 1, 1);  
+    P1D.PlotStack( "npv1_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (1-6 PVs)", 1, 1, 1);  
+    P1D.PlotStack( "npv1_svmass",           "SV mass (1-6 PVs)",                              1, 0, 1);  
+    P1D.PlotStack( "npv1_svmass_3tr",       "SV mass for >=3tracks (1-6 PVs)",                1, 0, 1);  
+    P1D.PlotStack( "npv1_nsv0_3tr",         "# of secondary vertices (>=3tr) (1-6 PVs)",      1, 1, 1);
  
-    P1D.PlotStack("npv1_sveratio",        "SV eratio (#PV:1-6)",                  1, 0, 0);
-    P1D.PlotStack("npv1_deltar_jet",      "SV deltaR jet (#PV:1-6)",              1, 0, 1);
-    P1D.PlotStack("npv1_deltar_sum_jet",      "SV deltaR sum jet (#PV:1-6)",      1, 0, 1);
-    P1D.PlotStack("npv1_deltar_sum_dir",      "SV deltaR sum dir (#PV:1-6)",      1, 0, 1);
-    P1D.PlotStack("npv1_vtxpt",      "SV vtx pt (#PV:1-6)",                       1, 1, 1);
-    P1D.PlotStack("npv1_discri_tche",      "TCHE discriminator (#PV:1-6)",        1, 1, 1);
-    P1D.PlotStack("npv1_discri_tchp",      "TCHP discriminator (#PV:1-6)",        1, 1, 1);
-    P1D.PlotStack("npv1_discri_jetprob",      "JP discriminator (#PV:1-6)",       1, 1, 1);
-    P1D.PlotStack("npv1_discri_jetbprob",      "JBP discriminator (#PV:1-6)",     1, 1, 1);
-    P1D.PlotStack("npv1_discri_ssche0",       "SSVHE Discriminator (#PV:1-6)",    1, 1, 1);
-    P1D.PlotStack("npv1_discri_ssche",   "SSVHE Discriminator (#PV:1-6)",         1, 0, 0);
-    P1D.PlotStack("npv1_discri_sschp0",   "SSVHP Discriminator (#PV:1-6)",        1, 1, 1);
-    P1D.PlotStack("npv1_discri_sschp",   "SSVHP Discriminator (#PV:1-6)",         1, 0, 0);
-    P1D.PlotStack("npv1_muon_Pt",        "Muon p_{T} (#PV:1-6)",                  1, 1, 1);
-    P1D.PlotStack("npv1_muon_ptrel",    "Muon p_{T}^{rel} (#PV:1-6)",             1, 0, 1);
-    P1D.PlotStack("npv1_muon_DeltaR",         "Muon1 deltaR (#PV:1-6)",           1, 0, 1);
+    P1D.PlotStack("npv1_sveratio",        "SV eratio (1-6 PVs)",                  1, 0, 0);
+    P1D.PlotStack("npv1_deltar_jet",      "SV deltaR jet (1-6 PVs)",              1, 0, 1);
+    P1D.PlotStack("npv1_deltar_sum_jet",      "SV deltaR sum jet (1-6 PVs)",      1, 0, 1);
+    P1D.PlotStack("npv1_deltar_sum_dir",      "SV deltaR sum dir (1-6 PVs)",      1, 0, 1);
+    P1D.PlotStack("npv1_vtxpt",      "SV vtx pt (1-6 PVs)",                       1, 1, 1);
+    P1D.PlotStack("npv1_discri_tche",      "TCHE discriminator (1-6 PVs)",        1, 1, 1);
+    P1D.PlotStack("npv1_discri_tchp",      "TCHP discriminator (1-6 PVs)",        1, 1, 1);
+    P1D.PlotStack("npv1_discri_jetprob",      "JP discriminator (1-6 PVs)",       1, 1, 1);
+    P1D.PlotStack("npv1_discri_jetbprob",      "JBP discriminator (1-6 PVs)",     1, 1, 1);
+    P1D.PlotStack("npv1_discri_ssche0",       "SSVHE Discriminator (1-6 PVs)",    1, 1, 1);
+    P1D.PlotStack("npv1_discri_ssche",   "SSVHE Discriminator (1-6 PVs)",         1, 0, 0);
+    P1D.PlotStack("npv1_discri_sschp0",   "SSVHP Discriminator (1-6 PVs)",        1, 1, 1);
+    P1D.PlotStack("npv1_discri_sschp",   "SSVHP Discriminator (1-6 PVs)",         1, 0, 0);
+    P1D.PlotStack("npv1_muon_Pt",        "Muon p_{T} (1-6 PVs)",                  1, 1, 1);
+    P1D.PlotStack("npv1_muon_ptrel",    "Muon p_{T}^{rel} (1-6 PVs)",             1, 0, 1);
+    P1D.PlotStack("npv1_muon_DeltaR",         "Muon1 deltaR (1-6 PVs)",           1, 0, 1);
 
 
     P1D.PlotStack("npv2_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV:7-10)",   1, 1, 1);  
@@ -833,56 +838,56 @@ void run(){
     P1D.PlotStack("npv2_muon_DeltaR",         "Muon1 deltaR (#PV:7-10)",           1, 0, 1);
 
 
-    P1D.PlotStack("npv3_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV:>=11)",   1, 1, 1);  
-    P1D.PlotStack(  "npv3_IP3d3sig0",        "3rd sorted track 3D IP significance (#PV:>=11)", 1, 1, 1);  
-    // P1D.PlotStack( "npv3_ntracks_jet",      "nr. of tracks in jet (#PV:>=11)",                   1, 1, 1);  
-    //  P1D.PlotStack( "npv3_nseltracks_jet",   "nr. of sel tracks in jet (#PV:>=11)",               1, 1, 1);  
-    P1D.PlotStack( "npv3_ncutseltracks_jet","nr. of tracks in jet (#PV:>=11)",           1, 1, 1);  
-    P1D.PlotStack( "npv3_pt_tracks",        "Pt of tracks (#PV:>=11)",                         1, 1, 1);  
-    P1D.PlotStack( "npv3_pt_seltracks",     "Pt of  sel tracks (#PV:>=11)",                    1, 1, 1);  
-    P1D.PlotStack( "npv3_pt_cutseltracks",  "Pt of  cut sel tracks (#PV:>=11)",                1, 1, 1);  
-    P1D.PlotStack( "npv3_nsv0",             "# of secondary vertices (#PV:>=11)",              1, 1, 1);  
-    P1D.PlotStack( "npv3_nsv",              "# of secondary vertices (#PV:>=11)",              1, 1, 1);  
-    P1D.PlotStack( "npv3_flightsig3d",      "Flight Significance 3D (#PV:>=11)",               1, 1, 1);  
-    P1D.PlotStack( "npv3_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV:>=11)", 1, 1, 1);  
-    P1D.PlotStack( "npv3_svmass",           "SV mass (#PV:>=11)",                              1, 0, 1);  
-    P1D.PlotStack( "npv3_svmass_3tr",       "SV mass for >=3tracks (#PV:>=11)",                1, 0, 1);  
-    P1D.PlotStack( "npv3_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV:>=11)",      1, 1, 1);
+    P1D.PlotStack("npv3_IP3d2sig0",        "2nd sorted track 3D IP significance (#PV#geq11)",   1, 1, 1);  
+    P1D.PlotStack(  "npv3_IP3d3sig0",        "3rd sorted track 3D IP significance (#PV#geq11)", 1, 1, 1);  
+    // P1D.PlotStack( "npv3_ntracks_jet",      "nr. of tracks in jet (#PV#geq11)",                   1, 1, 1);  
+    //  P1D.PlotStack( "npv3_nseltracks_jet",   "nr. of sel tracks in jet (#PV#geq11)",               1, 1, 1);  
+    P1D.PlotStack( "npv3_ncutseltracks_jet","nr. of tracks in jet (#PV#geq11)",           1, 1, 1);  
+    P1D.PlotStack( "npv3_pt_tracks",        "Pt of tracks (#PV#geq11)",                         1, 1, 1);  
+    P1D.PlotStack( "npv3_pt_seltracks",     "Pt of  sel tracks (#PV#geq11)",                    1, 1, 1);  
+    P1D.PlotStack( "npv3_pt_cutseltracks",  "Pt of  cut sel tracks (#PV#geq11)",                1, 1, 1);  
+    P1D.PlotStack( "npv3_nsv0",             "# of secondary vertices (#PV#geq11)",              1, 1, 1);  
+    P1D.PlotStack( "npv3_nsv",              "# of secondary vertices (#PV#geq11)",              1, 1, 1);  
+    P1D.PlotStack( "npv3_flightsig3d",      "Flight Significance 3D (#PV#geq11)",               1, 1, 1);  
+    P1D.PlotStack( "npv3_flightsig3d_3tr",  "Flight Significance 3D for >=3tracks (#PV#geq11)", 1, 1, 1);  
+    P1D.PlotStack( "npv3_svmass",           "SV mass (#PV#geq11)",                              1, 0, 1);  
+    P1D.PlotStack( "npv3_svmass_3tr",       "SV mass for >=3tracks (#PV#geq11)",                1, 0, 1);  
+    P1D.PlotStack( "npv3_nsv0_3tr",         "# of secondary vertices (>=3tr) (#PV#geq11)",      1, 1, 1);
  
-    P1D.PlotStack("npv3_sveratio",        "SV eratio (#PV:>=11)",                  1, 0, 0);
-    P1D.PlotStack("npv3_deltar_jet",      "SV deltaR jet (#PV:>=11)",              1, 0, 1);
-    P1D.PlotStack("npv3_deltar_sum_jet",      "SV deltaR sum jet (#PV:>=11)",      1, 0, 1);
-    P1D.PlotStack("npv3_deltar_sum_dir",      "SV deltaR sum dir (#PV:>=11)",      1, 0, 1);
-    P1D.PlotStack("npv3_vtxpt",      "SV vtx pt (#PV:>=11)",                       1, 1, 1);
-    P1D.PlotStack("npv3_discri_tche",      "TCHE discriminator (#PV:>=11)",        1, 1, 1);
-    P1D.PlotStack("npv3_discri_tchp",      "TCHP discriminator (#PV:>=11)",        1, 1, 1);
-    P1D.PlotStack("npv3_discri_jetprob",      "JP discriminator (#PV:>=11)",       1, 1, 1);
-    P1D.PlotStack("npv3_discri_jetbprob",      "JBP discriminator (#PV:>=11)",     1, 1, 1);
-    P1D.PlotStack("npv3_discri_ssche0",       "SSVHE Discriminator (#PV:>=11)",    1, 1, 1);
-    P1D.PlotStack("npv3_discri_ssche",   "SSVHE Discriminator (#PV:>=11)",         1, 0, 0);
-    P1D.PlotStack("npv3_discri_sschp0",   "SSVHP Discriminator (#PV:>=11)",        1, 1, 1);
-    P1D.PlotStack("npv3_discri_sschp",   "SSVHP Discriminator (#PV:>=11)",         1, 0, 0);
-    P1D.PlotStack("npv3_muon_Pt",        "Muon p_{T} (#PV:>=11)",                  1, 1, 1);
-    P1D.PlotStack("npv3_muon_ptrel",    "Muon p_{T}^{rel} (#PV:>=11)",             1, 0, 1);
-    P1D.PlotStack("npv3_muon_DeltaR",         "Muon1 deltaR (#PV:>=11)",           1, 0, 1);
+    P1D.PlotStack("npv3_sveratio",        "SV eratio (#PV#geq11)",                  1, 0, 0);
+    P1D.PlotStack("npv3_deltar_jet",      "SV deltaR jet (#PV#geq11)",              1, 0, 1);
+    P1D.PlotStack("npv3_deltar_sum_jet",      "SV deltaR sum jet (#PV#geq11)",      1, 0, 1);
+    P1D.PlotStack("npv3_deltar_sum_dir",      "SV deltaR sum dir (#PV#geq11)",      1, 0, 1);
+    P1D.PlotStack("npv3_vtxpt",      "SV vtx pt (#PV#geq11)",                       1, 1, 1);
+    P1D.PlotStack("npv3_discri_tche",      "TCHE discriminator (#PV#geq11)",        1, 1, 1);
+    P1D.PlotStack("npv3_discri_tchp",      "TCHP discriminator (#PV#geq11)",        1, 1, 1);
+    P1D.PlotStack("npv3_discri_jetprob",      "JP discriminator (#PV#geq11)",       1, 1, 1);
+    P1D.PlotStack("npv3_discri_jetbprob",      "JBP discriminator (#PV#geq11)",     1, 1, 1);
+    P1D.PlotStack("npv3_discri_ssche0",       "SSVHE Discriminator (#PV#geq11)",    1, 1, 1);
+    P1D.PlotStack("npv3_discri_ssche",   "SSVHE Discriminator (#PV#geq11)",         1, 0, 0);
+    P1D.PlotStack("npv3_discri_sschp0",   "SSVHP Discriminator (#PV#geq11)",        1, 1, 1);
+    P1D.PlotStack("npv3_discri_sschp",   "SSVHP Discriminator (#PV#geq11)",         1, 0, 0);
+    P1D.PlotStack("npv3_muon_Pt",        "Muon p_{T} (#PV#geq11)",                  1, 1, 1);
+    P1D.PlotStack("npv3_muon_ptrel",    "Muon p_{T}^{rel} (#PV#geq11)",             1, 0, 1);
+    P1D.PlotStack("npv3_muon_DeltaR",         "Muon1 deltaR (#PV#geq11)",           1, 0, 1);
 
-    P2D.PlotStack2D("track_vs_jetpt", "jet p_{t}", "track multiplicity",  0,10,35);
-    P2D.PlotStack2D("cutseltrack_vs_jetpt", "jet p_{t}", "track multiplicity", 0,4,17);
-    P2D.PlotStack2D("sv_track_vs_jetpt",    "jet p_{t}", "SV track multiplicity",  0,1.,5.5);
+    P2D.PlotStack2D("track_vs_jetpt", "jet p_{T}", "track multiplicity",  0,10,35);
+    P2D.PlotStack2D("cutseltrack_vs_jetpt", "jet p_{T}", "track multiplicity", 0,4,17);
+    P2D.PlotStack2D("sv_track_vs_jetpt",    "jet p_{T}", "SV track multiplicity",  0,1.,5.5);
 
     P2D.PlotStack2D("sv_mass_vs_flightDistSignCut", "flight dist sign.", "SV mass", 0, 0, 6.5);
     P2D.PlotStack2D("sv_mass_vs_flightDistCut","flight dist.", "SV mass",  0,0,4.5);
 
-    P2D.PlotStack2D("avg_sv_mass_vs_jetpt", "jet p_{t}", "SV mass", 0,0,5.5);
+    P2D.PlotStack2D("avg_sv_mass_vs_jetpt", "jet p_{T}", "SV mass", 0,0,5.5);
 
-    P2D.PlotStack2D("sv_deltar_jet_vs_jetpt", "jet p_{t}", "#Delta R(vertex dir., jet)", 0,0,0.13);
-    P2D.PlotStack2D("sv_deltar_sum_jet_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, jet)",  0,0,0.09);
-    P2D.PlotStack2D("sv_deltar_sum_dir_vs_jetpt","jet p_{t}", "#Delta R(vertex {#vec p}, vertex dir.)",  0,0,0.09);
-    P2D.PlotStack2D("muon_ptrel_vs_jetpt", "jet p_{t}","muon p_{t}^{rel}",  0);
-    P2D.PlotStack2D("muon_DeltaR_vs_jetpt","jet p_{t}","muon #Delta R",   0);
+    P2D.PlotStack2D("sv_deltar_jet_vs_jetpt", "jet p_{T}", "#Delta R(vertex dir., jet)", 0,0,0.13);
+    P2D.PlotStack2D("sv_deltar_sum_jet_vs_jetpt","jet p_{T}", "#Delta R(vertex {#vec p}, jet)",  0,0,0.09);
+    P2D.PlotStack2D("sv_deltar_sum_dir_vs_jetpt","jet p_{T}", "#Delta R(vertex {#vec p}, vertex dir.)",  0,0,0.09);
+    P2D.PlotStack2D("muon_ptrel_vs_jetpt", "jet p_{T}","muon p_{T}^{rel}",  0);
+    P2D.PlotStack2D("muon_DeltaR_vs_jetpt","jet p_{T}","muon #Delta R",   0);
 
-    P2D.PlotStack2D("sv_eratio_vs_jetpt","jet p_{t}","SV energy ratio",  0,0,0.75);
-    P2D.PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{t}","SV p_{t}",  0,0,55);
+    P2D.PlotStack2D("sv_eratio_vs_jetpt","jet p_{T}","SV energy ratio",  0,0,0.75);
+    P2D.PlotStack2D("sv_vtx_pt_vs_jetpt","jet p_{T}","SV p_{T}",  0,0,55);
 #endif
 }
 

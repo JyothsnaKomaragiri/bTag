@@ -18,15 +18,32 @@
 
 Float_t bEnrichCutSal=1.0;
 
-class Plotter : public btagNtupReader{
-public:
-  Plotter(string filename):btagNtupReader(filename){};
-  virtual void     Loop(Bool_t isRealData, Float_t weight, const string resultfilename);
-  virtual void     AddHisto(vector<TH1F*> &HistoBtag, string name,  const int& j, string title,  const int& nbins, const Float_t& min, const Float_t& max);
-  virtual void     AddHisto2D(vector<TH2F*> &Histo2DB, string name,  const int& j, string title, const int& nbins, const Float_t& min, const Float_t& max, const int& nbinsy, const Float_t& miny, const Float_t& maxy);
-  
-};
 // TO BE DEFINED FIRST !
+#if DATAYEAR==2012
+#if PTVAL == 30 && defined(RUN_ON_JET)
+TString my_trigger_path="HLT_PFJet40";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=30.;
+#endif
+
+#if PTVAL == 60 && defined(RUN_ON_JET)
+TString my_trigger_path="HLT_PFJet80";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=60.;
+#endif
+
+#if PTVAL == 100 && defined(RUN_ON_JET)
+TString my_trigger_path="HLT_PFJet80";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=100.;
+#endif
+
+#if PTVAL == 120 && defined(RUN_ON_JET)
+TString my_trigger_path="HLT_PFJet80";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=120.;
+#endif
+
+#if PTVAL == 140 && defined(RUN_ON_JET)
+TString my_trigger_path="HLT_PFJet140";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=140.;
+#define MaxJetPt 300
+#endif
+
+#endif
+
+#if DATAYEAR==2011
 // + check the data and MC input files
 // JetPtthresholdsfornm is the threshold from Daniel
 #if PTVAL == 30 && defined(RUN_ON_JET)
@@ -37,6 +54,14 @@ TString my_trigger_path="HLT_Jet30";Float_t JetPtthresholdsfornmu=-1; Float_t cu
 TString my_trigger_path="HLT_Jet60";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=60.;
 #endif
 
+#if PTVAL == 100 && defined(RUN_ON_JET)
+TString my_trigger_path="HLT_Jet60";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=100.;
+#endif
+
+#if PTVAL == 120 && defined(RUN_ON_JET)
+TString my_trigger_path="HLT_Jet60";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=120.;
+#endif
+
 #if PTVAL == 80 && defined(RUN_ON_JET)
 TString my_trigger_path="HLT_Jet80";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=80.;
 #endif
@@ -45,25 +70,47 @@ TString my_trigger_path="HLT_Jet80";Float_t JetPtthresholdsfornmu=-1; Float_t cu
 TString my_trigger_path="HLT_Jet110";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=110.;
 #endif
 
-#if PTVAL == 20 && !defined(RUN_ON_JET)
+#if PTVAL == 20 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";Float_t JetPtthresholdsfornmu=20.; Float_t cutJetPt=45.; Float_t cutMuonPt=7.;
 #endif
 
-#if PTVAL == 40 && !defined(RUN_ON_JET)
+#if PTVAL == 40 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";Float_t JetPtthresholdsfornmu=60.; Float_t cutJetPt=65.; Float_t cutMuonPt=7.;
 #endif
 
-#if PTVAL == 60 && !defined(RUN_ON_JET)
+#if PTVAL == 60 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet60_Mu7";Float_t JetPtthresholdsfornmu=90; Float_t cutJetPt=95.; Float_t cutMuonPt=9.;
 #endif
 
-#if PTVAL == 70 && !defined(RUN_ON_JET)
+#if PTVAL == 70 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet70_Mu5";Float_t JetPtthresholdsfornmu=100; Float_t cutJetPt=105.; Float_t cutMuonPt=7.;
 #endif
 
-#if PTVAL == 110 && !defined(RUN_ON_JET)
+#if PTVAL == 110 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet110_Mu5";Float_t JetPtthresholdsfornmu=155;/*130?*/ Float_t cutJetPt=160.; Float_t cutMuonPt=7.;
 #endif
+#endif
+
+class Plotter : public btagNtupReader{
+public:
+  Plotter(string filename):btagNtupReader(filename){};
+  virtual void     Loop(Bool_t isRealData, Float_t weight, const string resultfilename);
+  virtual void     AddHisto(vector<TH1F*> &HistoBtag, string name,  const int& j, string title,  const int& nbins, const Float_t& min, const Float_t& max);
+  virtual void     AddHisto2D(vector<TH2F*> &Histo2DB, string name,  const int& j, string title, const int& nbins, const Float_t& min, const Float_t& max, const int& nbinsy, const Float_t& miny, const Float_t& maxy);
+  virtual void PileUpDistribution(TH1D* dis) {
+     if (fChain == 0) return;
+     Long64_t nentries = fChain->GetEntries();//GetEntriesFast() will give you something wrong in the first running
+     for (Long64_t jentry=0; jentry<nentries;jentry++) {
+       if ( LoadTree(jentry) < 0 ) break;
+       fChain->GetEntry(jentry);
+#if bTagNtupleVersion>4
+       dis->Fill(numberOfPUVerticesMixingTruth);
+#else
+       dis->Fill(numberOfPUVertices);
+#endif
+     }
+  }
+};
 
 Float_t puweight[MAXPU+1];
 TString final_dir;
@@ -213,55 +260,55 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 
     // additional plots : with #PV selection
     // #PV: 1-6
-    AddHisto(HistoBtag, "npv1_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:1-6)",100,-35.,35.);
-    AddHisto(HistoBtag, "npv1_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:1-6)",100,-35.,35.);
-    AddHisto(HistoBtag, "npv1_ntracks_jet",      j,"# of tracks in jet (#PV:1-6)",                 45,-0.5,44.5);
-    AddHisto(HistoBtag, "npv1_nseltracks_jet",   j,"# of sel tracks in jet (#PV:1-6)",              45,-0.5,44.5); //95
-    AddHisto(HistoBtag, "npv1_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:1-6)",          45,-0.5,44.5);
-    AddHisto(HistoBtag, "npv1_pt_tracks",        j,"Pt of tracks (#PV:1-6)",                        80,0.,200.);
-    AddHisto(HistoBtag, "npv1_pt_seltracks",     j,"Pt of  sel tracks (#PV:1-6)",                   80,0.,200.);
-    AddHisto(HistoBtag, "npv1_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:1-6)",               80,0.,200.);
+    AddHisto(HistoBtag, "npv1_IP3d2sig0",        j,"2nd sorted track 3D IP significance (1-6 PVs)",100,-35.,35.);
+    AddHisto(HistoBtag, "npv1_IP3d3sig0",        j,"3rd sorted track 3D IP significance (1-6 PVs)",100,-35.,35.);
+    AddHisto(HistoBtag, "npv1_ntracks_jet",      j,"# of tracks in jet (1-6 PVs)",                 45,-0.5,44.5);
+    AddHisto(HistoBtag, "npv1_nseltracks_jet",   j,"# of sel tracks in jet (1-6 PVs)",              45,-0.5,44.5); //95
+    AddHisto(HistoBtag, "npv1_ncutseltracks_jet",j,"# of cut sel tracks in jet (1-6 PVs)",          45,-0.5,44.5);
+    AddHisto(HistoBtag, "npv1_pt_tracks",        j,"Pt of tracks (1-6 PVs)",                        80,0.,200.);
+    AddHisto(HistoBtag, "npv1_pt_seltracks",     j,"Pt of  sel tracks (1-6 PVs)",                   80,0.,200.);
+    AddHisto(HistoBtag, "npv1_pt_cutseltracks",  j,"Pt of  cut sel tracks (1-6 PVs)",               80,0.,200.);
 
-    AddHisto(HistoBtag, "npv1_nsv0",              j,"# of secondary vertices (#PV:1-6)",             6 ,-0.5,5.5); //100
-    AddHisto(HistoBtag, "npv1_nsv",              j,"# of secondary vertices (#PV:1-6)",              6,-0.5,5.5);
-    AddHisto(HistoBtag, "npv1_flightsig3d",      j,"Flight Significance 3D (#PV:1-6)",                  50,0.,100.);
-    AddHisto(HistoBtag, "npv1_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (#PV:1-6)",    50,0.,100.);
-    AddHisto(HistoBtag, "npv1_svmass",           j,"SV mass (#PV:1-6)",                             50,0.,8.);
-    AddHisto(HistoBtag, "npv1_svmass_3tr",       j,"SV mass for >=3tracks (#PV:1-6)",               50,0.,8.); //105
+    AddHisto(HistoBtag, "npv1_nsv0",              j,"# of secondary vertices (1-6 PVs)",             6 ,-0.5,5.5); //100
+    AddHisto(HistoBtag, "npv1_nsv",              j,"# of secondary vertices (1-6 PVs)",              6,-0.5,5.5);
+    AddHisto(HistoBtag, "npv1_flightsig3d",      j,"Flight Significance 3D (1-6 PVs)",                  50,0.,100.);
+    AddHisto(HistoBtag, "npv1_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (1-6 PVs)",    50,0.,100.);
+    AddHisto(HistoBtag, "npv1_svmass",           j,"SV mass (1-6 PVs)",                             50,0.,8.);
+    AddHisto(HistoBtag, "npv1_svmass_3tr",       j,"SV mass for >=3tracks (1-6 PVs)",               50,0.,8.); //105
 
     // #PV: 7-10
-    AddHisto(HistoBtag, "npv2_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:7-10)",100,-35.,35.);
-    AddHisto(HistoBtag, "npv2_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:7-10)",100,-35.,35.);
-    AddHisto(HistoBtag, "npv2_ntracks_jet",      j,"# of tracks in jet (#PV:7-10)",                 45,-0.5,44.5);
-    AddHisto(HistoBtag, "npv2_nseltracks_jet",   j,"# of sel tracks in jet (#PV:7-10)",              45,-0.5,44.5); 
-    AddHisto(HistoBtag, "npv2_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:7-10)",          45,-0.5,44.5);//110
-    AddHisto(HistoBtag, "npv2_pt_tracks",        j,"Pt of tracks (#PV:7-10)",                        80,0.,200.);
-    AddHisto(HistoBtag, "npv2_pt_seltracks",     j,"Pt of  sel tracks (#PV:7-10)",                   80,0.,200.);
-    AddHisto(HistoBtag, "npv2_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:7-10)",               80,0.,200.);
+    AddHisto(HistoBtag, "npv2_IP3d2sig0",        j,"2nd sorted track 3D IP significance (7-10 PVs)",100,-35.,35.);
+    AddHisto(HistoBtag, "npv2_IP3d3sig0",        j,"3rd sorted track 3D IP significance (7-10 PVs)",100,-35.,35.);
+    AddHisto(HistoBtag, "npv2_ntracks_jet",      j,"# of tracks in jet (7-10 PVs)",                 45,-0.5,44.5);
+    AddHisto(HistoBtag, "npv2_nseltracks_jet",   j,"# of sel tracks in jet (7-10 PVs)",              45,-0.5,44.5); 
+    AddHisto(HistoBtag, "npv2_ncutseltracks_jet",j,"# of cut sel tracks in jet (7-10 PVs)",          45,-0.5,44.5);//110
+    AddHisto(HistoBtag, "npv2_pt_tracks",        j,"Pt of tracks (7-10 PVs)",                        80,0.,200.);
+    AddHisto(HistoBtag, "npv2_pt_seltracks",     j,"Pt of  sel tracks (7-10 PVs)",                   80,0.,200.);
+    AddHisto(HistoBtag, "npv2_pt_cutseltracks",  j,"Pt of  cut sel tracks (7-10 PVs)",               80,0.,200.);
 
-    AddHisto(HistoBtag, "npv2_nsv0",              j,"# of secondary vertices (#PV:7-10)",              6,-0.5,5.5);
-    AddHisto(HistoBtag, "npv2_nsv",              j,"# of secondary vertices (#PV:7-10)",              6,-0.5,5.5); //115
-    AddHisto(HistoBtag, "npv2_flightsig3d",      j,"Flight Significance 3D (#PV:7-10)",                  50,0.,100.);
-    AddHisto(HistoBtag, "npv2_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (#PV:7-10)",    50,0.,100.);
-    AddHisto(HistoBtag, "npv2_svmass",           j,"SV mass (#PV:7-10)",                             50,0.,8.);
-    AddHisto(HistoBtag, "npv2_svmass_3tr",       j,"SV mass for >=3tracks (#PV:7-10)",               50,0.,8.);
+    AddHisto(HistoBtag, "npv2_nsv0",              j,"# of secondary vertices (7-10 PVs)",              6,-0.5,5.5);
+    AddHisto(HistoBtag, "npv2_nsv",              j,"# of secondary vertices (7-10 PVs)",              6,-0.5,5.5); //115
+    AddHisto(HistoBtag, "npv2_flightsig3d",      j,"Flight Significance 3D (7-10 PVs)",                  50,0.,100.);
+    AddHisto(HistoBtag, "npv2_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (7-10 PVs)",    50,0.,100.);
+    AddHisto(HistoBtag, "npv2_svmass",           j,"SV mass (7-10 PVs)",                             50,0.,8.);
+    AddHisto(HistoBtag, "npv2_svmass_3tr",       j,"SV mass for >=3tracks (7-10 PVs)",               50,0.,8.);
 
     // #PV: >=11
-    AddHisto(HistoBtag, "npv3_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV:>=11)",100,-35.,35.); //120
-    AddHisto(HistoBtag, "npv3_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV:>=11)",100,-35.,35.);
-    AddHisto(HistoBtag, "npv3_ntracks_jet",      j,"# of tracks in jet (#PV:>=11)",                 45,-0.5,44.5);
-    AddHisto(HistoBtag, "npv3_nseltracks_jet",   j,"# of sel tracks in jet (#PV:>=11)",              45,-0.5,44.5);
-    AddHisto(HistoBtag, "npv3_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV:>=11)",          45,-0.5,44.5); 
-    AddHisto(HistoBtag, "npv3_pt_tracks",        j,"Pt of tracks (#PV:>=11)",                        80,0.,200.); //125
-    AddHisto(HistoBtag, "npv3_pt_seltracks",     j,"Pt of  sel tracks (#PV:>=11)",                   80,0.,200.);
-    AddHisto(HistoBtag, "npv3_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV:>=11)",               80,0.,200.);
+    AddHisto(HistoBtag, "npv3_IP3d2sig0",        j,"2nd sorted track 3D IP significance (#PV#geq11)",100,-35.,35.); //120
+    AddHisto(HistoBtag, "npv3_IP3d3sig0",        j,"3rd sorted track 3D IP significance (#PV#geq11)",100,-35.,35.);
+    AddHisto(HistoBtag, "npv3_ntracks_jet",      j,"# of tracks in jet (#PV#geq11)",                 45,-0.5,44.5);
+    AddHisto(HistoBtag, "npv3_nseltracks_jet",   j,"# of sel tracks in jet (#PV#geq11)",              45,-0.5,44.5);
+    AddHisto(HistoBtag, "npv3_ncutseltracks_jet",j,"# of cut sel tracks in jet (#PV#geq11)",          45,-0.5,44.5); 
+    AddHisto(HistoBtag, "npv3_pt_tracks",        j,"Pt of tracks (#PV#geq11)",                        80,0.,200.); //125
+    AddHisto(HistoBtag, "npv3_pt_seltracks",     j,"Pt of  sel tracks (#PV#geq11)",                   80,0.,200.);
+    AddHisto(HistoBtag, "npv3_pt_cutseltracks",  j,"Pt of  cut sel tracks (#PV#geq11)",               80,0.,200.);
 
-    AddHisto(HistoBtag, "npv3_nsv0",              j,"# of secondary vertices (#PV:>=11)",              6,-0.5,5.5); 
-    AddHisto(HistoBtag, "npv3_nsv",              j,"# of secondary vertices (#PV:>=11)",              6,-0.5,5.5);
-    AddHisto(HistoBtag, "npv3_flightsig3d",      j,"Flight Significance 3D (#PV:>=11)",                  50,0.,100.); //130
-    AddHisto(HistoBtag, "npv3_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (#PV:>=11)",    50,0.,100.);
-    AddHisto(HistoBtag, "npv3_svmass",           j,"SV mass (#PV:>=11)",                             50,0.,8.);
-    AddHisto(HistoBtag, "npv3_svmass_3tr",       j,"SV mass for >=3tracks (#PV:>=11)",               50,0.,8.);
+    AddHisto(HistoBtag, "npv3_nsv0",              j,"# of secondary vertices (#PV#geq11)",              6,-0.5,5.5); 
+    AddHisto(HistoBtag, "npv3_nsv",              j,"# of secondary vertices (#PV#geq11)",              6,-0.5,5.5);
+    AddHisto(HistoBtag, "npv3_flightsig3d",      j,"Flight Significance 3D (#PV#geq11)",                  50,0.,100.); //130
+    AddHisto(HistoBtag, "npv3_flightsig3d_3tr",  j,"Flight Significance 3D for >=3tracks (#PV#geq11)",    50,0.,100.);
+    AddHisto(HistoBtag, "npv3_svmass",           j,"SV mass (#PV#geq11)",                             50,0.,8.);
+    AddHisto(HistoBtag, "npv3_svmass_3tr",       j,"SV mass for >=3tracks (#PV#geq11)",               50,0.,8.);
 
 
 
@@ -278,12 +325,12 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
     AddHisto(HistoBtag, "trackIP3d_bin4_cutsel",  j,"Track 3D IP value (8<Pt<=12 GeV/c)",100,-0.1,0.1); 
     AddHisto(HistoBtag, "trackIP3d_bin5_cutsel",  j,"Track 3D IP value (12<Pt<=20 GeV/c)",100,-0.1,0.1); 
     AddHisto(HistoBtag, "trackIP3d_bin6_cutsel",  j,"Track 3D IP value (20<Pt<=50 GeV/c)",100,-0.1,0.1); 
-    AddHisto(HistoBtag, "npv1_nsv_3tr",              j,"# of secondary vertices (>=3tr) (#PV:1-6)",              5,0,5); //145
-    AddHisto(HistoBtag, "npv2_nsv_3tr",              j,"# of secondary vertices (>=3tr) (#PV:7-10)",              5,0,5); 
-    AddHisto(HistoBtag, "npv3_nsv_3tr",              j,"# of secondary vertices (>=3tr) (#PV:>=11)",              5,0,5);
-    AddHisto(HistoBtag, "npv1_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:1-6)",              5,0,5);
-    AddHisto(HistoBtag, "npv2_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:7-10)",              5,0,5); 
-    AddHisto(HistoBtag, "npv3_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV:>=11)",              5,0,5); //150
+    AddHisto(HistoBtag, "npv1_nsv_3tr",              j,"# of secondary vertices (>=3tr) (1-6 PVs)",              5,0,5); //145
+    AddHisto(HistoBtag, "npv2_nsv_3tr",              j,"# of secondary vertices (>=3tr) (7-10 PVs)",              5,0,5); 
+    AddHisto(HistoBtag, "npv3_nsv_3tr",              j,"# of secondary vertices (>=3tr) (#PV#geq11)",              5,0,5);
+    AddHisto(HistoBtag, "npv1_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (1-6 PVs)",              5,0,5);
+    AddHisto(HistoBtag, "npv2_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (7-10 PVs)",              5,0,5); 
+    AddHisto(HistoBtag, "npv3_nsv0_3tr",              j,"# of secondary vertices (>=3tr) (#PV#geq11)",              5,0,5); //150
 
     //IP significance sorted in bins of track pt
     AddHisto(HistoBtag, "IP3d1sigsorted_bin1",j,"1st track 3D IP significance (sorted)",100,-35.,35.);
@@ -461,60 +508,60 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
     AddHisto(HistoBtag, "muons_multiplicity_centered",    j,"# of muons in jet (centered)",11,-0.5,10.5);
 
 
-    AddHisto(HistoBtag, "npv1_sveratio",        j,"SV eratio (#PV:1-6)",                       50,0.,1.);          //278
-    AddHisto(HistoBtag, "npv1_deltar_jet",      j,"SV deltaR jet (#PV:1-6)",                 50,0.,0.5);
-    AddHisto(HistoBtag, "npv1_deltar_sum_jet",      j,"SV deltaR sum jet (#PV:1-6)",                 50,0.,0.5);   //280
-    AddHisto(HistoBtag, "npv1_deltar_sum_dir",      j,"SV deltaR sum dir (#PV:1-6)",                 50,0.,0.5);   
-    AddHisto(HistoBtag, "npv1_vtxpt",      j,"SV vtx pt (#PV:1-6)",                 50,0.,100);   
-    AddHisto(HistoBtag, "npv1_discri_tche",      j,"TCHE discriminator (#PV:1-6)",                 50,0.,30);   
-    AddHisto(HistoBtag, "npv1_discri_tchp",      j,"TCHP discriminator (#PV:1-6)",                 50,0.,30);   
-    AddHisto(HistoBtag, "npv1_discri_jetprob",      j,"JP discriminator (#PV:1-6)",                 50,0.,2.5);   //285
-    AddHisto(HistoBtag, "npv1_discri_jetbprob",      j,"JBP discriminator (#PV:1-6)",                 50,0.,8);   
+    AddHisto(HistoBtag, "npv1_sveratio",        j,"SV eratio (1-6 PVs)",                       50,0.,1.);          //278
+    AddHisto(HistoBtag, "npv1_deltar_jet",      j,"SV deltaR jet (1-6 PVs)",                 50,0.,0.5);
+    AddHisto(HistoBtag, "npv1_deltar_sum_jet",      j,"SV deltaR sum jet (1-6 PVs)",                 50,0.,0.5);   //280
+    AddHisto(HistoBtag, "npv1_deltar_sum_dir",      j,"SV deltaR sum dir (1-6 PVs)",                 50,0.,0.5);   
+    AddHisto(HistoBtag, "npv1_vtxpt",      j,"SV vtx pt (1-6 PVs)",                 50,0.,100);   
+    AddHisto(HistoBtag, "npv1_discri_tche",      j,"TCHE discriminator (1-6 PVs)",                 50,0.,30);   
+    AddHisto(HistoBtag, "npv1_discri_tchp",      j,"TCHP discriminator (1-6 PVs)",                 50,0.,30);   
+    AddHisto(HistoBtag, "npv1_discri_jetprob",      j,"JP discriminator (1-6 PVs)",                 50,0.,2.5);   //285
+    AddHisto(HistoBtag, "npv1_discri_jetbprob",      j,"JBP discriminator (1-6 PVs)",                 50,0.,8);   
 
-    AddHisto(HistoBtag, "npv1_discri_ssche0",       j,"SSVHE Discriminator (#PV:1-6)",80,-1.,7.); 
-    AddHisto(HistoBtag, "npv1_discri_ssche",   j,"SSVHE Discriminator (#PV:1-6)",50,0.,7.);   
-    AddHisto(HistoBtag, "npv1_discri_sschp0",   j,"SSVHP Discriminator (#PV:1-6)",80,-1.,7.); 
-    AddHisto(HistoBtag, "npv1_discri_sschp",   j,"SSVHP Discriminator (#PV:1-6)",50,0.,7.);                     //290
-    AddHisto(HistoBtag, "npv1_muon_Pt", j,       "Muon p_{T} (#PV:1-6)",200,0,100);
-    AddHisto(HistoBtag, "npv1_muon_ptrel", j ,   "Muon p_{T}^{rel} (#PV:1-6)",50,0,5); 
-    AddHisto(HistoBtag, "npv1_muon_DeltaR", j,        "Muon1 deltaR (#PV:1-6)",50,0,0.5); 
+    AddHisto(HistoBtag, "npv1_discri_ssche0",       j,"SSVHE Discriminator (1-6 PVs)",80,-1.,7.); 
+    AddHisto(HistoBtag, "npv1_discri_ssche",   j,"SSVHE Discriminator (1-6 PVs)",50,0.,7.);   
+    AddHisto(HistoBtag, "npv1_discri_sschp0",   j,"SSVHP Discriminator (1-6 PVs)",80,-1.,7.); 
+    AddHisto(HistoBtag, "npv1_discri_sschp",   j,"SSVHP Discriminator (1-6 PVs)",50,0.,7.);                     //290
+    AddHisto(HistoBtag, "npv1_muon_Pt", j,       "Muon p_{T} (1-6 PVs)",200,0,100);
+    AddHisto(HistoBtag, "npv1_muon_ptrel", j ,   "Muon p_{T}^{rel} (1-6 PVs)",50,0,5); 
+    AddHisto(HistoBtag, "npv1_muon_DeltaR", j,        "Muon1 deltaR (1-6 PVs)",50,0,0.5); 
 
-    AddHisto(HistoBtag, "npv2_sveratio",        j,"SV eratio (#PV:7-10)",                       50,0.,1.);
-    AddHisto(HistoBtag, "npv2_deltar_jet",      j,"SV deltaR jet (#PV:7-10)",                 50,0.,0.5);           //295
-    AddHisto(HistoBtag, "npv2_deltar_sum_jet",      j,"SV deltaR sum jet (#PV:7-10)",                 50,0.,0.5);   
-    AddHisto(HistoBtag, "npv2_deltar_sum_dir",      j,"SV deltaR sum dir (#PV:7-10)",                 50,0.,0.5);   
-    AddHisto(HistoBtag, "npv2_vtxpt",      j,"SV vtx pt (#PV:7-10)",                 50,0., 100);   
-    AddHisto(HistoBtag, "npv2_discri_tche",      j,"TCHE discriminator (#PV:7-10)",                 50,0.,30);   
-    AddHisto(HistoBtag, "npv2_discri_tchp",      j,"TCHP discriminator (#PV:7-10)",                 50,0.,30);   //300
-    AddHisto(HistoBtag, "npv2_discri_jetprob",      j,"JP discriminator (#PV:7-10)",                 50,0.,2.5);   
-    AddHisto(HistoBtag, "npv2_discri_jetbprob",      j,"JBP discriminator (#PV:7-10)",                 50,0.,8);   
+    AddHisto(HistoBtag, "npv2_sveratio",        j,"SV eratio (7-10 PVs)",                       50,0.,1.);
+    AddHisto(HistoBtag, "npv2_deltar_jet",      j,"SV deltaR jet (7-10 PVs)",                 50,0.,0.5);           //295
+    AddHisto(HistoBtag, "npv2_deltar_sum_jet",      j,"SV deltaR sum jet (7-10 PVs)",                 50,0.,0.5);   
+    AddHisto(HistoBtag, "npv2_deltar_sum_dir",      j,"SV deltaR sum dir (7-10 PVs)",                 50,0.,0.5);   
+    AddHisto(HistoBtag, "npv2_vtxpt",      j,"SV vtx pt (7-10 PVs)",                 50,0., 100);   
+    AddHisto(HistoBtag, "npv2_discri_tche",      j,"TCHE discriminator (7-10 PVs)",                 50,0.,30);   
+    AddHisto(HistoBtag, "npv2_discri_tchp",      j,"TCHP discriminator (7-10 PVs)",                 50,0.,30);   //300
+    AddHisto(HistoBtag, "npv2_discri_jetprob",      j,"JP discriminator (7-10 PVs)",                 50,0.,2.5);   
+    AddHisto(HistoBtag, "npv2_discri_jetbprob",      j,"JBP discriminator (7-10 PVs)",                 50,0.,8);   
 
-    AddHisto(HistoBtag, "npv2_discri_ssche0",       j,"SSVHE Discriminator (#PV:7-10)",80,-1.,7.); 
-    AddHisto(HistoBtag, "npv2_discri_ssche",   j,"SSVHE Discriminator (#PV:7-10)",50,0.,7.);   
-    AddHisto(HistoBtag, "npv2_discri_sschp0",   j,"SSVHP Discriminator (#PV:7-10)",80,-1.,7.); //305
-    AddHisto(HistoBtag, "npv2_discri_sschp",   j,"SSVHP Discriminator (#PV:7-10)",50,0.,7.);   
-    AddHisto(HistoBtag, "npv2_muon_Pt", j,       "Muon p_{T} (#PV:7-10)",200,0,100);
-    AddHisto(HistoBtag, "npv2_muon_ptrel", j ,   "Muon p_{T}^{rel} (#PV:7-10)",50,0,5); 
-    AddHisto(HistoBtag, "npv2_muon_DeltaR", j,        "Muon1 deltaR (#PV:7-10)",50,0,0.5); 
+    AddHisto(HistoBtag, "npv2_discri_ssche0",       j,"SSVHE Discriminator (7-10 PVs)",80,-1.,7.); 
+    AddHisto(HistoBtag, "npv2_discri_ssche",   j,"SSVHE Discriminator (7-10 PVs)",50,0.,7.);   
+    AddHisto(HistoBtag, "npv2_discri_sschp0",   j,"SSVHP Discriminator (7-10 PVs)",80,-1.,7.); //305
+    AddHisto(HistoBtag, "npv2_discri_sschp",   j,"SSVHP Discriminator (7-10 PVs)",50,0.,7.);   
+    AddHisto(HistoBtag, "npv2_muon_Pt", j,       "Muon p_{T} (7-10 PVs)",200,0,100);
+    AddHisto(HistoBtag, "npv2_muon_ptrel", j ,   "Muon p_{T}^{rel} (7-10 PVs)",50,0,5); 
+    AddHisto(HistoBtag, "npv2_muon_DeltaR", j,        "Muon1 deltaR (7-10 PVs)",50,0,0.5); 
 
      
-    AddHisto(HistoBtag, "npv3_sveratio",        j,"SV eratio (#PV:>=11)",                       50,0.,1.);     //310
-    AddHisto(HistoBtag, "npv3_deltar_jet",      j,"SV deltaR jet (#PV:>=11)",                 50,0.,0.5);
-    AddHisto(HistoBtag, "npv3_deltar_sum_jet",      j,"SV deltaR sum jet (#PV:>=11)",                 50,0.,0.5);   
-    AddHisto(HistoBtag, "npv3_deltar_sum_dir",      j,"SV deltaR sum dir (#PV:>=11)",                 50,0.,0.5);   
-    AddHisto(HistoBtag, "npv3_vtxpt",      j,"SV vtx pt (#PV:>=11)",                 50,0., 100);   
-    AddHisto(HistoBtag, "npv3_discri_tche",      j,"TCHE discriminator (#PV:>=11)",                 50,0.,30);      //315
-    AddHisto(HistoBtag, "npv3_discri_tchp",      j,"TCHP discriminator (#PV:>=11)",                 50,0.,30);   
-    AddHisto(HistoBtag, "npv3_discri_jetprob",      j,"JP discriminator (#PV:>=11)",                 50,0.,2.5);   
-    AddHisto(HistoBtag, "npv3_discri_jetbprob",      j,"JBP discriminator (#PV:>=11)",                 50,0.,8);   
+    AddHisto(HistoBtag, "npv3_sveratio",        j,"SV eratio (#PV#geq11)",                       50,0.,1.);     //310
+    AddHisto(HistoBtag, "npv3_deltar_jet",      j,"SV deltaR jet (#PV#geq11)",                 50,0.,0.5);
+    AddHisto(HistoBtag, "npv3_deltar_sum_jet",      j,"SV deltaR sum jet (#PV#geq11)",                 50,0.,0.5);   
+    AddHisto(HistoBtag, "npv3_deltar_sum_dir",      j,"SV deltaR sum dir (#PV#geq11)",                 50,0.,0.5);   
+    AddHisto(HistoBtag, "npv3_vtxpt",      j,"SV vtx pt (#PV#geq11)",                 50,0., 100);   
+    AddHisto(HistoBtag, "npv3_discri_tche",      j,"TCHE discriminator (#PV#geq11)",                 50,0.,30);      //315
+    AddHisto(HistoBtag, "npv3_discri_tchp",      j,"TCHP discriminator (#PV#geq11)",                 50,0.,30);   
+    AddHisto(HistoBtag, "npv3_discri_jetprob",      j,"JP discriminator (#PV#geq11)",                 50,0.,2.5);   
+    AddHisto(HistoBtag, "npv3_discri_jetbprob",      j,"JBP discriminator (#PV#geq11)",                 50,0.,8);   
 
-    AddHisto(HistoBtag, "npv3_discri_ssche0",       j,"SSVHE Discriminator (#PV:>=11)",80,-1.,7.); 
-    AddHisto(HistoBtag, "npv3_discri_ssche",   j,"SSVHE Discriminator (#PV:>=11)",50,0.,7.);      //320
-    AddHisto(HistoBtag, "npv3_discri_sschp0",   j,"SSVHP Discriminator (#PV:>=11)",80,-1.,7.); 
-    AddHisto(HistoBtag, "npv3_discri_sschp",   j,"SSVHP Discriminator (#PV:>=11)",50,0.,7.);   
-    AddHisto(HistoBtag, "npv3_muon_Pt", j,       "Muon p_{T} (#PV:>=11)",200,0,100);
-    AddHisto(HistoBtag, "npv3_muon_ptrel", j ,   "Muon p_{T}^{rel} (#PV:>=11)",50,0,5); 
-    AddHisto(HistoBtag, "npv3_muon_DeltaR", j,        "Muon1 deltaR (#PV:>=11)",50,0,0.5);       //325
+    AddHisto(HistoBtag, "npv3_discri_ssche0",       j,"SSVHE Discriminator (#PV#geq11)",80,-1.,7.); 
+    AddHisto(HistoBtag, "npv3_discri_ssche",   j,"SSVHE Discriminator (#PV#geq11)",50,0.,7.);      //320
+    AddHisto(HistoBtag, "npv3_discri_sschp0",   j,"SSVHP Discriminator (#PV#geq11)",80,-1.,7.); 
+    AddHisto(HistoBtag, "npv3_discri_sschp",   j,"SSVHP Discriminator (#PV#geq11)",50,0.,7.);   
+    AddHisto(HistoBtag, "npv3_muon_Pt", j,       "Muon p_{T} (#PV#geq11)",200,0,100);
+    AddHisto(HistoBtag, "npv3_muon_ptrel", j ,   "Muon p_{T}^{rel} (#PV#geq11)",50,0,5); 
+    AddHisto(HistoBtag, "npv3_muon_DeltaR", j,        "Muon1 deltaR (#PV#geq11)",50,0,0.5);       //325
 
 
     AddHisto(HistoBtag, "npv1_jetpt",               j,"PT of all jets",80,50,400.);   //326
@@ -560,14 +607,12 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
      
     AddHisto2D(Histo2DB, "sv_eratio_vs_jetpt", j,"SV eratio vs jet pt",30,60,MAXJETPT, 50,0,1);
     AddHisto2D(Histo2DB, "sv_vtx_pt_vs_jetpt", j,"SV vtx pt vs jet pt",30,60,MAXJETPT, 50,0,100); //13
-
-
     // ====> ADD HERE NEW HISTO AT 2D FOR WHICH QUARK CONTENT INFO IS NEEDED
 
     if (j==0) nhisto_to_clone=HistoBtag.size();
     if (j==0) nhisto_to_clone2D=Histo2DB.size();
   }
-  AddHisto(HistoBtag, "pthat",       0,"PThat",80,0.,400.);
+  AddHisto(HistoBtag, "pthat",       0,"PThat",80,0.,400.);//0
   AddHisto(HistoBtag, "prescale_30",      0,"prescale HLT_JET30",400,0.,400.);
   AddHisto(HistoBtag, "prescale_60",      0,"prescale HLT_JET60",400,0.,400.);
   AddHisto(HistoBtag, "prescale_80",      0,"prescale HLT_JET80",400,0.,400.);
@@ -575,7 +620,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 #if bTagNtupleVersion <= 3
   AddHisto(HistoBtag, "prescale_100",     0,"prescale HLT_JET100",400,0.,400.);
 #endif
-#if bTagNtupleVersion == 4
+#if bTagNtupleVersion >= 4
   AddHisto(HistoBtag, "prescale_190",     0,"prescale HLT_JET190",400,0.,400.);
 #endif
   AddHisto(HistoBtag, "weight_prescale",  0,"weight from prescale HLTJET50to100",400,0.,400.);
@@ -583,12 +628,17 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
   AddHisto(HistoBtag, "npv_no_scaled",  0,"numberOfPrimaryVertices",50,-0.5,49.5);
 
   AddHisto(HistoBtag, "npu",  0,"numberOfPUVertices",50,-0.5,49.5);
-  AddHisto(HistoBtag, "npu_no_scaled",  0,"numberOfPUVertices",50,-0.5,49.5);
+  AddHisto(HistoBtag, "npu_no_scaled",  0,"numberOfPUVertices_no_scaled",50,-0.5,49.5);//10
 
   // ====> ADD HERE NEW HISTO AT 1D OR 2D FOR WHICH QUARK CONTENT INFO IS NOT NEEDED
   // in this case, do not put "j" but 0!
   // example : 
   // AddHisto(HistoBtag, "another_new_histo", 0,"Test Caro 2",50,0.,1.);
+  AddHisto2D(Histo2DB, "pu_vs_pv", 0,"pu vs pv",MAXPU,0,MAXPU, MAXPU,0,MAXPU); //2D-0
+  AddHisto2D(Histo2DB, "ip3dvsphi",0,"ip3d vs phi",60,-3.14,3.14,20000,-35.,35.); //2D-1
+  AddHisto2D(Histo2DB, "ip2dvsphi",0,"ip2d vs phi",60,-3.14,3.14,20000,-1.,1.); //2D-2
+  AddHisto2D(Histo2DB, "ip3dsigvsphi",0,"ip3dsig vs phi",60,-3.14,3.14,2000,-35.,35.); //2D-3
+  AddHisto2D(Histo2DB, "ip2dsigvsphi",0,"ip2dsig vs phi",60,-3.14,3.14,2000,-35.,35.); //2D-4
 
   cout << " # histos created : " << HistoBtag.size() << " (nhisto_to_clone : " << nhisto_to_clone  << ")" << endl;
   /*
@@ -614,10 +664,15 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);  nbytes += nb;
     Float_t weight=weightsave;
-    if ( (jentry+1) % (nentries/100) == 0) clog<<"\r"<<"Calculating "<<jentry+1<<"/"<<nentries<<"("<<(jentry+1)/Float_t(nentries)*100<<"%)";
+    if ( (jentry+1) % (nentries/100) == 0) cout<<"\r"<<"Calculating "<<jentry+1<<"/"<<nentries<<"("<<(jentry+1)/Float_t(nentries)*100<<"%)";
     if (!isRealData) {
+#if bTagNtupleVersion > 4
+      int npvval=int(numberOfPUVerticesMixingTruth);
+#else
       int npvval=numberOfPUVertices;
-      if (numberOfPUVertices>=MAXPU) npvval=MAXPU;
+#endif
+      if (npvval>=MAXPU) npvval=MAXPU;
+      //      cerr<<npvval<<":"<<numberOfPUVertices<<":"<<puweight[npvval]<<endl;
 #if bTagNtupleVersion > 3
       weight*=mcweight;
 #endif
@@ -625,8 +680,11 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
       HistoBtag[jmax*nhisto_to_clone]->Fill(pthat,weight);
       HistoBtag[jmax*nhisto_to_clone+9]->Fill(numberOfPUVertices,weight);
 #if bTagNtupleVersion>3
-      if (!isRealData) HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave*mcweight);
-      else HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave);
+      if (!isRealData) {
+	HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave*mcweight);
+	Histo2DB[jmax*nhisto_to_clone2D]->Fill(numberOfPrimaryVertices,numberOfPUVertices, weight);
+      }
+       else HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave);
 #else
       HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave);
 #endif
@@ -650,9 +708,8 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
     //// IMPORTANT : TRIGGER 
     bool cut_trigger= false;
 
-    UInt_t prescale=1.;
-    // HLT_BTagMu_DiJet20_Mu5
-#if bTagNtupleVersion>3
+    UInt_t prescale=1;
+#if bTagNtupleVersion>=4
     if (JetPtthresholdsfornmu>0) {//"<0" means that we are not studying BTagMu trigger.
       UInt_t nmu=0;
       for (int i=0; i<nJets; i++)
@@ -677,6 +734,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
       for (int i=0; i<nJets; i++)
 	if (-2.4<jetEta[i] && jetEta[i]<2.4 && jetPt[i]>JetPtthresholdsfornmu) nmu++;
 
+    // HLT_BTagMu_DiJet20_Mu5
     if (my_trigger_path=="HLT_BTagMu_DiJet20_Mu5") {
       if (isRealData && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
 	if ( triggerHLT_BTagMu_DiJet20_Mu5 && nmu>1 ) {
@@ -747,7 +805,6 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
       }
     }
 
-
     // HLT_Jet60
     else if (my_trigger_path=="HLT_Jet60") {
       if (isRealData && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
@@ -817,7 +874,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 
       for (int i=0; i<nJets; i++) {
 	// cut on Muon in jets from plot_muJet.cfg
-#if Run_on_Btag == true
+#ifdef RUN_ON_BTAG
 	Bool_t cut_mu_pass=false;
 	if (muon1Pt[i]> cutMuonPt     && TMath::Abs(muon1Eta[i]) < 2.4 && muon1IsGlobal[i] == 1     && 
 	    muon1GlobalMuonHits[i]> 0 && muon1NumberOfMatches[i]>1     && muon1InnerValidHits[i]>10 &&
@@ -829,13 +886,16 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 	Bool_t cut_mu_pass=true;// BYPASS THIS CUT IF YOU DON'T CARE ABOUT MUON IN JET
 #endif
 
-	if (jetPt[i]>cutJetPt && -2.4<jetEta[i] && jetEta[i]<2.4 && cut_mu_pass) {
+#ifdef MAXJETPT
+	if ( jetPt[i]<MAXJETPT )
+#endif
+	  if (jetPt[i]>cutJetPt && -2.4<jetEta[i] && jetEta[i]<2.4 && cut_mu_pass) {
 	  for (int j=0; j<jmax; j++) {
 	    int ok=0;
 	    if (j==0) ok=1;  // everyone 
 	    else if (j==1 && MCTrueFlavor[i]==5 && isBGluonSplitting==0) ok=1;   // b only
 	    else if (j==2 && MCTrueFlavor[i]==4) ok=1;  // c only
-	    else if (j==3 && (MCTrueFlavor[i]==0 || MCTrueFlavor[i]==1 || MCTrueFlavor[i]==2 || MCTrueFlavor[i]==3 || MCTrueFlavor[i]==21 )) ok=1;  // light 
+	    else if (j==3 && (MCTrueFlavor[i]<=0 || MCTrueFlavor[i]==1 || MCTrueFlavor[i]==2 || MCTrueFlavor[i]==3 || MCTrueFlavor[i]==21 )) ok=1;  // light 
 	    else if (j==4 && MCTrueFlavor[i]==5 && isBGluonSplitting==1) ok=1; // gluon splitting in b
 	    if (ok==1) {
 	      // HERE WE FILL THE HISTOGRAMS
@@ -953,6 +1013,9 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 
 	      // info on tracks
 	      int ntrack_jet=0;
+#if bTagNtupleVersion>=5
+          int nselectedtrack_jet=0;
+#endif
 	      int nseltrack_jet=0;
 	      int ncutseltrack_jet=0;
 	      int n1_ip=-1;
@@ -990,6 +1053,12 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 		  if (TMath::Abs(trackLongitudinalImpactParameter[k]) < 17) cut2=true;
 		  if (trackTransverseMomentum[k]> 1 && TMath::Abs(trackIP2d[k]) < 0.2) cut3=true;
 		  if (TMath::Abs(trackDistJetAxis[k])< 0.07 && trackDecayLength[k]< 5) cut4=true;
+		  if (trackSelected[k] && trackTransverseMomentum[k]>4 && fabs(trackEta[k])<1.0 ) {
+		    Histo2DB[1+jmax*nhisto_to_clone2D]->Fill(trackPhi[k],trackIP3d[k], weight);
+		    Histo2DB[2+jmax*nhisto_to_clone2D]->Fill(trackPhi[k],trackIP2d[k], weight);
+		    Histo2DB[3+jmax*nhisto_to_clone2D]->Fill(trackPhi[k],trackIP3d[k]/trackIP3dError[k], weight);
+		    Histo2DB[4+jmax*nhisto_to_clone2D]->Fill(trackPhi[k],trackIP2d[k]/trackIP2dError[k], weight);
+		  }
 		  if (trackNormChi2[k]< 5 && trackNPixelHits[k] >=2 && cut2 && cut3 && cut4) HistoBtag[21+j*nhisto_to_clone]->Fill(trackNHits[k], weight);
 		  if (trackNormChi2[k]< 5 && trackNHits[k]>= 8      && cut2 && cut3 && cut4) HistoBtag[22+j*nhisto_to_clone]->Fill(trackNPixelHits[k], weight);
 		  if (trackNHits[k]>= 8   && trackNPixelHits[k] >=2 && cut2 && cut3 && cut4) HistoBtag[23+j*nhisto_to_clone]->Fill(trackNormChi2[k], weight);
@@ -1094,12 +1163,22 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 		      sig3_ip=sig;
 		      n3_ip=k;
 		    }
+#if bTagNtupleVersion>=5
+		    if ( nselectedtrack_jet<3 && trackSelected[k] ) {
+		      if (TMath::Abs(trackDistJetAxis[k]) < 0.07 && trackDecayLength[k] < 5 && trackIP3d[k]>-99 && trackIP3dError[k]>-0.5) {  
+			HistoBtag[38+nselectedtrack_jet*3+j*nhisto_to_clone]->Fill(trackIP3d[k], weight);
+			HistoBtag[39+nselectedtrack_jet*3+j*nhisto_to_clone]->Fill(trackIP3d[k]/trackIP3dError[k], weight);
+			HistoBtag[40+nselectedtrack_jet*3+j*nhisto_to_clone]->Fill(trackIP3d[k]/trackIP3dError[k], weight);
+		      }
+		      nselectedtrack_jet++;
+		    }
+#endif
 		  }  
 		} // end trackJetIndex
 	      } // end nTracks loop
 	      HistoBtag[9+j*nhisto_to_clone]->Fill(ntrack_jet, weight);  // ntracks_jet
 	      HistoBtag[11+j*nhisto_to_clone]->Fill(nseltrack_jet, weight); // nseltracks_jet
-
+#if bTagNtupleVersion<=4
 	      // IP
 	      if (TMath::Abs(IP3dDistJetAxis1[i]) < 0.07 && IP3dDecayLength1[i] < 5 && IP3d1[i]>-99 && IP3dError1[i]>-0.5) {  
 		HistoBtag[38+j*nhisto_to_clone]->Fill(IP3d1[i], weight);
@@ -1116,6 +1195,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 		HistoBtag[45+j*nhisto_to_clone]->Fill(IP3d3[i]/IP3dError3[i], weight);
 		HistoBtag[46+j*nhisto_to_clone]->Fill(IP3d3[i]/IP3dError3[i], weight);
 	      }
+#endif
 
 	      // tracks sorted by ip
 	      if (n1_ip>-1)  {
@@ -1223,8 +1303,6 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 	      Histo2DB[3+j*nhisto_to_clone2D]->Fill(jetPt[i],ntrack_jet, weight);
 	      Histo2DB[4+j*nhisto_to_clone2D]->Fill(jetPt[i],nseltrack_jet, weight);
 	      Histo2DB[5+j*nhisto_to_clone2D]->Fill(jetPt[i],ncutseltrack_jet, weight);
-
-		    
 
 	      // SV
 	      Histo2DB[0+j*nhisto_to_clone2D]->Fill(jetPt[i],SVnVertexTracks[i], weight);
@@ -1376,7 +1454,6 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 		Histo2DB[6+j*nhisto_to_clone2D]->Fill(jetPt[i], SVMass[i], weight);
 			
 	      } // end cut SVnVertices
-
                 // muon info
 	      HistoBtag[83+j*nhisto_to_clone]->Fill(nMuons[i], weight);
 
@@ -1497,8 +1574,8 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 	} //jet cut (Pt, Eta)
       } // end loop i : Jet
     } // cut trigger
-        
   } // loop event
+
   clog<<"\r"<<"Calculating "<<nentries<<"/"<<nentries<<"(100/100%)"<<endl;
   TString rootfiletofill = final_dir+"/"+resultfilename+".root";
   TFile* fout  = new TFile(rootfiletofill,"RECREATE");
@@ -1546,7 +1623,7 @@ void Plotter::AddHisto2D(vector<TH2F*> &Histo2DB, string name, const int& j, str
   Histo2DB.push_back(h1);
 }
 
-#if !defined(npu_probs) || !defined(pudistribution_data_filename)
+#ifdef EarlyAnalysis
 void predefinedpuweights() {
   // 499 pb-1
 #ifdef RUN_ON_JET
@@ -1672,17 +1749,19 @@ int main( int argc, char* argv[] ) {
 
   for (int n = 1; n < argc; n++)
     if ( strstr(argv[n],"data")!=NULL ) {
-#if DATAYEAR == 2011
-      cout << " ----> DATA 2011" << endl;
+#if DATAYEAR >= 2011
+      cout << " ----> DATA" <<DATAYEAR<< endl;
 #ifdef RUN_ON_JET
       if (strlen(JetDATA)>0) { 
 	Plotter yt(JetDATA);
-	yt.Loop( true, 1.,string("histo_minijet2011") ); //weight=1
+	sprintf(tmpstr,"histo_minijet%d",DATAYEAR);
+	yt.Loop( true, 1.,string(tmpstr) ); //weight=1
       }
 #else
       if (strlen(MetDATA)>0){ 
 	Plotter yt(MetDATA);    
-	yt.Loop(true, 1.,string("histo_minibtag2011") ); //weight=1
+	sprintf(tmpstr,"histo_minibtag%d",DATAYEAR);
+	yt.Loop(true, 1.,string(tmpstr) ); //weight=1
 	system(action);
       }
 #endif
@@ -1705,11 +1784,12 @@ int main( int argc, char* argv[] ) {
   for(Byte_t npu=0; npu<MAXPU+1; ++npu)
     puweight[npu]=npu_data->GetBinContent(npu_data->FindBin(npu))/puweight[npu];
 #else
+#ifdef EarlyAnalysis//suppose not use anymore
   predefinedpuweights();
+#else
+  TH1D* npu_mc=new TH1D("pu_distribution","pu_distribution;# of PU; entries",MAXPU+1,-0.5,MAXPU+0.5);
 #endif
-  clog<<"Pileup weights:"<<endl;
-  for(Byte_t npu=0; npu<MAXPU+1; ++npu)
-    clog<<Int_t(npu)<<" : "<<puweight[npu]<<endl;
+#endif
 
   const UInt_t nSamples=sizeof(MC_Weights)/sizeof(Float_t);
   for (UInt_t iSample=0;iSample<nSamples;iSample++) 
@@ -1718,8 +1798,20 @@ int main( int argc, char* argv[] ) {
 	   strlen(MC_files[iSample])>0
 	   ) {
 	printf(" ----> MC : %s (weight=%f)\n",MC_SampleNames[iSample],MC_Weights[iSample]);
-	Plotter xmu(MC_files[iSample]);
-	xmu.Loop(false, MC_Weights[iSample],string("histo_")+string(MC_SampleNames[iSample]));
+	Plotter mc(MC_files[iSample]);
+	#if !defined(npu_probs)
+	mc.PileUpDistribution(npu_mc);
+	npu_mc->Scale(1/npu_mc->Integral());
+	for(Byte_t npu=0; npu<MAXPU+1; ++npu) {
+	  Double_t numberofpu_mc=npu_mc->GetBinContent(npu_mc->FindBin(npu));
+	  if ( numberofpu_mc>0 ) puweight[npu]=numberofpu_mc;
+	  else puweight[npu]=0; //printf("%d:%f/%f=%f;\n",npu,npu_data->GetBinContent(npu_data->FindBin(npu)),numberofpu_mc,puweight[npu]);
+	}
+	#endif
+	clog<<"Pileup weights:"<<endl;
+	for(Byte_t npu=0; npu<MAXPU+1; ++npu)
+	  clog<<Int_t(npu)<<" : "<<puweight[npu]<<endl;
+	mc.Loop(false, MC_Weights[iSample],string("histo_")+string(MC_SampleNames[iSample]));
       }
   return 0;
 }
