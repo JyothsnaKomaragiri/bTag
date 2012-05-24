@@ -39,10 +39,7 @@ usePFnoPU = True
 import FWCore.ParameterSet.Config as cms
 
 #JetSelection
-if usePFnoPU :
-   JetCut=cms.string("pt > 30.0 && abs(eta) < 2.4")
-else:
-   JetCut=cms.string("pt > 30.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99")
+JetCut=cms.string("pt > 30.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99")
 
 # It will select the events based on the TriggerSelections. The ntuple will only save the triggers whose name matches any entry in TriggerSelections
 TriggerSelections=cms.vstring("HLT_*Jet*")
@@ -74,8 +71,8 @@ else:
 
 process.source = cms.Source("PoolSource",
 #    fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_Chamonix_TTbar_AODSIM.root")
-                            fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/k/kkaadze/BTagging/QCD_Fall11_44_Pt80to120_RECODEBUG.root")
-#                           fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Summer12_QCD15to3000.root")
+#                            fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/k/kkaadze/BTagging/QCD_Fall11_44_Pt80to120_RECODEBUG.root")
+                           fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Summer12_QCD15to3000.root")
 #    fileNames = cms.untracked.vstring("rfio:/dpm/in2p3.fr/home/cms/phedex/store/data/Run2012A/Jet/AOD/PromptReco-v1/000/190/934/304B8EF5-CE85-E111-B4DF-003048F110BE.root")
 #    fileNames = cms.untracked.vstring("file:/storage1/cms/jandrea/425MC/TTJets_TuneZ2_7TeV/TTJets_TuneZ2_7TeV/NTuple_67_1_HhM.root")
 #fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD.root",
