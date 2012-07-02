@@ -42,7 +42,7 @@ import os
 CMSSW_Version_=os.getenv("CMSSW_VERSION")
 print 
 Version_Number_=CMSSW_Version_.split('_')
-if ( int(Version_Number_[1])>=5 ) and ( int(Version_Number_[1])>=2 ):
+if ( int(Version_Number_[1])>=5 ) and ( int(Version_Number_[2])>=2 ):
     usePFnoPUdefault=True
 else:
     usePFnoPUdefault=False
