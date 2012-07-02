@@ -1,3 +1,5 @@
+//#define GetPUFromEarlyThan_4_1_2
+//#define GetPUFromEarlyThan_4_4_0
 // system include files
 #include <memory>
 #include <vector>
@@ -100,8 +102,8 @@ using namespace reco;
 using namespace ROOT::Math::VectorUtil;
 
 // maximum array size (the arrays are stored with variable size in the root tree)
-const UInt_t MAXJETS = 40;
-const UInt_t MAXTRACKS = 1500;
+const UInt_t MAXJETS = 100;
+const UInt_t MAXTRACKS = 4000;
 
 
 class TagNtupleProducer : public edm::EDAnalyzer {
@@ -1507,8 +1509,8 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   
   Int_t iTotalTracksCounter = 0;
   nJets = jets->size();
-  if ( nJets > (Int_t) MAXJETS ) {
-    edm::LogError("Buffer")<<"increase MAXJETS or set tighter cuts, this event is dropped"<<endl;
+  if(nJets > (Int_t)MAXJETS) {
+    edm::LogError("DataLost")<<"MAXJETS is not big enough. Current nJets="<<nJets<<endl;
     return;
   }
 
@@ -1584,6 +1586,12 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       size_t nSelectedTracks=0;
       size_t nSelectedAndDecayLengthAndJetAsixTracks=0;
 
+      if ( iTotalTracksCounter+(*jetTracks)[thisJetRef].size() >= (Int_t)MAXTRACKS) {
+   	     for (Int_t jJet = iJet; jJet<nJets; jJet++)
+           iTotalTracksCounter+=(*jetTracks)[RefToBase<Jet>(jets, jJet)].size();
+	     edm::LogError("DataLost")<<"MAXTRACKS is not big enough. Current nTotalTracks="<<iTotalTracksCounter<<endl;
+	     return;
+	  }
       //jet axis of the selected tracks jet
       const GlobalVector jetAxis = ipTagInfo[thisJetRef]->axis();
       const math::XYZVector axis( jetAxis.x(), jetAxis.y(), jetAxis.z());
@@ -1606,11 +1614,6 @@ void TagNtupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       for(trackSortedQueueVec::const_iterator iTrack_iter = trackSortedQueue.begin(); iTrack_iter != trackSortedQueue.end(); iTrack_iter++)
 	{ 
 	  track_iterator iTrack=iTrack_iter->first;
-	  if(iTotalTracksCounter >= (Int_t)MAXTRACKS) {
-	    edm::LogError("Buffer")<<"increase MAXTRACKS, this event is dropped"<<endl;
-	    return;
-	  }
-	  
 	  trackJetIndex[iTotalTracksCounter] = iJet;
 	  Bool_t isSelected = false;
 	  trackIsFromPU[iTotalTracksCounter] = false;
