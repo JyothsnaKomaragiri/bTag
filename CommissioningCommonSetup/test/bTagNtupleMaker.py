@@ -27,22 +27,35 @@ DATALIST=[
 #"/QCD_Pt-300to470_TuneZ2_7TeV_pythia6/Fall11-PU_S6-START44_V5-v1/AODSIM",
 #"/QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6/Fall11-Peak32PU_START42_V14B-v1/GEN-SIM-RECO",
 #"/Jet/Run2011B-PromptReco-v1/AOD",
-"/Jet/Run2012A-PromptReco-v1/AOD",
+#"/Jet/Run2012A-PromptReco-v1/AOD",
+#"/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/Summer12-428SLHCstd_DESIGN42_V17-v3/AODSIM",
+"/PYTHIA6_Tauola_TTbar_TuneZ2star_14TeV/Summer12-UpgradeStdGeom2_DR428-PU50-DESIGN42_V17S-v1/GEN-SIM-DIGI-RECO"
 #"/BTag/Run2012A-PromptReco-v1/AOD",
 #"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-NoPileUp_START52_V9-v5/AODSIM",
 #"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-PU_S7_START52_V5-v1/AODSIM"
           ]
-HLTProc="HLT"
+HLTProc="RECO"
 runOnMC = True
-usePFnoPU = True
+usePFnoPU =True
+
+import os
+CMSSW_Version_=os.getenv("CMSSW_VERSION")
+print 
+Version_Number_=CMSSW_Version_.split('_')
+if ( int(Version_Number_[1])>=5 ) and ( int(Version_Number_[1])>=2 ):
+    usePFnoPUdefault=True
+else:
+    usePFnoPUdefault=False
+    print "I am going to calculate the Rho parameter for PFnoPU because the CMSSW version is",CMSSW_Version_
 
 import FWCore.ParameterSet.Config as cms
 
-#JetSelection
 JetCut=cms.string("pt > 30.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 0.99 && neutralEmEnergyFraction < 0.99 && nConstituents > 1 && chargedHadronEnergyFraction > 0.0 && chargedMultiplicity > 0.0 && chargedEmEnergyFraction < 0.99")
 
+	
 # It will select the events based on the TriggerSelections. The ntuple will only save the triggers whose name matches any entry in TriggerSelections
-TriggerSelections=cms.vstring("HLT_*Jet*")
+#TriggerSelections=cms.vstring("HLT_*Jet*")
+TriggerSelections=cms.vstring("*")
 
 ############################
 ###    Main Program   ######
@@ -61,41 +74,17 @@ process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #Global tag
-#from Configuration.PyReleaseValidation.autoCond import autoCond  # for <CMSSW_4_3_0
-from Configuration.AlCa.autoCond import autoCond # for >=CMSSW_4_3_0
+from Configuration.PyReleaseValidation.autoCond import autoCond  # for <CMSSW_4_3_0
+#from Configuration.AlCa.autoCond import autoCond # for >=CMSSW_4_3_0
 
-if runOnMC:
-  process.GlobalTag.globaltag = autoCond['startup']
-else:
-  process.GlobalTag.globaltag = autoCond['com10']
+process.GlobalTag.globaltag = 'DESIGN42_V17::All'
 
 process.source = cms.Source("PoolSource",
-#    fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_Chamonix_TTbar_AODSIM.root")
-#                            fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/k/kkaadze/BTagging/QCD_Fall11_44_Pt80to120_RECODEBUG.root")
-                           fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Summer12_QCD15to3000.root")
-#    fileNames = cms.untracked.vstring("rfio:/dpm/in2p3.fr/home/cms/phedex/store/data/Run2012A/Jet/AOD/PromptReco-v1/000/190/934/304B8EF5-CE85-E111-B4DF-003048F110BE.root")
-#    fileNames = cms.untracked.vstring("file:/storage1/cms/jandrea/425MC/TTJets_TuneZ2_7TeV/TTJets_TuneZ2_7TeV/NTuple_67_1_HhM.root")
-#fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD.root",
-#                                  "file:/afs/cern.ch/user/z/zhangjin/MetaData/Test_Jet_Run2011B_AOD_2.root")
+    fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_TTbar_UpgradeStdGeom2_DR428-PU50-DESIGN42_V17S-v1.root")
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
-)
-
-########### Trigger selection ###########
-# Select events based on the HLT triggers....singleJet and BTag triggers
-# Use the instructions provided at:
-# https://twiki.cern.ch/twiki/bin/viewauth/CMS/TriggerResultsFilter
-# This eases the trigger selection for different HLT menus and also takes care of wildcard and trigger versioning
-#######
-
-import HLTrigger.HLTfilters.triggerResultsFilter_cfi as hlt
-process.JetHLTFilter = hlt.triggerResultsFilter.clone(
-   triggerConditions = TriggerSelections,
-   hltResults = cms.InputTag("TriggerResults","",HLTProc),
-   l1tResults = cms.InputTag( "" ),
-   throw = cms.bool( False) #set to false to deal with missing triggers while running over different trigger menus
+    input = cms.untracked.int32(-1)
 )
 
 ########### Event cleaning ###########
@@ -149,6 +138,27 @@ process.pthat_filter = cms.EDFilter("MCProcessFilter",
 
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryPaths_cfi")
 
+
+#######calculate Rho for PFnoPU (<CMSSW_5_2_0)
+if not usePFnoPUdefault:
+    from RecoJets.JetProducers.kt4PFJets_cfi import kt4PFJets
+    process.kt6PFJets = kt4PFJets.clone(
+        src = cms.InputTag( 'particleFlow'),
+        rParam = cms.double(0.6),
+        doRhoFastjet = cms.bool(True),
+        Rho_EtaMax = cms.double(2.5)
+        )
+    # CV: need to rerun 'ak5PFJets' module with jet area computation enabled,
+    #     since it has not been enabled per default in CMSSW_4_2_x
+    #    (if the jet area of 'ak5PFJets' is zero, the L1FastjetCorrector::correction function always returns 1.0)
+#from RecoJets.JetProducers.ak5PFJets_cfi import ak5PFJets
+    process.load("RecoJets.JetProducers.ak5PFJets_cfi")
+    process.ak5PFJets.doAreaFastjet = cms.bool(True)
+    process.redoJets = cms.Sequence( process.kt6PFJets * process.ak5PFJets )
+else:
+    process.redoJets = cms.Sequence()
+#######end of calculation of Rho
+
 ########### Jet selection and JEC use PFtoPAT and PFnoPU ###########
 #JetID
 
@@ -162,14 +172,25 @@ if usePFnoPU :
     postfix="PF2PAT"
     usePF2PAT(process,runPF2PAT=True, jetAlgo="AK5", runOnMC=runOnMC, postfix=postfix) 
     applyPostfix(process,"patJetCorrFactors",postfix).payload = cms.string('AK5PFchs')
-    process.pfPileUpPF2PAT.Enable = True
     process.pfPileUpPF2PAT.Vertices = cms.InputTag('goodOfflinePrimaryVertices')
+    process.pfPileUpPF2PAT.checkClosestZVertex = cms.bool(False)
+    if usePFnoPUdefault:
+        process.pfPileUpPF2PAT.Enable = True
+        process.pfJetsPF2PAT.doAreaFastjet = True
+        process.pfJetsPF2PAT.doRhoFastjet = False
+        process.patJetCorrFactorsPF2PAT.rho = cms.InputTag("kt6PFJets", "rho")
     process.selectedPatJetsPF2PAT.cut = JetCut
     process.JECAlgo = cms.Sequence( getattr(process,"patPF2PATSequence"+postfix) )
     JetID=cms.InputTag("selectedPatJetsPF2PAT")
 else:
     process.JECAlgo = cms.Sequence( process.ak5PFJetsJEC*process.PFJetsFilter )
     JetID=cms.InputTag("PFJetsFilter")
+
+ 
+
+
+
+
 
 ########### Rerun b-tagging for PF Jets ###########
 process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
@@ -428,10 +449,10 @@ else:
 
 process.plots = cms.Path( 
   process.noscraping + 
-  process.JetHLTFilter + 
   process.offlinePrimaryVertices *
   process.goodOfflinePrimaryVertices *
   process.primaryVertexFilter +
+  process.redoJets*
   process.JECAlgo*
   process.GenHistory +
   process.ak5PFJetTracksAssociatorAtVertex  *
@@ -451,10 +472,10 @@ process.options = cms.untracked.PSet(
 
 process.MessageLogger.categories.append('L1GtTrigReport')
 process.MessageLogger.categories.append('HLTrigReport')
-process.MessageLogger.cerr.FwkReport.reportEvery = 500
+#process.MessageLogger.cerr.FwkReport.reportEvery = 500
 process.MessageLogger.cerr.threshold = cms.untracked.string('WARNING')
 
-import sys,os,datetime,re
+import sys,datetime,re
 
 if sys.argv[0] != "cmsRun":
     castorhome_=os.getenv("CASTOR_HOME")
@@ -474,7 +495,7 @@ if sys.argv[0] != "cmsRun":
             print 'Submitting %s as MC' % dataset_
             jobcontrol_='''
 total_number_of_events = -1
-number_of_jobs = 128
+number_of_jobs = 100
 '''
             dirname_=time+"_"+dirname_[1]+"_"+dirname_[2]
             new_py = re.sub("runOnMC = .*\n",
