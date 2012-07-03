@@ -34,19 +34,45 @@ DATALIST=[
 #"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-NoPileUp_START52_V9-v5/AODSIM",
 #"/QCD_Pt-15to3000_TuneZ2star_Flat_8TeV_pythia6/Summer12-PU_S7_START52_V5-v1/AODSIM"
           ]
+
+import os,sys
+CMSSW_Version_=os.getenv("CMSSW_VERSION")
+Version_Number_=CMSSW_Version_.split('_')
+castorhome_=os.getenv("CASTOR_HOME")
+
+if sys.argv[-1] == "setup":
+    os.system( 'rfchmod 775 %s' % castorhome_ )
+    CMSSW_home_=os.getenv("CMSSW_BASE")
+    if ( int(Version_Number_[1])<4 ) or ( int(Version_Number_[1])==4 and int(Version_Number_[2])<1 ) or ( int(Version_Number_[1])==4 and int(Version_Number_[2])==1 and int(Version_Number_[3])<2 ):
+        os.system( 'sed -i "s/.*#define GetPUFromEarlyThan_4_1_2/#define GetPUFromEarlyThan_4_1_2/g" %s/src/bTag/CommissioningCommonSetup/plugins/TagNtupleProducer.cc' % CMSSW_home_ )
+    else:
+        os.system( 'sed -i "s/.*#define GetPUFromEarlyThan_4_1_2/\/\/#define GetPUFromEarlyThan_4_1_2/g" %s/src/bTag/CommissioningCommonSetup/plugins/TagNtupleProducer.cc' % CMSSW_home_ )
+    if ( int(Version_Number_[1])<4 ) or ( int(Version_Number_[1])==4 and int(Version_Number_[2])<4 ):
+        os.system( 'sed -i "s/.*#define GetPUFromEarlyThan_4_4_0/#define GetPUFromEarlyThan_4_4_0/g" %s/src/bTag/CommissioningCommonSetup/plugins/TagNtupleProducer.cc' % CMSSW_home_ )
+    else:
+        os.system( 'sed -i "s/.*#define GetPUFromEarlyThan_4_4_0/\/\/#define GetPUFromEarlyThan_4_4_0/g" %s/src/bTag/CommissioningCommonSetup/plugins/TagNtupleProducer.cc' % CMSSW_home_ )
+    if ( int(Version_Number_[1])<4 ) or ( int(Version_Number_[1])==4 and int(Version_Number_[2])<2 ) or ( int(Version_Number_[1])==4 and int(Version_Number_[2])==2 and int(Version_Number_[3])<3 ):
+        os.system( 'cd %s/src/;cvs co -r V01-06-00 RecoBTag/SecondaryVertex;cvs co -r CMSSW_4_2_3 RecoVertex/PrimaryVertexProducer;cvs co -r CMSSW_4_2_3 TrackingTools/TrajectoryState' % CMSSW_home_ )
+
+    print "Current main code settings:"
+    os.system( 'head %s/src/bTag/CommissioningCommonSetup/plugins/TagNtupleProducer.cc' % CMSSW_home_ )
+    os.system( 'cd %s/src/bTag/CommissioningCommonSetup/;scramv1 b;cd test' % CMSSW_home_ )
+    sys.exit()
+
+if ( int(Version_Number_[1])<5 ) or ( int(Version_Number_[1])==5 and int(Version_Number_[2])<2 ):
+    usePFnoPUdefault=False
+    print "I am going to calculate the Rho parameter for PFnoPU because the CMSSW version is ",CMSSW_Version_
+else:
+    usePFnoPUdefault=True
+
+if ( int(Version_Number_[1])<4 ) or ( int(Version_Number_[1])==4 and int(Version_Number_[2])<3 ):
+    newerthan430=False
+else:
+    newerthan430=True
+
 HLTProc="RECO"
 runOnMC = True
 usePFnoPU =True
-
-import os
-CMSSW_Version_=os.getenv("CMSSW_VERSION")
-print 
-Version_Number_=CMSSW_Version_.split('_')
-if ( int(Version_Number_[1])>=5 ) and ( int(Version_Number_[2])>=2 ):
-    usePFnoPUdefault=True
-else:
-    usePFnoPUdefault=False
-    print "I am going to calculate the Rho parameter for PFnoPU because the CMSSW version is",CMSSW_Version_
 
 import FWCore.ParameterSet.Config as cms
 
@@ -61,6 +87,7 @@ TriggerSelections=cms.vstring("*")
 ###    Main Program   ######
 ############################
 process = cms.Process("validation")
+
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
 #keep the logging output to a nice level
@@ -73,11 +100,15 @@ process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-#Global tag
-from Configuration.PyReleaseValidation.autoCond import autoCond  # for <CMSSW_4_3_0
-#from Configuration.AlCa.autoCond import autoCond # for >=CMSSW_4_3_0
+if newerthan430:
+    from Configuration.AlCa.autoCond import autoCond # for >=CMSSW_4_3_0
+else:
+    from Configuration.PyReleaseValidation.autoCond import autoCond  # for <CMSSW_4_3_0
 
-process.GlobalTag.globaltag = 'DESIGN42_V17::All'
+if runOnMC:
+  process.GlobalTag.globaltag = autoCond['startup']
+else:
+  process.GlobalTag.globaltag = autoCond['com10']
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring("rfio:/castor/cern.ch/user/z/zhangjin/Test_TTbar_UpgradeStdGeom2_DR428-PU50-DESIGN42_V17S-v1.root")
@@ -475,18 +506,18 @@ process.MessageLogger.categories.append('HLTrigReport')
 #process.MessageLogger.cerr.FwkReport.reportEvery = 500
 process.MessageLogger.cerr.threshold = cms.untracked.string('WARNING')
 
-import sys,datetime,re
+import datetime,re
 
-if sys.argv[0] != "cmsRun":
-    castorhome_=os.getenv("CASTOR_HOME")
-    home_=os.getenv("HOME")
+if sys.argv[0] != "cmsRun" and sys.argv[-1] != "setup":
     castorhome_=castorhome_.replace("/castor/cern.ch/","")
+    home_=os.getenv("HOME")
     time=datetime.datetime.now().strftime("%d%b%Y")
     for dataset_ in DATALIST:
         new_py = open('bTagNtupleMaker.py').read()
-        crab_py_start_index=new_py.find(']')
-        crab_py_end_index=new_py.rfind("\nimport sys,os,datetime,re")
-        new_py = new_py[crab_py_start_index+1:crab_py_end_index-1]
+        crab_py_start_index=new_py.find('HLTProc=')
+        crab_py_end_index=new_py.rfind("\nimport datetime,re")
+        new_py = new_py[crab_py_start_index:crab_py_end_index-1]
+        new_py = "usePFnoPUdefault=%s\n" % str(usePFnoPUdefault) + "newerthan430=%s\n" % str(newerthan430) + new_py
         new_py = re.sub("input = cms.untracked.int32(.*)",
                         "input = cms.untracked.int32(-1)",
                         new_py)
