@@ -53,6 +53,8 @@ if sys.argv[-1] == "setup":
         os.system( 'sed -i "s/.*#define GetPUFromEarlyThan_4_4_0/\/\/#define GetPUFromEarlyThan_4_4_0/g" %s/src/bTag/CommissioningCommonSetup/plugins/TagNtupleProducer.cc' % CMSSW_home_ )
     if ( int(Version_Number_[1])<4 ) or ( int(Version_Number_[1])==4 and int(Version_Number_[2])<2 ) or ( int(Version_Number_[1])==4 and int(Version_Number_[2])==2 and int(Version_Number_[3])<3 ):
         os.system( 'cd %s/src/;cvs co -r V01-06-00 RecoBTag/SecondaryVertex;cvs co -r CMSSW_4_2_3 RecoVertex/PrimaryVertexProducer;cvs co -r CMSSW_4_2_3 TrackingTools/TrajectoryState' % CMSSW_home_ )
+    if ( int(Version_Number_[1])>5 ) or ( int(Version_Number_[1])==5 and int(Version_Number_[2])>=2 ):
+        os.system( 'rm %s/src/bTag/CommissioningCommonSetup/plugins/PFJetSelector.cc' % CMSSW_home_ )
 
     print "Current main code settings:"
     os.system( 'head %s/src/bTag/CommissioningCommonSetup/plugins/TagNtupleProducer.cc' % CMSSW_home_ )
