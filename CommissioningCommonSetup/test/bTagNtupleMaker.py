@@ -82,8 +82,7 @@ JetCut=cms.string("pt > 30.0 && abs(eta) < 2.4 && neutralHadronEnergyFraction < 
 
 	
 # It will select the events based on the TriggerSelections. The ntuple will only save the triggers whose name matches any entry in TriggerSelections
-#TriggerSelections=cms.vstring("HLT_*Jet*")
-TriggerSelections=cms.vstring("*")
+TriggerSelections=cms.vstring("HLT_*Jet*","HLT_HT*")
 
 ############################
 ###    Main Program   ######
@@ -119,6 +118,22 @@ process.source = cms.Source("PoolSource",
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
 )
+
+########### Trigger selection ###########
+# Select events based on the HLT triggers....singleJet and BTag triggers
+# Use the instructions provided at:
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/TriggerResultsFilter
+# This eases the trigger selection for different HLT menus and also takes care of wildcard and trigger versioning
+#######
+
+import HLTrigger.HLTfilters.triggerResultsFilter_cfi as hlt
+process.JetHLTFilter = hlt.triggerResultsFilter.clone(
+   triggerConditions = TriggerSelections,
+   hltResults = cms.InputTag("TriggerResults","",HLTProc),
+   l1tResults = cms.InputTag( "" ),
+   throw = cms.bool( False) #set to false to deal with missing triggers while running over different trigger menus
+)
+
 
 ########### Event cleaning ###########
 #Require a good vertex
@@ -482,6 +497,7 @@ else:
 
 process.plots = cms.Path( 
   process.noscraping + 
+#  process.JetHLTFilter + 
   process.offlinePrimaryVertices *
   process.goodOfflinePrimaryVertices *
   process.primaryVertexFilter +
