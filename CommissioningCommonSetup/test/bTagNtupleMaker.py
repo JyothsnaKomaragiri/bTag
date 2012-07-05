@@ -222,7 +222,7 @@ if usePFnoPU :
     applyPostfix(process,"patJetCorrFactors",postfix).payload = cms.string('AK5PFchs')
     process.pfPileUpPF2PAT.Vertices = cms.InputTag('goodOfflinePrimaryVertices')
     process.pfPileUpPF2PAT.checkClosestZVertex = cms.bool(False)
-    if usePFnoPUdefault:
+    if not usePFnoPUdefault:
         process.pfPileUpPF2PAT.Enable = True
         process.pfJetsPF2PAT.doAreaFastjet = True
         process.pfJetsPF2PAT.doRhoFastjet = False
