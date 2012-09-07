@@ -19,7 +19,7 @@
 Float_t bEnrichCutSal=1.0;
 
 // TO BE DEFINED FIRST !
-#if DATAYEAR==2012
+
 #if PTVAL == 30 && defined(RUN_ON_JET)
 TString my_trigger_path="HLT_PFJet40";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=30.;
 #endif
@@ -38,58 +38,26 @@ TString my_trigger_path="HLT_PFJet80";Float_t JetPtthresholdsfornmu=-1; Float_t 
 
 #if PTVAL == 140 && defined(RUN_ON_JET)
 TString my_trigger_path="HLT_PFJet140";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=140.;
-#define MaxJetPt 300
-#endif
-
-#endif
-
-#if DATAYEAR==2011
-// + check the data and MC input files
-// JetPtthresholdsfornm is the threshold from Daniel
-#if PTVAL == 30 && defined(RUN_ON_JET)
-TString my_trigger_path="HLT_Jet30";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=30.;
-#endif
-
-#if PTVAL == 60 && defined(RUN_ON_JET)
-TString my_trigger_path="HLT_Jet60";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=60.;
-#endif
-
-#if PTVAL == 100 && defined(RUN_ON_JET)
-TString my_trigger_path="HLT_Jet60";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=100.;
-#endif
-
-#if PTVAL == 120 && defined(RUN_ON_JET)
-TString my_trigger_path="HLT_Jet60";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=120.;
-#endif
-
-#if PTVAL == 80 && defined(RUN_ON_JET)
-TString my_trigger_path="HLT_Jet80";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=80.;
-#endif
-
-#if PTVAL == 110 && defined(RUN_ON_JET)
-TString my_trigger_path="HLT_Jet110";Float_t JetPtthresholdsfornmu=-1; Float_t cutJetPt=110.;
+#define MaxJetPt 1000
 #endif
 
 #if PTVAL == 20 && defined(RUN_ON_BTAG)
-TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";Float_t JetPtthresholdsfornmu=20.; Float_t cutJetPt=45.; Float_t cutMuonPt=7.;
+TString my_trigger_path="HLT_BTagMu_DiJet20_Mu5";Float_t JetPtthresholdsfornmu=30.; Float_t cutJetPt=30.; Float_t cutMuonPt=5.;
 #endif
 
 #if PTVAL == 40 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet40_Mu5";Float_t JetPtthresholdsfornmu=60.; Float_t cutJetPt=65.; Float_t cutMuonPt=7.;
 #endif
 
-#if PTVAL == 60 && defined(RUN_ON_BTAG)
-TString my_trigger_path="HLT_BTagMu_DiJet60_Mu7";Float_t JetPtthresholdsfornmu=90; Float_t cutJetPt=95.; Float_t cutMuonPt=9.;
-#endif
 
 #if PTVAL == 70 && defined(RUN_ON_BTAG)
 TString my_trigger_path="HLT_BTagMu_DiJet70_Mu5";Float_t JetPtthresholdsfornmu=100; Float_t cutJetPt=105.; Float_t cutMuonPt=7.;
 #endif
 
 #if PTVAL == 110 && defined(RUN_ON_BTAG)
-TString my_trigger_path="HLT_BTagMu_DiJet110_Mu5";Float_t JetPtthresholdsfornmu=155;/*130?*/ Float_t cutJetPt=160.; Float_t cutMuonPt=7.;
+TString my_trigger_path="HLT_BTagMu_DiJet110_Mu5";Float_t JetPtthresholdsfornmu=120;/*130?*/ Float_t cutJetPt=120.; Float_t cutMuonPt=5.;
 #endif
-#endif
+
 
 class Plotter : public btagNtupReader{
 public:
@@ -103,11 +71,9 @@ public:
      for (Long64_t jentry=0; jentry<nentries;jentry++) {
        if ( LoadTree(jentry) < 0 ) break;
        fChain->GetEntry(jentry);
-#if bTagNtupleVersion>4
+       
        dis->Fill(numberOfPUVerticesMixingTruth);
-#else
-       dis->Fill(numberOfPUVertices);
-#endif
+       //dis->Fill(numberOfPUVertices);
      }
   }
 };
@@ -236,7 +202,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
     AddHisto(HistoBtag, "sv_deltar_sum_jet",    j,"SVvtxSumJetDeltaR",50,0.,0.5);
     AddHisto(HistoBtag, "sv_deltar_sum_dir",    j,"SVvtxSumVtxDirDeltaR",50,0.,0.5);
 
-    AddHisto(HistoBtag, "sv_vtxsum_eta",    j,"SVvtxSumEta",52,-2.6,2.6); //75
+    AddHisto(HistoBtag, "sv_vtxsum_eta",    j,"SVvtxSuDATA",52,-2.6,2.6); //75
     AddHisto(HistoBtag, "sv_vtxsum_phi",    j,"SVvtxSumPhi",50,-1.*pi,pi);
     AddHisto(HistoBtag, "sv_vtxdir_eta",    j,"SVvtxDirEta",52,-2.6,2.6);
     AddHisto(HistoBtag, "sv_vtxdir_phi",    j,"SVvtxDirPhi",50,-1.*pi,pi);
@@ -583,7 +549,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
     // AddHisto(HistoBtag, "new_histo", j,"Test Caro",50,0.,1.);
 
     // 2D plots SV
-#define MAXJETPT 350
+#define MAXJETPT 1000
     AddHisto2D(Histo2DB, "sv_track_vs_jetpt", j,"SV track multiplicity vs jet pt",30,60,MAXJETPT, 10,-0.5,9.5);   //0
     AddHisto2D(Histo2DB, "sv_mass_vs_flightDistSignCut", j, " SVMass vs Cut on SV sign ", 100,0, 80,100,0,6);
     AddHisto2D(Histo2DB, "sv_mass_vs_flightDistCut", j, " SVMass vs Cut on SV distance ",100,0, 10,100,0,6);
@@ -617,9 +583,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
   AddHisto(HistoBtag, "prescale_60",      0,"prescale HLT_JET60",400,0.,400.);
   AddHisto(HistoBtag, "prescale_80",      0,"prescale HLT_JET80",400,0.,400.);
   AddHisto(HistoBtag, "prescale_110",     0,"prescale HLT_JET110",400,0.,400.);
-#if bTagNtupleVersion <= 3
-  AddHisto(HistoBtag, "prescale_100",     0,"prescale HLT_JET100",400,0.,400.);
-#endif
+
 #if bTagNtupleVersion >= 4
   AddHisto(HistoBtag, "prescale_190",     0,"prescale HLT_JET190",400,0.,400.);
 #endif
@@ -661,59 +625,51 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
+    
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);  nbytes += nb;
     Float_t weight=weightsave;
     if ( (jentry+1) % (nentries/100) == 0) cout<<"\r"<<"Calculating "<<jentry+1<<"/"<<nentries<<"("<<(jentry+1)/Float_t(nentries)*100<<"%)";
+    
     if (!isRealData) {
-#if bTagNtupleVersion > 4
       int npvval=int(numberOfPUVerticesMixingTruth);
-#else
-      int npvval=numberOfPUVertices;
-#endif
+
+      //int npvval=numberOfPUVertices;
+
       if (npvval>=MAXPU) npvval=MAXPU;
       //      cerr<<npvval<<":"<<numberOfPUVertices<<":"<<puweight[npvval]<<endl;
-#if bTagNtupleVersion > 3
       weight*=mcweight;
-#endif
       weight*=puweight[npvval];
       HistoBtag[jmax*nhisto_to_clone]->Fill(pthat,weight);
       HistoBtag[jmax*nhisto_to_clone+9]->Fill(numberOfPUVertices,weight);
-#if bTagNtupleVersion>3
       if (!isRealData) {
 	HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave*mcweight);
 	Histo2DB[jmax*nhisto_to_clone2D]->Fill(numberOfPrimaryVertices,numberOfPUVertices, weight);
       }
        else HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave);
-#else
-      HistoBtag[jmax*nhisto_to_clone+10]->Fill(numberOfPUVertices,weightsave);
-#endif
+
     }
     else {
-#if bTagNtupleVersion <= 3
-      HistoBtag[jmax*nhisto_to_clone+1]->Fill(prescaleHLT_Jet30);
-      HistoBtag[jmax*nhisto_to_clone+2]->Fill(prescaleHLT_Jet60);
-      HistoBtag[jmax*nhisto_to_clone+3]->Fill(prescaleHLT_Jet80);
-      HistoBtag[jmax*nhisto_to_clone+4]->Fill(prescaleHLT_Jet110);
-      HistoBtag[jmax*nhisto_to_clone+5]->Fill(prescaleHLT_Jet100U);
-#else
+      if (runNumber==191090 ||  runNumber==191367|| runNumber==191411 ||runNumber==193112 ||runNumber==193116) continue;
+
+
       HistoBtag[jmax*nhisto_to_clone+1]->Fill(HLTPrescale("HLT_Jet30"));
       HistoBtag[jmax*nhisto_to_clone+2]->Fill(HLTPrescale("HLT_Jet60"));
       HistoBtag[jmax*nhisto_to_clone+3]->Fill(HLTPrescale("HLT_Jet80"));
       HistoBtag[jmax*nhisto_to_clone+4]->Fill(HLTPrescale("HLT_Jet110"));
       HistoBtag[jmax*nhisto_to_clone+5]->Fill(HLTPrescale("HLT_Jet190"));
-#endif
     }
 
     //// IMPORTANT : TRIGGER 
     bool cut_trigger= false;
 
     UInt_t prescale=1;
-#if bTagNtupleVersion>=4
     if (JetPtthresholdsfornmu>0) {//"<0" means that we are not studying BTagMu trigger.
       UInt_t nmu=0;
-      for (int i=0; i<nJets; i++)
+      for (int i=0; i<nJets; i++){
+        
 	if (-2.4<jetEta[i] && jetEta[i]<2.4 && jetPt[i]>JetPtthresholdsfornmu) nmu++;
+	}
       if (isRealData) {
 	if ( HLTAcceptance(my_trigger_path.Data()) && nmu>1 ) {
 	  cut_trigger=true;
@@ -728,131 +684,6 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 	prescale = HLTPrescale(my_trigger_path.Data());
       }
     }
-#else
-    UInt_t nmu=0;
-    if (JetPtthresholdsfornmu>0)
-      for (int i=0; i<nJets; i++)
-	if (-2.4<jetEta[i] && jetEta[i]<2.4 && jetPt[i]>JetPtthresholdsfornmu) nmu++;
-
-    // HLT_BTagMu_DiJet20_Mu5
-    if (my_trigger_path=="HLT_BTagMu_DiJet20_Mu5") {
-      if (isRealData && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
-	if ( triggerHLT_BTagMu_DiJet20_Mu5 && nmu>1 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_BTagMu_DiJet20_Mu5;
-	}
-      }
-      else if ( nmu>1 ) cut_trigger=true;// APPLIED ON MC
-    }
-
-    // HLT_BTagMu_DiJet40_Mu5
-    if (my_trigger_path=="HLT_BTagMu_DiJet40_Mu5") {
-      if (isRealData==0 && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
-        if ( triggerHLT_BTagMu_DiJet40_Mu5 && nmu>1 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_BTagMu_DiJet40_Mu5;
-	}
-      }
-      else if ( nmu>1 ) cut_trigger=true; // APPLIED ON MC
-    }
-
-    // HLT_BTagMu_DiJet70_Mu5
-    if (my_trigger_path=="HLT_BTagMu_DiJet70_Mu5") {
-      if (isRealData==0 && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
-	if ( triggerHLT_BTagMu_DiJet70_Mu5 && nmu>1 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_BTagMu_DiJet70_Mu5;
-	}
-      }
-      else if ( nmu>1 ) cut_trigger=true; // APPLIED ON MC
-    }
-
-    // HLT_BTagMu_DiJet110_Mu5
-    if (my_trigger_path=="HLT_BTagMu_DiJet110_Mu5") {
-      if (isRealData==0 && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
-        if ( triggerHLT_BTagMu_DiJet110_Mu5 && nmu>1 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_BTagMu_DiJet110_Mu5;
-        }
-      }
-      else if (nmu>1) cut_trigger=true;// APPLIED ON MC
-    }
-
-    // HLT_BTagMu_DiJet60_Mu7
-    else if (my_trigger_path=="HLT_BTagMu_DiJet60_Mu7") {
-      if (isRealData==0 && bTagNtupleVersion>=2) { // APPLIED ON 2011 DATA
-        if ( triggerHLT_BTagMu_DiJet60_Mu7_v2 && nmu>1 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_BTagMu_DiJet60_Mu7_v2;
-        }
-      }      
-      else if ( nmu>1 ) cut_trigger=true;// APPLIED ON MC
-    }
-
-    // HLT_Jet30
-    else if (my_trigger_path=="HLT_Jet30") {
-      if (isRealData && bTagNtupleVersion>=2) { // APPLIED ON 2011 DATA
-        if ( triggerHLT_Jet30 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_Jet30;
-        }
-      }
-      else { 
-	if ( triggerHLT_Jet15U ) {
-	  cut_trigger=true; // APPLIED ON MC AND DATA 2010
-	  prescale =prescaleHLT_Jet15U;
-	}
-      }
-    }
-
-    // HLT_Jet60
-    else if (my_trigger_path=="HLT_Jet60") {
-      if (isRealData && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
-        if ( triggerHLT_Jet60 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_Jet60;
-        }
-      } 
-      else { // APPLIED ON MC AND DATA 2010
-	if ( triggerHLT_Jet30U ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_Jet30U;
-	}
-      } 
-    }
-
-    // HLT_Jet80
-    else if (my_trigger_path=="HLT_Jet80") {
-      if (isRealData && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
-	if ( triggerHLT_Jet80 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_Jet80;
-	}
-      }
-      else { // APPLIED ON MC AND DATA 2010
-	if ( triggerHLT_Jet50U ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_Jet50U;
-	}
-      }
-    }
-
-    // HLT_Jet110
-    else if (my_trigger_path=="HLT_Jet110") {
-      if (isRealData && bTagNtupleVersion>=2) {  // APPLIED ON 2011 DATA
-        if ( triggerHLT_Jet110 ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_Jet110;
-        }
-      }
-      else { // APPLIED ON MC AND DATA 2010
-        if ( triggerHLT_Jet70U ) {
-	  cut_trigger=true;
-	  prescale =prescaleHLT_Jet70U;
-        }
-      }
-    }
-#endif //endof bTagNtupleVersion<=3
 
     if (cut_trigger) {
       if (isRealData) {
@@ -860,12 +691,9 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 	HistoBtag[jmax*nhisto_to_clone+6]->Fill(prescale);
       }
       HistoBtag[jmax*nhisto_to_clone+7]->Fill(numberOfPrimaryVertices,weight);
-#if bTagNtupleVersion>3
       if (!isRealData)HistoBtag[jmax*nhisto_to_clone+8]->Fill(numberOfPrimaryVertices,weightsave*mcweight);
       else HistoBtag[jmax*nhisto_to_clone+8]->Fill(numberOfPrimaryVertices,weightsave);
-#else
-      HistoBtag[jmax*nhisto_to_clone+8]->Fill(numberOfPrimaryVertices,weightsave);
-#endif
+
 
       // FILL HERE YOUR NEW HISTO outside "j" loop
       // example :
@@ -1013,9 +841,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 
 	      // info on tracks
 	      int ntrack_jet=0;
-#if bTagNtupleVersion>=5
-          int nselectedtrack_jet=0;
-#endif
+              int nselectedtrack_jet=0;
 	      int nseltrack_jet=0;
 	      int ncutseltrack_jet=0;
 	      int n1_ip=-1;
@@ -1163,7 +989,6 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 		      sig3_ip=sig;
 		      n3_ip=k;
 		    }
-#if bTagNtupleVersion>=5
 		    if ( nselectedtrack_jet<3 && trackSelected[k] ) {
 		      if (TMath::Abs(trackDistJetAxis[k]) < 0.07 && trackDecayLength[k] < 5 && trackIP3d[k]>-99 && trackIP3dError[k]>-0.5) {  
 			HistoBtag[38+nselectedtrack_jet*3+j*nhisto_to_clone]->Fill(trackIP3d[k], weight);
@@ -1172,30 +997,12 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 		      }
 		      nselectedtrack_jet++;
 		    }
-#endif
 		  }  
 		} // end trackJetIndex
 	      } // end nTracks loop
 	      HistoBtag[9+j*nhisto_to_clone]->Fill(ntrack_jet, weight);  // ntracks_jet
 	      HistoBtag[11+j*nhisto_to_clone]->Fill(nseltrack_jet, weight); // nseltracks_jet
-#if bTagNtupleVersion<=4
-	      // IP
-	      if (TMath::Abs(IP3dDistJetAxis1[i]) < 0.07 && IP3dDecayLength1[i] < 5 && IP3d1[i]>-99 && IP3dError1[i]>-0.5) {  
-		HistoBtag[38+j*nhisto_to_clone]->Fill(IP3d1[i], weight);
-		HistoBtag[39+j*nhisto_to_clone]->Fill(IP3d1[i]/IP3dError1[i], weight);
-		HistoBtag[40+j*nhisto_to_clone]->Fill(IP3d1[i]/IP3dError1[i], weight);
-	      }
-	      if (TMath::Abs(IP3dDistJetAxis2[i]) < 0.07 && IP3dDecayLength2[i] < 5 && IP3d2[i]>-99 && IP3dError2[i]>-0.5) {  
-		HistoBtag[41+j*nhisto_to_clone]->Fill(IP3d2[i], weight);
-		HistoBtag[42+j*nhisto_to_clone]->Fill(IP3d2[i]/IP3dError2[i], weight);
-		HistoBtag[43+j*nhisto_to_clone]->Fill(IP3d2[i]/IP3dError2[i], weight);
-	      }
-	      if (TMath::Abs(IP3dDistJetAxis3[i]) < 0.07 && IP3dDecayLength3[i] < 5 && IP3d3[i]>-99 && IP3dError3[i]>-0.5) {  
-		HistoBtag[44+j*nhisto_to_clone]->Fill(IP3d3[i], weight);
-		HistoBtag[45+j*nhisto_to_clone]->Fill(IP3d3[i]/IP3dError3[i], weight);
-		HistoBtag[46+j*nhisto_to_clone]->Fill(IP3d3[i]/IP3dError3[i], weight);
-	      }
-#endif
+
 
 	      // tracks sorted by ip
 	      if (n1_ip>-1)  {
@@ -1574,7 +1381,7 @@ void Plotter::Loop(const Bool_t isRealData, const Float_t weightsave, const stri
 	} //jet cut (Pt, Eta)
       } // end loop i : Jet
     } // cut trigger
-  } // loop event
+ } // loop event
 
   clog<<"\r"<<"Calculating "<<nentries<<"/"<<nentries<<"(100/100%)"<<endl;
   TString rootfiletofill = final_dir+"/"+resultfilename+".root";
@@ -1627,83 +1434,7 @@ void Plotter::AddHisto2D(vector<TH2F*> &Histo2DB, string name, const int& j, str
 void predefinedpuweights() {
   // 499 pb-1
 #ifdef RUN_ON_JET
-    /*
-    //HLT_Jet60
-    puweight[0]=0;
-    puweight[1]=0.222754;
-    puweight[2]=0.754103;
-    puweight[3]=1.43403;
-    puweight[4]=1.85957;
-    puweight[5]=1.94963;
-    puweight[6]=1.68839;
-    puweight[7]=1.28163;
-    puweight[8]=0.884921;
-    puweight[9]=0.585522;
-    puweight[10]=0.386745;
-    puweight[11]=0.264428;
-    puweight[12]=0.192353;
-    puweight[13]=0.142132;
-    puweight[14]=0.113182;
-    puweight[15]=0.0891076;
-    puweight[16]=0.0787451;
-    puweight[17]=0.0544419;
-    puweight[18]=0.0678632;
-    puweight[19]=0.0861539;
-    puweight[20]=0;
-    puweight[21]=0;
-    */
-    puweight[0]=0.129517;
-    puweight[1]=0.311049;
-    puweight[2]=0.877493;
-    puweight[3]=1.32235;
-    puweight[4]=1.91109;
-    puweight[5]=1.81043;
-    puweight[6]=1.83934;
-    puweight[7]=1.77981;
-    puweight[8]=1.29938;
-    puweight[9]=0.8919;
-    puweight[10]=0.590799;
-    puweight[11]=0.430463;
-    puweight[12]=0.306837;
-    puweight[13]=0.255782;
-    puweight[14]=0.20193;
-    puweight[15]=0.162117;
-    puweight[16]=0.133357;
-    puweight[17]=0.0979672;
-    puweight[18]=0.0954009;
-    puweight[19]=0.133177;
-    puweight[20]=0.201325;
-    puweight[21]=0.159833;
-    puweight[22]=0.336746;
-    puweight[23]=0.0713124;
-    puweight[24]=0.0463483;
-    puweight[25]=0;
-#else
-    // BTagMu_Dijet40_Mu5
-    /*
-      puweight[0]=0;
-      puweight[1]=0.185062;
-      puweight[2]=0.684153;
-      puweight[3]=1.36635;
-      puweight[4]=1.80395;
-      puweight[5]=1.95111;
-      puweight[6]=1.71438;
-      puweight[7]=1.31984;
-      puweight[8]=0.916886;
-      puweight[9]=0.604304;
-      puweight[10]=0.403362;
-      puweight[11]=0.285383;
-      puweight[12]=0.199778;
-      puweight[13]=0.148974;
-      puweight[14]=0.110441;
-      puweight[15]=0.0930386;
-      puweight[16]=0.0717144;
-      puweight[17]=0.0708401;
-      puweight[18]=0.0359999;
-      puweight[19]=0.0434156;
-      puweight[20]=0.;
-      puweight[21]=0.;
-    */
+
     puweight[0]=0.156498;
     puweight[1]=0.348279;
     puweight[2]=0.931435;
@@ -1766,14 +1497,9 @@ int main( int argc, char* argv[] ) {
       }
 #endif
 #endif
-#if DATAYEAR == 2010
-      cout << " ----> DATA 2010" << endl;
-#ifdef RUN_ON_JET
-      Plotter yt2("/opt/sbg/cms/ui2_data2/ccollard/btagCommNtuple/V1/Jet_Run2010B-Dec22ReReco_v1_prescale/*.root");
-      yt2.Loop(true, 1., string("histo_minijet2010") ); //weight=1
-#endif
-#endif
+
     }
+
 
 #if defined(npu_probs) && defined(pudistribution_data_filename)
   for(Byte_t npu=0; npu<MAXPU+1; ++npu)
@@ -1782,14 +1508,12 @@ int main( int argc, char* argv[] ) {
   TH1D* npu_data= (TH1D*) filepuest->Get("pileup");
   npu_data->Scale(1/npu_data->Integral());//normalize to ONE
   for(Byte_t npu=0; npu<MAXPU+1; ++npu)
-    puweight[npu]=npu_data->GetBinContent(npu_data->FindBin(npu))/puweight[npu];
-#else
-#ifdef EarlyAnalysis//suppose not use anymore
-  predefinedpuweights();
-#else
+   if defined(npu_probs) && defined(pudistribution_data_filename) puweight[npu]=npu_data->GetBinContent(npu_data->FindBin(npu))/puweight[npu];
+#endif  
+#if !defined(npu_probs) && defined(pudistribution_data_filename)
+
   TH1D* npu_mc=new TH1D("pu_distribution","pu_distribution;# of PU; entries",MAXPU+1,-0.5,MAXPU+0.5);
-#endif
-#endif
+
 
   const UInt_t nSamples=sizeof(MC_Weights)/sizeof(Float_t);
   for (UInt_t iSample=0;iSample<nSamples;iSample++) 
@@ -1799,19 +1523,30 @@ int main( int argc, char* argv[] ) {
 	   ) {
 	printf(" ----> MC : %s (weight=%f)\n",MC_SampleNames[iSample],MC_Weights[iSample]);
 	Plotter mc(MC_files[iSample]);
-	#if !defined(npu_probs)
+
 	mc.PileUpDistribution(npu_mc);
-	npu_mc->Scale(1/npu_mc->Integral());
+	npu_mc->Scale(1/npu_mc->Integral());    
+	
+	
+        TFile *filepuest = new TFile(pudistribution_data_filename,"READ");
+        TH1D* npu_data= (TH1D*) filepuest->Get("pileup");
+        npu_data->Scale(1/npu_data->Integral());//normalize to ONE
+	
 	for(Byte_t npu=0; npu<MAXPU+1; ++npu) {
+	  
 	  Double_t numberofpu_mc=npu_mc->GetBinContent(npu_mc->FindBin(npu));
-	  if ( numberofpu_mc>0 ) puweight[npu]=numberofpu_mc;
-	  else puweight[npu]=0; //printf("%d:%f/%f=%f;\n",npu,npu_data->GetBinContent(npu_data->FindBin(npu)),numberofpu_mc,puweight[npu]);
+	  //if ( numberofpu_mc>0 ) puweight[npu]=numberofpu_mc;
+	  //else puweight[npu]=0; //printf("%d:%f/%f=%f;\n",npu,npu_data->GetBinContent(npu_data->FindBin(npu)),numberofpu_mc,puweight[npu]);
+	  if (numberofpu_mc!=0)puweight[npu]=npu_data->GetBinContent(npu_data->FindBin(npu))/numberofpu_mc;
+	  else numberofpu_mc=0;
 	}
-	#endif
+	
 	clog<<"Pileup weights:"<<endl;
 	for(Byte_t npu=0; npu<MAXPU+1; ++npu)
 	  clog<<Int_t(npu)<<" : "<<puweight[npu]<<endl;
 	mc.Loop(false, MC_Weights[iSample],string("histo_")+string(MC_SampleNames[iSample]));
       }
+      
+#endif
   return 0;
 }
